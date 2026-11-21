@@ -1,0 +1,240 @@
+{
+  "locales": {
+    "root": {
+      "label": "Angular",
+      "base": "/",
+      "sidebar": {
+        "/api/": [
+          {
+            "text": "API",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "API 参考",
+                "link": "/api/index"
+              }
+            ]
+          }
+        ],
+        "/": [
+          {
+            "text": "Getting Started",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "Angular 简介",
+                "link": "/intro"
+              },
+              {
+                "text": "什么是 Angular",
+                "link": "/guide/what-is-angular"
+              },
+              {
+                "text": "搭建本地环境",
+                "link": "/guide/setup-local"
+              }
+            ]
+          },
+          {
+            "text": "Tutorial",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "架构概览",
+                "link": "/guide/architecture"
+              },
+              {
+                "text": "模块简介",
+                "link": "/guide/architecture-modules"
+              },
+              {
+                "text": "组件简介",
+                "link": "/guide/architecture-components"
+              }
+            ]
+          },
+          {
+            "text": "Components",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "组件概述",
+                "link": "/guide/component-overview"
+              },
+              {
+                "text": "组件交互",
+                "link": "/guide/component-interaction"
+              },
+              {
+                "text": "生命周期钩子",
+                "link": "/guide/lifecycle-hooks"
+              }
+            ]
+          },
+          {
+            "text": "Templates",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "模板语法",
+                "link": "/guide/template-syntax"
+              },
+              {
+                "text": "插值",
+                "link": "/guide/interpolation"
+              },
+              {
+                "text": "属性绑定",
+                "link": "/guide/property-binding"
+              },
+              {
+                "text": "事件绑定",
+                "link": "/guide/event-binding"
+              }
+            ]
+          },
+          {
+            "text": "Directives",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "内置指令",
+                "link": "/guide/built-in-directives"
+              },
+              {
+                "text": "属性型指令",
+                "link": "/guide/attribute-directives"
+              },
+              {
+                "text": "结构型指令",
+                "link": "/guide/structural-directives"
+              }
+            ]
+          },
+          {
+            "text": "Dependency Injection",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "依赖注入简介",
+                "link": "/guide/dependency-injection"
+              },
+              {
+                "text": "DI 提供者",
+                "link": "/guide/dependency-injection-providers"
+              },
+              {
+                "text": "分层注入",
+                "link": "/guide/hierarchical-dependency-injection"
+              }
+            ]
+          },
+          {
+            "text": "Routing",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "路由简介",
+                "link": "/guide/router"
+              },
+              {
+                "text": "路由教程",
+                "link": "/guide/router-tutorial"
+              }
+            ]
+          },
+          {
+            "text": "Forms",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "表单简介",
+                "link": "/guide/forms-overview"
+              },
+              {
+                "text": "响应式表单",
+                "link": "/guide/reactive-forms"
+              },
+              {
+                "text": "模板驱动表单",
+                "link": "/guide/forms"
+              }
+            ]
+          },
+          {
+            "text": "HTTP Client",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "HTTP 客户端",
+                "link": "/guide/http"
+              }
+            ]
+          },
+          {
+            "text": "Testing",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "测试简介",
+                "link": "/guide/testing"
+              },
+              {
+                "text": "组件测试",
+                "link": "/guide/testing-components-basics"
+              },
+              {
+                "text": "服务测试",
+                "link": "/guide/testing-services"
+              }
+            ]
+          },
+          {
+            "text": "Developer Guides",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "国际化",
+                "link": "/guide/i18n"
+              },
+              {
+                "text": "动画",
+                "link": "/guide/animations"
+              },
+              {
+                "text": "Service Workers",
+                "link": "/guide/service-worker-intro"
+              },
+              {
+                "text": "Web Workers",
+                "link": "/guide/web-worker"
+              },
+              {
+                "text": "服务端渲染",
+                "link": "/guide/universal"
+              }
+            ]
+          },
+          {
+            "text": "Best Practices",
+            "collapsed": false,
+            "items": [
+              {
+                "text": "安全",
+                "link": "/guide/security"
+              },
+              {
+                "text": "无障碍",
+                "link": "/guide/accessibility"
+              },
+              {
+                "text": "保持更新",
+                "link": "/guide/updating"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

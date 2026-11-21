@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(ls /Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/)",
+      "Read(//Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/**)",
+      "Bash(cat > *)",
+      "Bash(rm -rf /Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/angular-docs-isharkfly/.vitepress/theme/components)",
+      "Bash(rm -f /Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/angular-docs-isharkfly/.vitepress/theme/languageSwitcher.ts)",
+      "Bash(# 更新 *)"
+    ],
+    "additionalDirectories": [
+      "/Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/angular-docs-isharkfly/.vitepress/theme",
+      "/Users/yuchenghu/Documents/WorkDir/iSharkFly/iSharkFly-Docs/angular-docs-isharkfly"
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+:root {
+  --vp-c-brand-1: #dd0031;
+  --vp-c-brand-2: #c3002f;
+  --vp-c-brand-3: #a4002b;
+  --vp-c-brand-soft: rgba(221, 0, 49, 0.14);
+}
+
+.dark {
+  --vp-c-brand-1: #f44336;
+  --vp-c-brand-2: #e53935;
+  --vp-c-brand-3: #d32f2f;
+  --vp-c-brand-soft: rgba(244, 67, 54, 0.16);
+}
+
+.docs-tabs {
+  margin: 16px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.docs-tabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.docs-tabs-bar button {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.docs-tabs-bar button.active {
+  color: var(--vp-c-brand-1);
+  border-bottom-color: var(--vp-c-brand-1);
+}
+
+.docs-tabs-panels {
+  padding: 0 16px;
+}
+
+.vp-doc img {
+  display: inline-block;
+}
