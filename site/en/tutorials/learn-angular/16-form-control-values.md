@@ -1,0 +1,67 @@
+# Getting form control value
+
+Now that your forms are set up with Angular, the next step is to access the values from the form controls.
+
+::: info NOTE
+Learn more about [adding a basic form control in the in-depth guide](/en/guide/forms/reactive-forms#adding-a-basic-form-control).
+
+:::
+
+In this activity, you'll learn how to get the value from your form input.
+
+<hr>
+
+
+
+### 1. Show the value of the input field in the template
+
+To display the input value in a template, you can use the interpolation syntax `{{}}` just like any other class property of the component:
+
+```ts
+@Component({
+  selector: 'app-user',
+  template: `
+    ...
+    <p>Framework: {{ favoriteFramework }}</p>
+    <label for="framework">
+      Favorite Framework:
+      <input id="framework" type="text" [(ngModel)]="favoriteFramework" />
+    </label>
+  `,
+})
+export class User {
+  favoriteFramework = '';
+}
+```
+
+
+### 2. Retrieve the value of an input field
+
+When you need to reference the input field value in the component class, you can do so by accessing the class property with the `this` syntax.
+
+```ts
+...
+@Component({
+  selector: 'app-user',
+  template: `
+    ...
+    <button (click)="showFramework()">Show Framework</button>
+  `,
+  ...
+})
+export class User {
+  favoriteFramework = '';
+  ...
+
+  showFramework() {
+    alert(this.favoriteFramework);
+  }
+}
+```
+
+
+
+
+Great job learning how to display the input values in your template and access them programmatically.
+
+Time to progress onto the next way of managing forms with Angular: reactive forms. If you'd like to learn more about template-driven forms, please refer to the [Angular forms documentation](/en/guide/forms/template-driven-forms).

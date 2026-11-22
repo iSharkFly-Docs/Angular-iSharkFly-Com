@@ -10,7 +10,7 @@ hero:
   actions:
     - theme: brand
       text: 快速入门
-      link: /intro
+      link: /overview
     - theme: alt
       text: API 参考
       link: /api/

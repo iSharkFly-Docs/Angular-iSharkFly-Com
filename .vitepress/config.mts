@@ -19,8 +19,10 @@ const englishSrcDir = path.join(rootDir, 'src');
 const EN_PREFIX = '/en';
 
 const zhSidebarText: Record<string, string> = {
-  'Getting Started': '入门',
-  'Tutorial': '教程',
+  'Introduction': '介绍',
+  'Essentials': '基础知识',
+  'In-depth Guides': '深入指南',
+  'Signals': 'Signals',
   'Components': '组件',
   'Templates': '模板',
   'Directives': '指令',
@@ -28,10 +30,31 @@ const zhSidebarText: Record<string, string> = {
   'Routing': '路由',
   'Forms': '表单',
   'HTTP Client': 'HTTP 客户端',
+  'Server-side & hybrid-rendering': '服务端与混合渲染',
   'Testing': '测试',
-  'Developer Guides': '开发指南',
+  'Angular Aria': 'Angular Aria',
+  'Internationalization': '国际化',
+  'Animations': '动画',
+  'Build with AI': '使用 AI 构建',
+  'Developer Tools': '开发者工具',
+  'Angular CLI': 'Angular CLI',
+  'Libraries': '库',
+  'DevTools': 'DevTools',
   'Best Practices': '最佳实践',
-  'API': 'API',
+  'Performance': '性能',
+  'Developer Events': '开发者活动',
+  'Extended Ecosystem': '扩展生态',
+  'Legacy Animations': '旧版动画',
+  'Using RxJS with Angular': '在 Angular 中使用 RxJS',
+  'Service Workers & PWAs': 'Service Worker 与 PWA',
+  'Tutorials': '教程',
+  'Reference': '参考',
+  'API Reference': 'API 参考',
+  'CLI Reference': 'CLI 参考',
+  'Error Encyclopedia': '错误百科',
+  'Extended Diagnostics': '扩展诊断',
+  'Configurations': '配置',
+  'Migrations': '迁移',
 };
 
 function enLink(link: string) {
@@ -108,8 +131,9 @@ for (const [key, locale] of Object.entries(site.locales)) {
     themeConfig: {
       ...zhThemeText,
       nav: [
-        { text: '文档', link: `${locale.base}intro`, activeMatch: `^${locale.base}(?!api/)[^/]+$` },
-        { text: '指南', link: `${locale.base}guide/what-is-angular`, activeMatch: `^${locale.base}guide/` },
+        { text: '文档', link: `${locale.base}overview`, activeMatch: `^${locale.base}(?!tutorials|api/|errors|extended-diagnostics|reference/)` },
+        { text: '教程', link: `${locale.base}tutorials`, activeMatch: `^${locale.base}tutorials` },
+        { text: '参考', link: `${locale.base}errors`, activeMatch: `^${locale.base}(errors|extended-diagnostics|reference/)` },
         { text: 'API', link: `${locale.base}api/`, activeMatch: `^${locale.base}api/` },
       ],
       sidebar: mapSidebar(locale.sidebar, link => link, text => zhSidebarText[text] ?? text),
@@ -125,8 +149,9 @@ for (const [key, locale] of Object.entries(site.locales)) {
     description: `Angular documentation`,
     themeConfig: {
       nav: [
-        { text: 'Docs', link: `${enBase}intro`, activeMatch: `^${enBase}(?!api/)[^/]+$` },
-        { text: 'Guide', link: `${enBase}guide/what-is-angular`, activeMatch: `^${enBase}guide/` },
+        { text: 'Docs', link: `${enBase}overview`, activeMatch: `^${enBase}(?!tutorials|api/|errors|extended-diagnostics|reference/)` },
+        { text: 'Tutorials', link: `${enBase}tutorials`, activeMatch: `^${enBase}tutorials` },
+        { text: 'Reference', link: `${enBase}errors`, activeMatch: `^${enBase}(errors|extended-diagnostics|reference/)` },
         { text: 'API', link: `${enBase}api/`, activeMatch: `^${enBase}api/` },
       ],
       sidebar: mapSidebar(locale.sidebar, enLink, text => text),

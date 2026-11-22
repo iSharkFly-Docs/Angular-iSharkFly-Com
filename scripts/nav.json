@@ -1,0 +1,2064 @@
+[
+  {
+    "text": "Introduction",
+    "items": [
+      {
+        "text": "What is Angular?",
+        "link": "/overview"
+      },
+      {
+        "text": "Installation",
+        "link": "/installation"
+      },
+      {
+        "text": "Essentials",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/essentials"
+          },
+          {
+            "text": "Composition with components",
+            "link": "/essentials/components"
+          },
+          {
+            "text": "Reactivity with signals",
+            "link": "/essentials/signals"
+          },
+          {
+            "text": "Dynamic interfaces with templates",
+            "link": "/essentials/templates"
+          },
+          {
+            "text": "Forms with signals",
+            "link": "/essentials/signal-forms"
+          },
+          {
+            "text": "Modular design with dependency injection",
+            "link": "/essentials/dependency-injection"
+          },
+          {
+            "text": "Next Steps",
+            "link": "/essentials/next-steps"
+          }
+        ]
+      },
+      {
+        "text": "Start coding! 🚀",
+        "link": "/tutorials/learn-angular"
+      }
+    ]
+  },
+  {
+    "text": "In-depth Guides",
+    "items": [
+      {
+        "text": "Signals",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/signals"
+          },
+          {
+            "text": "Dependent state with linkedSignal",
+            "link": "/guide/signals/linked-signal"
+          },
+          {
+            "text": "Async reactivity with resources",
+            "link": "/guide/signals/resource"
+          },
+          {
+            "text": "Debounced signals",
+            "link": "/guide/signals/debounced"
+          },
+          {
+            "text": "Side effects for non-reactives APIs",
+            "link": "/guide/signals/effect"
+          }
+        ]
+      },
+      {
+        "text": "Components",
+        "items": [
+          {
+            "text": "Anatomy of components",
+            "link": "/guide/components"
+          },
+          {
+            "text": "Selectors",
+            "link": "/guide/components/selectors"
+          },
+          {
+            "text": "Styling",
+            "link": "/guide/components/styling"
+          },
+          {
+            "text": "Accepting data with input properties",
+            "link": "/guide/components/inputs"
+          },
+          {
+            "text": "Custom events with outputs",
+            "link": "/guide/components/outputs"
+          },
+          {
+            "text": "Content projection with ng-content",
+            "link": "/guide/components/content-projection"
+          },
+          {
+            "text": "Host elements",
+            "link": "/guide/components/host-elements"
+          },
+          {
+            "text": "Lifecycle",
+            "link": "/guide/components/lifecycle"
+          },
+          {
+            "text": "Referencing component children with queries",
+            "link": "/guide/components/queries"
+          },
+          {
+            "text": "Using DOM APIs",
+            "link": "/guide/components/dom-apis"
+          },
+          {
+            "text": "Inheritance",
+            "link": "/guide/components/inheritance"
+          },
+          {
+            "text": "Programmatically rendering components",
+            "link": "/guide/components/programmatic-rendering"
+          },
+          {
+            "text": "Advanced configuration",
+            "link": "/guide/components/advanced-configuration"
+          },
+          {
+            "text": "Custom Elements",
+            "link": "/guide/elements"
+          }
+        ]
+      },
+      {
+        "text": "Templates",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/templates"
+          },
+          {
+            "text": "Binding dynamic text, properties and attributes",
+            "link": "/guide/templates/binding"
+          },
+          {
+            "text": "Adding event listeners",
+            "link": "/guide/templates/event-listeners"
+          },
+          {
+            "text": "Two-way binding",
+            "link": "/guide/templates/two-way-binding"
+          },
+          {
+            "text": "Control flow",
+            "link": "/guide/templates/control-flow"
+          },
+          {
+            "text": "Pipes",
+            "link": "/guide/templates/pipes"
+          },
+          {
+            "text": "Slotting child content with ng-content",
+            "link": "/guide/templates/ng-content"
+          },
+          {
+            "text": "Create template fragments with ng-template",
+            "link": "/guide/templates/ng-template"
+          },
+          {
+            "text": "Grouping elements with ng-container",
+            "link": "/guide/templates/ng-container"
+          },
+          {
+            "text": "Variables in templates",
+            "link": "/guide/templates/variables"
+          },
+          {
+            "text": "Deferred loading with @defer",
+            "link": "/guide/templates/defer"
+          },
+          {
+            "text": "Error boundaries with @boundary",
+            "link": "/guide/templates/error-boundaries"
+          },
+          {
+            "text": "Expression syntax",
+            "link": "/guide/templates/expression-syntax"
+          },
+          {
+            "text": "Whitespace in templates",
+            "link": "/guide/templates/whitespace"
+          }
+        ]
+      },
+      {
+        "text": "Directives",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/directives"
+          },
+          {
+            "text": "Attribute directives",
+            "link": "/guide/directives/attribute-directives"
+          },
+          {
+            "text": "Structural directives",
+            "link": "/guide/directives/structural-directives"
+          },
+          {
+            "text": "Directive composition API",
+            "link": "/guide/directives/directive-composition-api"
+          },
+          {
+            "text": "Optimizing images with NgOptimizedImage",
+            "link": "/guide/image-optimization"
+          }
+        ]
+      },
+      {
+        "text": "Dependency Injection",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/di"
+          },
+          {
+            "text": "Creating and using services",
+            "link": "/guide/di/creating-and-using-services"
+          },
+          {
+            "text": "Lazy loading services",
+            "link": "/guide/di/lazy-loading-services"
+          },
+          {
+            "text": "Defining dependency providers",
+            "link": "/guide/di/defining-dependency-providers"
+          },
+          {
+            "text": "Injection context",
+            "link": "/guide/di/dependency-injection-context"
+          },
+          {
+            "text": "Hierarchical injectors",
+            "link": "/guide/di/hierarchical-dependency-injection"
+          },
+          {
+            "text": "Optimizing injection tokens",
+            "link": "/guide/di/lightweight-injection-tokens"
+          },
+          {
+            "text": "DI in action",
+            "link": "/guide/di/di-in-action"
+          },
+          {
+            "text": "Debugging and troubleshooting DI",
+            "link": "/guide/di/debugging-and-troubleshooting-di"
+          }
+        ]
+      },
+      {
+        "text": "Routing",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/routing"
+          },
+          {
+            "text": "Define routes",
+            "link": "/guide/routing/define-routes"
+          },
+          {
+            "text": "Route Loading Strategies",
+            "link": "/guide/routing/loading-strategies"
+          },
+          {
+            "text": "Show routes with Outlets",
+            "link": "/guide/routing/show-routes-with-outlets"
+          },
+          {
+            "text": "Navigate to routes",
+            "link": "/guide/routing/navigate-to-routes"
+          },
+          {
+            "text": "Read route state",
+            "link": "/guide/routing/read-route-state"
+          },
+          {
+            "text": "Redirecting routes",
+            "link": "/guide/routing/redirecting-routes"
+          },
+          {
+            "text": "Control route access with guards",
+            "link": "/guide/routing/route-guards"
+          },
+          {
+            "text": "Route data resolvers",
+            "link": "/guide/routing/data-resolvers"
+          },
+          {
+            "text": "Data fetching with resources",
+            "link": "/guide/routing/data-fetching-with-resources"
+          },
+          {
+            "text": "Error boundaries",
+            "link": "/guide/routing/error-boundaries"
+          },
+          {
+            "text": "Lifecycle and events",
+            "link": "/guide/routing/lifecycle-and-events"
+          },
+          {
+            "text": "Testing routing and navigation",
+            "link": "/guide/routing/testing"
+          },
+          {
+            "text": "Other routing tasks",
+            "link": "/guide/routing/common-router-tasks"
+          },
+          {
+            "text": "Creating custom route matches",
+            "link": "/guide/routing/routing-with-urlmatcher"
+          },
+          {
+            "text": "Rendering strategies",
+            "link": "/guide/routing/rendering-strategies"
+          },
+          {
+            "text": "Customizing route behavior",
+            "link": "/guide/routing/customizing-route-behavior"
+          },
+          {
+            "text": "Router reference",
+            "link": "/guide/routing/router-reference"
+          },
+          {
+            "text": "Route transition animations",
+            "link": "/guide/routing/route-transition-animations"
+          }
+        ]
+      },
+      {
+        "text": "Forms",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/forms"
+          },
+          {
+            "text": "Overview",
+            "link": "/guide/forms/signals/overview"
+          },
+          {
+            "text": "Form models",
+            "link": "/guide/forms/signals/models"
+          },
+          {
+            "text": "Form model design",
+            "link": "/guide/forms/signals/model-design"
+          },
+          {
+            "text": "Field state management",
+            "link": "/guide/forms/signals/field-state-management"
+          },
+          {
+            "text": "Validation",
+            "link": "/guide/forms/signals/validation"
+          },
+          {
+            "text": "Form logic",
+            "link": "/guide/forms/signals/form-logic"
+          },
+          {
+            "text": "Cross-field logic",
+            "link": "/guide/forms/signals/cross-field-logic"
+          },
+          {
+            "text": "Form submission",
+            "link": "/guide/forms/signals/form-submission"
+          },
+          {
+            "text": "Schemas",
+            "link": "/guide/forms/signals/schemas"
+          },
+          {
+            "text": "Field metadata",
+            "link": "/guide/forms/signals/field-metadata"
+          },
+          {
+            "text": "Async operations",
+            "link": "/guide/forms/signals/async-operations"
+          },
+          {
+            "text": "Dynamic forms with JSON",
+            "link": "/guide/forms/signals/dynamic-forms-with-json"
+          },
+          {
+            "text": "Custom controls",
+            "link": "/guide/forms/signals/custom-controls"
+          },
+          {
+            "text": "Testing",
+            "link": "/guide/forms/signals/testing"
+          },
+          {
+            "text": "Comparison with other form systems",
+            "link": "/guide/forms/signals/comparison"
+          },
+          {
+            "text": "Migrating from Reactive Forms",
+            "link": "/guide/forms/signals/migration"
+          },
+          {
+            "text": "Reactive forms",
+            "link": "/guide/forms/reactive-forms"
+          },
+          {
+            "text": "Strictly typed reactive forms",
+            "link": "/guide/forms/typed-forms"
+          },
+          {
+            "text": "Template-driven forms",
+            "link": "/guide/forms/template-driven-forms"
+          },
+          {
+            "text": "Validate form input",
+            "link": "/guide/forms/form-validation"
+          },
+          {
+            "text": "Validate form input",
+            "link": "/guide/forms/form-validation"
+          },
+          {
+            "text": "Building dynamic forms",
+            "link": "/guide/forms/dynamic-forms"
+          }
+        ]
+      },
+      {
+        "text": "HTTP Client",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/http"
+          },
+          {
+            "text": "Setting up HttpClient",
+            "link": "/guide/http/setup"
+          },
+          {
+            "text": "Making requests",
+            "link": "/guide/http/making-requests"
+          },
+          {
+            "text": "Reactive data fetching with httpResource",
+            "link": "/guide/http/http-resource"
+          },
+          {
+            "text": "Intercepting requests and responses",
+            "link": "/guide/http/interceptors"
+          },
+          {
+            "text": "Testing",
+            "link": "/guide/http/testing"
+          }
+        ]
+      },
+      {
+        "text": "Server-side & hybrid-rendering",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/performance"
+          },
+          {
+            "text": "Server-side and hybrid-rendering",
+            "link": "/guide/ssr"
+          },
+          {
+            "text": "Hydration",
+            "link": "/guide/hydration"
+          },
+          {
+            "text": "Incremental Hydration",
+            "link": "/guide/incremental-hydration"
+          }
+        ]
+      },
+      {
+        "text": "Testing",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/testing"
+          },
+          {
+            "text": "Basics of testing components",
+            "link": "/guide/testing/components-basics"
+          },
+          {
+            "text": "Component testing scenarios",
+            "link": "/guide/testing/components-scenarios"
+          },
+          {
+            "text": "Testing services",
+            "link": "/guide/testing/services"
+          },
+          {
+            "text": "Testing attribute directives",
+            "link": "/guide/testing/attribute-directives"
+          },
+          {
+            "text": "Testing pipes",
+            "link": "/guide/testing/pipes"
+          },
+          {
+            "text": "Testing routing and navigation",
+            "link": "/guide/routing/testing"
+          },
+          {
+            "text": "Debugging tests",
+            "link": "/guide/testing/debugging"
+          },
+          {
+            "text": "Code coverage",
+            "link": "/guide/testing/code-coverage"
+          },
+          {
+            "text": "Testing utility APIs",
+            "link": "/guide/testing/utility-apis"
+          },
+          {
+            "text": "Component harnesses overview",
+            "link": "/guide/testing/component-harnesses-overview"
+          },
+          {
+            "text": "Using component harnesses in tests",
+            "link": "/guide/testing/using-component-harnesses"
+          },
+          {
+            "text": "Creating harnesses for your components",
+            "link": "/guide/testing/creating-component-harnesses"
+          },
+          {
+            "text": "Adding harness support for additional testing environments",
+            "link": "/guide/testing/component-harnesses-testing-environments"
+          },
+          {
+            "text": "Migrating from Karma to Vitest",
+            "link": "/guide/testing/migrating-to-vitest"
+          },
+          {
+            "text": "Testing with Karma and Jasmine",
+            "link": "/guide/testing/karma"
+          },
+          {
+            "text": "Zone.js Testing Utilities",
+            "link": "/guide/testing/zone-js-testing-utilities"
+          }
+        ]
+      },
+      {
+        "text": "Angular Aria",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/aria/overview"
+          },
+          {
+            "text": "Accordion",
+            "link": "/guide/aria/accordion"
+          },
+          {
+            "text": "Autocomplete",
+            "link": "/guide/aria/autocomplete"
+          },
+          {
+            "text": "Combobox",
+            "link": "/guide/aria/combobox"
+          },
+          {
+            "text": "Grid",
+            "link": "/guide/aria/grid"
+          },
+          {
+            "text": "Listbox",
+            "link": "/guide/aria/listbox"
+          },
+          {
+            "text": "Menu",
+            "link": "/guide/aria/menu"
+          },
+          {
+            "text": "Menubar",
+            "link": "/guide/aria/menubar"
+          },
+          {
+            "text": "Multiselect",
+            "link": "/guide/aria/multiselect"
+          },
+          {
+            "text": "Select",
+            "link": "/guide/aria/select"
+          },
+          {
+            "text": "Tabs",
+            "link": "/guide/aria/tabs"
+          },
+          {
+            "text": "Toolbar",
+            "link": "/guide/aria/toolbar"
+          },
+          {
+            "text": "Tree",
+            "link": "/guide/aria/tree"
+          }
+        ]
+      },
+      {
+        "text": "Internationalization",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/i18n"
+          },
+          {
+            "text": "Add the localize package",
+            "link": "/guide/i18n/add-package"
+          },
+          {
+            "text": "Refer to locales by ID",
+            "link": "/guide/i18n/locale-id"
+          },
+          {
+            "text": "Format data based on locale",
+            "link": "/guide/i18n/format-data-locale"
+          },
+          {
+            "text": "Prepare component for translation",
+            "link": "/guide/i18n/prepare"
+          },
+          {
+            "text": "Work with translation files",
+            "link": "/guide/i18n/translation-files"
+          },
+          {
+            "text": "Merge translations into the app",
+            "link": "/guide/i18n/merge"
+          },
+          {
+            "text": "Deploy multiple locales",
+            "link": "/guide/i18n/deploy"
+          },
+          {
+            "text": "Import global variants of the locale data",
+            "link": "/guide/i18n/import-global-variants"
+          },
+          {
+            "text": "Manage marked text with custom IDs",
+            "link": "/guide/i18n/manage-marked-text"
+          },
+          {
+            "text": "Example Angular application",
+            "link": "/guide/i18n/example"
+          }
+        ]
+      },
+      {
+        "text": "Animations",
+        "items": [
+          {
+            "text": "Enter and Leave animations",
+            "link": "/guide/animations"
+          },
+          {
+            "text": "Complex Animations with CSS",
+            "link": "/guide/animations/css"
+          },
+          {
+            "text": "Route transition animations",
+            "link": "/guide/routing/route-transition-animations"
+          }
+        ]
+      },
+      {
+        "text": "Drag and drop",
+        "link": "/guide/drag-drop"
+      }
+    ]
+  },
+  {
+    "text": "Build with AI",
+    "items": [
+      {
+        "text": "Get Started",
+        "link": "/ai"
+      },
+      {
+        "text": "LLM prompts and AI IDE setup",
+        "link": "/ai/develop-with-ai"
+      },
+      {
+        "text": "Agent Skills",
+        "link": "/ai/agent-skills"
+      },
+      {
+        "text": "Angular CLI MCP Server setup",
+        "link": "/ai/mcp"
+      },
+      {
+        "text": "Angular AI Tutor",
+        "link": "/ai/ai-tutor"
+      },
+      {
+        "text": "Design Patterns",
+        "link": "/ai/design-patterns"
+      },
+      {
+        "text": "WebMCP",
+        "link": "/ai/webmcp"
+      }
+    ]
+  },
+  {
+    "text": "Developer Tools",
+    "items": [
+      {
+        "text": "Angular CLI",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/tools/cli"
+          },
+          {
+            "text": "Local set-up",
+            "link": "/tools/cli/setup-local"
+          },
+          {
+            "text": "Building Angular apps",
+            "link": "/tools/cli/build"
+          },
+          {
+            "text": "Serving Angular apps for development",
+            "link": "/tools/cli/serve"
+          },
+          {
+            "text": "Deployment",
+            "link": "/tools/cli/deployment"
+          },
+          {
+            "text": "End-to-End Testing",
+            "link": "/tools/cli/end-to-end"
+          },
+          {
+            "text": "Migrating to new build system",
+            "link": "/tools/cli/build-system-migration"
+          },
+          {
+            "text": "Build environments",
+            "link": "/tools/cli/environments"
+          },
+          {
+            "text": "Angular CLI builders",
+            "link": "/tools/cli/cli-builder"
+          },
+          {
+            "text": "Generating code using schematics",
+            "link": "/tools/cli/schematics"
+          },
+          {
+            "text": "Authoring schematics",
+            "link": "/tools/cli/schematics-authoring"
+          },
+          {
+            "text": "Schematics for libraries",
+            "link": "/tools/cli/schematics-for-libraries"
+          },
+          {
+            "text": "Template type checking",
+            "link": "/tools/cli/template-typecheck"
+          },
+          {
+            "text": "Ahead-of-time (AOT) compilation",
+            "link": "/tools/cli/aot-compiler"
+          },
+          {
+            "text": "AOT metadata errors",
+            "link": "/tools/cli/aot-metadata-errors"
+          }
+        ]
+      },
+      {
+        "text": "Libraries",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/tools/libraries"
+          },
+          {
+            "text": "Creating Libraries",
+            "link": "/tools/libraries/creating-libraries"
+          },
+          {
+            "text": "Using Libraries",
+            "link": "/tools/libraries/using-libraries"
+          },
+          {
+            "text": "Angular Package Format",
+            "link": "/tools/libraries/angular-package-format"
+          }
+        ]
+      },
+      {
+        "text": "DevTools",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/tools/devtools"
+          },
+          {
+            "text": "Components",
+            "link": "/tools/devtools/component"
+          },
+          {
+            "text": "Profiler",
+            "link": "/tools/devtools/profiler"
+          },
+          {
+            "text": "Injectors",
+            "link": "/tools/devtools/injectors"
+          },
+          {
+            "text": "Signals",
+            "link": "/tools/devtools/signals"
+          },
+          {
+            "text": "Router Tree",
+            "link": "/tools/devtools/router"
+          }
+        ]
+      },
+      {
+        "text": "Language Service",
+        "link": "/tools/language-service"
+      }
+    ]
+  },
+  {
+    "text": "Best Practices",
+    "items": [
+      {
+        "text": "Style Guide",
+        "link": "/style-guide"
+      },
+      {
+        "text": "Security",
+        "link": "/best-practices/security"
+      },
+      {
+        "text": "Accessibility",
+        "link": "/best-practices/a11y"
+      },
+      {
+        "text": "Unhandled errors in Angular",
+        "link": "/best-practices/error-handling"
+      },
+      {
+        "text": "Performance",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/best-practices/performance"
+          },
+          {
+            "text": "Lazy-loaded routes",
+            "link": "/best-practices/performance/lazy-loaded-routes"
+          },
+          {
+            "text": "Deferred loading with @defer",
+            "link": "/best-practices/performance/defer"
+          },
+          {
+            "text": "Lazy loading services",
+            "link": "/best-practices/performance/lazy-loading-services"
+          },
+          {
+            "text": "Image optimization",
+            "link": "/best-practices/performance/image-optimization"
+          },
+          {
+            "text": "Server-side rendering",
+            "link": "/best-practices/performance/ssr"
+          },
+          {
+            "text": "Overview",
+            "link": "/best-practices/runtime-performance"
+          },
+          {
+            "text": "Zoneless",
+            "link": "/guide/zoneless"
+          },
+          {
+            "text": "Slow computations",
+            "link": "/best-practices/slow-computations"
+          },
+          {
+            "text": "Skipping component subtrees",
+            "link": "/best-practices/skipping-subtrees"
+          },
+          {
+            "text": "Zone pollution",
+            "link": "/best-practices/zone-pollution"
+          },
+          {
+            "text": "Chrome DevTools profiling",
+            "link": "/best-practices/profiling-with-chrome-devtools"
+          }
+        ]
+      },
+      {
+        "text": "Keeping up-to-date",
+        "link": "/update"
+      }
+    ]
+  },
+  {
+    "text": "Developer Events",
+    "items": [
+      {
+        "text": "Angular v22 Release",
+        "link": "/events/v22"
+      },
+      {
+        "text": "Angular v21 Release",
+        "link": "/events/v21"
+      }
+    ]
+  },
+  {
+    "text": "Extended Ecosystem",
+    "items": [
+      {
+        "text": "NgModules",
+        "link": "/guide/ngmodules/overview"
+      },
+      {
+        "text": "Legacy Animations",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/guide/legacy-animations"
+          },
+          {
+            "text": "Transition and Triggers",
+            "link": "/guide/legacy-animations/transition-and-triggers"
+          },
+          {
+            "text": "Complex Sequences",
+            "link": "/guide/legacy-animations/complex-sequences"
+          },
+          {
+            "text": "Reusable Animations",
+            "link": "/guide/legacy-animations/reusable-animations"
+          },
+          {
+            "text": "Migrating to Native CSS Animations",
+            "link": "/guide/animations/migration"
+          }
+        ]
+      },
+      {
+        "text": "Using RxJS with Angular",
+        "items": [
+          {
+            "text": "Signals interop",
+            "link": "/ecosystem/rxjs-interop"
+          },
+          {
+            "text": "Component output interop",
+            "link": "/ecosystem/rxjs-interop/output-interop"
+          },
+          {
+            "text": "Unsubscribing with takeUntilDestroyed",
+            "link": "/ecosystem/rxjs-interop/take-until-destroyed"
+          }
+        ]
+      },
+      {
+        "text": "Service Workers & PWAs",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/ecosystem/service-workers"
+          },
+          {
+            "text": "Getting started",
+            "link": "/ecosystem/service-workers/getting-started"
+          },
+          {
+            "text": "Custom service worker scripts",
+            "link": "/ecosystem/service-workers/custom-service-worker-scripts"
+          },
+          {
+            "text": "Configuration file",
+            "link": "/ecosystem/service-workers/config"
+          },
+          {
+            "text": "Communicating with the service worker",
+            "link": "/ecosystem/service-workers/communications"
+          },
+          {
+            "text": "Push notifications",
+            "link": "/ecosystem/service-workers/push-notifications"
+          },
+          {
+            "text": "Service worker devops",
+            "link": "/ecosystem/service-workers/devops"
+          },
+          {
+            "text": "App shell pattern",
+            "link": "/ecosystem/service-workers/app-shell"
+          }
+        ]
+      },
+      {
+        "text": "Web workers",
+        "link": "/ecosystem/web-workers"
+      },
+      {
+        "text": "Custom build pipeline",
+        "link": "/ecosystem/custom-build-pipeline"
+      },
+      {
+        "text": "Tailwind",
+        "link": "/guide/tailwind"
+      },
+      {
+        "text": "Angular Fire",
+        "link": "https://github.com/angular/angularfire#readme"
+      },
+      {
+        "text": "Google Maps",
+        "link": "https://github.com/angular/components/tree/main/src/google-maps#readme"
+      },
+      {
+        "text": "Google Pay",
+        "link": "https://github.com/google-pay/google-pay-button#angular"
+      },
+      {
+        "text": "YouTube player",
+        "link": "https://github.com/angular/components/blob/main/src/youtube-player/README.md"
+      },
+      {
+        "text": "Angular CDK",
+        "link": "https://material.angular.dev/cdk/categories"
+      },
+      {
+        "text": "Angular Material",
+        "link": "https://material.angular.dev/"
+      }
+    ]
+  },
+  {
+    "text": "Tutorials",
+    "items": [
+      {
+        "text": "Overview",
+        "link": "/tutorials"
+      },
+      {
+        "text": "Deferrable views tutorial",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Introduction",
+            "link": "/tutorials/deferrable-views"
+          },
+          {
+            "text": "What are deferrable views?",
+            "link": "/tutorials/deferrable-views/1-what-are-deferrable-views"
+          },
+          {
+            "text": "@loading, @error and @placeholder blocks",
+            "link": "/tutorials/deferrable-views/2-loading-error-placeholder"
+          },
+          {
+            "text": "Defer triggers",
+            "link": "/tutorials/deferrable-views/3-defer-triggers"
+          }
+        ]
+      },
+      {
+        "text": "Build your first Angular app",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Introduction",
+            "link": "/tutorials/first-app"
+          },
+          {
+            "text": "Hello world",
+            "link": "/tutorials/first-app/01-hello-world"
+          },
+          {
+            "text": "Create Home component",
+            "link": "/tutorials/first-app/02-Home"
+          },
+          {
+            "text": "Create the application’s HousingLocation component",
+            "link": "/tutorials/first-app/03-HousingLocation"
+          },
+          {
+            "text": "Creating an interface",
+            "link": "/tutorials/first-app/04-interfaces"
+          },
+          {
+            "text": "Add an input parameter to the component",
+            "link": "/tutorials/first-app/05-inputs"
+          },
+          {
+            "text": "Add a property binding to a component’s template",
+            "link": "/tutorials/first-app/06-property-binding"
+          },
+          {
+            "text": "Add an interpolation to a component’s template",
+            "link": "/tutorials/first-app/07-dynamic-template-values"
+          },
+          {
+            "text": "Use @for to list objects in component",
+            "link": "/tutorials/first-app/08-ngFor"
+          },
+          {
+            "text": "Angular services",
+            "link": "/tutorials/first-app/09-services"
+          },
+          {
+            "text": "Add routes to the application",
+            "link": "/tutorials/first-app/10-routing"
+          },
+          {
+            "text": "Integrate details page into application",
+            "link": "/tutorials/first-app/11-details-page"
+          },
+          {
+            "text": "Adding a form to your Angular app",
+            "link": "/tutorials/first-app/12-forms"
+          },
+          {
+            "text": "Add the search feature to your app",
+            "link": "/tutorials/first-app/13-search"
+          },
+          {
+            "text": "Add HTTP communication to your app",
+            "link": "/tutorials/first-app/14-http"
+          }
+        ]
+      },
+      {
+        "text": "Welcome to the Angular tutorial",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Introduction",
+            "link": "/tutorials/learn-angular"
+          },
+          {
+            "text": "Components in Angular",
+            "link": "/tutorials/learn-angular/1-components-in-angular"
+          },
+          {
+            "text": "Updating the Component Class",
+            "link": "/tutorials/learn-angular/2-updating-the-component-class"
+          },
+          {
+            "text": "Composing Components",
+            "link": "/tutorials/learn-angular/3-composing-components"
+          },
+          {
+            "text": "Control Flow in Components - @if",
+            "link": "/tutorials/learn-angular/4-control-flow-if"
+          },
+          {
+            "text": "Control Flow in Components - @for",
+            "link": "/tutorials/learn-angular/5-control-flow-for"
+          },
+          {
+            "text": "Property Binding in Angular",
+            "link": "/tutorials/learn-angular/6-property-binding"
+          },
+          {
+            "text": "Event handling",
+            "link": "/tutorials/learn-angular/7-event-handling"
+          },
+          {
+            "text": "Component input properties",
+            "link": "/tutorials/learn-angular/8-input"
+          },
+          {
+            "text": "Component output properties",
+            "link": "/tutorials/learn-angular/9-output"
+          },
+          {
+            "text": "Deferrable Views",
+            "link": "/tutorials/learn-angular/10-deferrable-views"
+          },
+          {
+            "text": "Optimizing images",
+            "link": "/tutorials/learn-angular/11-optimizing-images"
+          },
+          {
+            "text": "Routing Overview",
+            "link": "/tutorials/learn-angular/12-enable-routing"
+          },
+          {
+            "text": "Define a Route",
+            "link": "/tutorials/learn-angular/13-define-a-route"
+          },
+          {
+            "text": "Use RouterLink for Navigation",
+            "link": "/tutorials/learn-angular/14-routerLink"
+          },
+          {
+            "text": "Forms Overview",
+            "link": "/tutorials/learn-angular/15-forms"
+          },
+          {
+            "text": "Getting form control value",
+            "link": "/tutorials/learn-angular/16-form-control-values"
+          },
+          {
+            "text": "Reactive Forms",
+            "link": "/tutorials/learn-angular/17-reactive-forms"
+          },
+          {
+            "text": "Validating forms",
+            "link": "/tutorials/learn-angular/18-forms-validation"
+          },
+          {
+            "text": "Creating an injectable service",
+            "link": "/tutorials/learn-angular/19-creating-an-injectable-service"
+          },
+          {
+            "text": "Inject-based dependency injection",
+            "link": "/tutorials/learn-angular/20-inject-based-di"
+          },
+          {
+            "text": "Pipes",
+            "link": "/tutorials/learn-angular/22-pipes"
+          },
+          {
+            "text": "Formatting data with pipes",
+            "link": "/tutorials/learn-angular/23-pipes-format-data"
+          },
+          {
+            "text": "Create a custom pipe",
+            "link": "/tutorials/learn-angular/24-create-a-pipe"
+          },
+          {
+            "text": "Ready to explore more of Angular?",
+            "link": "/tutorials/learn-angular/25-next-steps"
+          }
+        ]
+      },
+      {
+        "text": "Learn Angular Signal Forms",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Introduction",
+            "link": "/tutorials/signal-forms"
+          },
+          {
+            "text": "Set up the form model",
+            "link": "/tutorials/signal-forms/1-set-up-form-model"
+          },
+          {
+            "text": "Connect your form to the template",
+            "link": "/tutorials/signal-forms/2-connect-form-template"
+          },
+          {
+            "text": "Add validation to your form",
+            "link": "/tutorials/signal-forms/3-add-validation"
+          },
+          {
+            "text": "Display validation errors",
+            "link": "/tutorials/signal-forms/4-display-errors"
+          },
+          {
+            "text": "Add form submission",
+            "link": "/tutorials/signal-forms/5-add-submission"
+          },
+          {
+            "text": "Congratulations!",
+            "link": "/tutorials/signal-forms/6-next-steps"
+          }
+        ]
+      },
+      {
+        "text": "Learn Angular signals",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Introduction",
+            "link": "/tutorials/signals"
+          },
+          {
+            "text": "Creating and updating your first signal",
+            "link": "/tutorials/signals/1-creating-your-first-signal"
+          },
+          {
+            "text": "Deriving state with computed signals",
+            "link": "/tutorials/signals/2-deriving-state-with-computed-signals"
+          },
+          {
+            "text": "Deriving state with linked signals",
+            "link": "/tutorials/signals/3-deriving-state-with-linked-signals"
+          },
+          {
+            "text": "Managing async data with signals using the Resources API",
+            "link": "/tutorials/signals/4-managing-async-data-with-signals"
+          },
+          {
+            "text": "Passing data to components with input signals",
+            "link": "/tutorials/signals/5-component-communication-with-signals"
+          },
+          {
+            "text": "Two-way binding with model signals",
+            "link": "/tutorials/signals/6-two-way-binding-with-model-signals"
+          },
+          {
+            "text": "Using signals with services",
+            "link": "/tutorials/signals/7-using-signals-with-services"
+          },
+          {
+            "text": "Using signals with directives",
+            "link": "/tutorials/signals/8-using-signals-with-directives"
+          },
+          {
+            "text": "Query child elements with signal queries",
+            "link": "/tutorials/signals/9-query-child-elements-with-signal-queries"
+          },
+          {
+            "text": "Reacting to signal changes with effect",
+            "link": "/tutorials/signals/10-reacting-to-signal-changes-with-effect"
+          },
+          {
+            "text": "Want to dive deeper into signals?",
+            "link": "/tutorials/signals/11-next-steps"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "Reference",
+    "items": [
+      {
+        "text": "Roadmap",
+        "link": "/roadmap"
+      },
+      {
+        "text": "Get involved",
+        "link": "https://github.com/angular/angular/blob/main/CONTRIBUTING.md"
+      },
+      {
+        "text": "API Reference",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/api"
+          }
+        ]
+      },
+      {
+        "text": "CLI Reference",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/cli"
+          },
+          {
+            "text": "ng add",
+            "link": "/cli/add"
+          },
+          {
+            "text": "ng analytics",
+            "items": [
+              {
+                "text": "Overview",
+                "link": "/cli/analytics"
+              },
+              {
+                "text": "disable",
+                "link": "/cli/analytics/disable"
+              },
+              {
+                "text": "enable",
+                "link": "/cli/analytics/enable"
+              },
+              {
+                "text": "info",
+                "link": "/cli/analytics/info"
+              },
+              {
+                "text": "prompt",
+                "link": "/cli/analytics/prompt"
+              }
+            ]
+          },
+          {
+            "text": "ng build",
+            "link": "/cli/build"
+          },
+          {
+            "text": "ng cache",
+            "items": [
+              {
+                "text": "Overview",
+                "link": "/cli/cache"
+              },
+              {
+                "text": "clean",
+                "link": "/cli/cache/clean"
+              },
+              {
+                "text": "disable",
+                "link": "/cli/cache/disable"
+              },
+              {
+                "text": "enable",
+                "link": "/cli/cache/enable"
+              },
+              {
+                "text": "info",
+                "link": "/cli/cache/info"
+              }
+            ]
+          },
+          {
+            "text": "ng completion",
+            "items": [
+              {
+                "text": "Overview",
+                "link": "/cli/completion"
+              },
+              {
+                "text": "script",
+                "link": "/cli/completion/script"
+              }
+            ]
+          },
+          {
+            "text": "ng config",
+            "link": "/cli/config"
+          },
+          {
+            "text": "ng deploy",
+            "link": "/cli/deploy"
+          },
+          {
+            "text": "ng e2e",
+            "link": "/cli/e2e"
+          },
+          {
+            "text": "ng extract-i18n",
+            "link": "/cli/extract-i18n"
+          },
+          {
+            "text": "ng generate",
+            "items": [
+              {
+                "text": "Overview",
+                "link": "/cli/generate"
+              },
+              {
+                "text": "ai-config",
+                "link": "/cli/generate/ai-config"
+              },
+              {
+                "text": "app-shell",
+                "link": "/cli/generate/app-shell"
+              },
+              {
+                "text": "application",
+                "link": "/cli/generate/application"
+              },
+              {
+                "text": "class",
+                "link": "/cli/generate/class"
+              },
+              {
+                "text": "component",
+                "link": "/cli/generate/component"
+              },
+              {
+                "text": "config",
+                "link": "/cli/generate/config"
+              },
+              {
+                "text": "directive",
+                "link": "/cli/generate/directive"
+              },
+              {
+                "text": "entry-point",
+                "link": "/cli/generate/entry-point"
+              },
+              {
+                "text": "enum",
+                "link": "/cli/generate/enum"
+              },
+              {
+                "text": "environments",
+                "link": "/cli/generate/environments"
+              },
+              {
+                "text": "guard",
+                "link": "/cli/generate/guard"
+              },
+              {
+                "text": "interceptor",
+                "link": "/cli/generate/interceptor"
+              },
+              {
+                "text": "interface",
+                "link": "/cli/generate/interface"
+              },
+              {
+                "text": "library",
+                "link": "/cli/generate/library"
+              },
+              {
+                "text": "module",
+                "link": "/cli/generate/module"
+              },
+              {
+                "text": "pipe",
+                "link": "/cli/generate/pipe"
+              },
+              {
+                "text": "resolver",
+                "link": "/cli/generate/resolver"
+              },
+              {
+                "text": "service-worker",
+                "link": "/cli/generate/service-worker"
+              },
+              {
+                "text": "service",
+                "link": "/cli/generate/service"
+              },
+              {
+                "text": "web-worker",
+                "link": "/cli/generate/web-worker"
+              }
+            ]
+          },
+          {
+            "text": "ng lint",
+            "link": "/cli/lint"
+          },
+          {
+            "text": "ng new",
+            "link": "/cli/new"
+          },
+          {
+            "text": "ng run",
+            "link": "/cli/run"
+          },
+          {
+            "text": "ng serve",
+            "link": "/cli/serve"
+          },
+          {
+            "text": "ng test",
+            "link": "/cli/test"
+          },
+          {
+            "text": "ng update",
+            "link": "/cli/update"
+          },
+          {
+            "text": "ng version",
+            "link": "/cli/version"
+          }
+        ]
+      },
+      {
+        "text": "Error Encyclopedia",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/errors"
+          },
+          {
+            "text": "Expression Changed After Checked",
+            "link": "/errors/NG0100"
+          },
+          {
+            "text": "Missing Control Value",
+            "link": "/errors/NG01002"
+          },
+          {
+            "text": "Missing control for formControlName",
+            "link": "/errors/NG01055"
+          },
+          {
+            "text": "Wrong Async Validator Return Type",
+            "link": "/errors/NG01101"
+          },
+          {
+            "text": "Missing value accessor",
+            "link": "/errors/NG01203"
+          },
+          {
+            "text": "NgModel in child component cannot reach parent form",
+            "link": "/errors/NG01354"
+          },
+          {
+            "text": "Orphan field in signal forms",
+            "link": "/errors/NG01902"
+          },
+          {
+            "text": "Circular Dependency in DI",
+            "link": "/errors/NG0200"
+          },
+          {
+            "text": "No Provider Found",
+            "link": "/errors/NG0201"
+          },
+          {
+            "text": "inject() must be called from an injection context",
+            "link": "/errors/NG0203"
+          },
+          {
+            "text": "Invalid Injection Token",
+            "link": "/errors/NG0204"
+          },
+          {
+            "text": "Injector has already been destroyed",
+            "link": "/errors/NG0205"
+          },
+          {
+            "text": "EnvironmentProviders in wrong context",
+            "link": "/errors/NG0207"
+          },
+          {
+            "text": "Invalid multi provider",
+            "link": "/errors/NG0209"
+          },
+          {
+            "text": "Missing Iterable Differ",
+            "link": "/errors/NG02200"
+          },
+          {
+            "text": "JSONP support in HttpClient configuration",
+            "link": "/errors/NG02800"
+          },
+          {
+            "text": "Headers not transferred by HttpTransferCache",
+            "link": "/errors/NG02802"
+          },
+          {
+            "text": "Fetch response body exceeds the configured limit",
+            "link": "/errors/NG02825"
+          },
+          {
+            "text": "Selector Collision",
+            "link": "/errors/NG0300"
+          },
+          {
+            "text": "Export Not Found",
+            "link": "/errors/NG0301"
+          },
+          {
+            "text": "Pipe Not Found",
+            "link": "/errors/NG0302"
+          },
+          {
+            "text": "Invalid style property binding value",
+            "link": "/errors/NG0318"
+          },
+          {
+            "text": "Missing Platform",
+            "link": "/errors/NG0401"
+          },
+          {
+            "text": "Bootstrapped NgModule doesn't specify which component to initialize",
+            "link": "/errors/NG0403"
+          },
+          {
+            "text": "Hydration Node Mismatch",
+            "link": "/errors/NG0500"
+          },
+          {
+            "text": "Hydration with unsupported Zone.js instance",
+            "link": "/errors/NG05000"
+          },
+          {
+            "text": "Hydration Missing Siblings",
+            "link": "/errors/NG0501"
+          },
+          {
+            "text": "Hydration Missing Node",
+            "link": "/errors/NG0502"
+          },
+          {
+            "text": "Hydration Unsupported Projection of DOM Nodes",
+            "link": "/errors/NG0503"
+          },
+          {
+            "text": "Skip hydration flag is applied to an invalid node",
+            "link": "/errors/NG0504"
+          },
+          {
+            "text": "No hydration info in server response",
+            "link": "/errors/NG0505"
+          },
+          {
+            "text": "Application remains unstable",
+            "link": "/errors/NG0506"
+          },
+          {
+            "text": "HTML content was altered after server-side rendering",
+            "link": "/errors/NG0507"
+          },
+          {
+            "text": "Hydration Missing Node on Path",
+            "link": "/errors/NG0509"
+          },
+          {
+            "text": "No event manager plugin found for event",
+            "link": "/errors/NG05101"
+          },
+          {
+            "text": "Unsupported event target",
+            "link": "/errors/NG05102"
+          },
+          {
+            "text": "Root element was not found",
+            "link": "/errors/NG05104"
+          },
+          {
+            "text": "Insertion reference node not found",
+            "link": "/errors/NG05106"
+          },
+          {
+            "text": "Hydration Missing Text",
+            "link": "/errors/NG0512"
+          },
+          {
+            "text": "Unsafe resource URL passed to DomSanitizer",
+            "link": "/errors/NG05201"
+          },
+          {
+            "text": "Suspicious URL Origin Change",
+            "link": "/errors/NG05703"
+          },
+          {
+            "text": "Signal write in a disallowed context",
+            "link": "/errors/NG0600"
+          },
+          {
+            "text": "Disallowed function call inside reactive context",
+            "link": "/errors/NG0602"
+          },
+          {
+            "text": "@defer dependencies failed to load",
+            "link": "/errors/NG0750"
+          },
+          {
+            "text": "@defer behavior when HMR is enabled",
+            "link": "/errors/NG0751"
+          },
+          {
+            "text": "Unsafe value used in a resource URL context",
+            "link": "/errors/NG0904"
+          },
+          {
+            "text": "Unsafe bindings on an element",
+            "link": "/errors/NG0910"
+          },
+          {
+            "text": "Component ID generation collision",
+            "link": "/errors/NG0912"
+          },
+          {
+            "text": "Runtime Performance Warnings",
+            "link": "/errors/NG0913"
+          },
+          {
+            "text": "Circular Dependency Detected",
+            "link": "/errors/NG0919"
+          },
+          {
+            "text": "Required input is accessed before a value is set.",
+            "link": "/errors/NG0950"
+          },
+          {
+            "text": "Child query result is required but no value is available.",
+            "link": "/errors/NG0951"
+          },
+          {
+            "text": "Track expression resulted in duplicated keys for a given collection.",
+            "link": "/errors/NG0955"
+          },
+          {
+            "text": "Tracking expression caused re-creation of the DOM structure.",
+            "link": "/errors/NG0956"
+          },
+          {
+            "text": "Collection used in @for is not iterable",
+            "link": "/errors/NG0957"
+          },
+          {
+            "text": "Resource completed before producing a value",
+            "link": "/errors/NG0991"
+          },
+          {
+            "text": "Argument Not Literal",
+            "link": "/errors/NG1001"
+          },
+          {
+            "text": "Missing Token",
+            "link": "/errors/NG2003"
+          },
+          {
+            "text": "Invalid Shadow DOM selector",
+            "link": "/errors/NG2009"
+          },
+          {
+            "text": "Import Cycle Detected",
+            "link": "/errors/NG3003"
+          },
+          {
+            "text": "NgModule.id Set to module.id anti-pattern",
+            "link": "/errors/NG6100"
+          },
+          {
+            "text": "Invalid Element",
+            "link": "/errors/NG8001"
+          },
+          {
+            "text": "Invalid Attribute",
+            "link": "/errors/NG8002"
+          },
+          {
+            "text": "Missing Reference Target",
+            "link": "/errors/NG8003"
+          },
+          {
+            "text": "Control flow preventing content projection",
+            "link": "/errors/NG8011"
+          },
+          {
+            "text": "Unsupported binding on a form field",
+            "link": "/errors/NG8022"
+          },
+          {
+            "text": "Multiple Components Match Same Element",
+            "link": "/errors/NG8023"
+          },
+          {
+            "text": "Conflicting Host Directive Binding",
+            "link": "/errors/NG8024"
+          }
+        ]
+      },
+      {
+        "text": "Extended Diagnostics",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/extended-diagnostics"
+          },
+          {
+            "text": "Defer Trigger Misconfiguration",
+            "link": "/extended-diagnostics/NG8021"
+          },
+          {
+            "text": "Invalid Banana-in-Box",
+            "link": "/extended-diagnostics/NG8101"
+          },
+          {
+            "text": "Nullish coalescing not nullable",
+            "link": "/extended-diagnostics/NG8102"
+          },
+          {
+            "text": "Missing control flow directive",
+            "link": "/extended-diagnostics/NG8103"
+          },
+          {
+            "text": "Text attribute not binding",
+            "link": "/extended-diagnostics/NG8104"
+          },
+          {
+            "text": "Missing let keyword in an *ngFor expression",
+            "link": "/extended-diagnostics/NG8105"
+          },
+          {
+            "text": "Suffix not supported",
+            "link": "/extended-diagnostics/NG8106"
+          },
+          {
+            "text": "Optional chain not nullable",
+            "link": "/extended-diagnostics/NG8107"
+          },
+          {
+            "text": "ngSkipHydration should be a static attribute",
+            "link": "/extended-diagnostics/NG8108"
+          },
+          {
+            "text": "Signals must be invoked in template interpolations.",
+            "link": "/extended-diagnostics/NG8109"
+          },
+          {
+            "text": "Functions should be invoked in event bindings.",
+            "link": "/extended-diagnostics/NG8111"
+          },
+          {
+            "text": "Unused @let declaration",
+            "link": "/extended-diagnostics/NG8112"
+          },
+          {
+            "text": "Unused Standalone Imports",
+            "link": "/extended-diagnostics/NG8113"
+          },
+          {
+            "text": "Unparenthesized Nullish Coalescing",
+            "link": "/extended-diagnostics/NG8114"
+          },
+          {
+            "text": "Uninvoked Track Function",
+            "link": "/extended-diagnostics/NG8115"
+          },
+          {
+            "text": "Missing structural directive",
+            "link": "/extended-diagnostics/NG8116"
+          },
+          {
+            "text": "Functions should be invoked in text interpolation.",
+            "link": "/extended-diagnostics/NG8117"
+          },
+          {
+            "text": "Numeric CSS property requires a unit",
+            "link": "/extended-diagnostics/NG8119"
+          }
+        ]
+      },
+      {
+        "text": "Versioning and releases",
+        "link": "/reference/releases"
+      },
+      {
+        "text": "Version compatibility",
+        "link": "/reference/versions"
+      },
+      {
+        "text": "Update guide",
+        "link": "/update-guide"
+      },
+      {
+        "text": "Configurations",
+        "items": [
+          {
+            "text": "File structure",
+            "link": "/reference/configs/file-structure"
+          },
+          {
+            "text": "Workspace configuration",
+            "link": "/reference/configs/workspace-config"
+          },
+          {
+            "text": "Angular compiler options",
+            "link": "/reference/configs/angular-compiler-options"
+          },
+          {
+            "text": "npm dependencies",
+            "link": "/reference/configs/npm-packages"
+          }
+        ]
+      },
+      {
+        "text": "Migrations",
+        "items": [
+          {
+            "text": "Overview",
+            "link": "/reference/migrations"
+          },
+          {
+            "text": "Standalone",
+            "link": "/reference/migrations/standalone"
+          },
+          {
+            "text": "Control Flow Syntax",
+            "link": "/reference/migrations/control-flow"
+          },
+          {
+            "text": "inject() Function",
+            "link": "/reference/migrations/inject-function"
+          },
+          {
+            "text": "Lazy-loaded routes",
+            "link": "/reference/migrations/route-lazy-loading"
+          },
+          {
+            "text": "Signal inputs",
+            "link": "/reference/migrations/signal-inputs"
+          },
+          {
+            "text": "Outputs",
+            "link": "/reference/migrations/outputs"
+          },
+          {
+            "text": "Signal queries",
+            "link": "/reference/migrations/signal-queries"
+          },
+          {
+            "text": "Clean up unused imports",
+            "link": "/reference/migrations/cleanup-unused-imports"
+          },
+          {
+            "text": "Self-closing tags",
+            "link": "/reference/migrations/self-closing-tags"
+          },
+          {
+            "text": "NgClass to Class",
+            "link": "/reference/migrations/ngclass-to-class"
+          },
+          {
+            "text": "NgStyle to Style",
+            "link": "/reference/migrations/ngstyle-to-style"
+          },
+          {
+            "text": "Router Testing Module Migration",
+            "link": "/reference/migrations/router-testing-module-migration"
+          },
+          {
+            "text": "CommonModule to Standalone",
+            "link": "/reference/migrations/common-to-standalone"
+          },
+          {
+            "text": "Injectable to Service",
+            "link": "/reference/migrations/injectable-to-service"
+          }
+        ]
+      },
+      {
+        "text": "Press Kit",
+        "link": "/press-kit"
+      },
+      {
+        "text": "License",
+        "link": "/license"
+      }
+    ]
+  }
+]

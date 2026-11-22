@@ -11,7 +11,7 @@ const EN_DIR = 'en';
 const ZH_TRANSLATIONS_DIR = path.join(SITE_DIR, 'i18n', 'zh');
 
 const SKIP_DIRS = new Set(['public', 'zh', EN_DIR]);
-const STATIC_PREFIXES = ['images/', 'img/', `${EN_DIR}/`];
+const STATIC_PREFIXES = ['images/', 'img/', 'assets/', `${EN_DIR}/`];
 
 function listMarkdown(dir, rel = '') {
   const files = [];
