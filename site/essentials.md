@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 基础知识 {#essentials}
 
-# Essentials
-
-A short introduction to some of Angular's main concepts.
+简要介绍 Angular 的一些主要概念。
 
 
-## Interested in Angular?
+## 对 Angular 感兴趣？ {#interested-in-angular}
 
-Welcome! This _Essentials_ guide explains some of Angular's main concepts, helping you understand what it's like to use the framework. This guide focuses on just a few building blocks as a short introduction. If you're looking for deep, comprehensive documentation, you can navigate to specific _In-depth Guides_ from the [documentation landing page](/overview).
+欢迎！这份*基础知识*指南讲解了 Angular 的一些主要概念，帮助你了解使用这个框架是什么样的体验。作为简短的入门介绍，本指南只聚焦于少数几个基本构件。如果你在寻找深入、全面的文档，可以从[文档首页](/overview)进入具体的*深入指南*。
 
-If you prefer to immediately start writing some code, you can [skip straight to the hands-on tutorial](/tutorials/learn-angular).
+如果你更想立即开始编写代码，可以[直接跳到动手教程](/tutorials/learn-angular)。
 
-### Before you start
+### 开始之前 {#before-you-start}
 
-This site expects that you're familiar with HTML, CSS and TypeScript. If you are totally new to web development, you should seek out some more introductory content before coming back here.
+本站假定你已熟悉 HTML、CSS 和 TypeScript。如果你完全是 Web 开发新手，建议先学习一些更入门的内容，然后再回到这里。
 
-In particular, you should be familiar with the following concepts:
+特别是，你应该熟悉以下概念：
 
-- [JavaScript Classes](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Classes)
-- [TypeScript fundamentals](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
-- [TypeScript Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html)
+- [JavaScript 类](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Classes)
+- [TypeScript 基础](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
+- [TypeScript 装饰器](https://www.typescriptlang.org/docs/handbook/decorators.html)
 
-## Next Step
+## 下一步 {#next-step}
 
-Ready to jump in? It's time to learn about components in Angular!
+准备好开始了吗？是时候学习 Angular 中的组件（Component）了！
 
-- [Composing with Components](/essentials/components)
+- [使用组件进行组合](/essentials/components)
 

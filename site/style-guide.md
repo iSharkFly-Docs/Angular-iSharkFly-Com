@@ -1,88 +1,83 @@
----
-untranslated: true
----
+# Angular 编码风格指南 {#angular-coding-style-guide}
 
-# Angular coding style guide
+## 简介 {#introduction}
 
-## Introduction
+本指南涵盖了 Angular 应用代码的一系列风格约定。这些建议并不是 Angular 正常运行所必需的，
+而是确立了一套编码实践，以促进整个 Angular 生态系统的一致性。一套一致的实践能让共享
+代码以及在不同项目之间切换变得更容易。
 
-This guide covers a range of style conventions for Angular application code. These recommendations
-are not required for Angular to work, but instead establish a set of coding practices that promote
-consistency across the Angular ecosystem. A consistent set of practices makes it easier to share
-code and move between projects.
+本指南*不*涵盖 TypeScript 或与 Angular 无关的通用编码实践。关于
+TypeScript，请参阅
+[Google 的 TypeScript 风格指南](https://google.github.io/styleguide/tsguide.html)。
 
-This guide does _not_ cover TypeScript or general coding practices unrelated to Angular. For
-TypeScript, check
-out [Google's TypeScript style guide](https://google.github.io/styleguide/tsguide.html).
+### 拿不准时，优先保持一致 {#when-in-doubt-prefer-consistency}
 
-### When in doubt, prefer consistency
+每当遇到这些规则与某个特定文件的风格相冲突的情况时，
+应优先保持文件内部的一致性。在单个文件中混用不同的风格约定，
+比偏离本指南的建议造成的混乱更大。
 
-Whenever you encounter a situation in which these rules contradict the style of a particular file,
-prioritize maintaining consistency within a file. Mixing different style conventions in a single
-file creates more confusion than diverging from the recommendations in this guide.
+## 命名 {#naming}
 
-## Naming
+### 用连字符分隔文件名中的单词 {#separate-words-in-file-names-with-hyphens}
 
-### Separate words in file names with hyphens
+用连字符（`-`）分隔文件名中的单词。例如，名为 `UserProfile` 的组件（Component）
+的文件名为 `user-profile.ts`。
 
-Separate words within a file name with hyphens (`-`). For example, a component named `UserProfile`
-has a file name `user-profile.ts`.
+### 测试文件使用相同的名称，并以 `.spec` 结尾 {#use-the-same-name-for-a-file-s-tests-with-spec-at-the-end}
 
-### Use the same name for a file's tests with `.spec` at the end
+单元测试的文件名以 `.spec.ts` 结尾。例如，
+`UserProfile` 组件的单元测试文件名为 `user-profile.spec.ts`。
 
-For unit tests, end file names with `.spec.ts`. For example, the unit test file for
-the `UserProfile` component has the file name `user-profile.spec.ts`.
+### 文件名与其中的 TypeScript 标识符相匹配 {#match-file-names-to-the-typescript-identifier-within}
 
-### Match file names to the TypeScript identifier within
+文件名通常应描述文件中代码的内容。当文件包含一个
+TypeScript 类时，文件名应体现该类的名称。例如，包含
+名为 `UserProfile` 的组件的文件命名为 `user-profile.ts`。
 
-File names should generally describe the contents of the code in the file. When the file contains a
-TypeScript class, the file name should reflect that class name. For example, a file containing a
-component named `UserProfile` has the name `user-profile.ts`.
+如果文件包含不止一个主要的可命名标识符，请选择一个能描述其中代码共同主题的名称。
+如果文件中的代码不属于同一个共同主题或功能领域，
+请考虑将代码拆分到不同的文件中。避免使用过于宽泛的文件名，
+例如 `helpers.ts`、`utils.ts` 或 `common.ts`。
 
-If the file contains more than one primary namable identifier, choose a name that describes the
-common theme to the code within. If the code in a file does not fit within a common theme or feature
-area, consider breaking the code up into different files. Avoid overly generic file names
-like `helpers.ts`, `utils.ts`, or `common.ts`.
+### 组件的 TypeScript、模板和样式使用相同的文件名 {#use-the-same-file-name-for-a-component-s-typescript-template-and-styles}
 
-### Use the same file name for a component's TypeScript, template, and styles
+组件通常由一个 TypeScript 文件、一个模板（Template）文件和一个样式文件组成。这些
+文件应使用相同的名称和不同的文件扩展名。例如，`UserProfile`
+组件可以包含 `user-profile.ts`、`user-profile.html` 和 `user-profile.css` 这几个文件。
 
-Components typically consist of one TypeScript file, one template file, and one style file. These
-files should share the same name with different file extensions. For example, a `UserProfile`
-component can have the files `user-profile.ts`, `user-profile.html`, and `user-profile.css`.
+如果组件有不止一个样式文件，请在名称后追加额外的单词，用来描述
+该文件特有的样式。例如，`UserProfile` 可能有
+`user-profile-settings.css` 和 `user-profile-subscription.css` 两个样式文件。
 
-If a component has more than one style file, append the name with additional words that describe the
-styles specific to that file. For example, `UserProfile` might have style
-files `user-profile-settings.css` and `user-profile-subscription.css`.
+## 项目结构 {#project-structure}
 
-## Project structure
+### 应用的所有代码都放在名为 `src` 的目录中 {#all-the-application-s-code-goes-in-a-directory-named-src}
 
-### All the application's code goes in a directory named `src`
+你所有的 Angular UI 代码（TypeScript、HTML 和样式）都应放在一个
+名为 `src` 的目录中。与 UI 无关的代码，例如配置文件或脚本，应放在
+`src` 目录之外。
 
-All of your Angular UI code (TypeScript, HTML, and styles) should live inside a directory
-named `src`. Code that's not related to UI, such as configuration files or scripts, should live
-outside the `src` directory.
+这能让不同 Angular 项目的应用根目录保持一致，并在项目中的
+UI 代码与其他代码之间形成清晰的分隔。
 
-This keeps the root application directory consistent between different Angular projects and creates
-a clear separation between UI code and other code in your project.
+### 在 `src` 目录下直接创建名为 `main.ts` 的文件来引导应用 {#bootstrap-your-application-in-a-file-named-main-ts-directly-inside-src}
 
-### Bootstrap your application in a file named `main.ts` directly inside `src`
+启动（或称**引导**）Angular 应用的代码应始终放在一个
+名为 `main.ts` 的文件中。它代表应用的主入口点。
 
-The code to start up, or **bootstrap**, an Angular application should always live in a file
-named `main.ts`. This represents the primary entry point to the application.
+### 将密切相关的文件放在同一个目录中 {#group-closely-related-files-together-in-the-same-directory}
 
-### Group closely related files together in the same directory
+Angular 组件由一个 TypeScript 文件以及可选的一个模板文件和一个或多个样式
+文件组成。你应该把它们放在同一个目录中。
 
-Angular components consist of a TypeScript file and, optionally, a template and one or more style
-files. You should group these together in the same directory.
+单元测试应与被测代码放在同一个目录中。避免将互不相关的
+测试集中到单个 `tests` 目录中。
 
-Unit tests should live in the same directory as the code-under-test. Avoid collecting unrelated
-tests into a single `tests` directory.
+### 按功能领域组织项目 {#organize-your-project-by-feature-areas}
 
-### Organize your project by feature areas
-
-Organize your project into subdirectories based on the features of your application or common themes
-to the code in those directories. For example, the project structure for a movie theater site,
-MovieReel, might look like this:
+根据应用的功能或目录中代码的共同主题，将项目组织成多个子目录。
+例如，一个名为 MovieReel 的电影院网站，
+其项目结构可能如下所示：
 
 ```
 src/
@@ -95,89 +90,88 @@ src/
 │ │ ├─ purchase-confirmation/
 ```
 
-Avoid creating subdirectories based on the type of code that lives in those directories. For
-example, avoid creating directories like `components`, `directives`, and `services`.
+避免根据目录中代码的类型来创建子目录。例如，
+避免创建 `components`、`directives` 和 `services` 这样的目录。
 
-Avoid putting so many files into one directory that it becomes hard to read or navigate. As the
-number of files in a directory grows, consider splitting further into additional sub-directories.
+避免在一个目录中放入过多文件，以至于难以阅读或浏览。随着
+目录中文件数量的增长，请考虑进一步拆分为更多的子目录。
 
-### One concept per file
+### 每个文件一个概念 {#one-concept-per-file}
 
-Prefer focusing source files on a single _concept_. For Angular classes specifically, this usually
-means one component, directive, or service per file. However, it's okay if a file contains more than
-one component or directive if your classes are relatively small and they tie together as part of a
-single concept.
+源文件最好专注于单一*概念*。具体到 Angular 类，这通常
+意味着每个文件一个组件、指令（Directive）或服务（Service）。不过，如果你的类相对较小，
+并且它们共同构成同一个概念的一部分，那么一个文件包含不止
+一个组件或指令也是可以的。
 
-When in doubt, go with the approach that leads to smaller files.
+拿不准时，选择能让文件更小的方式。
 
-## Dependency injection
+## 依赖注入 {#dependency-injection}
 
-### Prefer the `inject` function over constructor parameter injection
+### 优先使用 `inject` 函数，而不是构造函数参数注入 {#prefer-the-inject-function-over-constructor-parameter-injection}
 
-Prefer using the [`inject`](https://angular.dev/api/core/inject) function over injecting constructor parameters. The [`inject`](https://angular.dev/api/core/inject) function works the same way as constructor parameter injection, but offers several style advantages:
+优先使用 [`inject`](https://angular.dev/api/core/inject) 函数，而不是注入构造函数参数。[`inject`](https://angular.dev/api/core/inject) 函数的工作方式与构造函数参数注入相同，但在风格上有以下几个优势：
 
-- [`inject`](https://angular.dev/api/core/inject) is generally more readable, especially when a class injects many dependencies.
-- It's more syntactically straightforward to add comments to injected dependencies
-- [`inject`](https://angular.dev/api/core/inject) offers better type inference.
-- When targeting ES2022+ with [`useDefineForClassFields`](https://www.typescriptlang.org/tsconfig/#useDefineForClassFields), you can avoid separating field declaration and initialization when fields read on injected dependencies.
+- [`inject`](https://angular.dev/api/core/inject) 通常可读性更好，尤其是当一个类注入很多依赖时。
+- 为注入的依赖添加注释在语法上更直接
+- [`inject`](https://angular.dev/api/core/inject) 提供更好的类型推断。
+- 当以 ES2022+ 为目标并启用 [`useDefineForClassFields`](https://www.typescriptlang.org/tsconfig/#useDefineForClassFields) 时，如果字段需要读取注入的依赖，你可以避免将字段声明与初始化分开。
 
-[You can refactor existing code to `inject` with an automatic tool](/reference/migrations/inject-function).
+[你可以使用自动化工具将现有代码重构为使用 `inject`](/reference/migrations/inject-function)。
 
-## Components and directives
+## 组件和指令 {#components-and-directives}
 
-### Choosing component selectors
+### 选择组件选择器 {#choosing-component-selectors}
 
-See
-the [Components guide for details on choosing component selectors](/guide/components/selectors#choosing-a-selector).
+请参阅
+[组件指南中关于选择组件选择器的详细说明](/guide/components/selectors#choosing-a-selector)。
 
-### Naming component and directive members
+### 组件和指令成员的命名 {#naming-component-and-directive-members}
 
-See the Components guide for details
-on [naming input properties](/guide/components/inputs#choosing-input-names)
-and [naming output properties](/guide/components/outputs#choosing-event-names).
+请参阅组件指南中关于
+[输入属性命名](/guide/components/inputs#choosing-input-names)
+和[输出属性命名](/guide/components/outputs#choosing-event-names)的详细说明。
 
-### Choosing directive selectors
+### 选择指令选择器 {#choosing-directive-selectors}
 
-Directives should use the
-same [application-specific prefix](/guide/components/selectors#selector-prefixes)
-as your components.
+指令应使用与组件
+相同的[应用专属前缀](/guide/components/selectors#selector-prefixes)。
 
-When using an attribute selector for a directive, use a camelCase attribute name. For example, if
-your application is named "MovieReel" and you build a directive that adds a tooltip to an element,
-you might use the selector `[mrTooltip]`.
+为指令使用属性选择器时，请使用 camelCase 形式的属性名。例如，如果
+你的应用名为 "MovieReel"，而你构建了一个为元素添加工具提示的指令，
+可以使用选择器 `[mrTooltip]`。
 
-### Group Angular-specific properties before methods
+### 将 Angular 特有的属性放在方法之前 {#group-angular-specific-properties-before-methods}
 
-Components and directives should group Angular-specific properties together, typically near the top
-of the class declaration. This includes injected dependencies, inputs, outputs, and queries. Define
-these and other properties before the class's methods.
+组件和指令应将 Angular 特有的属性集中在一起，通常放在
+类声明的顶部附近。这包括注入的依赖、输入、输出和查询。请在
+类的方法之前定义这些属性以及其他属性。
 
-This practice makes it easier to find the class's template APIs and dependencies.
+这种做法能让人更容易找到类的模板 API 和依赖。
 
-### Keep components and directives focused on presentation
+### 让组件和指令专注于展示 {#keep-components-and-directives-focused-on-presentation}
 
-Code inside your components and directives should generally relate to the UI shown on the page. For
-code that makes sense on its own, decoupled from the UI, prefer refactoring to other files. For
-example, you can factor form validation rules or data transformations into separate functions or
-classes.
+组件和指令中的代码通常应与页面上显示的 UI 相关。对于
+能够脱离 UI 独立存在的代码，最好将其重构到其他文件中。例如，
+你可以把表单验证规则或数据转换提取为单独的函数或
+类。
 
-### Avoid overly complex logic in templates
+### 避免在模板中编写过于复杂的逻辑 {#avoid-overly-complex-logic-in-templates}
 
-Angular templates are designed to
-accommodate [JavaScript-like expressions](/guide/templates/expression-syntax).
-You should take advantage of these expressions to capture relatively straightforward logic directly
-in template expressions.
+Angular 模板被设计为
+支持[类似 JavaScript 的表达式](/guide/templates/expression-syntax)。
+你应该利用这些表达式，直接在模板表达式中表达
+相对简单的逻辑。
 
-When the code in a template gets too complex, though, refactor logic into the TypeScript code (typically with a [computed](/guide/signals#computed-signals)).
+不过，当模板中的代码变得过于复杂时，请将逻辑重构到 TypeScript 代码中（通常使用 [computed](/guide/signals#computed-signals)）。
 
-There's no one hard-and-fast rule that determines what constitutes "complex". Use your best
-judgement.
+并没有一条硬性规定来界定什么才算「复杂」。请根据你的最佳
+判断来决定。
 
-### Use `protected` on class members that are only used by a component's template
+### 对仅由组件模板使用的类成员使用 `protected` {#use-protected-on-class-members-that-are-only-used-by-a-component-s-template}
 
-A component class's public members intrinsically define a public API that's accessible via
-dependency injection and [queries](/guide/components/queries). Prefer `protected`
-access for any members that are meant to be read from the component's template.
+组件类的公共成员本质上定义了一个公共 API，可以通过
+依赖注入（Dependency Injection）和[查询](/guide/components/queries)访问。对于要从组件模板中读取的成员，
+最好使用 `protected` 访问修饰符。
 
 ```ts
 @Component({
@@ -188,16 +182,16 @@ export class UserProfile {
   firstName = input();
   lastName = input();
 
-// `fullName` is not part of the component's public API, but is used in the template.
+// `fullName` 不属于组件的公共 API，但会在模板中使用。
   protected fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
 }
 ```
 
-### Use `readonly` for properties that shouldn't change
+### 对不应改变的属性使用 `readonly` {#use-readonly-for-properties-that-shouldn-t-change}
 
-Mark component and directive properties initialized by Angular as `readonly`. This includes
-properties initialized by `input`, `model`, `output`, and queries. The readonly access modifier
-ensures that the value set by Angular is not overwritten.
+将由 Angular 初始化的组件和指令属性标记为 `readonly`。这包括
+由 `input`、`model`、`output` 和查询初始化的属性。readonly 访问修饰符
+可确保 Angular 设置的值不会被覆盖。
 
 ```ts
 @Component(/* ... */)
@@ -208,8 +202,8 @@ export class UserProfile {
 }
 ```
 
-For components and directives that use the decorator-based `@Input`, `@Output`, and query APIs, this
-advice applies to output properties and queries, but not input properties.
+对于使用基于装饰器的 `@Input`、`@Output` 和查询 API 的组件和指令，这条
+建议适用于输出属性和查询，但不适用于输入属性。
 
 ```ts
 @Component(/* ... */)
@@ -219,14 +213,14 @@ export class UserProfile {
 }
 ```
 
-### Prefer `class` and `style` over `ngClass` and `ngStyle`
+### 优先使用 `class` 和 `style`，而不是 `ngClass` 和 `ngStyle` {#prefer-class-and-style-over-ngclass-and-ngstyle}
 
-Prefer `class` and `style` bindings over using the [`NgClass`](https://angular.dev/api/common/NgClass) and [`NgStyle`](https://angular.dev/api/common/NgStyle) directives.
+优先使用 `class` 和 `style` 绑定，而不是 [`NgClass`](https://angular.dev/api/common/NgClass) 和 [`NgStyle`](https://angular.dev/api/common/NgStyle) 指令。
 
 ```html
 <div [class.admin]="isAdmin" [class.dense]="density === 'high'">
   <div [style.color]="textColor" [style.background-color]="backgroundColor">
-    <!-- OR -->
+    <!-- 或者 -->
     <div [class]="{admin: isAdmin, dense: density === 'high'}">
       <div [style]="{'color': textColor, 'background-color': backgroundColor}"></div>
     </div>
@@ -240,18 +234,18 @@ Prefer `class` and `style` bindings over using the [`NgClass`](https://angular.d
 </div>
 ```
 
-Both `class` and `style` bindings use a more straightforward syntax that aligns closely with
-standard HTML attributes. This makes your templates easier to read and understand, especially for
-developers familiar with basic HTML.
+`class` 和 `style` 绑定使用的语法都更直观，与
+标准 HTML 属性非常接近。这能让你的模板更易于阅读和理解，尤其是对于
+熟悉基础 HTML 的开发者。
 
-Additionally, the `NgClass` and `NgStyle` directives incur an additional performance cost compared
-to the built-in `class` and `style` binding syntax.
+此外，与内置的 `class` 和 `style` 绑定语法相比，`NgClass` 和 `NgStyle` 指令
+会带来额外的性能开销。
 
-For more details, refer to the [bindings guide](/guide/templates/binding#css-class-and-style-property-bindings)
+更多详情，请参阅[绑定指南](/guide/templates/binding#css-class-and-style-property-bindings)
 
-### Name event handlers for what they _do_, not for the triggering event
+### 按事件处理器所*做的事*来命名，而不是按触发事件命名 {#name-event-handlers-for-what-they-do-not-for-the-triggering-event}
 
-Prefer naming event handlers for the action they perform rather than for the triggering event:
+事件处理器最好按其执行的操作来命名，而不是按触发事件来命名：
 
 ```html
 <button (click)="saveUserData()">Save</button>
@@ -261,18 +255,17 @@ Prefer naming event handlers for the action they perform rather than for the tri
 <button (click)="handleClick()">Save</button>
 ```
 
-Using meaningful names like this makes it easier to tell what an event does from reading the
-template.
+使用这样有意义的名称，在阅读模板时就能更容易看出某个事件做了什么。
 
-For keyboard events, you can use Angular's key event modifiers with specific handler names:
+对于键盘事件，你可以将 Angular 的按键事件修饰符与具体的处理器名称结合使用：
 
 ```html
 <textarea (keydown.control.enter)="commitNotes()" (keydown.control.space)="showSuggestions()">
 ```
 
-Sometimes, event handling logic is especially long or complex, making it impractical to declare a
-single well-named handler. In these cases, it's fine to fall back to a name like 'handleKeydown' and
-then delegate to more specific behaviors based on the event details:
+有时，事件处理逻辑特别长或特别复杂，导致无法只声明
+一个命名恰当的处理器。在这种情况下，可以退而使用 'handleKeydown' 这样的名称，
+然后根据事件详情委托给更具体的行为：
 
 ```ts
 @Component(/* ... */)
@@ -290,12 +283,12 @@ class RichText {
 }
 ```
 
-### Keep lifecycle methods simple
+### 保持生命周期方法简洁 {#keep-lifecycle-methods-simple}
 
-Avoid putting long or complex logic inside lifecycle hooks like `ngOnInit`. Instead, prefer creating
-well-named methods to contain that logic and then _call those methods_ in your lifecycle hooks.
-Lifecycle hook names describe _when_ they run, meaning that the code inside doesn't have a
-meaningful name that describes what the code inside is doing.
+避免在 `ngOnInit` 等生命周期钩子（Lifecycle Hook）中放入冗长或复杂的逻辑。相反，最好创建
+命名恰当的方法来容纳这些逻辑，然后在生命周期钩子中*调用这些方法*。
+生命周期钩子的名称描述的是它们*何时*运行，这意味着其中的代码
+没有一个能描述其具体作用的有意义的名称。
 
 ```ts
 ngOnInit() {
@@ -308,21 +301,21 @@ ngOnInit() {
 ngOnInit() {
   this.logger.setMode('info');
   this.logger.monitorErrors();
-  // ...and all the rest of the code that would be unrolled from these methods.
+  // ……以及从这些方法中展开的所有其余代码。
 }
 ```
 
-### Use lifecycle hook interfaces
+### 使用生命周期钩子接口 {#use-lifecycle-hook-interfaces}
 
-Angular provides a TypeScript interface for each lifecycle method. When adding a lifecycle hook to
-your class, import and `implement` these interfaces to ensure that the methods are named correctly.
+Angular 为每个生命周期方法都提供了一个 TypeScript 接口。为类添加生命周期钩子时，
+请导入并 `implement` 这些接口，以确保方法名称正确。
 
 ```ts
 import {Component, OnInit} from '@angular/core';
 
 @Component(/* ... */)
 export class UserProfile implements OnInit {
-  // The `OnInit` interface ensures this method is named correctly.
+  // `OnInit` 接口可确保此方法的名称正确。
   ngOnInit() {
     /* ... */
   }

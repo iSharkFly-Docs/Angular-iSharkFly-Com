@@ -1,24 +1,20 @@
----
-untranslated: true
----
+# 依赖注入 {#dependency-injection}
 
-# Dependency Injection
-
-Reuse code and control behaviors across your application and tests.
+在应用和测试中复用代码并控制行为。
 
 
-When you need to share logic between components, Angular leverages the design pattern of [dependency injection](/guide/di) that allows you to create a “service” which allows you to inject code into components while managing it from a single source of truth.
+当你需要在组件（Component）之间共享逻辑时，Angular 利用[依赖注入（Dependency Injection）](/guide/di)设计模式，让你可以创建一个「服务（Service）」，从而将代码注入到组件中，同时从单一事实来源对其进行管理。
 
-## What are services?
+## 什么是服务？ {#what-are-services}
 
-Services are reusable pieces of code that can be injected.
+服务是可以被注入的可复用代码片段。
 
-Similar to defining a component, services are comprised of the following:
+与定义组件类似，服务由以下部分组成：
 
-- A **TypeScript decorator** that declares the class as an Angular service via `@Service` and allows you to define a service that can be accessed anywhere in your application.
-- A **TypeScript class** that defines the desired code that will be accessible when the service is injected
+- 一个 **TypeScript 装饰器**，通过 `@Service` 将该类声明为 Angular 服务，并让你定义一个可以在应用中任何地方访问的服务。
+- 一个 **TypeScript 类**，定义服务被注入后可供访问的代码
 
-Here is an example of a `Calculator` service.
+下面是一个 `Calculator` 服务的示例。
 
 ```ts
 import {Service} from '@angular/core';
@@ -31,14 +27,14 @@ export class Calculator {
 }
 ```
 
-## How to use a service
+## 如何使用服务 {#how-to-use-a-service}
 
-When you want to use a service in a component, you need to:
+当你想在组件中使用某个服务时，你需要：
 
-1. Import the service
-2. Declare a class field where the service is injected. Assign the class field to the result of the call of the built-in function [`inject`](https://angular.dev/api/core/inject) which creates the service
+1. 导入该服务
+2. 声明一个用于注入该服务的类字段。将该类字段赋值为调用内置函数 [`inject`](https://angular.dev/api/core/inject) 的结果，该函数会创建服务
 
-Here’s what it might look like in the `Receipt` component:
+下面是它在 `Receipt` 组件中的样子：
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -54,10 +50,10 @@ export class Receipt {
 }
 ```
 
-In this example, the `Calculator` is being used by calling the Angular function [`inject`](https://angular.dev/api/core/inject) and passing in the service to it.
+在这个示例中，通过调用 Angular 函数 [`inject`](https://angular.dev/api/core/inject) 并将服务传入其中来使用 `Calculator`。
 
-## Next Step
+## 下一步 {#next-step}
 
-- [Next Steps After Essentials](/essentials/next-steps)
-- [In-depth dependency injection guide](/guide/di)
+- [基础知识之后的后续步骤](/essentials/next-steps)
+- [深入依赖注入指南](/guide/di)
 

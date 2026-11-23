@@ -1,24 +1,20 @@
----
-untranslated: true
----
+# 组件 {#components}
 
-# Components
-
-The fundamental building block for creating applications in Angular.
+在 Angular 中创建应用的基本构建块。
 
 
-Components are the main building blocks of Angular applications. Each component represents a part of a larger web page. Organizing an application into components helps provide structure to your project, clearly separating code into specific parts that are easy to maintain and grow over time.
+组件（Component）是 Angular 应用的主要构建块。每个组件代表一个更大网页中的一部分。将应用组织成组件有助于为项目提供结构，把代码清晰地划分为易于维护、并能随时间不断扩展的特定部分。
 
-## Defining a component
+## 定义组件 {#defining-a-component}
 
-Every component has a few main parts:
+每个组件都包含几个主要部分：
 
-1. A `@Component` [decorator](https://www.typescriptlang.org/docs/handbook/decorators.html) that contains some configuration used by Angular.
-2. An HTML template that controls what renders into the DOM.
-3. A [CSS selector](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors) that defines how the component is used in HTML.
-4. A TypeScript class with behaviors, such as handling user input or making requests to a server.
+1. 一个 `@Component` [装饰器（Decorator）](https://www.typescriptlang.org/docs/handbook/decorators.html)，其中包含 Angular 使用的一些配置。
+2. 一个 HTML 模板（Template），用于控制渲染到 DOM 中的内容。
+3. 一个 [CSS 选择器](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors)，用于定义该组件在 HTML 中的使用方式。
+4. 一个包含行为的 TypeScript 类，例如处理用户输入或向服务器发送请求。
 
-Here is a simplified example of a `UserProfile` component.
+下面是一个 `UserProfile` 组件的简化示例。
 
 ```ts [user-profile.ts]
 @Component({
@@ -29,11 +25,11 @@ Here is a simplified example of a `UserProfile` component.
   `,
 })
 export class UserProfile {
-  /* Your component code goes here */
+  /* 你的组件代码写在这里 */
 }
 ```
 
-The `@Component` decorator also optionally accepts a `styles` property for any CSS you want to apply to your template:
+`@Component` 装饰器还可以选择性地接受一个 `styles` 属性，用于放置你想应用到模板上的 CSS：
 
 ```ts [user-profile.ts]
 @Component({
@@ -49,13 +45,13 @@ The `@Component` decorator also optionally accepts a `styles` property for any C
   `,
 })
 export class UserProfile {
-  /* Your component code goes here */
+  /* 你的组件代码写在这里 */
 }
 ```
 
-### Separating HTML and CSS into separate files
+### 将 HTML 和 CSS 拆分到单独的文件中 {#separating-html-and-css-into-separate-files}
 
-You can define a component's HTML and CSS in separate files using `templateUrl` and `styleUrl`:
+你可以使用 `templateUrl` 和 `styleUrl` 在单独的文件中定义组件的 HTML 和 CSS：
 
 ```ts [user-profile.ts]
 @Component({
@@ -64,7 +60,7 @@ You can define a component's HTML and CSS in separate files using `templateUrl` 
   styleUrl: 'user-profile.css',
 })
 export class UserProfile {
-  // Component behavior is defined in here
+  // 组件行为在这里定义
 }
 ```
 
@@ -79,9 +75,9 @@ h1 {
 }
 ```
 
-## Using components
+## 使用组件 {#using-components}
 
-You build an application by composing multiple components together. For example, if you are building a user profile page, you might break the page up into several components like this:
+你可以通过将多个组件组合在一起来构建应用。例如，如果你在构建一个用户资料页面，可能会像下面这样把页面拆分成几个组件：
 
 ```txt
 flowchart TD
@@ -92,15 +88,15 @@ flowchart TD
     D[UserAddress]
 ```
 
-Here, the `UserProfile` component uses several other components to produce the final page.
+这里，`UserProfile` 组件使用了其他几个组件来生成最终页面。
 
-To import and use a component, you need to:
+要导入并使用一个组件，你需要：
 
-1. In your component's TypeScript file, add an `import` statement for the component you want to use.
-2. In your `@Component` decorator, add an entry to the `imports` array for the component you want to use.
-3. In your component's template, add an element that matches the selector of the component you want to use.
+1. 在你的组件的 TypeScript 文件中，为要使用的组件添加一条 `import` 语句。
+2. 在你的 `@Component` 装饰器中，为要使用的组件在 `imports` 数组里添加一项。
+3. 在你的组件模板中，添加一个与要使用的组件的选择器相匹配的元素。
 
-Here's an example of a `UserProfile` component importing a `ProfilePhoto` component:
+下面是一个 `UserProfile` 组件导入 `ProfilePhoto` 组件的示例：
 
 ```ts [user-profile.ts]
 import {Component} from '@angular/core';
@@ -116,19 +112,19 @@ import {ProfilePhoto} from './profile-photo';
   `,
 })
 export class UserProfile {
-  // Component behavior is defined in here
+  // 组件行为在这里定义
 }
 ```
 
-::: tip TIP
-Want to know more about Angular components? See the [In-depth Components guide](/guide/components) for the full details.
+::: tip 提示
+想进一步了解 Angular 组件吗？完整细节请参阅[深入组件指南](/guide/components)。
 
 :::
 
-## Next Step
+## 下一步 {#next-step}
 
-Now that you know how components work in Angular, it's time to learn how we add and manage dynamic data in our application.
+现在你已经知道组件在 Angular 中如何工作，接下来该学习如何在应用中添加和管理动态数据了。
 
-- [Reactivity with signals](/essentials/signals)
-- [In-depth components guide](/guide/components)
+- [使用信号实现响应性](/essentials/signals)
+- [深入组件指南](/guide/components)
 

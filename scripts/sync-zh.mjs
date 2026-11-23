@@ -47,6 +47,79 @@ function markUntranslated(text) {
   return `---\nuntranslated: true\n---\n\n${text}`;
 }
 
+// Same algorithm as VitePress's default heading slugify.
+function slugify(str) {
+  return str.normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0000-\u001f]/g, '')
+    .replace(/[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’<>,.?/]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/^(\d)/, '_$1')
+    .toLowerCase();
+}
+
+const HEADING = /^(#{1,6})\s+(.*?)\s*$/;
+const CUSTOM_ID = /\s*\{#([^}]+)\}\s*$/;
+
+// Line indexes of ATX headings outside fenced code blocks and frontmatter.
+function headingLines(lines) {
+  const result = [];
+  let fence = null;
+  let i = 0;
+  if (lines[0]?.trim() === '---') {
+    i = lines.findIndex((line, idx) => idx > 0 && line.trim() === '---') + 1;
+  }
+  for (; i < lines.length; i++) {
+    const fenceMatch = lines[i].match(/^\s*(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      if (!fence) fence = fenceMatch[1];
+      else if (lines[i].trim().startsWith(fence)) fence = null;
+      continue;
+    }
+    if (!fence && HEADING.test(lines[i])) result.push(i);
+  }
+  return result;
+}
+
+// Plain text of a heading as rendered, which is what VitePress slugifies.
+function headingText(raw) {
+  return raw
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/`([^`]*)`/g, '$1')
+    .replace(/(\*\*|__|\*|_)(?=\S)([^*_]*?\S)\1/g, '$2')
+    .trim();
+}
+
+// Give each translated heading the English heading's id, so that #anchor links
+// written against the English text keep working on the Chinese page.
+function keepEnglishAnchors(rel, english, chinese) {
+  const enLines = english.split(/\r?\n/);
+  const zhLines = chinese.split(/\r?\n/);
+  const enHeadings = headingLines(enLines);
+  const zhHeadings = headingLines(zhLines);
+  if (enHeadings.length !== zhHeadings.length) {
+    console.warn(`[sync-zh] i18n/zh/${rel}: ${zhHeadings.length} headings vs ${enHeadings.length} in English; anchors not aligned.`);
+    return chinese;
+  }
+  const seen = new Map();
+  enHeadings.forEach((enIdx, n) => {
+    const [, , enRaw] = enLines[enIdx].match(HEADING);
+    const custom = enRaw.match(CUSTOM_ID);
+    let id = custom ? custom[1] : slugify(headingText(enRaw));
+    if (!custom) {
+      const count = seen.get(id) ?? 0;
+      seen.set(id, count + 1);
+      if (count) id = `${id}-${count}`;
+    }
+    const zhIdx = zhHeadings[n];
+    if (!CUSTOM_ID.test(zhLines[zhIdx]) && id)
+      zhLines[zhIdx] = `${zhLines[zhIdx].trimEnd()} {#${id}}`;
+  });
+  return zhLines.join('\n');
+}
+
 function write(rel, text) {
   const file = path.join(OUT_DIR, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -67,7 +140,7 @@ function main() {
 
     const translationFile = path.join(ZH_TRANSLATIONS_DIR, rel);
     if (fs.existsSync(translationFile)) {
-      write(rel, fs.readFileSync(translationFile, 'utf8'));
+      write(rel, keepEnglishAnchors(rel, english, fs.readFileSync(translationFile, 'utf8')));
       translated++;
     } else {
       write(rel, markUntranslated(english));
