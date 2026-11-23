@@ -1,15 +1,11 @@
----
-untranslated: true
----
+# 可延迟视图教程 {#deferrable-views-tutorial}
 
-# Deferrable views tutorial
+本交互式教程由多节课组成，介绍 Angular 可延迟视图（Deferrable Views）的相关概念。
 
-This interactive tutorial consists of lessons that introduce the Angular deferrable views concepts.
+## 如何使用本教程 {#how-to-use-this-tutorial}
 
-## How to use this tutorial
+每一步都代表 Angular 可延迟视图中的一个概念。你可以只做其中一步，也可以全部完成。
 
-Each step represents a concept in Angular deferrable views. You can do one, or all of them.
+如果遇到困难，请点击顶部的“Reveal answer”。
 
-If you get stuck, click "Reveal answer" at the top.
-
-Alright, let's [get started](/tutorials/deferrable-views/1-what-are-deferrable-views).
+好了，让我们[开始吧](/tutorials/deferrable-views/1-what-are-deferrable-views)。

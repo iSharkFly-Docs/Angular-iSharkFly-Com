@@ -1,39 +1,35 @@
----
-untranslated: true
----
+# 使用 @for 在组件中列出对象 {#use-for-to-list-objects-in-component}
 
-# Use @for to list objects in component
-
-This tutorial lesson demonstrates how to use `@for` block in Angular templates in order to display dynamically repeated data in a template.
+本节教程演示如何在 Angular 模板（Template）中使用 `@for` 块，以便在模板中显示动态重复的数据。
 
 <iframe src="https://www.youtube.com/embed/eM3zi_n7lNs?si=MIl5NcRxvcLjYt5f&amp;start=477" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-::: info NOTE
-This video reflects an older syntax, but the main concepts remain valid.
+::: info 注意
+该视频使用的是较旧的语法，但其中的主要概念依然适用。
 
 :::
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-- You will have added a data set to the app
-- Your app will display a list of elements from the new data set using `@for`
+- 你将为应用添加一个数据集
+- 你的应用将使用 `@for` 显示新数据集中的元素列表
 
-## Conceptual preview of `@for`
+## `@for` 概念预览 {#conceptual-preview-of-for}
 
-In Angular, `@for` is a specific type of [control flow block](/guide/templates/control-flow) used to dynamically repeat data in a template. In plain JavaScript you would use a for loop - `@for` provides similar functionality for Angular templates.
+在 Angular 中，`@for` 是一种特定类型的[控制流块（Control Flow Block）](/guide/templates/control-flow)，用于在模板中动态重复数据。在普通 JavaScript 中你会使用 for 循环，而 `@for` 为 Angular 模板提供了类似的功能。
 
-You can utilize `@for` to iterate over arrays and even asynchronous values. In this lesson, you'll add a new array of data to iterate over.
+你可以使用 `@for` 遍历数组，甚至是异步值。在本节中，你将添加一个新的数据数组用于遍历。
 
-For a more in depth explanation, please refer to the [control flow](/guide/templates/control-flow#repeat-content-with-the-for-block) guide.
+如需更深入的说明，请参阅[控制流](/guide/templates/control-flow#repeat-content-with-the-for-block)指南。
 
 
 
-### 1. Add housing data to the `Home`
+### 1. 向 `Home` 添加房屋数据 {#_1-add-housing-data-to-the-home}
 
-In the `Home` there is only a single housing location. In this step, you will add an array of `HousingLocation` entries.
+目前 `Home` 中只有一个房屋位置。在这一步中，你将添加一个由 `HousingLocation` 条目组成的数组。
 
-1. In `src/app/home/home.ts`, remove the `housingLocation` property from the `Home` class.
-1. Update the `Home` class to have a property called `housingLocationList`. Update your code to match the following code:
+1. 在 `src/app/home/home.ts` 中，从 `Home` 类里删除 `housingLocation` 属性。
+1. 更新 `Home` 类，为它添加一个名为 `housingLocationList` 的属性。将你的代码更新为如下所示：
    ```ts [Add housingLocationList property in home.ts]
    import {Component} from '@angular/core';
    import {HousingLocation} from '../housing-location/housing-location';
@@ -165,17 +161,17 @@ In the `Home` there is only a single housing location. In this step, you will ad
    }
    ```
 
-   ::: warning IMPORTANT
-   Do not remove the `@Component` decorator, you will update that code in an upcoming step.
+   ::: warning 重要
+   不要删除 `@Component` 装饰器，你将在后面的步骤中更新这段代码。
 
    :::
 
 
-### 2. Update the `Home` template to use `@for`
+### 2. 更新 `Home` 模板以使用 `@for` {#_2-update-the-home-template-to-use-for}
 
-Now the app has a dataset that you can use to display the entries in the browser using the `@for` block.
+现在应用已经有了一个数据集，你可以使用 `@for` 块在浏览器中显示这些条目。
 
-1. Update the `<app-housing-location>` tag in the template code to this:
+1. 将模板代码中的 `<app-housing-location>` 标签更新为：
    ```ts [Add @for to Home template in home.ts]
    import {Component} from '@angular/core';
    import {HousingLocation} from '../housing-location/housing-location';
@@ -307,11 +303,11 @@ Now the app has a dataset that you can use to display the entries in the browser
    }
    ```
 
-   Note, in the code `[housingLocation] = "housingLocation"` the `housingLocation` value now refers to the variable used in the `@for` block. Before this change, it referred to the property on the `Home` class.
+   注意，在代码 `[housingLocation] = "housingLocation"` 中，`housingLocation` 的值现在指的是 `@for` 块中使用的变量。在此更改之前，它指的是 `Home` 类上的属性。
 
-1. Save all changes.
+1. 保存所有更改。
 
-1. Refresh the browser and confirm that the app now renders a grid of housing locations.
+1. 刷新浏览器，确认应用现在渲染出了一个房屋位置网格。
 
 <section class="lightbox">
 <img alt="browser frame of homes-app displaying logo, filter text input box, search button and a grid of housing location cards" src="/assets/images/tutorials/first-app/homes-app-lesson-08-step-2.png">
@@ -320,16 +316,16 @@ Now the app has a dataset that you can use to display the entries in the browser
 
 
 
-::: info SUMMARY
-In this lesson, you used the `@for` block to repeat data dynamically in Angular templates. You also added a new array of data to be used in the Angular app. The application now dynamically renders a list of housing locations in the browser.
+::: info 总结
+在本节中，你使用 `@for` 块在 Angular 模板中动态重复数据，还添加了一个供 Angular 应用使用的新数据数组。现在，应用会在浏览器中动态渲染房屋位置列表。
 
 :::
 
-The app is taking shape, great job.
+应用已经初具雏形，干得好。
 
-For more information about the topics covered in this lesson, visit:
+如需进一步了解本节涉及的主题，请访问：
 
-- [Control flow blocks](/guide/templates/control-flow)
-- [@for guide](/guide/templates/control-flow#repeat-content-with-the-for-block)
+- [控制流块](/guide/templates/control-flow)
+- [@for 指南](/guide/templates/control-flow#repeat-content-with-the-for-block)
 - [@for](https://angular.dev/api/core/@for)
 

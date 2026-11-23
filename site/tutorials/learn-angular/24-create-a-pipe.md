@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 创建自定义管道 {#create-a-custom-pipe}
 
-# Create a custom pipe
+你可以在 Angular 中创建自定义管道（Pipe），以满足你的数据转换需求。
 
-You can create custom pipes in Angular to fit your data transformation needs.
-
-::: info NOTE
-Learn more about [creating custom pipes in the in-depth guide](/guide/templates/pipes#creating-custom-pipes).
+::: info 注意
+在[深入指南中了解更多关于创建自定义管道的内容](/guide/templates/pipes#creating-custom-pipes)。
 
 :::
 
-In this activity, you will create a custom pipe and use it in your template.
+在本活动中，你将创建一个自定义管道，并在模板（Template）中使用它。
 
 <hr>
 
-A pipe is a TypeScript class with a `@Pipe` decorator. Here's an example:
+管道是一个带有 `@Pipe` 装饰器的 TypeScript 类。示例如下：
 
 ```ts
 import {Pipe, PipeTransform} from '@angular/core';
@@ -30,18 +26,18 @@ export class StarPipe implements PipeTransform {
 }
 ```
 
-The `StarPipe` accepts a string value and returns that string with stars around it. Take note that:
+`StarPipe` 接收一个字符串值，并返回在其两侧加上星星的字符串。请注意：
 
-- the name in the `@Pipe` decorator configuration is what will be used in the template
-- the `transform` function is where you put your logic
+- `@Pipe` 装饰器配置中的 name 就是在模板中使用的名称
+- `transform` 函数是你编写逻辑的地方
 
-Alright, it's your turn to give this a try — you'll create the `ReversePipe`:
+好了，轮到你来试一试了——你将创建 `ReversePipe`：
 
 
 
-### 1. Create the `ReversePipe`
+### 1. 创建 `ReversePipe` {#_1-create-the-reversepipe}
 
-In `reverse.pipe.ts` add the `@Pipe` decorator to the `ReversePipe` class and provide the following configuration:
+在 `reverse.pipe.ts` 中，为 `ReversePipe` 类添加 `@Pipe` 装饰器，并提供以下配置：
 
 ```ts
 @Pipe({
@@ -50,9 +46,9 @@ In `reverse.pipe.ts` add the `@Pipe` decorator to the `ReversePipe` class and pr
 ```
 
 
-### 2. Implement the `transform` function
+### 2. 实现 `transform` 函数 {#_2-implement-the-transform-function}
 
-Now the `ReversePipe` class is a pipe. Update the `transform` function to add the reversing logic:
+现在 `ReversePipe` 类已经是一个管道了。更新 `transform` 函数，添加反转逻辑：
 
 ```ts
 export class ReversePipe implements PipeTransform {
@@ -69,9 +65,9 @@ export class ReversePipe implements PipeTransform {
 ```
 
 
-### 3. Use the `ReversePipe` in the template
+### 3. 在模板中使用 `ReversePipe` {#_3-use-the-reversepipe-in-the-template}
 
-With the pipe logic implemented, the final step is to use it in the template. In `app.ts` include the pipe in the template and add it to the component imports:
+管道逻辑实现之后，最后一步就是在模板中使用它。在 `app.ts` 中把管道加入模板，并将其添加到组件（Component）的 imports 中：
 
 ```ts
 @Component({
@@ -84,4 +80,4 @@ With the pipe logic implemented, the final step is to use it in the template. In
 
 
 
-And with that you've done it. Congratulations on completing this activity. You now know how to use pipes and even how to implement your own custom pipes.
+这样就大功告成了。恭喜你完成了本活动。现在你已经知道如何使用管道，甚至还能实现自己的自定义管道。

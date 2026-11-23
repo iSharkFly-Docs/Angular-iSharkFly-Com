@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 使用 RouterLink 进行导航 {#use-routerlink-for-navigation}
 
-# Use RouterLink for Navigation
+在应用当前的状态下，当我们点击应用内部的链接时，整个页面都会刷新。对于小型应用来说这似乎无关紧要，但对于内容更多的大型页面，这可能会带来性能问题，因为用户需要重新下载资源并再次执行计算。
 
-In the app's current state, the entire page refreshes when we click on an internal link that exists within the app. While this may not seem significant with a small app, this can have performance implications for larger pages with more content where users have to redownload assets and run calculations again.
-
-::: info NOTE
-Learn more about [adding routes to your application in the in-depth guide](/guide/routing/define-routes#adding-the-router-to-your-application).
+::: info 注意
+在[深入指南中了解更多关于为应用添加路由的内容](/guide/routing/define-routes#adding-the-router-to-your-application)。
 
 :::
 
-In this activity, you'll learn how to leverage the `RouterLink` directive to make the most use of Angular Router.
+在本活动中，你将学习如何利用 `RouterLink` 指令（Directive）来充分发挥 Angular 路由（Router）的作用。
 
 <hr>
 
 
 
-### 1. Import `RouterLink` directive
+### 1. 导入 `RouterLink` 指令 {#_1-import-routerlink-directive}
 
-In `app.ts` add the `RouterLink` directive import to the existing import statement from `@angular/router` and add it to the `imports` array of your component decorator.
+在 `app.ts` 中，把 `RouterLink` 指令添加到现有的 `@angular/router` 导入语句中，并将其添加到组件（Component）装饰器的 `imports` 数组里。
 
 ```ts
 ...
@@ -32,9 +28,9 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 ```
 
 
-### 2. Add a `routerLink` to template
+### 2. 在模板中添加 `routerLink` {#_2-add-a-routerlink-to-template}
 
-To use the `RouterLink` directive, replace the `href` attributes with `routerLink`. Update the template with this change.
+要使用 `RouterLink` 指令，请把 `href` 属性替换为 `routerLink`。按此修改更新模板（Template）。
 
 ```ts
 import { RouterLink, RouterOutlet } from '@angular/router';
@@ -54,6 +50,6 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 
 
 
-When you click on the links in the navigation now, you should not see any blinking and only the content of the page itself (i.e., `router-outlet`) being changed 🎉
+现在点击导航中的链接时，你应该不会再看到页面闪烁，只有页面本身的内容（即 `router-outlet`）会发生变化 🎉
 
-Great job learning about routing with Angular. This is just the surface of the `Router` API, to learn more check out the [Angular Router Documentation](/guide/routing).
+学习 Angular 路由，干得好。这只是 `Router` API 的冰山一角，想了解更多，请查看 [Angular 路由文档](/guide/routing)。

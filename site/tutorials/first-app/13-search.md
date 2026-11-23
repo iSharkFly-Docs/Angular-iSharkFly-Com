@@ -1,32 +1,28 @@
----
-untranslated: true
----
+# 为应用添加搜索功能 {#add-the-search-feature-to-your-app}
 
-# Add the search feature to your app
+本节教程演示如何为 Angular 应用添加搜索功能。
 
-This tutorial lesson demonstrates how to add a search functionality to your Angular app.
-
-The app will enable users to search through the data provided by your app and display only the results that match the entered term.
+该应用将允许用户搜索应用所提供的数据，并只显示与输入内容相匹配的结果。
 
 <iframe src="https://www.youtube.com/embed/5K10oYJ5Y-E?si=TiuNKx_teR9baO7k&amp;start=457" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-::: warning IMPORTANT
-We recommend using your local environment for this step of the tutorial.
+::: warning 重要
+建议你在本地环境中完成本节教程的这一步骤。
 
 :::
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-- Your app will use data from a form to search for matching housing locations
-- Your app will display only the matching housing locations
+- 你的应用将使用表单中的数据来搜索匹配的房源位置
+- 你的应用将只显示匹配的房源位置
 
 
 
-### 1. Update the home component properties
+### 1. 更新首页组件的属性 {#_1-update-the-home-component-properties}
 
-In this step, you'll update the `Home` class to store data in a new array property that you will use for filtering.
+在这一步中，你将更新 `Home` 类，把数据存储到一个新的数组属性中，用于过滤。
 
-1. In `src/app/home/home.ts`, add new property to the class called `filteredLocationList`.
+1. 在 `src/app/home/home.ts` 中，为该类添加一个名为 `filteredLocationList` 的新属性。
 
    ```ts [Add the filteredLocationList property in home.ts]
    import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -76,9 +72,9 @@ In this step, you'll update the `Home` class to store data in a new array proper
    }
    ```
 
-   The `filteredLocationList` hold the values that match the search criteria entered by the user.
+   `filteredLocationList` 保存与用户输入的搜索条件相匹配的值。
 
-1. The `filteredLocationList` should contain the total set of housing locations values by default when the page loads. Update the `constructor` for the `Home` to set the value.
+1. 页面加载时，`filteredLocationList` 默认应包含全部房源位置数据。更新 `Home` 的 `constructor` 来设置这个值。
 
    ```ts [Set the value of filteredLocationList]
    import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -129,11 +125,11 @@ In this step, you'll update the `Home` class to store data in a new array proper
    ```
 
 
-### 2. Update the home component template
+### 2. 更新首页组件的模板 {#_2-update-the-home-component-template}
 
-The `Home` already contains an input field that you will use to capture input from the user. That string text will be used to filter the results.
+`Home` 中已经包含一个输入框，你将用它来获取用户的输入。这段字符串文本将用于过滤结果。
 
-1. Update the `Home` template to include a template variable in the `input` element called `#filter`.
+1. 更新 `Home` 的模板（Template），在 `input` 元素上添加一个名为 `#filter` 的模板变量。
 
    ```ts [Add a template variable to the input HTML element in home.ts]
    import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -182,9 +178,9 @@ The `Home` already contains an input field that you will use to capture input fr
      }
    }
    ```
-   This example uses a [template reference variable](/guide/templates) to get access to the `input` element as its value.
+   本例使用[模板引用变量](/guide/templates)来访问 `input` 元素，从而获取它的值。
 
-1. Next, update the component template to attach an event handler to the "Search" button.
+1. 接下来，更新组件（Component）模板，为 "Search" 按钮绑定一个事件处理器。
 
    ```ts [Bind the button click event to a method in home.ts]
    import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -234,9 +230,9 @@ The `Home` already contains an input field that you will use to capture input fr
    }
    ```
 
-   By binding to the `click` event on the `button` element, you are able to call the `filterResults` function. The argument to the function is the `value` property of the `filter` template variable. Specifically, the `.value` property from the `input` HTML element.
+   通过绑定 `button` 元素的 `click` 事件，你就可以调用 `filterResults` 函数。该函数的参数是 `filter` 模板变量的 `value` 属性，具体来说，就是 `input` HTML 元素的 `.value` 属性。
 
-1. The last template update is to the `@for` directive. Update the `@for` to iterate over values from the `filteredLocationList` array.
+1. 最后一处模板更新是 `@for` 指令（Directive）。更新 `@for`，让它遍历 `filteredLocationList` 数组中的值。
 
    ```ts [Update the @for template directive in home.ts]
    import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -287,11 +283,11 @@ The `Home` already contains an input field that you will use to capture input fr
    ```
 
 
-### 3. Implement the event handler function
+### 3. 实现事件处理函数 {#_3-implement-the-event-handler-function}
 
-The template has been updated to bind the `filterResults` function to the `click` event. Next, your task is to implement the `filterResults` function in the `Home` class.
+模板已经更新，把 `filterResults` 函数绑定到了 `click` 事件上。接下来，你的任务是在 `Home` 类中实现 `filterResults` 函数。
 
-1.  Update the `Home` class to include the implementation of the `filterResults` function.
+1.  更新 `Home` 类，加入 `filterResults` 函数的实现。
 
     ```ts [Add the filterResults function implementation]
     import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -341,24 +337,24 @@ The template has been updated to bind the `filterResults` function to the `click
     }
     ```
 
-    This function uses the `Array` `filter` function to compare the value of the `text` parameter against the `housingLocation.city` property. You can update this function to match against any property or multiple properties for a fun exercise.
+    这个函数使用 `Array` 的 `filter` 函数，将 `text` 参数的值与 `housingLocation.city` 属性进行比较。作为一个有趣的练习，你可以修改这个函数，让它匹配任意一个或多个属性。
 
-1.  Save your code.
+1.  保存代码。
 
-1.  Refresh the browser and confirm that you can search the housing location data by city when you click the "Search" button after entering text.
+1.  刷新浏览器，确认在输入文本后点击 "Search" 按钮时，可以按城市搜索房源位置数据。
 
        <img alt="filtered search results based on user input" src="/assets/images/tutorials/first-app/homes-app-lesson-13-step-3.png">
 
 
 
 
-::: info SUMMARY
-In this lesson, you used template variables to interact with template values, and added search functionality using event binding and array functions.
+::: info 总结
+在本节中，你使用模板变量与模板中的值进行交互，并借助事件绑定和数组函数添加了搜索功能。
 
 :::
 
-For more information about the topics covered in this lesson, visit:
+如需进一步了解本节涉及的主题，请访问：
 
-- [Template Variables](/guide/templates)
-- [Event Handling](/guide/templates/event-listeners)
+- [模板变量](/guide/templates)
+- [事件处理](/guide/templates/event-listeners)
 

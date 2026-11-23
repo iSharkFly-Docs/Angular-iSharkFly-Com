@@ -1,39 +1,35 @@
----
-untranslated: true
----
+# 为应用添加 HTTP 通信 {#add-http-communication-to-your-app}
 
-# Add HTTP communication to your app
+本教程演示如何将 HTTP 和 API 集成到你的应用中。
 
-This tutorial demonstrates how to integrate HTTP and an API into your app.
-
-Up until this point your app has read data from a static array in an Angular service. The next step is to use a JSON server that your app will communicate with over HTTP. The HTTP request will simulate the experience of working with data from a server.
+到目前为止，你的应用一直从 Angular 服务（Service）中的静态数组读取数据。下一步是使用一个 JSON 服务器，让应用通过 HTTP 与它通信。这个 HTTP 请求将模拟从服务器获取数据的体验。
 
 <iframe src="https://www.youtube.com/embed/5K10oYJ5Y-E?si=TiuNKx_teR9baO7k" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-::: warning IMPORTANT
-We recommend using your local environment for this step of the tutorial.
+::: warning 重要
+我们建议在本地环境中完成本教程的这一步。
 
 :::
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-Your app will use data from a JSON server
+你的应用将使用来自 JSON 服务器的数据
 
 
 
-### 1. Configure the JSON server
+### 1. 配置 JSON 服务器 {#_1-configure-the-json-server}
 
-JSON Server is an open source tool used to create mock REST APIs. You'll use it to serve the housing location data that is currently stored in the housing service.
+JSON Server 是一个用于创建模拟 REST API 的开源工具。你将用它来提供目前存储在 housing 服务中的房源位置数据。
 
-1. Install `json-server` from npm by using the following command.
+1. 使用以下命令从 npm 安装 `json-server`。
 
    ```bash
    npm install -g json-server
    ```
 
-1. In the root directory of your project, create a file called `db.json`. This is where you will store the data for the `json-server`.
+1. 在项目的根目录中，创建一个名为 `db.json` 的文件。你将在这里为 `json-server` 存储数据。
 
-1. Open `db.json` and copy the following code into the file
+1. 打开 `db.json`，并将以下代码复制到文件中
 
    ```json
    {
@@ -142,28 +138,28 @@ JSON Server is an open source tool used to create mock REST APIs. You'll use it 
    }
    ```
 
-1. Save this file.
+1. 保存此文件。
 
-1. Time to test your configuration. From the command line, at the root of your project run the following commands.
+1. 现在来测试你的配置。在命令行中，于项目根目录下运行以下命令。
 
    ```bash
    json-server --watch db.json
    ```
 
-1. In your web browser, navigate to the `http://localhost:3000/locations` and confirm that the response includes the data stored in `db.json`.
+1. 在浏览器中访问 `http://localhost:3000/locations`，确认响应中包含 `db.json` 中存储的数据。
 
-If you have any trouble with your configuration, you can find more details in the [official documentation](https://www.npmjs.com/package/json-server).
+如果配置过程中遇到任何问题，可以在[官方文档](https://www.npmjs.com/package/json-server)中找到更多详细信息。
 
 
-### 2. Update service to use web server instead of local array
+### 2. 更新服务，改用 Web 服务器而不是本地数组 {#_2-update-service-to-use-web-server-instead-of-local-array}
 
-The data source has been configured, the next step is to update your web app to connect to it use the data.
+数据源已经配置好了，下一步是更新你的 Web 应用，让它连接到该数据源并使用其中的数据。
 
-1.  In `src/app/housing-service.ts`, make the following changes:
+1.  在 `src/app/housing-service.ts` 中进行以下修改：
 
-1.  Update the code to remove `housingLocationList` property and the array containing the data, as well as the `baseUrl` property.
+1.  更新代码，删除 `housingLocationList` 属性和包含数据的数组，以及 `baseUrl` 属性。
 
-1.  Add a string property called `url` and set its value to `'http://localhost:3000/locations'`
+1.  添加一个名为 `url` 的字符串属性，并将其值设置为 `'http://localhost:3000/locations'`
 
     ```ts [Add url property to housing-service.ts]
     import {Service} from '@angular/core';
@@ -192,9 +188,9 @@ The data source has been configured, the next step is to update your web app to 
     }
     ```
 
-    This code will result in errors in the rest of the file because it depends on the `housingLocationList` property. We're going to update the service methods next.
+    这段代码会导致文件其余部分出错，因为它们依赖 `housingLocationList` 属性。接下来我们将更新服务中的方法。
 
-1.  Update the `getAllHousingLocations` function to make a call to the web server you configured.
+1.  更新 `getAllHousingLocations` 函数，让它调用你配置好的 Web 服务器。
 
      ```ts [Update the getAllHousingLocations method in housing-service.ts]
      import {Service} from '@angular/core';
@@ -223,17 +219,17 @@ The data source has been configured, the next step is to update your web app to 
      }
      ```
 
-    The code now uses asynchronous code to make a **GET** request over HTTP.
+    现在，这段代码使用异步代码通过 HTTP 发起 **GET** 请求。
 
-    ::: tip HELPFUL
-    For this example, the code uses `fetch`. For more advanced use cases consider using `HttpClient` provided by Angular.
+    ::: tip 提示
+    在这个例子中，代码使用的是 `fetch`。对于更高级的用例，可以考虑使用 Angular 提供的 `HttpClient`。
 
     :::
 
-1.  Update the `getHousingLocationById` function to make a call to the web server you configured.
+1.  更新 `getHousingLocationById` 函数，让它调用你配置好的 Web 服务器。
 
-    ::: tip HELPFUL
-    Notice the `fetch` URL now appends the `id` as a path segment (`${this.url}/${id}`) to request the location with a matching `id` property value.
+    ::: tip 提示
+    注意，现在 `fetch` 的 URL 会把 `id` 作为路径段追加在后面（`${this.url}/${id}`），以请求 `id` 属性值与之匹配的房源位置。
 
     :::
 
@@ -264,7 +260,7 @@ The data source has been configured, the next step is to update your web app to 
      }
      ```
 
-1.  Once all the updates are complete, your updated service should match the following code.
+1.  完成所有更新后，你更新后的服务应与以下代码一致。
 
      ```ts [Final version of housing-service.ts]
      import {Service} from '@angular/core';
@@ -294,11 +290,11 @@ The data source has been configured, the next step is to update your web app to 
      ```
 
 
-### 3. Update the components to use asynchronous calls to the housing service
+### 3. 更新组件，以异步方式调用 housing 服务 {#_3-update-the-components-to-use-asynchronous-calls-to-the-housing-service}
 
-The server is now reading data from the HTTP request but the components that rely on the service now have errors because they were programmed to use the synchronous version of the service.
+现在服务器从 HTTP 请求中读取数据，但依赖该服务的组件（Component）出现了错误，因为它们是按照同步版本的服务编写的。
 
-1.  In `src/app/home/home.ts`, update the `constructor` to use the new asynchronous version of the `getAllHousingLocations` method. Because we didn't use signals for our state, you have to notify Angular that a change happened that requires a synchronization. Call `this.changeDetectorRef.markForCheck()` to do this.
+1.  在 `src/app/home/home.ts` 中，更新 `constructor`，改用新的异步版本的 `getAllHousingLocations` 方法。由于我们没有使用信号（Signal）来管理状态，你需要通知 Angular 发生了需要同步的变更。为此，调用 `this.changeDetectorRef.markForCheck()`。
 
       ```ts [Update constructor in home.ts]
       import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -353,7 +349,7 @@ The server is now reading data from the HTTP request but the components that rel
       }
       ```
 
-1.  In `src/app/details/details.ts`, update the `constructor` to use the new asynchronous version of the `getHousingLocationById` method. As before, you must also call `this.changeDetectorRef.markForCheck()` to notify Angular of the changes.
+1.  在 `src/app/details/details.ts` 中，更新 `constructor`，改用新的异步版本的 `getHousingLocationById` 方法。和之前一样，你还必须调用 `this.changeDetectorRef.markForCheck()` 来通知 Angular 发生了变更。
 
       ```ts [Update constructor in details.ts]
       import {ChangeDetectorRef, Component, inject} from '@angular/core';
@@ -433,23 +429,23 @@ The server is now reading data from the HTTP request but the components that rel
       }
       ```
 
-1.  Save your code.
+1.  保存代码。
 
-1.  Open the application in the browser and confirm that it runs without any errors.
-
-
+1.  在浏览器中打开应用，确认它运行时没有任何错误。
 
 
-::: info NOTE
-This lesson relies on the `fetch` browser API. For the support of interceptors, please refer to the [HTTP client documentation](/guide/http)
 
-:::
 
-::: info SUMMARY
-In this lesson, you used a local web server (`json-server`) and asynchronous service methods to retrieve data.
+::: info 注意
+本课依赖浏览器的 `fetch` API。如需了解对拦截器的支持，请参阅 [HTTP 客户端文档](/guide/http)
 
 :::
 
-Congratulations! You've successfully completed this tutorial and are ready to continue your journey with building even more complex Angular Apps.
+::: info 总结
+在本课中，你使用了本地 Web 服务器（`json-server`）和异步服务方法来获取数据。
 
-If you would like to learn more, please consider completing some of Angular's other developer [tutorials](/tutorials) and [guides](/overview).
+:::
+
+恭喜！你已经成功完成了本教程，可以继续你的旅程，构建更复杂的 Angular 应用了。
+
+如果想了解更多内容，请考虑完成 Angular 的其他开发者[教程](/tutorials)和[指南](/overview)。

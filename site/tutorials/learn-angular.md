@@ -1,26 +1,22 @@
----
-untranslated: true
----
-
-# Welcome to the Angular tutorial
+# 欢迎来到 Angular 教程 {#welcome-to-the-angular-tutorial}
 
 <div class="docs-tutorial-mascot">
   <img class="docs-tutorial-mascot__angie" src="/assets/images/angie/greeting.svg" aria-hidden="true">
-  <p class="docs-tutorial-mascot__bubble">Welcome! Let's learn the building blocks of Angular.</p>
+  <p class="docs-tutorial-mascot__bubble">欢迎！让我们一起学习 Angular 的基础构建块。</p>
 </div>
 
-This interactive tutorial will teach you the basic building blocks to start building great apps with Angular.
+这个交互式教程将教你掌握 Angular 的基础构建块，帮助你开始用 Angular 构建出色的应用。
 
-## How to use this tutorial
+## 如何使用本教程 {#how-to-use-this-tutorial}
 
-You'll need to have basic familiarity with HTML, CSS and JavaScript to understand Angular.
+要理解 Angular，你需要对 HTML、CSS 和 JavaScript 有基本的了解。
 
-Each step represents a concept in Angular. You can do one, or all of them.
+每一步都代表 Angular 中的一个概念。你可以只学其中一步，也可以全部学完。
 
-If you get stuck, click "Reveal answer" at the top.
+如果遇到困难，可以点击顶部的「Reveal answer」（显示答案）。
 
-Alright, let's [get started](/tutorials/learn-angular/1-components-in-angular).
+好了，让我们[开始吧](/tutorials/learn-angular/1-components-in-angular)。
 
-## Using AI for Development
+## 使用 AI 进行开发 {#using-ai-for-development}
 
-In case you're following this tutorial in your preferred AI powered IDE, [check out Angular prompt rules and best practices](/ai/develop-with-ai).
+如果你正在自己喜欢的 AI 驱动的 IDE 中学习本教程，请[查看 Angular 提示词规则和最佳实践](/ai/develop-with-ai)。

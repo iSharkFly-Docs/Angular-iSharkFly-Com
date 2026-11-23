@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 组件输出属性 {#component-output-properties}
 
-# Component output properties
+在使用组件（Component）时，可能需要通知其他组件发生了某些事情。也许是某个按钮被点击了、列表中添加或删除了某个条目，或者发生了其他重要的更新。在这种场景下，组件需要与父组件进行通信。
 
-When working with components it may be required to notify other components that something has happened. Perhaps a button has been clicked, an item has been added/removed from a list or some other important update has occurred. In this scenario components need to communicate with parent components.
+Angular 使用 `output()` 函数来实现这类行为。
 
-Angular uses the `output()` function to enable this type of behavior.
-
-::: info NOTE
-Learn more about [custom events in the outputs guide](/guide/components/outputs).
+::: info 注意
+在[输出指南中了解更多关于自定义事件的内容](/guide/components/outputs)。
 
 :::
 
-In this activity, you'll learn how to use the `output()` function to communicate with components.
+在本练习中，你将学习如何使用 `output()` 函数与组件通信。
 
 <hr />
 
-To create the communication path from child to parent components, use the `output` function to initialize a class property.
+要创建从子组件到父组件的通信路径，请使用 `output` 函数来初始化一个类属性。
 
 ```ts [child.ts]
 @Component({...})
@@ -26,7 +22,7 @@ class Child {
 }
 ```
 
-Now the component can generate events that can be listened to by the parent component. Trigger events by calling the `emit` method:
+现在，该组件可以生成能被父组件监听的事件了。通过调用 `emit` 方法来触发事件：
 
 ```ts [child.ts]
 class Child {
@@ -39,20 +35,20 @@ class Child {
 }
 ```
 
-The emit function will generate an event with the same type as defined by the `output`.
+emit 函数会生成一个事件，其类型与 `output` 中定义的类型相同。
 
-Alright, your turn to give this a try. Complete the code by following these tasks:
-
-
-
-### 1. Add an `output()` property
-
-Update `child.ts` by adding an output property called `addItemEvent`, be sure to set the output type to be `string`.
+好了，轮到你来试一试了。按照以下任务补全代码：
 
 
-### 2. Complete `addItem` method
 
-In `child.ts` update the `addItem` method; use the following code as the logic:
+### 1. 添加一个 `output()` 属性 {#_1-add-an-output-property}
+
+更新 `child.ts`，添加一个名为 `addItemEvent` 的输出属性，一定要把输出类型设为 `string`。
+
+
+### 2. 完成 `addItem` 方法 {#_2-complete-additem-method}
+
+在 `child.ts` 中更新 `addItem` 方法，使用以下代码作为其逻辑：
 
 ```ts [child.ts]
 addItem() {
@@ -61,19 +57,19 @@ addItem() {
 ```
 
 
-### 3. Update the `App` template
+### 3. 更新 `App` 模板 {#_3-update-the-app-template}
 
-In `app.ts` update the template to listen to the emitted event by adding the following code:
+在 `app.ts` 中更新模板（Template），添加以下代码来监听发出的事件：
 
 ```html
 <app-child (addItemEvent)="addItem($event)" />
 ```
 
-Now, the "Add Item" button adds a new item to the list every time the button is clicked.
+现在，每次点击「Add Item」按钮，都会向列表中添加一个新条目。
 
 
 
 
-Wow, at this point you've completed the component fundamentals - impressive 👏
+哇，到这里你已经学完了组件的基础知识，真了不起 👏
 
-Keep learning to unlock more of Angular's great features.
+继续学习，解锁 Angular 更多出色的功能吧。

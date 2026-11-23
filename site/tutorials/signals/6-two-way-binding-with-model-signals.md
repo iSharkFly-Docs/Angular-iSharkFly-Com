@@ -1,38 +1,34 @@
----
-untranslated: true
----
+# 使用模型信号实现双向绑定 {#two-way-binding-with-model-signals}
 
-# Two-way binding with model signals
+现在你已经学会了[使用输入信号向组件传递数据](/tutorials/signals/5-component-communication-with-signals)，接下来让我们探索 Angular 用于双向绑定（Two-way Binding）的 `model()` API。模型信号（Model Signal）非常适合复选框、滑块或自定义表单控件这类 UI 组件（Component）——这些组件既需要接收一个值，又需要更新这个值。
 
-Now that you've learned [passing data to components with input signals](/tutorials/signals/5-component-communication-with-signals), let's explore Angular's `model()` API for two-way binding. Model signals are perfect for UI components like checkboxes, sliders, or custom form controls where the component needs to both receive a value AND update it.
-
-In this activity, you'll create a custom checkbox component that manages its own state while keeping the parent synchronized.
+在本活动中，你将创建一个自定义复选框组件，它在管理自身状态的同时，还会让父组件保持同步。
 
 <hr />
 
 
 
-### 1. Set up the custom checkbox with model signal
+### 1. 使用模型信号设置自定义复选框 {#_1-set-up-the-custom-checkbox-with-model-signal}
 
-Create a model signal in the `custom-checkbox` component that can both receive and update the parent's value.
+在 `custom-checkbox` 组件中创建一个模型信号，它既能接收父组件的值，也能更新该值。
 
 ```ts
-// Add imports for model signals
+// 添加模型信号所需的导入
 import {Component, model, input, ChangeDetectionStrategy} from '@angular/core';
 
-// Model signal for two-way binding
+// 用于双向绑定的模型信号
 checked = model.required<boolean>();
 
-// Optional input for label
+// 用于标签的可选输入
 label = input<string>('');
 ```
 
-Unlike `input()` signals which are read-only, `model()` signals can be both read and written to.
+与只读的 `input()` 信号不同，`model()` 信号既可以读取，也可以写入。
 
 
-### 2. Create the checkbox template
+### 2. 创建复选框模板 {#_2-create-the-checkbox-template}
 
-Build the checkbox template that responds to clicks and updates its own model.
+构建复选框的模板（Template），使其能够响应点击并更新自身的模型。
 
 ```html
 <label class="custom-checkbox">
@@ -42,33 +38,33 @@ Build the checkbox template that responds to clicks and updates its own model.
 </label>
 ```
 
-The component reads from its model signal and has a method to update it.
+该组件从它的模型信号中读取值，并提供一个方法来更新它。
 
 
-### 3. Add the toggle method
+### 3. 添加切换方法 {#_3-add-the-toggle-method}
 
-Implement the toggle method that updates the model signal when the checkbox is clicked.
+实现 toggle 方法，在复选框被点击时更新模型信号。
 
 ```ts
 toggle() {
-  // This updates BOTH the component's state AND the parent's model!
+  // 这会同时更新组件自身的状态和父组件的模型！
   this.checked.set(!this.checked());
 }
 ```
 
-When the child component calls `this.checked.set()`, it automatically propagates the change back to the parent. This is the key difference from `input()` signals.
+当子组件调用 `this.checked.set()` 时，这一变化会自动传回父组件。这正是它与 `input()` 信号的关键区别。
 
 
-### 4. Set up two-way binding in the parent
+### 4. 在父组件中设置双向绑定 {#_4-set-up-two-way-binding-in-the-parent}
 
-First, uncomment the model signal properties and methods in `app.ts`:
+首先，取消 `app.ts` 中模型信号属性和方法的注释：
 
 ```ts
-// Parent signal models
+// 父组件的信号模型
 agreedToTerms = model(false);
 enableNotifications = model(true);
 
-// Methods to test two-way binding
+// 用于测试双向绑定的方法
 toggleTermsFromParent() {
   this.agreedToTerms.set(!this.agreedToTerms());
 }
@@ -79,14 +75,14 @@ resetAll() {
 }
 ```
 
-Then update the template:
+然后更新模板：
 
-Part 1. **Uncomment the checkboxes and add two-way binding:**
+第 1 部分. **取消复选框的注释并添加双向绑定：**
 
-- Replace `___ADD_TWO_WAY_BINDING___` with `[(checked)]="agreedToTerms"` for the first checkbox
-- Replace `___ADD_TWO_WAY_BINDING___` with `[(checked)]="enableNotifications"` for the second
+- 对于第一个复选框，将 `___ADD_TWO_WAY_BINDING___` 替换为 `[(checked)]="agreedToTerms"`
+- 对于第二个复选框，将 `___ADD_TWO_WAY_BINDING___` 替换为 `[(checked)]="enableNotifications"`
 
-Part 2. **Replace the `???` placeholders with @if blocks:**
+第 2 部分. **将 `???` 占位符替换为 @if 块：**
 
 ```html
 @if (agreedToTerms()) {
@@ -102,39 +98,39 @@ Part 2. **Replace the `???` placeholders with @if blocks:**
 }
 ```
 
-Part 3. **Add click handlers to the buttons:**
+第 3 部分. **为按钮添加点击处理器：**
 
 ```html
 <button (click)="toggleTermsFromParent()">Toggle Terms from Parent</button>
 <button (click)="resetAll()">Reset All</button>
 ```
 
-The `[(checked)]` syntax creates two-way binding - data flows down to the component AND changes flow back up to the parent by emitting an event that references the signal itself and does _not_ call the signal getter directly.
+`[(checked)]` 语法会创建双向绑定——数据向下流入组件，而变化则通过发出一个事件向上流回父组件。这个事件引用的是信号本身，*不会* 直接调用信号的 getter。
 
 
-### 5. Test the two-way binding
+### 5. 测试双向绑定 {#_5-test-the-two-way-binding}
 
-Interact with your app to see two-way binding in action:
+与应用进行交互，观察双向绑定的实际效果：
 
-1. **Click checkboxes** - Component updates its own state and notifies parent
-2. **Click "Toggle Terms from Parent"** - Parent updates propagate down to component
-3. **Click "Reset All"** - Parent resets both models and components update automatically
+1. **点击复选框** - 组件更新自身状态并通知父组件
+2. **点击“Toggle Terms from Parent”** - 父组件的更新会向下传递到组件
+3. **点击“Reset All”** - 父组件重置两个模型，组件会自动更新
 
-Both the parent and child can update the shared state, and both stay in sync automatically!
-
-
+父组件和子组件都可以更新共享状态，而且两者会自动保持同步！
 
 
-Perfect! You've learned how model signals enable two-way binding:
 
-- **Model signals** - Use `model()` and `model.required()` for values that can be both read and written
-- **Two-way binding** - Use `[(property)]` syntax to bind parent signals to child models
-- **Perfect for UI components** - Checkboxes, form controls, and widgets that need to manage their own state
-- **Automatic synchronization** - Parent and child stay in sync without manual event handling
 
-**When to use `model()` vs `input()`:**
+完美！你已经了解了模型信号如何实现双向绑定：
 
-- Use `input()` for data that only flows down (display data, configuration)
-- Use `model()` for UI components that need to update their own value (form controls, toggles)
+- **模型信号** - 对既可读又可写的值使用 `model()` 和 `model.required()`
+- **双向绑定** - 使用 `[(property)]` 语法将父组件的信号绑定到子组件的模型
+- **非常适合 UI 组件** - 例如需要管理自身状态的复选框、表单控件和小部件
+- **自动同步** - 父组件和子组件无需手动处理事件即可保持同步
 
-In the next lesson, you'll learn about [using signals with services](/tutorials/signals/7-using-signals-with-services)!
+**何时使用 `model()`，何时使用 `input()`：**
+
+- 对只向下流动的数据（展示数据、配置）使用 `input()`
+- 对需要更新自身值的 UI 组件（表单控件、开关）使用 `model()`
+
+在下一课中，你将学习[在服务中使用信号](/tutorials/signals/7-using-signals-with-services)！

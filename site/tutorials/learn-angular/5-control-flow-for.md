@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 组件中的控制流 - `@for` {#control-flow-in-components-for}
 
-# Control Flow in Components - `@for`
+在构建 Web 应用时，你经常需要把某段代码重复特定的次数。例如，给定一个名字数组，你可能希望把每个名字都显示在一个 `<p>` 标签中。
 
-Often when building web applications, you need to repeat some code a specific number of times - for example, given an array of names, you may want to display each name in a `<p>` tag.
-
-::: info NOTE
-Learn more about [control flow in the essentials guide](/essentials/templates#control-flow-with-if-and-for).
+::: info 注意
+在[基础知识指南中了解更多关于控制流的内容](/essentials/templates#control-flow-with-if-and-for)。
 
 :::
 
-In this activity, you'll learn how to use `@for` to repeat elements in a template.
+在本练习中，你将学习如何使用 `@for` 在模板（Template）中重复渲染元素。
 
 <hr/>
 
-The syntax that enables repeating elements in a template is `@for`.
+在模板中实现元素重复渲染的语法是 `@for`。
 
-Here's an example of how to use the `@for` syntax in a component:
+下面是在组件（Component）中使用 `@for` 语法的示例：
 
 ```ts
 @Component({
@@ -33,16 +29,16 @@ export class App {
 }
 ```
 
-Two things to take note of:
+有两点需要注意：
 
-- There is an `@` prefix for the `for` because it is a special syntax called [Angular template syntax](/guide/templates)
-- For applications that still use `*ngFor`, please refer to the [Angular documentation for NgFor](/guide/directives/structural-directives)
+- `for` 前面有一个 `@` 前缀，因为它是一种特殊的语法，称为 [Angular 模板语法](/guide/templates)
+- 对于仍在使用 `*ngFor` 的应用，请参阅 [NgFor 的 Angular 文档](/guide/directives/structural-directives)
 
 
 
-### 1. Add the `users` property
+### 1. 添加 `users` 属性 {#_1-add-the-users-property}
 
-In the `App` class, add a property called `users` that contains users and their names.
+在 `App` 类中，添加一个名为 `users` 的属性，其中包含用户及其名字。
 
 ```ts
 [
@@ -55,9 +51,9 @@ In the `App` class, add a property called `users` that contains users and their 
 ```
 
 
-### 2. Update the template
+### 2. 更新模板 {#_2-update-the-template}
 
-Update the template to display each user name in a `p` element using the `@for` template syntax.
+使用 `@for` 模板语法更新模板，把每个用户名显示在一个 `p` 元素中。
 
 ```html
 @for (user of users; track user.id) {
@@ -65,12 +61,12 @@ Update the template to display each user name in a `p` element using the `@for` 
 }
 ```
 
-::: info NOTE
-the use of `track` is required, you may use the `id` or some other unique identifier.
+::: info 注意
+`track` 是必需的，你可以使用 `id` 或其他某个唯一标识符。
 
 :::
 
 
 
 
-This type of functionality is called control flow. Next, you'll learn to customize and communicate with components - by the way, you're doing a great job so far.
+这类功能称为控制流。接下来，你将学习如何自定义组件以及如何与组件通信。顺便说一句，到目前为止你做得非常棒。

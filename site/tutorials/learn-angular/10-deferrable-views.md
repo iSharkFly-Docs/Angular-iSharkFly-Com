@@ -1,29 +1,25 @@
----
-untranslated: true
----
+# 可延迟视图 {#deferrable-views}
 
-# Deferrable Views
+在应用开发中，有时你会发现应用里需要引用大量组件（Component），但出于种种原因，其中一些组件并不需要立即加载。
 
-Sometimes in app development, you end up with a lot of components that you need to reference in your app, but some of those don't need to be loaded right away for various reasons.
+它们可能位于首屏可见区域之下，或者是一些较重、要过一段时间才会被交互的组件。在这种情况下，我们可以借助可延迟视图（Deferrable Views）稍后再加载其中的一些资源。
 
-Maybe they are below the visible fold or are heavy components that aren't interacted with until later. In that case, we can load some of those resources later with deferrable views.
-
-::: info NOTE
-Learn more about [deferred loading with @defer in the in-depth guide](/guide/templates/defer).
+::: info 注意
+在[深入指南中了解更多关于使用 @defer 进行延迟加载的内容](/guide/templates/defer)。
 
 :::
 
-In this activity, you'll learn how to use deferrable views to defer load a section of your component template.
+在本练习中，你将学习如何使用可延迟视图来延迟加载组件模板（Template）中的某一部分。
 
 <hr>
 
 
 
-### 1. Add a `@defer` block around the comments component
+### 1. 用 `@defer` 块包裹评论组件 {#_1-add-a-defer-block-around-the-comments-component}
 
-In your app, the blog post page has a comment component after the post details.
+在你的应用中，博客文章页面在文章详情之后有一个评论组件。
 
-Wrap the comment component with a `@defer` block to defer load it.
+用 `@defer` 块包裹评论组件，以延迟加载它。
 
 ```html
 @defer {
@@ -31,12 +27,12 @@ Wrap the comment component with a `@defer` block to defer load it.
 }
 ```
 
-The code above is an example of how to use a basic `@defer` block. By default `@defer` will load the `comments` component when the browser is idle.
+上面的代码展示了如何使用一个基本的 `@defer` 块。默认情况下，`@defer` 会在浏览器空闲时加载 `comments` 组件。
 
 
-### 2. Add a placeholder
+### 2. 添加占位内容 {#_2-add-a-placeholder}
 
-Add a `@placeholder` block to the `@defer` block. The `@placeholder` block is where you put html that will show before the deferred loading starts. The content in `@placeholder` blocks is eagerly loaded.
+向 `@defer` 块中添加一个 `@placeholder` 块。`@placeholder` 块用于放置在延迟加载开始之前显示的 html。`@placeholder` 块中的内容会被立即加载。
 
 ```html
 @defer {
@@ -47,9 +43,9 @@ Add a `@placeholder` block to the `@defer` block. The `@placeholder` block is wh
 ```
 
 
-### 3. Add a loading block
+### 3. 添加加载块 {#_3-add-a-loading-block}
 
-Add a `@loading` block to the `@defer` block. The `@loading` block is where you put html that will show _while_ the deferred content is actively being fetched, but hasn't finished yet. The content in `@loading` blocks is eagerly loaded.
+向 `@defer` 块中添加一个 `@loading` 块。`@loading` 块用于放置在延迟内容*正在*获取、但尚未完成时显示的 html。`@loading` 块中的内容会被立即加载。
 
 ```html
 @defer {
@@ -62,9 +58,9 @@ Add a `@loading` block to the `@defer` block. The `@loading` block is where you 
 ```
 
 
-### 4. Add a minimum duration
+### 4. 添加最短持续时间 {#_4-add-a-minimum-duration}
 
-Both `@placeholder` and `@loading` sections have optional parameters to prevent flickering from occurring when loading happens quickly. `@placeholder` has `minimum` and `@loading` has `minimum` and `after`. Add a `minimum` duration to the `@loading` block so it will be rendered for at least 2 seconds.
+`@placeholder` 和 `@loading` 部分都有可选参数，用于防止加载过快时出现闪烁。`@placeholder` 有 `minimum` 参数，`@loading` 有 `minimum` 和 `after` 参数。为 `@loading` 块添加一个 `minimum` 持续时间，使其至少渲染 2 秒。
 
 ```html
 @defer {
@@ -77,9 +73,9 @@ Both `@placeholder` and `@loading` sections have optional parameters to prevent 
 ```
 
 
-### 5. Add a viewport trigger
+### 5. 添加视口触发器 {#_5-add-a-viewport-trigger}
 
-Deferrable views have a number of trigger options. Add a viewport trigger so the content will defer load once it enters the viewport.
+可延迟视图有多种触发器选项。添加一个视口（viewport）触发器，让内容在进入视口后才进行延迟加载。
 
 ```html
 @defer (on viewport) {
@@ -92,9 +88,9 @@ Deferrable views have a number of trigger options. Add a viewport trigger so the
 ```
 
 
-### 6. Add content
+### 6. 添加内容 {#_6-add-content}
 
-A viewport trigger is best used when you're deferring content that's far enough down the page that it needs to be scrolled to see. So let's add some content to our blog post. You can either write your own, or you can copy the content below and put it inside the `<article>` element.
+当你要延迟加载的内容在页面中足够靠下、需要滚动才能看到时，最适合使用视口触发器。所以，让我们给博客文章添加一些内容。你可以自己写，也可以复制下面的内容并放到 `<article>` 元素中。
 
 ```html
 <article>
@@ -140,13 +136,13 @@ A viewport trigger is best used when you're deferring content that's far enough 
 </article>
 ```
 
-Once you've added this code, now scroll down to see the deferred content load once you scroll it into the viewport.
+添加这段代码后，向下滚动页面，当延迟内容滚动进入视口时，你就会看到它被加载出来。
 
 
 
 
-In the activity, you've learned how to use deferrable views in your applications. Great work. 🙌
+在本练习中，你学会了如何在应用中使用可延迟视图。干得好！🙌
 
-There's even more you can do with them, like different triggers, prefetching, and `@error` blocks.
+可延迟视图还能做更多事情，例如使用不同的触发器、预取（prefetching）以及 `@error` 块。
 
-If you would like to learn more, check out the [documentation for Deferrable views](/guide/templates/defer).
+如果想了解更多，请查看[可延迟视图的文档](/guide/templates/defer)。

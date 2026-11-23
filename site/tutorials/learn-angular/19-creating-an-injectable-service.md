@@ -1,52 +1,48 @@
----
-untranslated: true
----
+# 创建可注入的服务 {#creating-an-injectable-service}
 
-# Creating an injectable service
+Angular 中的依赖注入（Dependency Injection，DI）是该框架最强大的特性之一。你可以把依赖注入理解为 Angular 在运行时为应用 _提供_ 所需资源的能力。依赖可以是一个服务（Service），也可以是其他资源。
 
-Dependency injection (DI) in Angular is one of the framework's most powerful features. Consider dependency injection to be the ability for Angular to _provide_ resources you need for your application at runtime. A dependency could be a service or some other resources.
-
-::: info NOTE
-Learn more about [dependency injection in the essentials guide](/essentials/dependency-injection).
+::: info 注意
+在[基础指南中了解更多关于依赖注入的内容](/essentials/dependency-injection)。
 
 :::
 
-In this activity, you'll learn how to create an `injectable` service.
+在本活动中，你将学习如何创建一个 `injectable`（可注入的）服务。
 
 <hr>
 
-One way to use a service is to act as a way to interact with data and APIs. To make a service reusable you should keep the logic in the service and share it throughout the application when it is needed.
+服务的一种用途是作为与数据和 API 交互的途径。为了让服务可复用，应当把逻辑放在服务中，并在需要时在整个应用中共享它。
 
-To make a class eligible to be injected by the DI system, use the `@Service` decorator. For example:
+要让一个类能够被 DI 系统注入，请使用 `@Service` 装饰器。例如：
 
 ```ts
 @Service()
 class UserService {
-  // methods to retrieve and return data
+  // 获取并返回数据的方法
 }
 ```
 
-The `@Service` decorator marks the class as a service and notifies the DI system that `UserService` can be accessed anywhere in your application. By default, Angular provides the service across your entire application, so you don't need to write any extra configuration.
+`@Service` 装饰器把该类标记为服务，并告知 DI 系统 `UserService` 可以在应用中的任何地方访问。默认情况下，Angular 会在整个应用范围内提供该服务，因此你无需编写任何额外的配置。
 
-::: info NOTE
-By default, `@Service` provides the class at the root injector. If you want to provide it manually, for example, to scope it to a specific route or component, set `autoProvided: false`. Learn more in the [guide on creating and using services](/guide/di/creating-and-using-services#using-the-service-vs-injectable-decorator).
-
-:::
-
-Alright, you try:
-
-
-
-### 1. Add the `@Service` decorator
-
-Update the code in `car.service.ts` by adding the `@Service()` decorator to the `CarService` class.
-
-::: tip TIP
-Use the above example to find the correct syntax.
+::: info 注意
+默认情况下，`@Service` 会在根注入器（Injector）中提供该类。如果你想手动提供它，例如将其作用域限定在某个特定的路由或组件（Component）上，请设置 `autoProvided: false`。在[创建和使用服务指南](/guide/di/creating-and-using-services#using-the-service-vs-injectable-decorator)中了解更多。
 
 :::
 
+好了，轮到你来试试：
 
 
 
-Well, done 👍 that service is now `injectable` and can participate in the fun. Now that the service is `injectable`, let's try injecting it into a component 👉
+### 1. 添加 `@Service` 装饰器 {#_1-add-the-service-decorator}
+
+更新 `car.service.ts` 中的代码，为 `CarService` 类添加 `@Service()` 装饰器。
+
+::: tip 提示
+参考上面的示例找到正确的语法。
+
+:::
+
+
+
+
+干得好 👍 这个服务现在已经是 `injectable` 的了，可以参与到这场乐趣中。既然服务已经可注入，接下来我们试着把它注入到组件中 👉

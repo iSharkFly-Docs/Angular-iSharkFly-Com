@@ -1,37 +1,33 @@
----
-untranslated: true
----
+# 为 Angular 应用添加表单 {#adding-a-form-to-your-angular-app}
 
-# Adding a form to your Angular app
+本节教程演示如何为 Angular 应用添加一个收集用户数据的表单。
+本节从一个可以正常运行的 Angular 应用开始，演示如何为它添加表单。
 
-This tutorial lesson demonstrates how to add a form that collects user data to an Angular app.
-This lesson starts with a functional Angular app and shows how to add a form to it.
-
-The data that the form collects is sent only to the app's service, which writes it to the browser's console.
-Using a REST API to send and receive the form's data is not covered in this lesson.
+表单收集到的数据只会发送给应用的服务（Service），由服务将其输出到浏览器控制台。
+本节不涉及如何使用 REST API 发送和接收表单数据。
 
 <iframe src="https://www.youtube.com/embed/kWbk-dOJaNQ?si=FYMXGdUiT-qh321h" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-::: warning IMPORTANT
-We recommend using your local environment for this step of the tutorial.
+::: warning 重要
+建议你在本地环境中完成本节教程的这一步骤。
 
 :::
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-- Your app will have a form into which users can enter data that is sent to your app's service.
-- The service will write the data from the form to the browser's console log.
+- 你的应用将拥有一个表单，用户可以在其中输入数据，这些数据会被发送到应用的服务。
+- 服务会把表单中的数据输出到浏览器的控制台日志中。
 
 
 
-### 1. Add a method to send form data
+### 1. 添加一个用于发送表单数据的方法 {#_1-add-a-method-to-send-form-data}
 
-This step adds a method to your app's service that receives the form data to send to the data's destination.
-In this example, the method writes the data from the form to the browser's console log.
+这一步会在应用的服务中添加一个方法，用于接收表单数据并将其发送到数据的目的地。
+在本例中，该方法会把表单数据输出到浏览器的控制台日志中。
 
-In the **Edit** pane of your IDE:
+在 IDE 的 **Edit** 窗格中：
 
-1.  In `src/app/housing-service.ts`, inside the `HousingService` class, paste this method at the bottom of the class definition.
+1.  在 `src/app/housing-service.ts` 中，将这个方法粘贴到 `HousingService` 类定义的底部。
 
        ```ts [Submit method in src/app/housing-service.ts]
        import {Service} from '@angular/core';
@@ -160,17 +156,17 @@ In the **Edit** pane of your IDE:
        }
        ```
 
-1.  Confirm that the app builds without error.
-    Correct any errors before you continue to the next step.
+1.  确认应用构建时没有错误。
+    在继续下一步之前，先修正所有错误。
 
 
-### 2. Add the form functions to the details page
+### 2. 在详情页中添加表单相关的函数 {#_2-add-the-form-functions-to-the-details-page}
 
-This step adds the code to the details page that handles the form's interactions.
+这一步会在详情页中添加处理表单交互的代码。
 
-In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
+在 IDE 的 **Edit** 窗格中，打开 `src/app/details/details.ts`：
 
-1.  After the `import` statements at the top of the file, add the following code to import the Angular form classes.
+1.  在文件顶部的 `import` 语句之后，添加以下代码以导入 Angular 的表单类。
 
       ```ts [Forms imports in src/app/details/details.ts]
       import {Component, inject} from '@angular/core';
@@ -244,7 +240,7 @@ In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
       }
       ```
 
-1.  In the `Details` decorator metadata, update the `imports` property with the following code:
+1.  在 `Details` 的装饰器元数据中，用以下代码更新 `imports` 属性：
 
       ```ts [imports directive in src/app/details/details.ts]
       import {Component, inject} from '@angular/core';
@@ -318,7 +314,7 @@ In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
       }
       ```
 
-1.  In the `Details` class, before the `constructor()` method, add the following code to create the form object.
+1.  在 `Details` 类中，在 `constructor()` 方法之前，添加以下代码来创建表单对象。
 
       ```ts [template directive in src/app/details/details.ts]
       import {Component, inject} from '@angular/core';
@@ -392,9 +388,9 @@ In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
       }
       ```
 
-    In Angular, `FormGroup` and `FormControl` are types that enable you to build forms. The `FormControl` type can provide a default value and shape the form data. In this example `firstName` is a `string` and the default value is empty string.
+    在 Angular 中，`FormGroup` 和 `FormControl` 是用于构建表单的类型。`FormControl` 类型可以提供默认值，并决定表单数据的结构。在本例中，`firstName` 是 `string` 类型，默认值为空字符串。
 
-1.  In the `Details` class, after the `constructor()` method, add the following code to handle the **Apply now** click.
+1.  在 `Details` 类中，在 `constructor()` 方法之后，添加以下代码来处理 **Apply now** 按钮的点击。
 
       ```ts [template directive in src/app/details/details.ts]
       import {Component, inject} from '@angular/core';
@@ -468,19 +464,19 @@ In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
       }
       ```
 
-    This button does not exist yet - you will add it in the next step. In the above code, the `FormControl`s may return `null`. This code uses the nullish coalescing operator to default to empty string if the value is `null`.
+    这个按钮现在还不存在——你将在下一步中添加它。在上面的代码中，`FormControl` 可能会返回 `null`。这段代码使用空值合并运算符（nullish coalescing operator），在值为 `null` 时默认使用空字符串。
 
-1.  Confirm that the app builds without error.
-    Correct any errors before you continue to the next step.
+1.  确认应用构建时没有错误。
+    在继续下一步之前，先修正所有错误。
 
 
-### 3. Add the form's markup to the details page
+### 3. 在详情页中添加表单的标记 {#_3-add-the-form-s-markup-to-the-details-page}
 
-This step adds the markup to the details page that displays the form.
+这一步会在详情页中添加用于显示表单的标记。
 
-In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
+在 IDE 的 **Edit** 窗格中，打开 `src/app/details/details.ts`：
 
-1. In the `Details` decorator metadata, update the `template` HTML to match the following code to add the form's markup.
+1. 在 `Details` 的装饰器元数据中，将 `template` 的 HTML 更新为以下代码，以添加表单的标记。
 
    ```ts [template directive in src/app/details/details.ts]
    import {Component, inject} from '@angular/core';
@@ -554,40 +550,40 @@ In the **Edit** pane of your IDE, in `src/app/details/details.ts`:
    }
    ```
 
-   The template now includes an event handler `(submit)="submitApplication()"`. Angular uses parentheses syntax around the event name to define events in the template code. The code on the right hand side of the equals sign is the code that should be executed when this event is triggered. You can bind to browser events and custom events.
+   现在模板（Template）中包含了一个事件处理器 `(submit)="submitApplication()"`。Angular 在模板代码中使用将事件名括在圆括号中的语法来定义事件。等号右侧的代码就是该事件触发时要执行的代码。你可以绑定浏览器事件，也可以绑定自定义事件。
 
-1. Confirm that the app builds without error.
-   Correct any errors before you continue to the next step.
+1. 确认应用构建时没有错误。
+   在继续下一步之前，先修正所有错误。
 
    <img alt="details page with a form for applying to live at this location" src="/assets/images/tutorials/first-app/homes-app-lesson-12-step-3.png">
 
 
-### 4. Test your app's new form
+### 4. 测试应用的新表单 {#_4-test-your-app-s-new-form}
 
-This step tests the new form to see that when the form data is submitted to the app, the form data appears in the console log.
+这一步会测试新表单，确认当表单数据提交给应用后，表单数据会出现在控制台日志中。
 
-1. In the **Terminal** pane of your IDE, run `ng serve`, if it isn't already running.
-1. In your browser, open your app at `http://localhost:4200`.
-1. Right click on the app in the browser and from the context menu, choose **Inspect**.
-1. In the developer tools window, choose the **Console** tab.
-   Make sure that the developer tools window is visible for the next steps
-1. In your app:
-   1. Select a housing location and click **Learn more**, to see details about the house.
-   1. In the house's details page, scroll to the bottom to find the new form.
-   1. Enter data into the form's fields - any data is fine.
-   1. Choose **Apply now** to submit the data.
-1. In the developer tools window, review the log output to find your form data.
-
-
+1. 在 IDE 的 **Terminal** 窗格中运行 `ng serve`（如果它还没有运行）。
+1. 在浏览器中打开应用，地址为 `http://localhost:4200`。
+1. 在浏览器中右键点击应用，然后从上下文菜单中选择 **Inspect**（检查）。
+1. 在开发者工具窗口中，选择 **Console**（控制台）标签页。
+   确保在接下来的步骤中开发者工具窗口保持可见
+1. 在你的应用中：
+   1. 选择一个房源位置并点击 **Learn more**，查看该房屋的详细信息。
+   1. 在房屋详情页中，滚动到底部找到新的表单。
+   1. 在表单字段中输入数据——任意数据都可以。
+   1. 选择 **Apply now** 提交数据。
+1. 在开发者工具窗口中，查看日志输出，找到你的表单数据。
 
 
-::: info SUMMARY
-In this lesson, you added a form using Angular's forms feature, and connected the data captured in the form to a component using an event handler.
+
+
+::: info 总结
+在本节中，你使用 Angular 的表单功能添加了一个表单，并通过事件处理器把表单中采集到的数据连接到了组件（Component）。
 
 :::
 
-For more information about the topics covered in this lesson, visit:
+如需进一步了解本节涉及的主题，请访问：
 
-- [Angular Forms](/guide/forms)
-- [Event Handling](/guide/templates/event-listeners)
+- [Angular 表单](/guide/forms)
+- [事件处理](/guide/templates/event-listeners)
 

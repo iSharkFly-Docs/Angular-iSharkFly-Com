@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 基于 inject 的依赖注入 {#inject-based-dependency-injection}
 
-# Inject-based dependency injection
+创建可注入的服务（Service）是 Angular 依赖注入（Dependency Injection，DI）系统的第一部分。那么如何把服务注入到组件（Component）中呢？Angular 提供了一个方便的函数 `inject()`，可以在适当的上下文中使用。
 
-Creating an injectable service is the first part of the dependency injection (DI) system in Angular. How do you inject a service into a component? Angular has a convenient function called `inject()` that can be used in the proper context.
-
-::: info NOTE
-Injection contexts are beyond the scope of this tutorial, but you can learn more in the [dependency injection (DI) essentials guide](/essentials/dependency-injection) and [DI context guide](/guide/di/dependency-injection-context).
+::: info 注意
+注入上下文超出了本教程的范围，不过你可以在[依赖注入（DI）基础指南](/essentials/dependency-injection)和 [DI 上下文指南](/guide/di/dependency-injection-context)中了解更多。
 
 :::
 
-In this activity, you'll learn how to inject a service and use it in a component.
+在本活动中，你将学习如何注入一个服务并在组件中使用它。
 
 <hr>
 
-It is often helpful to initialize class properties with values provided by the DI system. Here's an example:
+用 DI 系统提供的值来初始化类属性通常很有用。示例如下：
 
 ```ts
 @Component({...})
@@ -26,30 +22,30 @@ class PetCareDashboard {
 
 
 
-### 1. Inject the `CarService`
+### 1. 注入 `CarService` {#_1-inject-the-carservice}
 
-In `app.ts`, using the `inject()` function inject the `CarService` and assign it to a property called `carService`
+在 `app.ts` 中，使用 `inject()` 函数注入 `CarService`，并将其赋值给一个名为 `carService` 的属性
 
-::: info NOTE
-Notice the difference between the property `carService` and the class `CarService`.
+::: info 注意
+注意属性 `carService` 与类 `CarService` 之间的区别。
 
 :::
 
 
-### 2. Use the `carService` instance
+### 2. 使用 `carService` 实例 {#_2-use-the-carservice-instance}
 
-Calling `inject(CarService)` gave you an instance of the `CarService` that you can use in your application, stored in the `carService` property.
+调用 `inject(CarService)` 会得到一个 `CarService` 的实例，它存储在 `carService` 属性中，你可以在应用中使用它。
 
-Initialize the `display` property with the following implementation:
+用下面的实现来初始化 `display` 属性：
 
 ```ts
 display = this.carService.getCars().join(' ⭐️ ');
 ```
 
 
-### 3. Update the `App` template
+### 3. 更新 `App` 模板 {#_3-update-the-app-template}
 
-Update the component template in `app.ts` with the following code:
+用下面的代码更新 `app.ts` 中的组件模板（Template）：
 
 ```ts
 template: `<p>Car Listing: {{ display }}</p>`,
@@ -58,4 +54,4 @@ template: `<p>Car Listing: {{ display }}</p>`,
 
 
 
-You've just injected your first service into a component - fantastic effort.
+你刚刚把第一个服务注入到了组件中，表现太棒了。

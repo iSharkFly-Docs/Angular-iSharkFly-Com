@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 在指令中使用信号 {#using-signals-with-directives}
 
-# Using signals with directives
+现在你已经学会了[在服务中使用信号](/tutorials/signals/7-using-signals-with-services)，接下来让我们探索指令（Directive）如何使用信号（Signal）。**好消息是：信号在指令中的用法与在组件（Component）中完全相同！** 主要区别在于，由于指令没有模板（Template），你主要会在宿主绑定（Host Binding）中使用信号，以响应式地更新宿主元素。
 
-Now that you've learned [using signals with services](/tutorials/signals/7-using-signals-with-services), let's explore how directives use signals. **The great news: signals work exactly the same in directives as they do in components!** The main difference is that since directives don't have templates, you'll primarily use signals in host bindings to reactively update the host element.
-
-In this activity, you'll build a highlight directive that demonstrates how signals create reactive behavior in directives.
+在本活动中，你将构建一个高亮指令，演示信号如何在指令中创建响应式行为。
 
 <hr />
 
 
 
-### 1. Set up signals just like in a component
+### 1. 像在组件中一样设置信号 {#_1-set-up-signals-just-like-in-a-component}
 
-Import the signal functions and create your reactive state. This works exactly the same as in components:
+导入信号相关函数并创建响应式状态。这与在组件中的做法完全相同：
 
 ```ts
 import {Directive, input, signal, computed} from '@angular/core';
@@ -23,14 +19,14 @@ import {Directive, input, signal, computed} from '@angular/core';
   selector: '[highlight]',
 })
 export class HighlightDirective {
-  // Signal inputs - same as components!
+  // 信号输入 —— 与组件中相同！
   color = input<string>('yellow');
   intensity = input<number>(0.3);
 
-  // Internal state - same as components!
+  // 内部状态 —— 与组件中相同！
   private isHovered = signal(false);
 
-  // Computed signals - same as components!
+  // 计算信号 —— 与组件中相同！
   backgroundStyle = computed(() => {
     const baseColor = this.color();
     const alpha = this.isHovered() ? this.intensity() : this.intensity() * 0.5;
@@ -47,12 +43,12 @@ export class HighlightDirective {
 }
 ```
 
-Notice how this is identical to component patterns - the only difference is we're in a `@Directive` instead of `@Component`.
+注意，这与组件中的写法完全一致——唯一的区别是我们使用的是 `@Directive` 而不是 `@Component`。
 
 
-### 2. Use signals in host bindings
+### 2. 在宿主绑定中使用信号 {#_2-use-signals-in-host-bindings}
 
-Since directives don't have templates, you'll use signals in **host bindings** to reactively update the host element. Add the `host` configuration and event handlers:
+由于指令没有模板，你需要在**宿主绑定**中使用信号来响应式地更新宿主元素。添加 `host` 配置和事件处理器：
 
 ```ts
 @Directive({
@@ -64,7 +60,7 @@ Since directives don't have templates, you'll use signals in **host bindings** t
   },
 })
 export class HighlightDirective {
-  // ... signals from previous step ...
+  // ... 上一步中的信号 ...
 
   onMouseEnter() {
     this.isHovered.set(true);
@@ -76,12 +72,12 @@ export class HighlightDirective {
 }
 ```
 
-The host bindings automatically re-evaluate when the signals change - just like template bindings in components! When `isHovered` changes, the `backgroundStyle` computed signal recalculates, and the host binding updates the element's style.
+当信号变化时，宿主绑定会自动重新求值——就像组件中的模板绑定一样！当 `isHovered` 变化时，计算信号（Computed）`backgroundStyle` 会重新计算，宿主绑定随之更新元素的样式。
 
 
-### 3. Use the directive in your template
+### 3. 在模板中使用该指令 {#_3-use-the-directive-in-your-template}
 
-Update the app template to demonstrate the reactive directive:
+更新应用模板，演示这个响应式指令：
 
 ```html
 template: `
@@ -97,15 +93,15 @@ template: `
 `,
 ```
 
-The directive automatically applies reactive highlighting based on the signal inputs!
+该指令会根据信号输入自动应用响应式高亮效果！
 
 
 
 
-Perfect! You've now seen how signals work with directives. Some key takeaways from this lesson are:
+完美！你已经了解了信号如何与指令配合使用。本课的几个关键要点如下：
 
-- **Signals are universal** - All signal APIs (`input()`, `signal()`, `computed()`, `effect()`) work the same in both directives and components
-- **Host bindings are the primary use case** - Since directives don't have templates, you use signals in host bindings to reactively modify the host element
-- **Same reactive patterns** - Signal updates trigger automatic re-evaluation of computed signals and host bindings, just like in component templates
+- **信号是通用的** - 所有信号 API（`input()`、`signal()`、`computed()`、`effect()`）在指令和组件中的用法都相同
+- **宿主绑定是主要使用场景** - 由于指令没有模板，你需要在宿主绑定中使用信号来响应式地修改宿主元素
+- **相同的响应式模式** - 信号更新会自动触发计算信号和宿主绑定的重新求值，就像在组件模板中一样
 
-In the next lesson, you'll [learn how to query child elements with signal queries](/tutorials/signals/9-query-child-elements-with-signal-queries)!
+在下一课中，你将[学习如何使用信号查询来查询子元素](/tutorials/signals/9-query-child-elements-with-signal-queries)！

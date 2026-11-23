@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 组件中的控制流 - `@if` {#control-flow-in-components-if}
 
-# Control Flow in Components - `@if`
+决定在屏幕上向用户显示什么内容，是应用开发中的常见任务。很多时候，这种决定是通过条件以编程方式做出的。
 
-Deciding what to display on the screen for a user is a common task in application development. Many times, the decision is made programmatically using conditions.
+为了在模板（Template）中表达条件显示，Angular 使用 `@if` 模板语法。
 
-To express conditional displays in templates, Angular uses the `@if` template syntax.
-
-::: info NOTE
-Learn more about [control flow in the essentials guide](/essentials/templates#control-flow-with-if-and-for).
+::: info 注意
+在[基础知识指南中了解更多关于控制流的内容](/essentials/templates#control-flow-with-if-and-for)。
 
 :::
 
-In this activity, you'll learn how to use conditionals in templates.
+在本练习中，你将学习如何在模板中使用条件语句。
 
 <hr/>
 
-The syntax that enables the conditional display of elements in a template is `@if`.
+在模板中实现元素条件显示的语法是 `@if`。
 
-Here's an example of how to use the `@if` syntax in a component:
+下面是在组件（Component）中使用 `@if` 语法的示例：
 
 ```ts
 @Component({
@@ -35,28 +31,28 @@ export class App {
 }
 ```
 
-Two things to take note of:
+有两点需要注意：
 
-- There is an `@` prefix for the `if` because it is a special type of syntax called [Angular template syntax](/guide/templates)
-- For applications that still use `*ngIf`, please refer to the [Angular documentation for NgIf](/guide/directives/structural-directives) for more information.
-
-
-
-### 1. Create a property called `isServerRunning`
-
-In the `App` class, add a `boolean` property called `isServerRunning`, set the initial value to `true`.
+- `if` 前面有一个 `@` 前缀，因为它是一种特殊的语法，称为 [Angular 模板语法](/guide/templates)
+- 对于仍在使用 `*ngIf` 的应用，请参阅 [NgIf 的 Angular 文档](/guide/directives/structural-directives)了解更多信息。
 
 
-### 2. Use `@if` in the template
 
-Update the template to display the message `Yes, the server is running` if the value of `isServerRunning` is `true`.
+### 1. 创建一个名为 `isServerRunning` 的属性 {#_1-create-a-property-called-isserverrunning}
+
+在 `App` 类中，添加一个名为 `isServerRunning` 的 `boolean` 属性，并将初始值设为 `true`。
 
 
-### 3. Use `@else` in the template
+### 2. 在模板中使用 `@if` {#_2-use-if-in-the-template}
 
-Now Angular supports native template syntax for defining the else case with the `@else` syntax. Update the template to display the message `No, the server is not running` as the else case.
+更新模板，当 `isServerRunning` 的值为 `true` 时显示消息 `Yes, the server is running`。
 
-Here's an example:
+
+### 3. 在模板中使用 `@else` {#_3-use-else-in-the-template}
+
+现在 Angular 支持使用原生模板语法 `@else` 来定义 else 分支。更新模板，在 else 分支中显示消息 `No, the server is not running`。
+
+下面是一个示例：
 
 ```html
 template: `
@@ -68,9 +64,9 @@ template: `
 `;
 ```
 
-Add your code to fill in the missing markup.
+添加你的代码，补全缺失的标记。
 
 
 
 
-This type of functionality is called conditional control flow. Next you'll learn how to repeat items in a template.
+这类功能称为条件控制流。接下来你将学习如何在模板中重复渲染条目。

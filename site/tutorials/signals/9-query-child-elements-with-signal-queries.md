@@ -1,42 +1,38 @@
----
-untranslated: true
----
+# 使用信号查询来查询子元素 {#query-child-elements-with-signal-queries}
 
-# Query child elements with signal queries
+现在你已经学会了[如何在指令中使用信号](/tutorials/signals/8-using-signals-with-directives)，接下来让我们探索基于信号（Signal）的查询（Query）API。它们提供了一种响应式的方式来访问子组件（Component）和指令（Directive）并与之交互。组件和指令既可以执行查询，也可以被查询。与传统的 ViewChild 不同，信号查询会自动更新，并提供对子组件和指令的类型安全访问。
 
-Now that you've learned [how to use signals with directives](/tutorials/signals/8-using-signals-with-directives), let's explore signal-based query APIs. These provide a reactive way to access and interact with child components and directives. Both components and directives can perform queries while also being queried themselves. Unlike the traditional ViewChild, signal queries automatically update and provide type-safe access to child components and directives.
-
-In this activity, you'll add viewChild queries to interact with child components programmatically.
+在本活动中，你将添加 viewChild 查询，以编程方式与子组件交互。
 
 <hr />
 
 
 
-### 1. Add viewChild import
+### 1. 添加 viewChild 导入 {#_1-add-viewchild-import}
 
-First, add the `viewChild` import to access child components in `app.ts`.
+首先，在 `app.ts` 中添加 `viewChild` 导入，以便访问子组件。
 
 ```ts
 import {Component, signal, computed, viewChild, ChangeDetectionStrategy} from '@angular/core';
 ```
 
 
-### 2. Create viewChild queries
+### 2. 创建 viewChild 查询 {#_2-create-viewchild-queries}
 
-Add viewChild queries to the App component to access child components.
+向 App 组件添加 viewChild 查询，以访问子组件。
 
 ```ts
-// Query APIs to access child components
+// 用于访问子组件的查询 API
 firstProduct = viewChild(ProductCard);
 cartSummary = viewChild(CartSummary);
 ```
 
-These queries create signals that reference child component instances.
+这些查询会创建引用子组件实例的信号。
 
 
-### 3. Implement parent methods
+### 3. 实现父组件中的方法 {#_3-implement-parent-methods}
 
-Use the viewChild queries to call methods on child components in `app.ts`:
+在 `app.ts` 中，使用 viewChild 查询调用子组件上的方法：
 
 ```ts
 showFirstProductDetails() {
@@ -55,18 +51,18 @@ initiateCheckout() {
 ```
 
 
-### 4. Test the interactions
+### 4. 测试交互 {#_4-test-the-interactions}
 
-The control buttons should now work:
+现在控制按钮应该可以正常工作了：
 
-- **"Show First Product Details"** - Calls `highlight()` on the ProductCard
-- **"Initiate Checkout"** - Calls `initiateCheckout()` on the CartSummary
+- **“Show First Product Details”** - 调用 ProductCard 上的 `highlight()`
+- **“Initiate Checkout”** - 调用 CartSummary 上的 `initiateCheckout()`
 
-Click the buttons to see how viewChild queries enable parent components to control child behavior.
-
-
+点击这些按钮，看看 viewChild 查询如何让父组件控制子组件的行为。
 
 
-Perfect! You've learned how to use signal-based query APIs for child component interaction:
 
-In the next lesson, you'll learn about [how to react to signal changes with effect](/tutorials/signals/10-reacting-to-signal-changes-with-effect)!
+
+完美！你已经学会了如何使用基于信号的查询 API 与子组件交互：
+
+在下一课中，你将学习[如何使用 effect 响应信号变化](/tutorials/signals/10-reacting-to-signal-changes-with-effect)！

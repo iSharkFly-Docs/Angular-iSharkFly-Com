@@ -56,7 +56,7 @@ loginForm.email; // 也是一个 FieldTree
 
 ### 4. 通过 `FieldTree` 信号读取状态
 
-你可以把 `FieldTree` 节点当作函数调用，来访问树中任意部分的状态。它会返回一个状态对象，其中包含表示值、校验状态和交互状态的响应式信号：
+你可以把 `FieldTree` 节点当作函数调用，来访问树中任意部分的状态。它会返回一个状态对象，其中包含表示值、验证状态和交互状态的响应式信号：
 
 ```ts
 loginForm(); // 返回整个表单的状态
@@ -300,9 +300,9 @@ select 元素同时支持静态选项和动态选项：
 
 :::
 
-## 校验与状态
+## 验证与状态
 
-信号表单提供了内置的校验器，你可以把它们应用到表单字段上。要添加校验，请把一个 schema 函数作为第二个参数传给 `form()`：
+信号表单提供了内置的验证器，你可以把它们应用到表单字段上。要添加验证，请把一个 schema 函数作为第二个参数传给 `form()`：
 
 ```ts
 const loginForm = form(loginModel, (schemaPath) => {
@@ -312,24 +312,24 @@ const loginForm = form(loginModel, (schemaPath) => {
 });
 ```
 
-schema 函数会接收一个 **schema 路径（schema path）** 参数，它提供了指向各个字段的路径，用于配置校验规则。
+schema 函数会接收一个 **schema 路径（schema path）** 参数，它提供了指向各个字段的路径，用于配置验证规则。
 
-常用的校验器包括：
+常用的验证器包括：
 
 - **`required()`** - 确保字段有值
-- **`email()`** - 校验邮箱格式
-- **`min()`** / **`max()`** - 校验数字范围
-- **`minLength()`** / **`maxLength()`** - 校验字符串或集合的长度
-- **`pattern()`** - 按正则表达式进行校验
+- **`email()`** - 验证邮箱格式
+- **`min()`** / **`max()`** - 验证数字范围
+- **`minLength()`** / **`maxLength()`** - 验证字符串或集合的长度
+- **`pattern()`** - 按正则表达式进行验证
 
-你也可以把一个选项对象作为第二个参数传给校验器，以自定义错误信息：
+你也可以把一个选项对象作为第二个参数传给验证器，以自定义错误信息：
 
 ```ts
 required(schemaPath.email, {message: 'Email is required'});
 email(schemaPath.email, {message: 'Please enter a valid email address'});
 ```
 
-`FieldTree` 中的每个节点都会通过响应式信号暴露其校验状态和交互状态。
+`FieldTree` 中的每个节点都会通过响应式信号暴露其验证状态和交互状态。
 
 ### FieldTree 状态信号
 
@@ -337,14 +337,14 @@ email(schemaPath.email, {message: 'Please enter a valid email address'});
 
 | 状态         | 说明                                                                            |
 | ------------ | ------------------------------------------------------------------------------- |
-| `valid()`    | 如果节点通过了所有校验规则，则返回 `true`                                       |
-| `invalid()`  | 如果存在校验错误，则返回 `true`                                                 |
-| `pending()`  | 如果异步校验正在进行中，则返回 `true`                                           |
+| `valid()`    | 如果节点通过了所有验证规则，则返回 `true`                                       |
+| `invalid()`  | 如果存在验证错误，则返回 `true`                                                 |
+| `pending()`  | 如果异步验证正在进行中，则返回 `true`                                           |
 | `touched()`  | 如果用户曾聚焦并离开该字段或其任意子字段，则返回 `true`                         |
 | `dirty()`    | 如果值已被用户修改，则返回 `true`                                               |
 | `disabled()` | 如果节点被禁用，则返回 `true`                                                   |
 | `readonly()` | 如果节点为只读，则返回 `true`                                                   |
-| `errors()`   | 返回一个校验错误数组，每个错误包含 `kind` 和 `message` 属性                     |
+| `errors()`   | 返回一个验证错误数组，每个错误包含 `kind` 和 `message` 属性                     |
 
 ### 完整示例 {#complete-example-validation}
 
@@ -505,8 +505,8 @@ button:active {
 
 - [概览](/guide/forms/signals/overview) - 信号表单简介及其适用场景
 - [表单模型](/guide/forms/signals/models) - 使用信号创建和管理表单数据
-- [字段状态管理](/guide/forms/signals/field-state-management) - 处理校验状态、交互跟踪和字段可见性
-- [校验](/guide/forms/signals/validation) - 内置校验器、自定义校验规则和异步校验
+- [字段状态管理](/guide/forms/signals/field-state-management) - 处理验证状态、交互跟踪和字段可见性
+- [验证](/guide/forms/signals/validation) - 内置验证器、自定义验证规则和异步验证
 
 - [借助依赖注入（Dependency Injection）实现模块化设计](/essentials/dependency-injection)
 

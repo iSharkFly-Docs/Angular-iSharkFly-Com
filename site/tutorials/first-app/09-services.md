@@ -1,66 +1,62 @@
----
-untranslated: true
----
+# Angular 服务 {#angular-services}
 
-# Angular services
-
-This tutorial lesson demonstrates how to create an Angular service and use dependency injection to include it in your app.
+本节教程演示如何创建 Angular 服务（Service），并使用依赖注入（Dependency Injection）将其引入你的应用。
 
 <iframe src="https://www.youtube.com/embed/-jRxG84AzCI?si=rieGfJawp9xJ00Sz" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-Your app will have a service that reads local, static data and serves it to your app.
-In a later lesson, you'll update the service to get data from a web service.
+你的应用将拥有一个服务，它读取本地的静态数据并将其提供给应用。
+在后续课程中，你将更新该服务，使其从 Web 服务获取数据。
 
-## Conceptual preview of services
+## 服务概念预览 {#conceptual-preview-of-services}
 
-This tutorial introduces Angular services and dependency injection.
+本教程介绍 Angular 服务和依赖注入。
 
-### Angular services
+### Angular 服务 {#angular-services-1}
 
-_Angular services_ provide a way for you to separate Angular app data and functions that can be used by multiple components in your app.
-To be used by multiple components, a service must be made _injectable_.
-Services that are injectable and used by a component become dependencies of that component.
-The component depends on those services and can't function without them.
+_Angular 服务_为你提供了一种方式，用来分离 Angular 应用中可供多个组件（Component）使用的数据和函数。
+要被多个组件使用，服务必须是_可注入的（injectable）_。
+可注入并被某个组件使用的服务，会成为该组件的依赖。
+该组件依赖这些服务，没有它们就无法正常工作。
 
-### Dependency injection
+### 依赖注入 {#dependency-injection}
 
-_Dependency injection_ is the mechanism that manages the dependencies of an app's components and the services that other components can use.
+_依赖注入_是一种机制，用于管理应用中组件的依赖，以及可供其他组件使用的服务。
 
 
 
-### 1. Create a new service for your app
+### 1. 为应用创建新服务 {#_1-create-a-new-service-for-your-app}
 
-This step creates an injectable service for your app.
+这一步为你的应用创建一个可注入的服务。
 
-In the **Terminal** pane of your IDE:
+在 IDE 的**终端（Terminal）**面板中：
 
-1. In your project directory, navigate to the `first-app` directory.
-1. In the `first-app` directory, run this command to create the new service.
+1. 在项目目录中，进入 `first-app` 目录。
+1. 在 `first-app` 目录中，运行以下命令创建新服务。
 
    ```shell
    ng generate service housingService --skip-tests
    ```
 
-1. Run `ng serve` to build the app and serve it to `http://localhost:4200`.
-1. Confirm that the app builds without error.
-   Correct any errors before you continue to the next step.
+1. 运行 `ng serve` 构建应用，并在 `http://localhost:4200` 上提供服务。
+1. 确认应用构建没有错误。
+   在继续下一步之前，修正所有错误。
 
 
-### 2. Add static data to the new service
+### 2. 向新服务添加静态数据 {#_2-add-static-data-to-the-new-service}
 
-This step adds some sample data to your new service.
-In a later lesson, you'll replace the static data with a web interface to get data as you might in a real app.
-For now, your app's new service uses the data that has, so far, been created locally in `Home`.
+这一步向新服务添加一些示例数据。
+在后续课程中，你将用 Web 接口替换这些静态数据，像在真实应用中那样获取数据。
+目前，应用的新服务使用的是到目前为止在 `Home` 中本地创建的数据。
 
-In the **Edit** pane of your IDE:
+在 IDE 的**编辑（Edit）**面板中：
 
-1. In `src/app/home/home.ts`, from `Home`, copy the `baseUrl` variable and the `housingLocationList` variable with its array value.
-1. In `src/app/housing-service.ts`:
-   1. Inside the `HousingService` class, paste the variables that you copied from `Home` in the previous step.
-   1. Inside the `HousingService` class, paste these functions after the data you just copied.
-      These functions allow dependencies to access the service's data.
+1. 在 `src/app/home/home.ts` 中，从 `Home` 里复制 `baseUrl` 变量，以及 `housingLocationList` 变量及其数组值。
+1. 在 `src/app/housing-service.ts` 中：
+   1. 在 `HousingService` 类中，粘贴上一步从 `Home` 复制的变量。
+   1. 在 `HousingService` 类中，把下面这些函数粘贴到你刚复制的数据之后。
+      这些函数让依赖方可以访问服务中的数据。
 
       ```ts [Service functions in src/app/housing-service.ts]
       import {Service} from '@angular/core';
@@ -183,9 +179,9 @@ In the **Edit** pane of your IDE:
       }
       ```
 
-      You will need these functions in a future lesson. For now, it is enough to understand that these functions return either a specific `HousingLocation` by id or the entire list.
+      你将在后续课程中用到这些函数。目前只需知道：这些函数要么按 id 返回某个特定的 `HousingLocation`，要么返回整个列表。
 
-   1. Add a file level import for the `HousingLocation`.
+   1. 为 `HousingLocation` 添加文件级导入。
 
       ```ts [Import HousingLocation type in  src/app/housing-service.ts]
       import {Service} from '@angular/core';
@@ -308,18 +304,18 @@ In the **Edit** pane of your IDE:
       }
       ```
 
-1. Confirm that the app builds without error.
-   Correct any errors before you continue to the next step.
+1. 确认应用构建没有错误。
+   在继续下一步之前，修正所有错误。
 
 
-### 3. Inject the new service into `Home`
+### 3. 将新服务注入到 `Home` 中 {#_3-inject-the-new-service-into-home}
 
-This step injects the new service into your app's `Home` so that it can read the app's data from a service.
-In a later lesson, you'll replace the static data with a live data source to get data as you might in a real app.
+这一步把新服务注入到应用的 `Home` 中，使其能够从服务中读取应用数据。
+在后续课程中，你将用实时数据源替换这些静态数据，像在真实应用中那样获取数据。
 
-In the **Edit** pane of your IDE, in `src/app/home/home.ts`:
+在 IDE 的**编辑**面板中，打开 `src/app/home/home.ts`：
 
-1.  At the top of `src/app/home/home.ts`, add the `inject` to the items imported from `@angular/core`. This will import the `inject` function into the `Home` class.
+1.  在 `src/app/home/home.ts` 顶部，把 `inject` 添加到从 `@angular/core` 导入的项中。这会把 `inject` 函数导入到 `Home` 类中。
 
       ```ts [Update to src/app/home/home.ts]
       import {Component, inject} from '@angular/core';
@@ -354,7 +350,7 @@ In the **Edit** pane of your IDE, in `src/app/home/home.ts`:
       }
       ```
 
-1.  Add a new file level import for the `HousingService`:
+1.  为 `HousingService` 添加一个新的文件级导入：
 
       ```ts [Add import to src/app/home/home.ts]
       import {Component, inject} from '@angular/core';
@@ -389,9 +385,9 @@ In the **Edit** pane of your IDE, in `src/app/home/home.ts`:
       }
       ```
 
-1.  From `Home`, delete the `baseUrl` variable, delete the `housingLocationList` array entries and assign `housingLocationList` the value of empty array (`[]`). In a few steps you will update the code to pull the data from the `HousingService`.
+1.  在 `Home` 中，删除 `baseUrl` 变量，删除 `housingLocationList` 数组中的条目，并将 `housingLocationList` 赋值为空数组（`[]`）。稍后几步，你将更新代码，从 `HousingService` 中获取数据。
 
-1.  In `Home`, add the following code to inject the new service and initialize the data for the app. The `constructor` is the first function that runs when this component is created. The code in the `constructor` will assign the `housingLocationList` the value returned from the call to `getAllHousingLocations`.
+1.  在 `Home` 中添加以下代码，注入新服务并为应用初始化数据。`constructor` 是创建该组件时运行的第一个函数。`constructor` 中的代码会把调用 `getAllHousingLocations` 返回的值赋给 `housingLocationList`。
 
       ```ts [Initialize data from service in src/app/home/home.ts]
       import {Component, inject} from '@angular/core';
@@ -426,24 +422,24 @@ In the **Edit** pane of your IDE, in `src/app/home/home.ts`:
       }
       ```
 
-1.  Save the changes to `src/app/home/home.ts` and confirm your app builds without error.
-    Correct any errors before you continue to the next step.
+1.  保存对 `src/app/home/home.ts` 的更改，并确认应用构建没有错误。
+    在继续下一步之前，修正所有错误。
 
 
 
 
-::: info SUMMARY
-In this lesson, you added an Angular service to your app and injected it into the `Home` class.
-This compartmentalizes how your app gets its data.
-For now, the new service gets its data from a static array of data.
-In a later lesson, you'll refactor the service to get its data from an API endpoint.
+::: info 总结
+在本节中，你为应用添加了一个 Angular 服务，并将其注入到了 `Home` 类中。
+这样就把应用获取数据的方式隔离了出来。
+目前，新服务从一个静态数据数组中获取数据。
+在后续课程中，你将重构该服务，使其从 API 端点获取数据。
 
 :::
 
-For more information about the topics covered in this lesson, visit:
+如需进一步了解本节涉及的主题，请访问：
 
-- [Creating an injectable service](/guide/di/creating-and-using-services)
-- [Dependency injection in Angular](/guide/di)
+- [创建可注入的服务](/guide/di/creating-and-using-services)
+- [Angular 中的依赖注入](/guide/di)
 - [ng generate service](https://angular.dev/cli/generate/service)
 - [ng generate](https://angular.dev/cli/generate)
 

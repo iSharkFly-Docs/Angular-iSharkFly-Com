@@ -1,39 +1,35 @@
----
-untranslated: true
----
+# 创建并更新你的第一个信号 {#creating-and-updating-your-first-signal}
 
-# Creating and updating your first signal
+欢迎来到 Angular 信号教程！[信号（Signal）](/essentials/signals)是 Angular 的响应式原语，它提供了一种管理状态的方式，并能在状态变化时自动更新 UI。
 
-Welcome to the Angular signals tutorial! [Signals](/essentials/signals) are Angular's reactive primitive that provide a way to manage state and automatically update your UI when that state changes.
+在本活动中，你将学习如何：
 
-In this activity, you'll learn how to:
+- 使用 `signal()` 函数创建你的第一个信号
+- 在模板（Template）中显示信号的值
+- 使用 `set()` 和 `update()` 方法更新信号的值
 
-- Create your first signal using the `signal()` function
-- Display its value in a template
-- Update the signal value using `set()` and `update()` methods
-
-Let's build an interactive user status system with signals!
+让我们用信号来构建一个交互式的用户状态系统吧！
 
 <hr />
 
 
 
-### 1. Import the signal function
+### 1. 导入 signal 函数 {#_1-import-the-signal-function}
 
-Import the `signal` function from `@angular/core` at the top of your component file.
+在组件（Component）文件顶部，从 `@angular/core` 导入 `signal` 函数。
 
 ```ts
 import {Component, signal, ChangeDetectionStrategy} from '@angular/core';
 ```
 
 
-### 2. Create a signal in your component
+### 2. 在组件中创建信号 {#_2-create-a-signal-in-your-component}
 
-Add a `userStatus` signal to your component class that is initialized with a value of `'offline'`.
+在组件类中添加一个 `userStatus` 信号，并将其初始值设为 `'offline'`。
 
 ```ts
 @Component({
-  /* Config omitted */
+  /* 省略配置 */
 })
 export class App {
   userStatus = signal<'online' | 'offline'>('offline');
@@ -41,32 +37,32 @@ export class App {
 ```
 
 
-### 3. Display the signal value in the template
+### 3. 在模板中显示信号的值 {#_3-display-the-signal-value-in-the-template}
 
-Update the status indicator to display the current user status by:
-1. Binding the signal to the class attribute with `[class]="userStatus()"`
-2. Displaying the status text by replacing `???` with `{{ userStatus() }}`
+按以下方式更新状态指示器，使其显示当前的用户状态：
+1. 使用 `[class]="userStatus()"` 将信号绑定到 class 属性
+2. 将 `???` 替换为 `{{ userStatus() }}` 来显示状态文本
 
 ```html
-<!-- Update from: -->
+<!-- 将原来的： -->
 <div class="status-indicator offline">
   <span class="status-dot"></span>
   Status: ???
 </div>
 
-<!-- To: -->
+<!-- 改为： -->
 <div class="status-indicator" [class]="userStatus()">
   <span class="status-dot"></span>
   Status: {{ userStatus() }}
 </div>
 ```
 
-Notice how we call the signal `userStatus()` with parentheses to read its value.
+注意，我们通过带括号的方式调用信号 `userStatus()` 来读取它的值。
 
 
-### 4. Add methods to update the signal
+### 4. 添加更新信号的方法 {#_4-add-methods-to-update-the-signal}
 
-Add methods to your component that change the user status using the `set()` method.
+在组件中添加使用 `set()` 方法更改用户状态的方法。
 
 ```ts
 goOnline() {
@@ -78,25 +74,25 @@ goOffline() {
 }
 ```
 
-The `set()` method replaces the signal's value entirely with a new value.
+`set()` 方法会用一个新值完全替换信号原来的值。
 
 
-### 5. Wire up the control buttons
+### 5. 连接控制按钮 {#_5-wire-up-the-control-buttons}
 
-The buttons are already in the template. Now connect them to your methods by adding:
-1. Click handlers with `(click)`
-2. Disabled states with `[disabled]` when already in that status
+模板中已经有这些按钮了。现在通过添加以下内容把它们连接到你的方法：
+1. 使用 `(click)` 添加点击处理器
+2. 使用 `[disabled]` 在已处于对应状态时禁用按钮
 
 ```html
-<!-- Add bindings to the existing buttons: -->
+<!-- 为现有按钮添加绑定： -->
 <button (click)="goOnline()" [disabled]="userStatus() === 'online'">Go Online</button>
 <button (click)="goOffline()" [disabled]="userStatus() === 'offline'">Go Offline</button>
 ```
 
 
-### 6. Add a toggle method using update()
+### 6. 使用 update() 添加切换方法 {#_6-add-a-toggle-method-using-update}
 
-Add a `toggleStatus()` method that switches between online and offline using the `update()` method.
+添加一个 `toggleStatus()` 方法，使用 `update()` 方法在 online 和 offline 之间切换。
 
 ```ts
 toggleStatus() {
@@ -104,12 +100,12 @@ toggleStatus() {
 }
 ```
 
-The `update()` method takes a function that receives the current value and returns the new value. This is useful when you need to modify the existing value based on its current state.
+`update()` 方法接收一个函数，该函数以当前值为参数并返回新值。当你需要基于当前状态修改现有值时，这个方法非常有用。
 
 
-### 7. Add the toggle button handler
+### 7. 添加切换按钮的处理器 {#_7-add-the-toggle-button-handler}
 
-The toggle button is already in the template. Connect it to your `toggleStatus()` method:
+模板中已经有切换按钮了。将它连接到你的 `toggleStatus()` 方法：
 
 ```html
 <button (click)="toggleStatus()" class="toggle-btn">Toggle Status</button>
@@ -118,6 +114,6 @@ The toggle button is already in the template. Connect it to your `toggleStatus()
 
 
 
-Congratulations! You've created your first signal and learned how to update it using both `set()` and `update()` methods. The `signal()` function creates a reactive value that Angular tracks, and when you update it, your UI automatically reflects the changes.
+恭喜！你已经创建了第一个信号，并学会了使用 `set()` 和 `update()` 两种方法来更新它。`signal()` 函数会创建一个由 Angular 追踪的响应式值，当你更新它时，UI 会自动反映这些变化。
 
-Next, you'll learn [how to derive state from signals using computed](/tutorials/signals/2-deriving-state-with-computed-signals)!
+接下来，你将学习[如何使用 computed 从信号派生状态](/tutorials/signals/2-deriving-state-with-computed-signals)！

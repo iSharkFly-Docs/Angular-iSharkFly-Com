@@ -1,36 +1,32 @@
----
-untranslated: true
----
+# 为组件模板添加插值 {#add-an-interpolation-to-a-component-s-template}
 
-# Add an interpolation to a component’s template
-
-This tutorial lesson demonstrates how to add interpolation to Angular templates in order to display dynamic data in a template.
+本节教程演示如何在 Angular 模板（Template）中添加插值（Interpolation），以便在模板中显示动态数据。
 
 <iframe src="https://www.youtube.com/embed/eM3zi_n7lNs?si=IFAly3Ss8dwqFx8N&amp;start=338" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-- Your app will display interpolated values in the `HousingLocation` template.
-- Your app will render a housing location data to the browser.
+- 你的应用将在 `HousingLocation` 模板中显示插值的值。
+- 你的应用将在浏览器中渲染一条房屋位置数据。
 
-## Conceptual preview of interpolation
+## 插值概念预览 {#conceptual-preview-of-interpolation}
 
-In this step you will display values read from `input` properties in a template using interpolation.
+在这一步中，你将使用插值在模板中显示从 `input` 属性读取到的值。
 
-Using the `{{ expression }}` in Angular templates, you can render values from properties, `inputs`, and valid JavaScript expressions.
+在 Angular 模板中使用 `{{ expression }}`，可以渲染来自属性、`inputs` 以及合法 JavaScript 表达式的值。
 
-For a more in depth explanation, please refer to the [Displaying values with interpolation](/guide/templates/binding#render-dynamic-text-with-text-interpolation) guide.
+如需更深入的说明，请参阅[使用插值显示值](/guide/templates/binding#render-dynamic-text-with-text-interpolation)指南。
 
 
 
-### 1. Update `HousingLocation` template to include interpolated values
+### 1. 更新 `HousingLocation` 模板以包含插值 {#_1-update-housinglocation-template-to-include-interpolated-values}
 
-This step adds new HTML structure and interpolated values in the `HousingLocation` template.
+这一步在 `HousingLocation` 模板中添加新的 HTML 结构和插值。
 
-In the code editor:
+在代码编辑器中：
 
-1.  Navigate to `src/app/housing-location/housing-location.ts`
-1.  In the template property of the `@Component` decorator, replace the existing HTML markup with the following code:
+1.  打开 `src/app/housing-location/housing-location.ts`
+1.  在 `@Component` 装饰器的 template 属性中，将现有的 HTML 标记替换为以下代码：
 
     ```ts [Update HousingLocation template in housing-location.ts]
     import {Component, input} from '@angular/core';
@@ -57,34 +53,34 @@ In the code editor:
     }
     ```
 
-In this updated template code you have used property binding to bind the `housingLocation.photo` to the `src` attribute. The `alt` attribute uses interpolation to give more context to the alt text of the image.
+在这段更新后的模板代码中，你使用属性绑定（Property Binding）把 `housingLocation.photo` 绑定到 `src` 属性上。`alt` 属性则使用插值，为图片的替代文本提供更多上下文。
 
-You use interpolation to include the values for `name`, `city` and `state` of the `housingLocation` property.
+你使用插值来包含 `housingLocation` 属性中 `name`、`city` 和 `state` 的值。
 
 
-### 2. Confirm the changes render in the browser
+### 2. 确认更改已在浏览器中渲染 {#_2-confirm-the-changes-render-in-the-browser}
 
-1.  Save all changes.
-1.  Open the browser and confirm that the app renders the photo, city and state sample data.
+1.  保存所有更改。
+1.  打开浏览器，确认应用渲染出了照片、城市和州的示例数据。
     <img alt="browser frame of homes-app displaying logo, filter text input box, search button and the same housing location UI card" src="/assets/images/tutorials/first-app/homes-app-lesson-07-step-2.png">
 
 
 
 
-::: info SUMMARY
-In this lesson, you added a new HTML structure and used Angular template syntax to render values in the `HousingLocation` template.
+::: info 总结
+在本节中，你添加了新的 HTML 结构，并使用 Angular 模板语法在 `HousingLocation` 模板中渲染值。
 
 :::
 
-Now, you have two important skills:
+现在，你已经掌握了两项重要技能：
 
-- passing data to components
-- Interpolating values into a template
+- 向组件（Component）传递数据
+- 在模板中插入值
 
-With these skills, your app can now share data and display dynamic values in the browser. Great work so far.
+有了这些技能，你的应用现在可以共享数据，并在浏览器中显示动态值。到目前为止，做得很好。
 
-For more information about the topics covered in this lesson, visit:
+如需进一步了解本节涉及的主题，请访问：
 
-- [Template syntax](/guide/templates)
-- [Displaying values with interpolation](/guide/templates/binding#render-dynamic-text-with-text-interpolation)
+- [模板语法](/guide/templates)
+- [使用插值显示值](/guide/templates/binding#render-dynamic-text-with-text-interpolation)
 

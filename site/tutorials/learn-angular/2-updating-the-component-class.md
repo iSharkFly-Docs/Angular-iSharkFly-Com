@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 更新组件类 {#updating-the-component-class}
 
-# Updating the Component Class
+在 Angular 中，组件（Component）的逻辑和行为定义在组件的 TypeScript 类中。
 
-In Angular, the component's logic and behavior are defined in the component's TypeScript class.
-
-::: info NOTE
-Learn more about [showing dynamic text in the essentials guide](/essentials/templates#showing-dynamic-text).
+::: info 注意
+在[基础知识指南中了解更多关于显示动态文本的内容](/essentials/templates#showing-dynamic-text)。
 
 :::
 
-In this activity, you'll learn how to update the component class and how to use [interpolation](/guide/templates/binding#render-dynamic-text-with-text-interpolation).
+在本练习中，你将学习如何更新组件类，以及如何使用[插值（Interpolation）](/guide/templates/binding#render-dynamic-text-with-text-interpolation)。
 
 <hr />
 
 
 
-### 1. Add a property called `city`
+### 1. 添加一个名为 `city` 的属性 {#_1-add-a-property-called-city}
 
-Update the component class by adding a property called `city` to the `App` class.
+通过向 `App` 类添加一个名为 `city` 的属性来更新组件类。
 
 ```ts
 export class App {
@@ -27,35 +23,35 @@ export class App {
 }
 ```
 
-The `city` property is of type `string` but you can omit the type because of [type inference in TypeScript](https://www.typescriptlang.org/docs/handbook/type-inference.html). The `city` property can be used in the `App` class and can be referenced in the component template.
+`city` 属性的类型是 `string`，但由于 [TypeScript 中的类型推断](https://www.typescriptlang.org/docs/handbook/type-inference.html)，你可以省略类型声明。`city` 属性可以在 `App` 类中使用，也可以在组件模板中引用。
 
 <br>
 
-To use a class property in a template, you have to use the `{{ }}` syntax.
+要在模板（Template）中使用类属性，你需要使用 `{{ }}` 语法。
 
 
-### 2. Update the component template
+### 2. 更新组件模板 {#_2-update-the-component-template}
 
-Update the `template` property to match the following HTML:
+更新 `template` 属性，使其与下面的 HTML 一致：
 
 ```ts
 template: `Hello {{ city }}`,
 ```
 
-This is an example of interpolation and is a part of Angular template syntax. It enables you to do much more than put dynamic text in a template. You can also use this syntax to call functions, write expressions and more.
+这是插值的一个例子，它是 Angular 模板语法的一部分。它能做的远不止在模板中放入动态文本。你还可以用这种语法调用函数、编写表达式等。
 
 
-### 3. More practice with interpolation
+### 3. 更多插值练习 {#_3-more-practice-with-interpolation}
 
-Try this - add another set of `{{ }}` with the contents being `1 + 1`:
+试试这个：再添加一组 `{{ }}`，内容为 `1 + 1`：
 
 ```ts
 template: `Hello {{ city }}, {{ 1 + 1 }}`,
 ```
 
-Angular evaluates the contents of the `{{ }}` and renders the output in the template.
+Angular 会对 `{{ }}` 中的内容求值，并将结果渲染到模板中。
 
 
 
 
-This is just the beginning of what's possible with Angular templates, keep on learning to find out more.
+这只是 Angular 模板能力的冰山一角，继续学习来了解更多吧。

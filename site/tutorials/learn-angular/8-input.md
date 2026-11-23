@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 组件输入属性 {#component-input-properties}
 
-# Component input properties
+有时在应用开发中，你需要把数据传入组件（Component）。这些数据可以用来定制组件，或者把信息从父组件传递给子组件。
 
-Sometimes app development requires you to send data into a component. This data can be used to customize a component or perhaps send information from a parent component to a child component.
+Angular 使用一个叫做 `input` 的概念，它类似于其他框架中的 `props`。要创建 `input` 属性，请使用 `input()` 函数。
 
-Angular uses a concept called `input`. This is similar to `props` in other frameworks. To create an `input` property, use the `input()` function.
-
-::: info NOTE
-Learn more about [accepting data with input properties in the inputs guide](/guide/components/inputs).
+::: info 注意
+在[输入指南中了解更多关于通过输入属性接收数据的内容](/guide/components/inputs)。
 
 :::
 
-In this activity, you'll learn how to use the `input()` function to send information to components.
+在本练习中，你将学习如何使用 `input()` 函数向组件传递信息。
 
 <hr>
 
-To create an `input` property, add the `input()` function to initialize a property of a component class:
+要创建 `input` 属性，请使用 `input()` 函数来初始化组件类的某个属性：
 
 ```ts [user.ts]
 class User {
@@ -25,7 +21,7 @@ class User {
 }
 ```
 
-When you are ready to pass in a value through an `input`, values can be set in templates using the attribute syntax. Here's an example:
+当你准备通过 `input` 传入值时，可以在模板（Template）中使用 Attribute 语法来设置值。下面是一个示例：
 
 ```ts [app.ts]
 @Component({
@@ -35,7 +31,7 @@ When you are ready to pass in a value through an `input`, values can be set in t
 export class App {}
 ```
 
-The `input` function returns an `InputSignal`. You can read the value by calling the signal.
+`input` 函数返回一个 `InputSignal`。你可以通过调用该信号（Signal）来读取它的值。
 
 ```ts [user.ts]
 @Component({
@@ -46,21 +42,21 @@ The `input` function returns an `InputSignal`. You can read the value by calling
 
 
 
-### 1. Define an `input()` property
+### 1. 定义一个 `input()` 属性 {#_1-define-an-input-property}
 
-Update the code in `user.ts` to define an `input` property on the `User` called `name` and specify the `string` type. For now, don't set an initial value and invoke `input()` without arguments. Be sure to update the template to invoke and interpolate the `name` property at the end of the sentence.
+更新 `user.ts` 中的代码，在 `User` 上定义一个名为 `name` 的 `input` 属性，并指定其类型为 `string`。目前先不要设置初始值，调用 `input()` 时不传参数。一定要更新模板，在句子末尾调用并插值显示 `name` 属性。
 
 
-### 2. Pass a value to the `input` property
+### 2. 向 `input` 属性传值 {#_2-pass-a-value-to-the-input-property}
 
-Update the code in `app.ts` to send in the `name` property with a value of `"Simran"`.
+更新 `app.ts` 中的代码，传入 `name` 属性，其值为 `"Simran"`。
 <br>
 
-When the code has been successfully updated, the app will display `The user's name is Simran`.
+代码更新成功后，应用将显示 `The user's name is Simran`。
 
 
 
 
-While this is great, it is only one direction of the component communication. What if you want to send information and data to a parent component from a child component? Check out the next lesson to find out.
+这很棒，但这只是组件通信的一个方向。如果你想把信息和数据从子组件发送给父组件呢？请查看下一课来一探究竟。
 
-P.S. you are doing great - keep going 🎉
+附言：你做得很棒，继续加油 🎉

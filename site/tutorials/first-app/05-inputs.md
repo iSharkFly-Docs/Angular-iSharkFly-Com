@@ -1,35 +1,31 @@
----
-untranslated: true
----
+# 为组件添加输入参数 {#add-an-input-parameter-to-the-component}
 
-# Add an input parameter to the component
-
-This tutorial lesson demonstrates how to create a component `input` and use it to pass data to a component for customization.
+本节教程演示如何创建组件（Component）的 `input`，并用它向组件传递数据以实现定制。
 
 <iframe src="https://www.youtube.com/embed/eM3zi_n7lNs?si=WvRGFSkW_7_zDIFD&amp;start=241" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-::: info NOTE
-This video reflects an older syntax, but the main concepts remain valid.
+::: info 注意
+这段视频展示的是较早的语法，但其中的主要概念仍然适用。
 
 :::
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-Your app's `HousingLocation` template will have a `HousingLocation` property to receive input.
+你应用中的 `HousingLocation` 模板（Template）将拥有一个 `HousingLocation` 属性，用于接收输入。
 
-## Conceptual preview of Inputs
+## 输入概览 {#conceptual-preview-of-inputs}
 
-[Inputs](https://angular.dev/api/core/input) allow components to specify data that can be passed to it from a parent component.
+[输入（Input）](https://angular.dev/api/core/input)允许组件指定可以由父组件传递给它的数据。
 
-In this lesson, you'll define an `input` property in the `HousingLocation` component that enables you to customize the data displayed in the component.
+在本课中，你将在 `HousingLocation` 组件中定义一个 `input` 属性，借此定制组件中显示的数据。
 
-Learn more in the [Accepting data with input properties](/guide/components/inputs) and [Custom events with outputs](/guide/components/outputs) guides.
+请在[通过输入属性接收数据](/guide/components/inputs)和[通过输出自定义事件](/guide/components/outputs)指南中了解更多。
 
 
 
-### 1. Import the input() function
+### 1. 导入 input() 函数 {#_1-import-the-input-function}
 
-In the code editor, import the `input` helper method from `@angular/core` and the `HousingLocationInfo` interface from `../housinglocation` into the `HousingLocation` component.
+在代码编辑器中，将 `@angular/core` 中的 `input` 辅助方法和 `../housinglocation` 中的 `HousingLocationInfo` 接口导入到 `HousingLocation` 组件中。
 
 ```ts [Import input and HousingLocationInfo in housing-location.ts]
 import {Component, input} from '@angular/core';
@@ -46,9 +42,9 @@ export class HousingLocation {
 ```
 
 
-### 2. Add the Input property
+### 2. 添加 Input 属性 {#_2-add-the-input-property}
 
-Add a required property called `housingLocation` and initialize it using `input.required()` with the type `HousingLocationInfo`.
+添加一个名为 `housingLocation` 的必需属性，并使用 `input.required()` 以 `HousingLocationInfo` 类型对其进行初始化。
 
   ```ts [Declare the input property in housing-location.ts]
   import {Component, input} from '@angular/core';
@@ -64,12 +60,12 @@ Add a required property called `housingLocation` and initialize it using `input.
   }
   ```
 
-You have to invoke the `required` method on `input` to indicate that the parent component must provide a value. In our example application, we know this value will always be passed in — this is by design. The `.required()` call ensures that the TypeScript compiler enforces this and treats the property as non-nullable when this component is used in a template.
+你必须调用 `input` 上的 `required` 方法，以表明父组件必须提供一个值。在我们的示例应用中，我们知道这个值总是会被传入——这是有意为之的设计。`.required()` 调用确保 TypeScript 编译器会强制执行这一点，并在模板中使用此组件时将该属性视为不可为空（non-nullable）。
 
 
-### 3. Pass data to the input
+### 3. 向输入传递数据 {#_3-pass-data-to-the-input}
 
-Send the `housingLocation` value from the `Home` component to the `housingLocation` property of the HousingLocation component.
+将 `Home` 组件中的 `housingLocation` 值传给 HousingLocation 组件的 `housingLocation` 属性。
 
 ```ts [Declare the input property for HousingLocation in home.ts]
 import {Component} from '@angular/core';
@@ -111,11 +107,11 @@ export class Home {
 
 
 
-::: info SUMMARY
-In this lesson, you created a new `input` property. You also used the `.required` method to ensure the signal value is always defined.
+::: info 总结
+在本课中，你创建了一个新的 `input` 属性。你还使用了 `.required` 方法来确保信号（Signal）的值始终有定义。
 
 :::
 
-- [Accepting data with input properties](/guide/components/inputs)
-- [Custom events with outputs](/guide/components/outputs)
+- [通过输入属性接收数据](/guide/components/inputs)
+- [通过输出自定义事件](/guide/components/outputs)
 

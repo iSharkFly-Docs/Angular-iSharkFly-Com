@@ -1,31 +1,27 @@
----
-untranslated: true
----
-
-# Learn Angular Signal Forms
+# 学习 Angular 信号表单 {#learn-angular-signal-forms}
 
 <div class="docs-tutorial-mascot">
   <img class="docs-tutorial-mascot__angie" src="/assets/images/angie/greeting.svg" aria-hidden="true">
-  <p class="docs-tutorial-mascot__bubble">Welcome! Let's build forms with signals.</p>
+  <p class="docs-tutorial-mascot__bubble">欢迎！让我们用信号来构建表单吧。</p>
 </div>
 
-This interactive tutorial will teach you how to build reactive forms using Angular's Signal Forms API.
+本交互式教程将教你如何使用 Angular 的信号表单（Signal Forms）API 构建响应式表单。
 
-## How to use this tutorial
+## 如何使用本教程 {#how-to-use-this-tutorial}
 
-This tutorial assumes you understand Angular's core concepts and have basic familiarity with signals. If you're new to Angular, read our [essentials guide](/essentials). If you're new to signals, complete the [signals tutorial](/tutorials/signals) first.
+本教程假定你已了解 Angular 的核心概念，并对信号（Signal）有基本的了解。如果你是 Angular 新手，请阅读我们的[基础指南](/essentials)。如果你刚接触信号，请先完成[信号教程](/tutorials/signals)。
 
-Each step represents a concept in Signal Forms. You'll build a complete login form from scratch, learning the fundamentals step by step.
+每一步都代表信号表单中的一个概念。你将从零开始构建一个完整的登录表单，循序渐进地学习基础知识。
 
-**Your learning path:**
+**你的学习路径：**
 
-1. Set up the form model with TypeScript and signals
-2. Connect the form to your template
-3. Add validation rules
-4. Display validation errors to users
-5. Handle form submission
-6. Explore advanced topics and next steps
+1. 使用 TypeScript 和信号设置表单模型
+2. 将表单连接到模板
+3. 添加验证规则
+4. 向用户显示验证错误
+5. 处理表单提交
+6. 探索进阶主题和后续步骤
 
-If you get stuck, click "Reveal answer" at the top.
+如果遇到困难，请点击顶部的 “Reveal answer”（显示答案）。
 
-Alright, let's [get started](/tutorials/signal-forms/1-set-up-form-model)!
+好了，让我们[开始吧](/tutorials/signal-forms/1-set-up-form-model)！

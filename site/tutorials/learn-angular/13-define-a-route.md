@@ -1,30 +1,26 @@
----
-untranslated: true
----
+# 定义路由 {#define-a-route}
 
-# Define a Route
+现在你已经把应用设置为使用 Angular 路由（Router），接下来需要定义路由。
 
-Now that you've set up the app to use Angular Router, you need to define the routes.
-
-::: info NOTE
-Learn more about [defining a basic route in the in-depth guide](/guide/routing/define-routes).
+::: info 注意
+在[深入指南中了解更多关于定义基本路由的内容](/guide/routing/define-routes)。
 
 :::
 
-In this activity, you'll learn how to add and configure routes with your app.
+在本活动中，你将学习如何在应用中添加和配置路由。
 
 <hr>
 
 
 
-### 1. Define a route in `app.routes.ts`
+### 1. 在 `app.routes.ts` 中定义路由 {#_1-define-a-route-in-app-routes-ts}
 
-In your app, there are two pages to display: (1) Home Page and (2) User Page.
+应用中有两个要显示的页面：(1) 首页和 (2) 用户页面。
 
-To define a route, add a route object to the `routes` array in `app.routes.ts` that contains:
+要定义路由，请在 `app.routes.ts` 的 `routes` 数组中添加一个路由对象，其中包含：
 
-- The `path` of the route (which automatically starts at the root path (i.e., `/`))
-- The `component` that you want the route to display
+- 路由的 `path`（它会自动从根路径开始，即 `/`）
+- 你希望该路由显示的 `component`
 
 ```ts
 import {Routes} from '@angular/router';
@@ -38,16 +34,16 @@ export const routes: Routes = [
 ];
 ```
 
-The code above is an example of how `Home` can be added as a route. Now go ahead and implement this along with the `User` in the playground.
+上面的代码示例演示了如何把 `Home` 添加为一个路由。现在请在演练场（playground）中实现它，并同时为 `User` 添加路由。
 
-Use `'user'` for the path of `User`.
+使用 `'user'` 作为 `User` 的路径。
 
 
-### 2. Add title to route definition
+### 2. 为路由定义添加标题 {#_2-add-title-to-route-definition}
 
-In addition to defining the routes correctly, Angular Router also enables you to set the page title whenever users are navigating by adding the `title` property to each route.
+除了正确定义路由之外，Angular 路由还允许你为每个路由添加 `title` 属性，从而在用户导航时设置页面标题。
 
-In `app.routes.ts`, add the `title` property to the default route (`path: ''`) and the `user` route. Here's an example:
+在 `app.routes.ts` 中，为默认路由（`path: ''`）和 `user` 路由添加 `title` 属性。示例如下：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -65,6 +61,6 @@ export const routes: Routes = [
 
 
 
-In the activity, you've learned how to define and configure routes in your Angular app. Nice work. 🙌
+在本活动中，你学会了如何在 Angular 应用中定义和配置路由。干得漂亮。🙌
 
-The journey to fully enabling routing in your app is almost complete, keep going.
+在应用中完整启用路由的旅程即将完成，继续加油。

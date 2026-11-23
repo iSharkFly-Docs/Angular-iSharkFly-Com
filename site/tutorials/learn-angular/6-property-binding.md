@@ -1,35 +1,31 @@
----
-untranslated: true
----
+# Angular 中的属性绑定 {#property-binding-in-angular}
 
-# Property Binding in Angular
+Angular 中的属性绑定（Property Binding）让你可以为 HTML 元素、Angular 组件（Component）等的属性设置值。
 
-Property binding in Angular enables you to set values for properties of HTML elements, Angular components and more.
+使用属性绑定可以动态设置 Property 和 Attribute 的值。你可以用它来切换按钮功能、以编程方式设置图片路径，以及在组件之间共享值。
 
-Use property binding to dynamically set values for properties and attributes. You can do things such as toggle button features, set image paths programmatically, and share values between components.
-
-::: info NOTE
-Learn more about [setting dynamic properties and attributes in the essentials guide](/essentials/templates#setting-dynamic-properties-and-attributes).
+::: info 注意
+在[基础知识指南中了解更多关于设置动态 Property 和 Attribute 的内容](/essentials/templates#setting-dynamic-properties-and-attributes)。
 
 :::
 
-In this activity, you'll learn how to use property binding in templates.
+在本练习中，你将学习如何在模板（Template）中使用属性绑定。
 
 <hr />
 
-To bind to an element's attribute, wrap the attribute name in square brackets. Here's an example:
+要绑定到元素的某个属性，请把属性名包裹在方括号中。下面是一个示例：
 
 ```html
 <img alt="photo" [src]="imageURL" />
 ```
 
-In this example, the value of the `src` attribute will be bound to the class property `imageURL`. Whatever value `imageURL` has will be set as the `src` attribute of the `img` tag.
+在这个例子中，`src` 属性的值会绑定到类属性 `imageURL`。无论 `imageURL` 的值是什么，都会被设置为 `img` 标签的 `src` 属性。
 
 
 
-### 1. Add a property called `isEditable`
+### 1. 添加一个名为 `isEditable` 的属性 {#_1-add-a-property-called-iseditable}
 
-Update the code in `app.ts` by adding a property to the `App` class called `isEditable` with the initial value set to `true`.
+更新 `app.ts` 中的代码，向 `App` 类添加一个名为 `isEditable` 的属性，并将初始值设为 `true`。
 
 ```ts
 export class App {
@@ -38,9 +34,9 @@ export class App {
 ```
 
 
-### 2. Bind to `contentEditable`
+### 2. 绑定到 `contentEditable` {#_2-bind-to-contenteditable}
 
-Next, bind the `contentEditable` attribute of the `div` to the `isEditable` property by using the <code aria-label="square brackets">[]</code> syntax.
+接下来，使用 <code aria-label="square brackets">[]</code> 语法把 `div` 的 `contentEditable` 属性绑定到 `isEditable` 属性。
 
 ```ts
 @Component({
@@ -52,6 +48,6 @@ Next, bind the `contentEditable` attribute of the `div` to the `isEditable` prop
 
 
 
-The div is now editable. Nice work 👍
+这个 div 现在可以编辑了。干得漂亮 👍
 
-Property binding is one of Angular's many powerful features. If you'd like to learn more checkout [the Angular documentation](/guide/templates/binding#css-class-and-style-property-bindings).
+属性绑定是 Angular 众多强大功能之一。如果想了解更多，请查看 [Angular 文档](/guide/templates/binding#css-class-and-style-property-bindings)。

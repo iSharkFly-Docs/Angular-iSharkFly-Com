@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 在服务中使用信号 {#using-signals-with-services}
 
-# Using signals with services
+现在你已经学会了[使用模型信号实现双向绑定](/tutorials/signals/6-two-way-binding-with-model-signals)，接下来让我们探索如何在 Angular 服务（Service）中使用信号（Signal）。服务非常适合在多个组件（Component）之间共享响应式状态，而信号通过提供自动变更检测（Change Detection）和简洁的响应式模式，让这一切变得更加强大。
 
-Now that you've learned [two-way binding with model signals](/tutorials/signals/6-two-way-binding-with-model-signals), let's explore how to use signals with Angular services. Services are perfect for sharing reactive state across multiple components, and signals make this even more powerful by providing automatic change detection and clean reactive patterns.
-
-In this activity, you'll learn how to create a cart store with signals that allow the cart display component to react to state changes automatically.
+在本活动中，你将学习如何使用信号创建一个购物车存储（store），让购物车展示组件能够自动响应状态变化。
 
 <hr />
 
 
 
-### 1. Add cart store signals
+### 1. 添加购物车存储的信号 {#_1-add-cart-store-signals}
 
-Add readonly and computed signals to make the cart state reactive in `cart-store.ts`.
+在 `cart-store.ts` 中添加只读信号和计算信号（Computed），让购物车状态具备响应性。
 
 ```ts
-// Add the computed import
+// 添加 computed 的导入
 import {Service, signal, computed} from '@angular/core';
 
-// Then add these signals to the class:
+// 然后在类中添加以下信号：
 
-// Readonly signals
+// 只读信号
 readonly cartItems = this.items.asReadonly();
 
-// Computed signals
+// 计算信号
 readonly totalQuantity = computed(() => {
   return this.items().reduce((sum, item) => sum + item.quantity, 0);
 });
@@ -35,12 +31,12 @@ readonly totalPrice = computed(() => {
 });
 ```
 
-These signals allow components to reactively access cart data and computed totals. The `asReadonly()` method prevents external code from modifying the cart items directly, while `computed()` creates derived state that automatically updates when the source signal changes.
+这些信号让组件能够以响应式的方式访问购物车数据和计算出的总计。`asReadonly()` 方法可以防止外部代码直接修改购物车中的商品，而 `computed()` 会创建派生状态，在源信号变化时自动更新。
 
 
-### 2. Complete the quantity update methods
+### 2. 完成数量更新方法 {#_2-complete-the-quantity-update-methods}
 
-The cart display component in `cart-display.ts` already uses the cart store signals in its template. Complete the quantity update methods to modify cart items:
+`cart-display.ts` 中的购物车展示组件已经在其模板（Template）中使用了购物车存储的信号。完成以下数量更新方法，以修改购物车中的商品：
 
 ```ts
 increaseQuantity(id: string) {
@@ -60,12 +56,12 @@ decreaseQuantity(id: string) {
 }
 ```
 
-These methods read the current cart state using `cartItems()` and update quantities through the store's methods. The UI automatically updates when the signals change!
+这些方法通过 `cartItems()` 读取当前的购物车状态，并借助存储提供的方法来更新数量。当信号变化时，UI 会自动更新！
 
 
-### 3. Update the main app component
+### 3. 更新主应用组件 {#_3-update-the-main-app-component}
 
-Update the main app component in `app.ts` to use the cart service and display the cart component.
+更新 `app.ts` 中的主应用组件，让它使用购物车服务并显示购物车组件。
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -99,11 +95,11 @@ export class App {
 
 
 
-Excellent! You've now learned how to use signals with services. Key concepts to remember:
+太棒了！你已经学会了如何在服务中使用信号。需要记住的关键概念：
 
-- **Service-level signals**: Services can use signals to manage reactive state
-- **Dependency injection**: Use `inject()` to access services with signals in components
-- **Computed signals in services**: Create derived state that updates automatically
-- **Readonly signals**: Expose read-only versions of signals to prevent external mutations
+- **服务级信号**：服务可以使用信号来管理响应式状态
+- **依赖注入（Dependency Injection）**：在组件中使用 `inject()` 来访问带有信号的服务
+- **服务中的计算信号**：创建可自动更新的派生状态
+- **只读信号**：暴露信号的只读版本，以防止外部修改
 
-In the next lesson, you'll learn about [how to use signals with directives](/tutorials/signals/8-using-signals-with-directives)!
+在下一课中，你将学习[如何在指令中使用信号](/tutorials/signals/8-using-signals-with-directives)！

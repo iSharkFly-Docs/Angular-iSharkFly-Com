@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 管道 {#pipes}
 
-# Pipes
+管道（Pipe）是用于在模板（Template）中转换数据的函数。一般来说，管道是不会产生副作用的「纯」函数。Angular 内置了许多实用的管道，你可以导入它们并在组件（Component）中使用。你也可以创建自定义管道。
 
-Pipes are functions that are used to transform data in templates. In general, pipes are "pure" functions that don't cause side effects. Angular has a number of helpful built-in pipes you can import and use in your components. You can also create a custom pipe.
-
-::: info NOTE
-Learn more about [pipes in the in-depth guide](/guide/templates/pipes).
+::: info 注意
+在[深入指南中了解更多关于管道的内容](/guide/templates/pipes)。
 
 :::
 
-In this activity, you will import a pipe and use it in the template.
+在本活动中，你将导入一个管道并在模板中使用它。
 
 <hr>
 
-To use a pipe in a template include it in an interpolated expression. Check out this example:
+要在模板中使用管道，请把它放在插值表达式中。看看这个示例：
 
 ```ts
 import {UpperCasePipe} from '@angular/common';
@@ -30,22 +26,22 @@ export class App {
 }
 ```
 
-Now, it's your turn to give this a try:
+现在轮到你来试一试了：
 
 
 
-### 1. Import the `LowerCase` pipe
+### 1. 导入 `LowerCase` 管道 {#_1-import-the-lowercase-pipe}
 
-First, update `app.ts` by adding the file level import for `LowerCasePipe` from `@angular/common`.
+首先，更新 `app.ts`，在文件级别添加从 `@angular/common` 导入 `LowerCasePipe` 的语句。
 
 ```ts
 import {LowerCasePipe} from '@angular/common';
 ```
 
 
-### 2. Add the pipe to the template imports
+### 2. 把管道添加到模板的 imports 中 {#_2-add-the-pipe-to-the-template-imports}
 
-Next, update `@Component()` decorator `imports` to include a reference to `LowerCasePipe`
+接下来，更新 `@Component()` 装饰器的 `imports`，加入对 `LowerCasePipe` 的引用
 
 ```ts
 @Component({
@@ -55,9 +51,9 @@ Next, update `@Component()` decorator `imports` to include a reference to `Lower
 ```
 
 
-### 3. Add the pipe to the template
+### 3. 在模板中添加管道 {#_3-add-the-pipe-to-the-template}
 
-Finally, in `app.ts` update the template to include the `lowercase` pipe:
+最后，在 `app.ts` 中更新模板，加入 `lowercase` 管道：
 
 ```html
 template: `{{ username | lowercase }}`
@@ -66,6 +62,6 @@ template: `{{ username | lowercase }}`
 
 
 
-Pipes can also accept parameters which can be used to configure their output. Find out more in the next activity.
+管道还可以接收参数，用于配置其输出。在下一个活动中了解更多。
 
-P.S. you are doing great ⭐️
+附言：你做得很棒 ⭐️

@@ -1,53 +1,49 @@
----
-untranslated: true
----
+# 创建 Home 组件 {#create-home-component}
 
-# Create Home component
-
-This tutorial lesson demonstrates how to create a new [component](/guide/components) for your Angular app.
+本节教程演示如何为你的 Angular 应用创建一个新的[组件（Component）](/guide/components)。
 
 <iframe src="https://www.youtube.com/embed/R0nRX8jD2D0?si=OMVaw71EIa44yIOJ" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-## What you'll learn
+## 你将学到什么 {#what-you-ll-learn}
 
-Your app will have a new component: `Home`.
+你的应用将拥有一个新组件：`Home`。
 
-## Conceptual preview of Angular components
+## Angular 组件概览 {#conceptual-preview-of-angular-components}
 
-Angular apps are built around components, which are Angular's building blocks.
-Components contain the code, HTML layout, and CSS style information that provide the function and appearance of an element in the app.
-In Angular, components can contain other components. An app's functions and appearance can be divided and partitioned into components.
+Angular 应用是围绕组件构建的，组件是 Angular 的基本构建块。
+组件包含代码、HTML 布局和 CSS 样式信息，它们共同决定了应用中某个元素的功能和外观。
+在 Angular 中，组件可以包含其他组件。应用的功能和外观可以被拆分并划分到各个组件中。
 
-In Angular, components have metadata that define its properties.
-When you create your `Home`, you use these properties:
+在 Angular 中，组件具有定义其属性的元数据。
+创建 `Home` 时，你会用到以下属性：
 
-- `selector`: to describe how Angular refers to the component in templates.
-- `imports`: to describe the component's dependencies.
-- `template`: to describe the component's HTML markup and layout.
-- `styleUrl`: to specify the URL of the CSS file that the component uses.
+- `selector`：描述 Angular 如何在模板（Template）中引用该组件。
+- `imports`：描述该组件的依赖项。
+- `template`：描述该组件的 HTML 标记和布局。
+- `styleUrl`：指定该组件所使用的 CSS 文件的 URL。
 
-- [Learn more about Components](https://angular.dev/api/core/Component)
-
-
+- [进一步了解组件](https://angular.dev/api/core/Component)
 
 
-### 1. Create the `Home`
 
-In this step, you create a new component for your app.
 
-In the **Terminal** pane of your IDE:
+### 1. 创建 `Home` {#_1-create-the-home}
 
-1. In your project directory, navigate to the `first-app` directory.
-1. Run this command to create a new `Home`
+在这一步中，你将为应用创建一个新组件。
+
+在 IDE 的**终端（Terminal）**窗格中：
+
+1. 在你的项目目录中，进入 `first-app` 目录。
+1. 运行此命令，创建一个新的 `Home`
 
    ```shell
    ng generate component home
    ```
 
-1. Run this command to build and serve your app.
+1. 运行此命令，构建并启动你的应用。
 
-   ::: info NOTE
-   This step is only for your local environment!
+   ::: info 注意
+   此步骤仅适用于你的本地环境！
 
    :::
 
@@ -55,26 +51,26 @@ In the **Terminal** pane of your IDE:
    ng serve
    ```
 
-1. Open a browser and navigate to `http://localhost:4200` to find the application.
+1. 打开浏览器并访问 `http://localhost:4200`，找到该应用。
 
-1. Confirm that the app builds without error.
+1. 确认应用无错误地完成构建。
 
-   ::: tip HELPFUL
-   It should render the same as it did in the previous lesson because even though you added a new component, you haven't included it in any of the app's templates, yet.
+   ::: tip 提示
+   它的渲染结果应该和上一课相同，因为虽然你添加了一个新组件，但还没有把它包含到应用的任何模板中。
 
    :::
 
-1. Leave `ng serve` running as you complete the next steps.
+1. 在完成后续步骤时，让 `ng serve` 保持运行。
 
 
-### 2. Add the new component to your app's layout
+### 2. 将新组件添加到应用的布局中 {#_2-add-the-new-component-to-your-app-s-layout}
 
-In this step, you add the new component, `Home` to your app's root component, `App`, so that it displays in your app's layout.
+在这一步中，你将把新组件 `Home` 添加到应用的根组件 `App` 中，使其显示在应用的布局里。
 
-In the **Edit** pane of your IDE:
+在 IDE 的**编辑（Edit）**窗格中：
 
-1.  Open `app.ts` in the editor.
-1.  In `app.ts`, import `Home` by adding this line to the file level imports.
+1.  在编辑器中打开 `app.ts`。
+1.  在 `app.ts` 中，将下面这行代码添加到文件顶部的导入语句中，以导入 `Home`。
 
       ```ts [Import Home in src/app/app.ts]
       import {Component} from '@angular/core';
@@ -100,7 +96,7 @@ In the **Edit** pane of your IDE:
       }
       ```
 
-1.  In `app.ts`, in `@Component`, update the `imports` array property and add `Home`.
+1.  在 `app.ts` 的 `@Component` 中，更新 `imports` 数组属性，添加 `Home`。
 
       ```ts [Replace in src/app/app.ts]
       import {Component} from '@angular/core';
@@ -126,7 +122,7 @@ In the **Edit** pane of your IDE:
       }
       ```
 
-1.  In `app.ts`, in `@Component`, update the `template` property to include the following HTML code.
+1.  在 `app.ts` 的 `@Component` 中，更新 `template` 属性，使其包含以下 HTML 代码。
 
       ```ts [Replace in src/app/app.ts]
       import {Component} from '@angular/core';
@@ -152,26 +148,26 @@ In the **Edit** pane of your IDE:
       }
       ```
 
-1.  Save your changes to `app.ts`.
-1.  If `ng serve` is running, the app should update.
-    If `ng serve` is not running, start it again.
-    _Hello world_ in your app should change to _home works!_ from the `Home`.
-1.  Check the running app in the browser and confirm that the app has been updated.
+1.  保存对 `app.ts` 的修改。
+1.  如果 `ng serve` 正在运行，应用应该会自动更新。
+    如果 `ng serve` 没有运行，请重新启动它。
+    应用中的 _Hello world_ 应该会变成来自 `Home` 的 _home works!_。
+1.  在浏览器中查看正在运行的应用，确认应用已经更新。
 
   <img alt="browser frame of page displaying the text 'home works!'" src="/assets/images/tutorials/first-app/homes-app-lesson-02-step-2.png">
 
 
-### 3. Add features to `Home`
+### 3. 为 `Home` 添加功能 {#_3-add-features-to-home}
 
-In this step you add features to `Home`.
+在这一步中，你将为 `Home` 添加功能。
 
-In the previous step, you added the default `Home` to your app's template so its default HTML appeared in the app.
-In this step, you add a search filter and button that is used in a later lesson.
-For now, that's all that `Home` has.
-Note that this step just adds the search elements to the layout without any functionality, yet.
+在上一步中，你把默认的 `Home` 添加到了应用的模板中，因此它的默认 HTML 显示在了应用里。
+在这一步中，你将添加一个搜索过滤框和一个按钮，它们会在后面的课程中用到。
+目前，`Home` 中只有这些内容。
+请注意，这一步只是把搜索元素添加到布局中，暂时还没有任何功能。
 
-If you started from a fresh Angular project instead of downloading the starter
-(ng new): add these globals to `src/styles.css` so the search button and input border are visible:
+如果你是从一个全新的 Angular 项目（ng new）开始，而不是下载了初始项目，
+请将以下全局样式添加到 `src/styles.css` 中，这样搜索按钮和输入框的边框才能显示出来：
 
 ```css
 :root {
@@ -190,10 +186,10 @@ button.primary {
 }
 ```
 
-In the **Edit** pane of your IDE:
+在 IDE 的**编辑**窗格中：
 
-1.  In the `first-app` directory, open `home.ts` in the editor.
-1.  In `home.ts`, in `@Component`, update the `template` property with this code.
+1.  在 `first-app` 目录中，在编辑器里打开 `home.ts`。
+1.  在 `home.ts` 的 `@Component` 中，用以下代码更新 `template` 属性。
 
       ```ts [Replace in src/app/home/home.ts]
       import {Component} from '@angular/core';
@@ -213,10 +209,10 @@ In the **Edit** pane of your IDE:
       export class Home {}
       ```
 
-1.  Next, open `home.css` in the editor and update the content with these styles.
+1.  接下来，在编辑器中打开 `home.css`，并用以下样式更新其内容。
 
-    ::: info NOTE
-    In the browser, these can go in `src/app/home/home.ts` in the `styles` array.
+    ::: info 注意
+    在浏览器中，这些样式可以放在 `src/app/home/home.ts` 的 `styles` 数组中。
 
     :::
 
@@ -263,21 +259,21 @@ In the **Edit** pane of your IDE:
        }
        ```
 
-1.  Confirm that the app builds without error. You should find the filter query box and button in your app and they should be styled. Correct any errors before you continue to the next step.
+1.  确认应用无错误地完成构建。你应该能在应用中看到过滤查询框和按钮，并且它们已经应用了样式。在继续下一步之前，请修正所有错误。
 
    <img alt="browser frame of homes-app displaying logo, filter text input box and search button" src="/assets/images/tutorials/first-app/homes-app-lesson-02-step-3.png">
 
 
 
 
-::: info SUMMARY
-In this lesson, you created a new component for your app and gave it a filter edit control and button.
+::: info 总结
+在本课中，你为应用创建了一个新组件，并为它添加了一个过滤编辑框和一个按钮。
 
 :::
 
-For more information about the topics covered in this lesson, visit:
+关于本课程所涉及主题的更多信息，请访问：
 
 - [`ng generate component`](https://angular.dev/cli/generate/component)
-- [`Component` reference](https://angular.dev/api/core/Component)
-- [Angular components overview](/guide/components)
+- [`Component` 参考](https://angular.dev/api/core/Component)
+- [Angular 组件概览](/guide/components)
 

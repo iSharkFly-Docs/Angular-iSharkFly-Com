@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 响应式表单 {#reactive-forms}
 
-# Reactive Forms
+当你希望以编程方式管理表单，而不是完全依赖模板（Template）时，响应式表单（Reactive Forms）就是答案。
 
-When you want to manage your forms programmatically instead of relying purely on the template, reactive forms are the answer.
-
-::: info NOTE
-Learn more about [reactive forms in the in-depth guide](/guide/forms/reactive-forms).
+::: info 注意
+在[深入指南中了解更多关于响应式表单的内容](/guide/forms/reactive-forms)。
 
 :::
 
-In this activity, you'll learn how to set up reactive forms.
+在本活动中，你将学习如何设置响应式表单。
 
 <hr>
 
 
 
-### 1. Import `ReactiveForms` module
+### 1. 导入 `ReactiveForms` 模块 {#_1-import-reactiveforms-module}
 
-In `app.ts`, import `ReactiveFormsModule` from `@angular/forms` and add it to the `imports` array of the component.
+在 `app.ts` 中，从 `@angular/forms` 导入 `ReactiveFormsModule`，并将其添加到组件（Component）的 `imports` 数组中。
 
 ```ts
 import { ReactiveFormsModule } from '@angular/forms';
@@ -42,11 +38,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 ```
 
 
-### 2. Create the `FormGroup` object with FormControls
+### 2. 使用 FormControl 创建 `FormGroup` 对象 {#_2-create-the-formgroup-object-with-formcontrols}
 
-Reactive forms use the `FormControl` class to represent the form controls (e.g., inputs). Angular provides the `FormGroup` class to serve as a grouping of form controls into a helpful object that makes handling large forms more convenient for developers.
+响应式表单使用 `FormControl` 类来表示表单控件（例如输入框）。Angular 提供了 `FormGroup` 类，用于把多个表单控件组合成一个便于使用的对象，让开发者处理大型表单时更加方便。
 
-Add `FormControl` and `FormGroup` to the import from `@angular/forms` so that you can create a FormGroup for each form, with the properties `name` and `email` as FormControls.
+把 `FormControl` 和 `FormGroup` 添加到 `@angular/forms` 的导入中，这样你就可以为每个表单创建一个 FormGroup，并以 `name` 和 `email` 属性作为 FormControl。
 
 ```ts
 import {ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
@@ -60,11 +56,11 @@ export class App {
 ```
 
 
-### 3. Link the FormGroup and FormControls to the form
+### 3. 把 FormGroup 和 FormControl 关联到表单 {#_3-link-the-formgroup-and-formcontrols-to-the-form}
 
-Each `FormGroup` should be attached to a form using the `[formGroup]` directive.
+每个 `FormGroup` 都应该通过 `[formGroup]` 指令（Directive）关联到一个表单上。
 
-In addition, each `FormControl` can be attached with the `formControlName` directive and assigned to the corresponding property. Update the template with the following form code:
+此外，每个 `FormControl` 都可以通过 `formControlName` 指令进行关联，并赋值为对应的属性。用下面的表单代码更新模板：
 
 ```html
 <form [formGroup]="profileForm">
@@ -81,9 +77,9 @@ In addition, each `FormControl` can be attached with the `formControlName` direc
 ```
 
 
-### 4. Handle update to the form
+### 4. 处理表单的更新 {#_4-handle-update-to-the-form}
 
-When you want to access data from the `FormGroup`, it can be done by accessing the value of the `FormGroup`. Update the `template` to display the form values:
+当你想要访问 `FormGroup` 中的数据时，可以通过访问 `FormGroup` 的值来实现。更新 `template` 以显示表单的值：
 
 ```html
 ...
@@ -93,12 +89,12 @@ When you want to access data from the `FormGroup`, it can be done by accessing t
 ```
 
 
-### 5. Access FormGroup values
+### 5. 访问 FormGroup 的值 {#_5-access-formgroup-values}
 
-Add a new method to the component class called `handleSubmit` that you'll later use to handle the form submission.
-This method will display values from the form, you can access the values from the FormGroup.
+在组件类中添加一个名为 `handleSubmit` 的新方法，稍后你会用它来处理表单提交。
+这个方法会显示表单中的值，你可以从 FormGroup 中访问这些值。
 
-In the component class, add the `handleSubmit()` method to handle the form submission.
+在组件类中添加 `handleSubmit()` 方法来处理表单提交。
 
 ```ts
 handleSubmit() {
@@ -109,10 +105,10 @@ handleSubmit() {
 ```
 
 
-### 6. Add `ngSubmit` to the form
+### 6. 为表单添加 `ngSubmit` {#_6-add-ngsubmit-to-the-form}
 
-You have access to the form values, now it is time to handle the submission event and use the `handleSubmit` method.
-Angular has an event handler for this specific purpose called `ngSubmit`. Update the form element to call the `handleSubmit` method when the form is submitted.
+你已经能够访问表单的值了，现在是时候处理提交事件并使用 `handleSubmit` 方法了。
+Angular 为此专门提供了一个名为 `ngSubmit` 的事件处理器。更新 form 元素，使表单提交时调用 `handleSubmit` 方法。
 
 ```html
 <form [formGroup]="profileForm" (ngSubmit)="handleSubmit()"></form>
@@ -121,6 +117,6 @@ Angular has an event handler for this specific purpose called `ngSubmit`. Update
 
 
 
-And just like that, you know how to work with reactive forms in Angular.
+就这样，你已经知道如何在 Angular 中使用响应式表单了。
 
-Fantastic job with this activity. Keep going to learn about form validation.
+这个活动完成得非常出色。继续学习表单验证吧。

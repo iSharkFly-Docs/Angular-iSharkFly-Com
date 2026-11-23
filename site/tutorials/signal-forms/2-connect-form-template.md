@@ -1,27 +1,23 @@
----
-untranslated: true
----
+# 将表单连接到模板 {#connect-your-form-to-the-template}
 
-# Connect your form to the template
+现在，你需要使用 `[formField]` 指令（Directive）将表单连接到模板（Template）。这会在表单模型和输入元素之间建立双向数据绑定。
 
-Now, you need to connect your form to the template using the `[formField]` directive. This creates two-way data binding between your form model and the input elements.
+在本课中，你将学习如何：
 
-In this lesson, you'll learn how to:
+- 导入 `FormField` 指令
+- 使用 `[formField]` 指令将表单字段绑定到输入框
+- 将文本输入框和复选框连接到表单
+- 在模板中显示表单字段的值
 
-- Import the `FormField` directive
-- Use the `[formField]` directive to bind form fields to inputs
-- Connect text inputs and checkboxes to your form
-- Display form field values in the template
-
-Let's wire up the template!
+让我们把模板连起来吧！
 
 <hr />
 
 
 
-### 1. Import the FormField directive
+### 1. 导入 FormField 指令 {#_1-import-the-formfield-directive}
 
-Import the `FormField` directive from `@angular/forms/signals` and add it to your component's imports array:
+从 `@angular/forms/signals` 导入 `FormField` 指令，并将其添加到组件（Component）的 imports 数组中：
 
 ```ts
 import { form, FormField } from '@angular/forms/signals';
@@ -35,38 +31,38 @@ import { form, FormField } from '@angular/forms/signals';
 ```
 
 
-### 2. Bind the email field
+### 2. 绑定 email 字段 {#_2-bind-the-email-field}
 
-In your template, add the `[formField]` directive to the email input:
+在模板中，为 email 输入框添加 `[formField]` 指令：
 
 ```html
 <input type="email" [formField]="loginForm.email" />
 ```
 
-The `loginForm.email` expression accesses the email field from your form.
+`loginForm.email` 表达式会访问表单中的 email 字段。
 
 
-### 3. Bind the password field
+### 3. 绑定 password 字段 {#_3-bind-the-password-field}
 
-Add the `[formField]` directive to the password input:
+为 password 输入框添加 `[formField]` 指令：
 
 ```html
 <input type="password" [formField]="loginForm.password" />
 ```
 
 
-### 4. Bind the checkbox field
+### 4. 绑定复选框字段 {#_4-bind-the-checkbox-field}
 
-Add the `[formField]` directive to the checkbox input:
+为复选框输入框添加 `[formField]` 指令：
 
 ```html
 <input type="checkbox" [formField]="loginForm.rememberMe" />
 ```
 
 
-### 5. Display the form values
+### 5. 显示表单值 {#_5-display-the-form-values}
 
-Below the form, there's a debug section to show current form values. Display each field value using `.value()`:
+表单下方有一个调试区域，用于显示当前的表单值。使用 `.value()` 显示每个字段的值：
 
 ```html
 <p>Email: {{ loginForm.email().value() }}</p>
@@ -74,11 +70,11 @@ Below the form, there's a debug section to show current form values. Display eac
 <p>Remember me: {{ loginForm.rememberMe().value() ? 'Yes' : 'No' }}</p>
 ```
 
-Form field values are signals, so the displayed values update automatically as you type.
+表单字段的值是信号（Signal），因此显示的值会随着你的输入自动更新。
 
 
 
 
-Great work! You've connected your form to the template and displayed the form values. The `[formField]` directive handles two-way data binding automatically - as you type, the `loginModel` signal updates, and the displayed values update immediately.
+做得好！你已经将表单连接到模板，并显示了表单值。`[formField]` 指令会自动处理双向数据绑定：当你输入时，`loginModel` 信号会更新，显示的值也会立即更新。
 
-Next, you'll learn [how to add validation to your form](/tutorials/signal-forms/3-add-validation)!
+接下来，你将学习[如何为表单添加验证](/tutorials/signal-forms/3-add-validation)！

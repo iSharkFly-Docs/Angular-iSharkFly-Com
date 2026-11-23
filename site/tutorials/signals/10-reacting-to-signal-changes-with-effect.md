@@ -1,40 +1,36 @@
----
-untranslated: true
----
+# 使用 effect 响应信号变化 {#reacting-to-signal-changes-with-effect}
 
-# Reacting to signal changes with effect
+现在你已经学会了[使用信号查询来查询子元素](/tutorials/signals/9-query-child-elements-with-signal-queries)，接下来让我们探索如何使用副作用（Effect）来响应信号（Signal）的变化。副作用是在其依赖项变化时自动运行的函数，非常适合处理日志记录、DOM 操作或 API 调用等附带操作。
 
-Now that you've learned [querying child elements with signal queries](/tutorials/signals/9-query-child-elements-with-signal-queries), let's explore how to react to signal changes with effects. Effects are functions that run automatically when their dependencies change, making them perfect for side effects like logging, DOM manipulation, or API calls.
+**重要提示：副作用应当是你最后才考虑使用的 API。** 对于派生值，始终优先使用 `computed()`；对于既可派生又可手动设置的值，优先使用 `linkedSignal()`。如果你发现自己在用副作用把数据从一个信号复制到另一个信号，这说明你应该把数据源（source-of-truth）提升到更高的层级，并改用 `computed()` 或 `linkedSignal()`。副作用最适合用于把信号状态同步到命令式的、非信号的 API。
 
-**Important: Effects should be the last API you reach for.** Always prefer `computed()` for derived values and `linkedSignal()` for values that can be both derived and manually set. If you find yourself copying data from one signal to another with an effect, it's a sign you should move your source-of-truth higher up and use `computed()` or `linkedSignal()` instead. Effects are best for syncing signal state to imperative, non-signal APIs.
-
-In this activity, you'll learn how to use the `effect()` function appropriately for legitimate side effects that respond to signal changes.
+在本活动中，你将学习如何恰当地使用 `effect()` 函数，处理那些确实需要响应信号变化的副作用。
 
 <hr />
 
-You have a theme manager app with signals already set up. Now you'll add effects to automatically react to signal changes.
+你已经有了一个设置好信号的主题管理器应用。现在你将添加副作用，让它自动响应信号的变化。
 
 
 
-### 1. Import effect function
+### 1. 导入 effect 函数 {#_1-import-effect-function}
 
-Add `effect` to your existing imports.
+将 `effect` 添加到现有的导入中。
 
 ```ts
-// Add effect to existing imports
+// 将 effect 添加到现有的导入中
 import {Component, signal, computed, effect, ChangeDetectionStrategy} from '@angular/core';
 ```
 
-The `effect` function creates a reactive side effect that runs automatically when any signals it reads change.
+`effect` 函数会创建一个响应式副作用，每当它读取的任何信号发生变化时，都会自动运行。
 
 
-### 2. Create an effect for local storage
+### 2. 创建用于本地存储的副作用 {#_2-create-an-effect-for-local-storage}
 
-Add an effect that automatically saves the theme to local storage when it changes.
+添加一个副作用，在主题变化时自动将其保存到 local storage。
 
 ```ts
 constructor() {
-  // Save theme to localStorage whenever it changes
+  // 每当主题变化时将其保存到 localStorage
   effect(() => {
     localStorage.setItem('theme', this.theme());
     console.log('Theme saved to localStorage:', this.theme());
@@ -42,18 +38,18 @@ constructor() {
 }
 ```
 
-This effect runs whenever the theme signal changes, automatically persisting the user's preference.
+每当 theme 信号变化时，这个副作用都会运行，从而自动持久化用户的偏好设置。
 
 
-### 3. Create an effect for logging user activity
+### 3. 创建用于记录用户活动的副作用 {#_3-create-an-effect-for-logging-user-activity}
 
-Add an effect that logs when the user logs in or out.
+添加一个副作用，在用户登录或登出时记录日志。
 
 ```ts
 constructor() {
-  // ... previous effect
+  // ... 之前的副作用
 
-  // Log user activity changes
+  // 记录用户活动的变化
   effect(() => {
     const status = this.isLoggedIn() ? 'logged in' : 'logged out';
     const user = this.username();
@@ -62,24 +58,24 @@ constructor() {
 }
 ```
 
-This effect demonstrates how effects can read multiple signals and react to changes in any of them.
+这个副作用演示了副作用如何读取多个信号，并在其中任何一个发生变化时做出响应。
 
 
-### 4. Create an effect with cleanup
+### 4. 创建带清理逻辑的副作用 {#_4-create-an-effect-with-cleanup}
 
-Add an effect that sets up a timer and cleans up when the component is destroyed.
+添加一个副作用，它会设置一个定时器，并在组件（Component）销毁时进行清理。
 
 ```ts
 constructor() {
-  // ... previous effects
+  // ... 之前的副作用
 
-  // Timer effect with cleanup
+  // 带清理逻辑的定时器副作用
   effect((onCleanup) => {
     const interval = setInterval(() => {
       console.log('Timer tick - Current theme:', this.theme());
     }, 5000);
 
-    // Clean up the interval when the effect is destroyed
+    // 在副作用销毁时清理定时器
     onCleanup(() => {
       clearInterval(interval);
       console.log('Timer cleaned up');
@@ -88,33 +84,33 @@ constructor() {
 }
 ```
 
-This effect reads no signals while it runs, because `this.theme()` is only called later inside the `setInterval` callback. It runs once and never re-runs, so the cleanup only happens when the component is destroyed, for example when the preview reloads.
+这个副作用在运行期间不会读取任何信号，因为 `this.theme()` 只会在稍后的 `setInterval` 回调中被调用。它只运行一次，并且永远不会重新运行，因此只有在组件被销毁时（例如预览重新加载时）才会执行清理。
 
 
-### 5. Test the effects
+### 5. 测试副作用 {#_5-test-the-effects}
 
-Open the browser console and interact with the app:
+打开浏览器控制台，与应用进行交互：
 
-- **Toggle Theme** - See localStorage saves
-- **Login/Logout** - See user activity logging
-- **Watch Timer** - See periodic theme logging every 5 seconds
+- **切换主题（Toggle Theme）** - 查看 localStorage 的保存记录
+- **登录/登出（Login/Logout）** - 查看用户活动日志
+- **观察定时器** - 每 5 秒查看一次定期输出的主题日志
 
-Effects run once when the component is created, so some of these logs appear before you click anything. After that, they run again whenever the signals they read change.
-
-
+副作用会在组件创建时运行一次，因此在你点击任何内容之前，就会出现部分日志。之后，每当它们读取的信号发生变化时，它们都会再次运行。
 
 
-Excellent! You've now learned how to use effects with signals. Key concepts to remember:
 
-- **Effects are reactive**: They automatically run when any signal they read changes
-- **Side effects only**: Perfect for logging, DOM manipulation, API calls, and syncing to imperative APIs
-- **Cleanup**: Use the `onCleanup` callback to clean up resources like timers or subscriptions
-- **Automatic tracking**: Effects automatically track which signals they read and re-run when those signals change
 
-**Remember: Use effects sparingly!** The examples in this lesson (localStorage sync, logging, timers) are appropriate uses. Avoid effects for:
+太棒了！你已经学会了如何将副作用与信号结合使用。需要记住的关键概念：
 
-- Deriving values from other signals - use `computed()` instead
-- Creating writable derived state - use `linkedSignal()` instead
-- Copying data between signals - restructure to use a shared source of truth
+- **副作用是响应式的**：每当它们读取的任何信号变化时，都会自动运行
+- **仅用于附带操作**：非常适合日志记录、DOM 操作、API 调用以及同步到命令式 API
+- **清理**：使用 `onCleanup` 回调来清理定时器或订阅等资源
+- **自动追踪**：副作用会自动追踪它们读取了哪些信号，并在这些信号变化时重新运行
 
-Effects are powerful but should be your last resort when `computed()` and `linkedSignal()` can't solve your use case.
+**记住：要谨慎使用副作用！** 本课中的示例（localStorage 同步、日志记录、定时器）都属于恰当的用法。以下情况应避免使用副作用：
+
+- 从其他信号派生值——请改用 `computed()`
+- 创建可写的派生状态——请改用 `linkedSignal()`
+- 在信号之间复制数据——请重构代码，改用共享的单一数据源
+
+副作用功能强大，但只有在 `computed()` 和 `linkedSignal()` 无法满足你的用例时，才应将其作为最后的手段。

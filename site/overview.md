@@ -24,7 +24,7 @@ Angular 是一个 Web 框架，它帮助<br/>
 - [**服务端渲染**](/guide/ssr)：Angular 同时支持服务端渲染（SSR）和静态站点生成（SSG），并支持完整的 DOM 水合（Hydration）。
 - [**依赖注入**](/essentials/dependency-injection)：在整个应用的各个组件之间轻松共享代码。
 - [**Angular 路由**](/guide/routing)：提供功能丰富的导航工具集，支持路由守卫、数据解析、延迟加载（Lazy Loading）等众多功能。
-- [**Angular 中的表单**](/guide/forms)：为表单参与和校验提供一套标准化的体系。
+- [**Angular 中的表单**](/guide/forms)：为表单参与和验证提供一套标准化的体系。
 
 
 **以前所未有的速度开发应用**

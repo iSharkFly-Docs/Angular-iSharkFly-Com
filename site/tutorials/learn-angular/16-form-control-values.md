@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 获取表单控件的值 {#getting-form-control-value}
 
-# Getting form control value
+现在你已经用 Angular 设置好了表单，下一步是访问表单控件中的值。
 
-Now that your forms are set up with Angular, the next step is to access the values from the form controls.
-
-::: info NOTE
-Learn more about [adding a basic form control in the in-depth guide](/guide/forms/reactive-forms#adding-a-basic-form-control).
+::: info 注意
+在[深入指南中了解更多关于添加基本表单控件的内容](/guide/forms/reactive-forms#adding-a-basic-form-control)。
 
 :::
 
-In this activity, you'll learn how to get the value from your form input.
+在本活动中，你将学习如何获取表单输入框的值。
 
 <hr>
 
 
 
-### 1. Show the value of the input field in the template
+### 1. 在模板中显示输入框的值 {#_1-show-the-value-of-the-input-field-in-the-template}
 
-To display the input value in a template, you can use the interpolation syntax `{{}}` just like any other class property of the component:
+要在模板（Template）中显示输入值，可以像使用组件（Component）的其他类属性一样，使用插值语法 `{{}}`：
 
 ```ts
 @Component({
@@ -39,9 +35,9 @@ export class User {
 ```
 
 
-### 2. Retrieve the value of an input field
+### 2. 获取输入框的值 {#_2-retrieve-the-value-of-an-input-field}
 
-When you need to reference the input field value in the component class, you can do so by accessing the class property with the `this` syntax.
+当你需要在组件类中引用输入框的值时，可以通过 `this` 语法访问对应的类属性。
 
 ```ts
 ...
@@ -66,6 +62,6 @@ export class User {
 
 
 
-Great job learning how to display the input values in your template and access them programmatically.
+很好，你已经学会了如何在模板中显示输入值，以及如何在代码中访问它们。
 
-Time to progress onto the next way of managing forms with Angular: reactive forms. If you'd like to learn more about template-driven forms, please refer to the [Angular forms documentation](/guide/forms/template-driven-forms).
+接下来学习 Angular 中管理表单的另一种方式：响应式表单（Reactive Forms）。如果想深入了解模板驱动表单（Template-driven Forms），请参阅 [Angular 表单文档](/guide/forms/template-driven-forms)。

@@ -1,46 +1,42 @@
----
-untranslated: true
----
+# 为表单添加验证 {#add-validation-to-your-form}
 
-# Add validation to your form
+为表单添加验证至关重要，它能确保用户输入有效的数据。信号表单（Signal Forms）在一个模式函数（schema function）中使用验证器，你需要把这个函数传给 `form()` 函数。
 
-Adding validation to your form is critical to ensure users enter valid data. Signal Forms uses validators in a schema function that you pass to the `form()` function.
+在本练习中，你将学习如何：
 
-In this activity, you'll learn how to:
+- 导入内置验证器
+- 为表单定义模式函数
+- 为特定字段应用验证器，并提供自定义错误消息
 
-- Import built-in validators
-- Define a schema function for your form
-- Apply validators to specific fields with custom error messages
-
-Let's add validation!
+让我们来添加验证吧！
 
 <hr />
 
 
 
-### 1. Import the validators
+### 1. 导入验证器 {#_1-import-the-validators}
 
-Import the `required` and `email` validators from `@angular/forms/signals`:
+从 `@angular/forms/signals` 导入 `required` 和 `email` 验证器：
 
 ```ts
 import {form, FormField, required, email} from '@angular/forms/signals';
 ```
 
 
-### 2. Add a schema function to your form
+### 2. 为表单添加模式函数 {#_2-add-a-schema-function-to-your-form}
 
-Update your `form()` call to include a schema function as the second parameter. The schema function receives a `fieldPath` parameter that lets you access each field:
+更新 `form()` 调用，把模式函数作为第二个参数传入。模式函数会接收一个 `fieldPath` 参数，你可以通过它访问每个字段：
 
 ```ts
 loginForm = form(this.loginModel, (fieldPath) => {
-  // Validators will go here
+  // 验证器写在这里
 });
 ```
 
 
-### 3. Add validation to the email field
+### 3. 为 email 字段添加验证 {#_3-add-validation-to-the-email-field}
 
-Inside the schema function, add validation for the email field. Use both `required()` and `email()` validators:
+在模式函数内部，为 email 字段添加验证。同时使用 `required()` 和 `email()` 两个验证器：
 
 ```ts
 loginForm = form(this.loginModel, (fieldPath) => {
@@ -49,12 +45,12 @@ loginForm = form(this.loginModel, (fieldPath) => {
 });
 ```
 
-The `message` option provides custom error messages for users.
+`message` 选项用于为用户提供自定义错误消息。
 
 
-### 4. Add validation to the password field
+### 4. 为 password 字段添加验证 {#_4-add-validation-to-the-password-field}
 
-Add validation for the password field using the `required()` validator:
+使用 `required()` 验证器为 password 字段添加验证：
 
 ```ts
 loginForm = form(this.loginModel, (fieldPath) => {
@@ -67,6 +63,6 @@ loginForm = form(this.loginModel, (fieldPath) => {
 
 
 
-Perfect! You've added validation to your form. The validators run automatically as users interact with the form. When validation fails, the field's state will reflect the errors.
+完美！你已经为表单添加了验证。当用户与表单交互时，验证器会自动运行。验证失败时，字段的状态会反映出这些错误。
 
-Next, you'll learn [how to display validation errors in the template](/tutorials/signal-forms/4-display-errors)!
+接下来，你将学习[如何在模板中显示验证错误](/tutorials/signal-forms/4-display-errors)！
