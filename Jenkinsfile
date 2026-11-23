@@ -20,7 +20,7 @@ pipeline {
         DOCS_TOOLS = '.vitepress/node_modules'
         WRANGLER = '.vitepress/node_modules/.bin/wrangler'
         // 发布到线上的分支
-        RELEASE_BRANCH = 'master'
+        RELEASE_BRANCH = 'main'
         // Cloudflare API Token（Jenkins Secret text 凭据，需要 Workers Scripts:Edit 权限）
         CLOUDFLARE_API_TOKEN = credentials('sharkdat-cloudflare-api-token')
         // Cloudflare Account ID（Secret text 凭据）。设置后 wrangler 不再调用 /memberships 查询账号，
@@ -90,7 +90,7 @@ pipeline {
                             return
                         }
 
-                        // master 分支：部署默认 Worker
+                        // main 分支：部署默认 Worker
                         if (env.BRANCH_NAME == env.RELEASE_BRANCH) {
                             sh """
                                 ${env.WRANGLER} deploy --config ${env.WRANGLER_CONFIG} --env="" \
@@ -112,6 +112,19 @@ pipeline {
 
                         // 打印当前 token 所属账号，便于排查 "Worker does not yet exist"（通常是账号不对）
                         sh "${env.WRANGLER} whoami"
+
+                        // versions upload 要求 Worker 已存在；首次构建时先 deploy 一次创建 Worker
+                        def workerExists = sh(
+                            script: "${env.WRANGLER} deployments list --config ${env.WRANGLER_CONFIG} --env=\"\" > /dev/null 2>&1",
+                            returnStatus: true
+                        ) == 0
+                        if (!workerExists) {
+                            echo "Worker ${env.PRJ_NAME} 尚不存在，先执行首次 deploy 创建 Worker ..."
+                            sh """
+                                ${env.WRANGLER} deploy --config ${env.WRANGLER_CONFIG} --env="" \
+                                  --message 'Initial deploy: ${deployMsg}'
+                            """
+                        }
 
                         sh """
                             ${env.WRANGLER} versions upload --config ${env.WRANGLER_CONFIG} --env="" \
