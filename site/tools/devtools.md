@@ -1,58 +1,54 @@
----
-untranslated: true
----
+# DevTools 概览 {#devtools-overview}
 
-# DevTools Overview
-
-Angular DevTools is a browser extension that provides debugging and profiling capabilities for Angular applications.
+Angular DevTools 是一个浏览器扩展，为 Angular 应用提供调试和性能分析能力。
 
 <iframe src="https://www.youtube.com/embed/bavWOHZM6zE" title="Video" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
 
-Install Angular DevTools from the [Chrome Web Store](https://chrome.google.com/webstore/detail/angular-developer-tools/ienfalfjdbdpebioblfackkekamfmbnh) or from [Firefox Addons](https://addons.mozilla.org/firefox/addon/angular-devtools/).
+你可以从 [Chrome 网上应用店](https://chrome.google.com/webstore/detail/angular-developer-tools/ienfalfjdbdpebioblfackkekamfmbnh)或 [Firefox 附加组件](https://addons.mozilla.org/firefox/addon/angular-devtools/)安装 Angular DevTools。
 
-You can open Chrome or Firefox DevTools on any web page by pressing <kbd>F12</kbd> or <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></kbd> (Windows or Linux) and <kbd><kbd>Fn</kbd>+<kbd>F12</kbd></kbd> or <kbd><kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd></kbd> (Mac).
-Once browser DevTools is open and Angular DevTools is installed, you can find it under the "Angular" tab.
+在任意网页上，你都可以按 <kbd>F12</kbd> 或 <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></kbd>（Windows 或 Linux），以及 <kbd><kbd>Fn</kbd>+<kbd>F12</kbd></kbd> 或 <kbd><kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd></kbd>（Mac）打开 Chrome 或 Firefox 的开发者工具。
+打开浏览器开发者工具并安装 Angular DevTools 后，就可以在 "Angular" 标签页中找到它。
 
-::: tip HELPFUL
-Chrome's new tab page does not run installed extensions, so the Angular tab will not appear in DevTools. Visit any other page to see it.
+::: tip 提示
+Chrome 的新标签页不会运行已安装的扩展，因此开发者工具中不会出现 Angular 标签页。访问任意其他页面即可看到它。
 
 :::
 
 <img src="/assets/images/guide/devtools/devtools.png" alt="An overview of Angular DevTools showing a tree of components for an application.">
 
-## Open your application
+## 打开你的应用 {#open-your-application}
 
-When you open the extension, you'll see four additional tabs:
+打开该扩展后，你会看到四个额外的标签页：
 
-| Tabs                                      | Details                                                                                                                |
+| 标签页                                     | 详情                                                                                                                   |
 | :---------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
-| [Components](/tools/devtools/component)    | Lets you explore the components and directives in your application and preview or edit their state.                    |
-| [Profiler](/tools/devtools/profiler)       | Lets you profile your application and understand what the performance bottleneck is during change detection execution. |
-| [Injector Tree](/tools/devtools/injectors) | Lets you visualize the Environment and Element Injector hierarchy                                                      |
-| [Router Tree](/tools/devtools/router)      | Lets you visualize the routing tree of your application.                                                               |
+| [Components](/tools/devtools/component)    | 浏览应用中的组件（Component）和指令（Directive），并预览或编辑它们的状态。                                             |
+| [Profiler](/tools/devtools/profiler)       | 对应用进行性能分析，了解变更检测（Change Detection）执行期间的性能瓶颈在哪里。                                         |
+| [Injector Tree](/tools/devtools/injectors) | 可视化环境注入器（Environment Injector）和元素注入器（Element Injector）的层级结构                                     |
+| [Router Tree](/tools/devtools/router)      | 可视化应用的路由树。                                                                                                   |
 
-A `Transfer State` tab also appears when the application uses hydration.
+当应用使用水合（Hydration）时，还会出现一个 `Transfer State` 标签页。
 
-::: tip HELPFUL
-For users of Chromium based browsers, you might be interested in the [Performance panel integration](/best-practices/profiling-with-chrome-devtools).
+::: tip 提示
+如果你使用的是基于 Chromium 的浏览器，可能会对 [Performance 面板集成](/best-practices/profiling-with-chrome-devtools)感兴趣。
 
 :::
 
 <img src="/assets/images/guide/devtools/devtools-tabs.png" alt="A screenshot of the top of Angular DevTools illustrating two tabs in the upper-left corner, one labeled 'Components' and another labeled 'Profiler'.">
 
-In the top-right corner of Angular DevTools you'll find the information button which open a popover.
-The information popover contains among others what version of Angular is running on the page as well as the devtools version.
+在 Angular DevTools 的右上角，有一个信息按钮，点击后会打开一个弹出框。
+该弹出框中包含页面上运行的 Angular 版本以及 DevTools 的版本等信息。
 
-### Angular application not detected
+### Angular application not detected（未检测到 Angular 应用） {#angular-application-not-detected}
 
-If you see an error message "Angular application not detected" when opening Angular DevTools, this means it is not able to communicate with an Angular app on the page.
-The most common reason for this is because the web page you are inspecting does not contain an Angular application.
-Double check that you are inspecting the right web page and that the Angular app is running.
+如果打开 Angular DevTools 时看到错误消息 "Angular application not detected"，说明它无法与页面上的 Angular 应用通信。
+最常见的原因是你正在检查的网页并不包含 Angular 应用。
+请仔细确认你检查的是正确的网页，并且 Angular 应用正在运行。
 
-### We detected an application built with production configuration
+### We detected an application built with production configuration（检测到使用生产配置构建的应用） {#we-detected-an-application-built-with-production-configuration}
 
-If you see an error message "We detected an application built with production configuration. Angular DevTools only supports development builds.", this means that an Angular application was found on the page, but it was compiled with production optimizations.
-When compiling for production, Angular CLI removes various debug features to minimize the amount of the JavaScript on the page to improve performance. This includes features needed to communicate with DevTools.
+如果你看到错误消息 "We detected an application built with production configuration. Angular DevTools only supports development builds."，说明页面上找到了 Angular 应用，但它是使用生产优化编译的。
+在为生产环境编译时，Angular CLI 会移除各种调试功能，以尽量减少页面上的 JavaScript 体积、提升性能，其中就包括与 DevTools 通信所需的功能。
 
-To run DevTools, you need to compile your application with optimizations disabled. `ng serve` does this by default.
-If you need to debug a deployed application, disable optimizations in your build with the [`optimization` configuration option](/reference/configs/workspace-config#optimization-configuration) (`{"optimization": false}`).
+要运行 DevTools，你需要在禁用优化的情况下编译应用。`ng serve` 默认就是这样做的。
+如果需要调试已部署的应用，请通过 [`optimization` 配置项](/reference/configs/workspace-config#optimization-configuration)（`{"optimization": false}`）在构建中禁用优化。

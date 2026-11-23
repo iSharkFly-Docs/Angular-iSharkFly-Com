@@ -1,24 +1,20 @@
----
-untranslated: true
----
+# 库的原理图 {#schematics-for-libraries}
 
-# Schematics for libraries
+创建 Angular 库时，你可以为它提供并打包一些原理图（Schematic），让它与 Angular CLI 集成。
+借助这些原理图，用户可以用 `ng add` 安装库的初始版本，
+用 `ng generate` 创建库中定义的各种产物，并在库的新版本引入破坏性变更时，用 `ng update` 调整他们的项目。
 
-When you create an Angular library, you can provide and package it with schematics that integrate it with the Angular CLI.
-With your schematics, your users can use `ng add` to install an initial version of your library,
-`ng generate` to create artifacts defined in your library, and `ng update` to adjust their project for a new version of your library that introduces breaking changes.
+这三类原理图都可以放进一个集合中，与你的库一起打包。
 
-All three types of schematics can be part of a collection that you package with your library.
+## 创建原理图集合 {#creating-a-schematics-collection}
 
-## Creating a schematics collection
+要创建一个集合，首先需要创建原理图文件。
+下面的步骤演示了如何在不修改任何项目文件的情况下添加初始支持。
 
-To start a collection, you need to create the schematic files.
-The following steps show you how to add initial support without modifying any project files.
-
-1. In your library's root folder, create a `schematics` folder.
-1. In the `schematics/` folder, create an `ng-add` folder for your first schematic.
-1. At the root level of the `schematics` folder, create a `collection.json` file.
-1. Edit the `collection.json` file to define the initial schema for your collection.
+1. 在库的根目录下，创建一个 `schematics` 文件夹。
+1. 在 `schematics/` 文件夹中，为你的第一个原理图创建一个 `ng-add` 文件夹。
+1. 在 `schematics` 文件夹的根级别，创建一个 `collection.json` 文件。
+1. 编辑 `collection.json` 文件，为集合定义初始的 schema。
 
    ```json [projects/my-lib/schematics/collection.json (Schematics Collection)]
    {
@@ -32,13 +28,13 @@ The following steps show you how to add initial support without modifying any pr
      }
    }
    ```
-   - The `$schema` path is relative to the Angular Devkit collection schema.
-   - The `schematics` object describes the named schematics that are part of this collection.
-   - The first entry is for a schematic named `ng-add`.
-     It contains the description, and points to the factory function that is called when your schematic is executed.
+   - `$schema` 路径是相对于 Angular Devkit 集合 schema 的。
+   - `schematics` 对象描述了属于该集合的各个具名原理图。
+   - 第一个条目是名为 `ng-add` 的原理图。
+     它包含描述信息，并指向执行该原理图时要调用的工厂函数。
 
-1. In your library project's `package.json` file, add a "schematics" entry with the path to your schema file.
-   The Angular CLI uses this entry to find named schematics in your collection when it runs commands.
+1. 在库项目的 `package.json` 文件中，添加一个 "schematics" 条目，其值为 schema 文件的路径。
+   Angular CLI 在运行命令时会通过这个条目找到集合中的具名原理图。
 
 ```json [projects/my-lib/package.json (Schematics Collection Reference)]
 {
@@ -48,16 +44,16 @@ The following steps show you how to add initial support without modifying any pr
 }
 ```
 
-The initial schema that you have created tells the CLI where to find the schematic that supports the `ng add` command.
-Now you are ready to create that schematic.
+你创建的这个初始 schema 告诉 CLI 在哪里可以找到支持 `ng add` 命令的原理图。
+现在，你可以开始创建这个原理图了。
 
-## Providing installation support
+## 提供安装支持 {#providing-installation-support}
 
-A schematic for the `ng add` command can enhance the initial installation process for your users.
-The following steps define this type of schematic.
+为 `ng add` 命令编写的原理图可以增强用户的初始安装过程。
+下面的步骤定义了这类原理图。
 
-1. Go to the `<lib-root>/schematics/ng-add` folder.
-1. Create a `schema.json` file to define the options that the schematic accepts.
+1. 进入 `<lib-root>/schematics/ng-add` 文件夹。
+1. 创建一个 `schema.json` 文件，定义该原理图接受的选项。
 
    ```json [projects/my-lib/schematics/ng-add/schema.json (ng-add Schema)]
    {
@@ -77,16 +73,16 @@ The following steps define this type of schematic.
    }
    ```
 
-1. Create a `schema.ts` file to define an interface for the options defined in the `schema.json` file.
+1. 创建一个 `schema.ts` 文件，为 `schema.json` 文件中定义的选项定义一个接口。
 
    ```ts [projects/my-lib/schematics/ng-add/schema.ts (ng-add Schema Interface)]
    export interface Schema {
-     // Name of the project.
+     // 项目名称。
      project: string;
    }
    ```
 
-1. Create the main file, `index.ts`, and add the source code for your schematic factory function.
+1. 创建主文件 `index.ts`，并添加原理图工厂函数的源代码。
 
    ```ts [projects/my-lib/schematics/ng-add/index.ts (ng-add Rule Factory)]
    import {Rule} from '@angular-devkit/schematics';
@@ -94,7 +90,7 @@ The following steps define this type of schematic.
    import {Schema} from './schema';
 
    export function ngAdd(options: Schema): Rule {
-     // Add an import `MyLibModule` from `my-lib` to the root of the user's project.
+     // 把来自 `my-lib` 的 `MyLibModule` 导入添加到用户项目的根部。
      return addRootImport(
        options.project,
        ({code, external}) => code`${external('MyLibModule', 'my-lib')}`,
@@ -102,11 +98,11 @@ The following steps define this type of schematic.
    }
    ```
 
-The Angular CLI will install the latest version of the library automatically, and this example is taking it a step further by adding the `MyLibModule` to the root of the application. The `addRootImport` function accepts a callback that needs to return a code block. You can write any code inside of the string tagged with the `code` function and any external symbol have to be wrapped with the `external` function to ensure that the appropriate import statements are generated.
+Angular CLI 会自动安装库的最新版本，而这个示例更进一步，把 `MyLibModule` 添加到了应用的根部。`addRootImport` 函数接受一个回调，该回调需要返回一个代码块。你可以在用 `code` 函数标记的字符串中编写任意代码，而任何外部符号都必须用 `external` 函数包裹起来，以确保生成正确的 import 语句。
 
-### Define dependency type
+### 定义依赖类型 {#define-dependency-type}
 
-Use the `save` option of `ng-add` to configure if the library should be added to the `dependencies`, the `devDependencies`, or not saved at all in the project's `package.json` configuration file.
+使用 `ng-add` 的 `save` 选项来配置该库是应该添加到项目 `package.json` 配置文件的 `dependencies`、`devDependencies` 中，还是完全不保存。
 
 ```json [projects/my-lib/package.json (ng-add Reference)]
 "ng-add": {
@@ -114,27 +110,27 @@ Use the `save` option of `ng-add` to configure if the library should be added to
 },
 ```
 
-Possible values are:
+可能的取值有：
 
-| Values              | Details                                 |
+| 值                  | 说明                                    |
 | :------------------ | :-------------------------------------- |
-| `false`             | Don't add the package to `package.json` |
-| `true`              | Add the package to the dependencies     |
-| `"dependencies"`    | Add the package to the dependencies     |
-| `"devDependencies"` | Add the package to the devDependencies  |
+| `false`             | 不把该包添加到 `package.json`           |
+| `true`              | 把该包添加到 dependencies               |
+| `"dependencies"`    | 把该包添加到 dependencies               |
+| `"devDependencies"` | 把该包添加到 devDependencies            |
 
-## Building your schematics
+## 构建原理图 {#building-your-schematics}
 
-To bundle your schematics together with your library, you must configure the library to build the schematics separately, then add them to the bundle.
-You must build your schematics _after_ you build your library, so they are placed in the correct directory.
+要把原理图和库打包在一起，必须配置库单独构建原理图，然后再把它们添加到包中。
+必须在构建库*之后*再构建原理图，这样它们才会被放到正确的目录中。
 
-- Your library needs a custom TypeScript configuration file with instructions on how to compile your schematics into your distributed library
-- To add the schematics to the library bundle, add scripts to the library's `package.json` file
+- 你的库需要一个自定义的 TypeScript 配置文件，说明如何把原理图编译到要分发的库中
+- 要把原理图添加到库的包中，需要在库的 `package.json` 文件中添加脚本
 
-Assume you have a library project `my-lib` in your Angular workspace.
-To tell the library how to build the schematics, add a `tsconfig.schematics.json` file next to the generated `tsconfig.lib.json` file that configures the library build.
+假设你的 Angular 工作区中有一个库项目 `my-lib`。
+为了告诉库如何构建原理图，请在用于配置库构建的、自动生成的 `tsconfig.lib.json` 文件旁边添加一个 `tsconfig.schematics.json` 文件。
 
-1. Edit the `tsconfig.schematics.json` file to add the following content.
+1. 编辑 `tsconfig.schematics.json` 文件，添加以下内容。
 
    ```json [projects/my-lib/tsconfig.schematics.json (TypeScript Config)]
    {
@@ -163,12 +159,12 @@ To tell the library how to build the schematics, add a `tsconfig.schematics.json
    }
    ```
 
-   | Options   | Details                                                                                                          |
+   | 选项      | 说明                                                                                                             |
    | :-------- | :--------------------------------------------------------------------------------------------------------------- |
-   | `rootDir` | Specifies that your `schematics` folder contains the input files to be compiled.                                 |
-   | `outDir`  | Maps to the library's output folder. By default, this is the `dist/my-lib` folder at the root of your workspace. |
+   | `rootDir` | 指定 `schematics` 文件夹中包含要编译的输入文件。                                                                 |
+   | `outDir`  | 映射到库的输出文件夹。默认情况下，它是工作区根目录下的 `dist/my-lib` 文件夹。                                    |
 
-1. To make sure your schematics source files get compiled into the library bundle, add the following scripts to the `package.json` file in your library project's root folder \(`projects/my-lib`\).
+1. 为确保原理图的源文件被编译进库的包中，请在库项目根目录（`projects/my-lib`）的 `package.json` 文件中添加以下脚本。
 
    ```json [projects/my-lib/package.json (Build Scripts)]
    // #docplaster
@@ -196,17 +192,17 @@ To tell the library how to build the schematics, add a `tsconfig.schematics.json
      }
    }
    ```
-   - The `build` script compiles your schematic using the custom `tsconfig.schematics.json` file
-   - The `postbuild` script copies the schematic files after the `build` script completes
-   - Both the `build` and the `postbuild` scripts require the `copyfiles` and `typescript` dependencies.
-     To install the dependencies, navigate to the path defined in `devDependencies` and run `npm install` before you run the scripts.
+   - `build` 脚本使用自定义的 `tsconfig.schematics.json` 文件编译原理图
+   - `postbuild` 脚本在 `build` 脚本完成后复制原理图文件
+   - `build` 和 `postbuild` 脚本都需要 `copyfiles` 和 `typescript` 依赖。
+     要安装这些依赖，请在运行脚本之前，进入 `devDependencies` 中定义的路径并运行 `npm install`。
 
-## Providing generation support
+## 提供生成支持 {#providing-generation-support}
 
-You can add a named schematic to your collection that lets your users use the `ng generate` command to create an artifact that is defined in your library.
+你可以向集合中添加一个具名原理图，让用户可以使用 `ng generate` 命令创建库中定义的产物。
 
-We'll assume that your library defines a service, `my-service`, that requires some setup.
-You want your users to be able to generate it using the following CLI command.
+假设你的库定义了一个需要进行一些设置的服务（Service）`my-service`。
+你希望用户可以通过以下 CLI 命令生成它。
 
 ```shell
 
@@ -214,13 +210,13 @@ ng generate my-lib:my-service
 
 ```
 
-To begin, create a new subfolder, `my-service`, in the `schematics` folder.
+首先，在 `schematics` 文件夹中新建一个子文件夹 `my-service`。
 
-### Configure the new schematic
+### 配置新的原理图 {#configure-the-new-schematic}
 
-When you add a schematic to the collection, you have to point to it in the collection's schema, and provide configuration files to define options that a user can pass to the command.
+向集合中添加原理图时，必须在集合的 schema 中指向它，并提供配置文件来定义用户可以传给命令的选项。
 
-1. Edit the `schematics/collection.json` file to point to the new schematic subfolder, and include a pointer to a schema file that specifies inputs for the new schematic.
+1. 编辑 `schematics/collection.json` 文件，让它指向新的原理图子文件夹，并包含一个指向 schema 文件的引用，该文件用于指定新原理图的输入。
 
    ```json [projects/my-lib/schematics/collection.json (Schematics Collection)]
    {
@@ -240,8 +236,8 @@ When you add a schematic to the collection, you have to point to it in the colle
    }
    ```
 
-1. Go to the `<lib-root>/schematics/my-service` folder.
-1. Create a `schema.json` file and define the available options for the schematic.
+1. 进入 `<lib-root>/schematics/my-service` 文件夹。
+1. 创建一个 `schema.json` 文件，并定义该原理图可用的选项。
 
    ```json [projects/my-lib/schematics/my-service/schema.json (Schematic JSON Schema)]
    {
@@ -274,45 +270,45 @@ When you add a schematic to the collection, you have to point to it in the colle
      "required": ["name"]
    }
    ```
-   - _id_: A unique ID for the schema in the collection.
-   - _title_: A human-readable description of the schema.
-   - _type_: A descriptor for the type provided by the properties.
-   - _properties_: An object that defines the available options for the schematic.
+   - _id_：该 schema 在集合中的唯一 ID。
+   - _title_：该 schema 的人类可读描述。
+   - _type_：属性所提供类型的描述符。
+   - _properties_：一个对象，定义该原理图可用的选项。
 
-   Each option associates key with a type, description, and optional alias.
-   The type defines the shape of the value you expect, and the description is displayed when the user requests usage help for your schematic.
+   每个选项都会把一个键与类型、描述以及可选的别名关联起来。
+   类型定义了你期望的值的形态，而描述会在用户请求该原理图的用法帮助时显示出来。
 
-   See the workspace schema for additional customizations for schematic options.
+   关于原理图选项的更多自定义方式，请参阅工作区 schema。
 
-1. Create a `schema.ts` file and define an interface that stores the values of the options defined in the `schema.json` file.
+1. 创建一个 `schema.ts` 文件，并定义一个接口，用于存储 `schema.json` 文件中所定义选项的值。
 
    ```ts [projects/my-lib/schematics/my-service/schema.ts (Schematic Interface)]
    export interface Schema {
-     // The name of the service.
+     // 服务的名称。
      name: string;
 
-     // The path to create the service.
+     // 创建服务的路径。
      path?: string;
 
-     // The name of the project.
+     // 项目的名称。
      project?: string;
    }
    ```
 
-   | Options | Details                                                                                                                                     |
+   | 选项    | 说明                                                                                                                                        |
    | :------ | :------------------------------------------------------------------------------------------------------------------------------------------ |
-   | name    | The name you want to provide for the created service.                                                                                       |
-   | path    | Overrides the path provided to the schematic. The default path value is based on the current working directory.                             |
-   | project | Provides a specific project to run the schematic on. In the schematic, you can provide a default if the option is not provided by the user. |
+   | name    | 你想为所创建的服务指定的名称。                                                                                                              |
+   | path    | 覆盖提供给原理图的路径。默认的路径值基于当前工作目录。                                                                                      |
+   | project | 指定要运行该原理图的具体项目。在原理图中，如果用户没有提供该选项，你可以提供一个默认值。                                                    |
 
-### Add template files
+### 添加模板文件 {#add-template-files}
 
-To add artifacts to a project, your schematic needs its own template files.
-Schematic templates support special syntax to execute code and variable substitution.
+要向项目中添加产物，原理图需要有自己的模板文件。
+原理图模板支持用于执行代码和变量替换的特殊语法。
 
-1. Create a `files/` folder inside the `schematics/my-service/` folder.
-1. Create a file named `__name@dasherize__.service.ts.template` that defines a template to use for generating files.
-   This template will generate a service that already has Angular's `HttpClient` injected into an `http` property.
+1. 在 `schematics/my-service/` 文件夹中创建一个 `files/` 文件夹。
+1. 创建一个名为 `__name@dasherize__.service.ts.template` 的文件，定义用于生成文件的模板。
+   这个模板会生成一个服务，该服务已经把 Angular 的 `HttpClient` 注入到了 `http` 属性中。
 
    ```ts [projects/my-lib/schematics/my-service/files/__name@dasherize__.service.ts.template (Schematic Template)]
 
@@ -326,23 +322,23 @@ Schematic templates support special syntax to execute code and variable substitu
 
    ```
 
-   - The `classify` and `dasherize` methods are utility functions that your schematic uses to transform your source template and filename.
-   - The `name` is provided as a property from your factory function.
-     It is the same `name` you defined in the schema.
+   - `classify` 和 `dasherize` 方法是工具函数，原理图会用它们来转换源模板和文件名。
+   - `name` 作为属性由工厂函数提供。
+     它就是你在 schema 中定义的那个 `name`。
 
-### Add the factory function
+### 添加工厂函数 {#add-the-factory-function}
 
-Now that you have the infrastructure in place, you can define the main function that performs the modifications you need in the user's project.
+基础设施已经就绪，现在可以定义主函数，对用户项目执行所需的修改了。
 
-The Schematics framework provides a file templating system, which supports both path and content templates.
-The system operates on placeholders defined inside files or paths that loaded in the input `Tree`.
-It fills these in using values passed into the `Rule`.
+Schematics 框架提供了一个文件模板系统，同时支持路径模板和内容模板。
+该系统作用于输入 `Tree` 中所加载的文件或路径里定义的占位符。
+它会使用传入 `Rule` 的值来填充这些占位符。
 
-For details of these data structures and syntax, see the [Schematics README](https://github.com/angular/angular-cli/blob/main/packages/angular_devkit/schematics/README.md).
+关于这些数据结构和语法的详细信息，请参阅 [Schematics README](https://github.com/angular/angular-cli/blob/main/packages/angular_devkit/schematics/README.md)。
 
-1. Create the main file `index.ts` and add the source code for your schematic factory function.
-1. First, import the schematics definitions you will need.
-   The Schematics framework offers many utility functions to create and use rules when running a schematic.
+1. 创建主文件 `index.ts`，并添加原理图工厂函数的源代码。
+1. 首先，导入你需要的原理图定义。
+   Schematics 框架提供了许多工具函数，用于在运行原理图时创建和使用规则。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Imports)]
    import {
@@ -360,7 +356,7 @@ For details of these data structures and syntax, see the [Schematics README](htt
    import {strings, normalize, virtualFs, workspaces} from '@angular-devkit/core';
    ```
 
-1. Import the defined schema interface that provides the type information for your schematic's options.
+1. 导入已定义的 schema 接口，它为原理图的选项提供类型信息。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Schema Import)]
    import {
@@ -380,7 +376,7 @@ For details of these data structures and syntax, see the [Schematics README](htt
    import {Schema as MyServiceSchema} from './schema';
    ```
 
-1. To build up the generation schematic, start with an empty rule factory.
+1. 要构建这个生成原理图，先从一个空的规则工厂开始。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Initial Rule)]
    export function myService(options: MyServiceSchema): Rule {
@@ -388,25 +384,25 @@ For details of these data structures and syntax, see the [Schematics README](htt
    }
    ```
 
-This rule factory returns the tree without modification.
-The options are the option values passed through from the `ng generate` command.
+这个规则工厂会原样返回 tree，不做任何修改。
+options 是从 `ng generate` 命令传入的选项值。
 
-## Define a generation rule
+## 定义生成规则 {#define-a-generation-rule}
 
-You now have the framework in place for creating the code that actually modifies the user's application to set it up for the service defined in your library.
+现在框架已经搭好，可以编写真正修改用户应用的代码，为库中定义的服务做好设置。
 
-The Angular workspace where the user installed your library contains multiple projects \(applications and libraries\).
-The user can specify the project on the command line, or let it default.
-In either case, your code needs to identify the specific project to which this schematic is being applied, so that you can retrieve information from the project configuration.
+用户安装你的库的 Angular 工作区中包含多个项目（应用和库）。
+用户可以在命令行中指定项目，也可以使用默认项目。
+无论哪种情况，你的代码都需要确定该原理图要应用到哪个具体项目上，以便从项目配置中获取信息。
 
-Do this using the `Tree` object that is passed in to the factory function.
-The `Tree` methods give you access to the complete file tree in your workspace, letting you read and write files during the execution of the schematic.
+这可以通过传入工厂函数的 `Tree` 对象来完成。
+`Tree` 的方法让你可以访问工作区中完整的文件树，从而在原理图执行期间读写文件。
 
-### Get the project configuration
+### 获取项目配置 {#get-the-project-configuration}
 
-1. To determine the destination project, use the `workspaces.readWorkspace` method to read the contents of the workspace configuration file, `angular.json`.
-   To use `workspaces.readWorkspace` you need to create a `workspaces.WorkspaceHost` from the `Tree`.
-   Add the following code to your factory function.
+1. 要确定目标项目，请使用 `workspaces.readWorkspace` 方法读取工作区配置文件 `angular.json` 的内容。
+   要使用 `workspaces.readWorkspace`，需要从 `Tree` 创建一个 `workspaces.WorkspaceHost`。
+   把以下代码添加到工厂函数中。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Schema Import)]
    import {
@@ -455,9 +451,9 @@ The `Tree` methods give you access to the complete file tree in your workspace, 
    }
    ```
 
-   Be sure to check that the context exists and throw the appropriate error.
+   请务必检查上下文是否存在，并抛出相应的错误。
 
-1. Now that you have the project name, use it to retrieve the project-specific configuration information.
+1. 有了项目名称之后，就可以用它来获取该项目专属的配置信息。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Project)]
    const project = options.project != null ? workspace.projects.get(options.project) : null;
@@ -468,12 +464,12 @@ The `Tree` methods give you access to the complete file tree in your workspace, 
    const projectType = project.extensions.projectType === 'application' ? 'app' : 'lib';
    ```
 
-   The `workspace.projects` object contains all the project-specific configuration information.
+   `workspace.projects` 对象包含了所有项目专属的配置信息。
 
-1. The `options.path` determines where the schematic template files are moved to once the schematic is applied.
+1. `options.path` 决定了应用原理图后，原理图模板文件会被移动到哪里。
 
-   The `path` option in the schematic's schema is substituted by default with the current working directory.
-   If the `path` is not defined, use the `sourceRoot` from the project configuration along with the `projectType`.
+   原理图 schema 中的 `path` 选项默认会被替换为当前工作目录。
+   如果没有定义 `path`，就使用项目配置中的 `sourceRoot` 加上 `projectType`。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Project Info)]
    if (options.path === undefined) {
@@ -481,12 +477,12 @@ The `Tree` methods give you access to the complete file tree in your workspace, 
    }
    ```
 
-### Define the rule
+### 定义规则 {#define-the-rule}
 
-A `Rule` can use external template files, transform them, and return another `Rule` object with the transformed template.
-Use the templating to generate any custom files required for your schematic.
+`Rule` 可以使用外部模板文件，对它们进行转换，并返回另一个包含转换后模板的 `Rule` 对象。
+使用模板来生成原理图所需的任何自定义文件。
 
-1. Add the following code to your factory function.
+1. 把以下代码添加到工厂函数中。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Template transform)]
    const templateSource = apply(url('./files'), [
@@ -499,25 +495,25 @@ Use the templating to generate any custom files required for your schematic.
    ]);
    ```
 
-   | Methods            | Details                                                                                                                                                                                                                                          |
+   | 方法               | 说明                                                                                                                                                                                                                                             |
    | :----------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `apply()`          | Applies multiple rules to a source and returns the transformed source. It takes 2 arguments, a source and an array of rules.                                                                                                                     |
-   | `url()`            | Reads source files from your filesystem, relative to the schematic.                                                                                                                                                                              |
-   | `applyTemplates()` | Receives an argument of methods and properties you want make available to the schematic template and the schematic filenames. It returns a `Rule`. This is where you define the `classify()` and `dasherize()` methods, and the `name` property. |
-   | `classify()`       | Takes a value and returns the value in title case. For example, if the provided name is `my service`, it is returned as `MyService`.                                                                                                             |
-   | `dasherize()`      | Takes a value and returns the value in dashed and lowercase. For example, if the provided name is MyService, it is returned as `my-service`.                                                                                                     |
-   | `move()`           | Moves the provided source files to their destination when the schematic is applied.                                                                                                                                                              |
+   | `apply()`          | 把多个规则应用到一个源上，并返回转换后的源。它接受 2 个参数：一个源和一个规则数组。                                                                                                                                                              |
+   | `url()`            | 从文件系统中读取源文件，路径相对于原理图。                                                                                                                                                                                                       |
+   | `applyTemplates()` | 接收一个参数，其中包含你希望提供给原理图模板和原理图文件名使用的方法和属性。它返回一个 `Rule`。你就是在这里定义 `classify()` 和 `dasherize()` 方法以及 `name` 属性的。                                                                          |
+   | `classify()`       | 接收一个值，并以首字母大写（title case）的形式返回。例如，如果提供的名称是 `my service`，则返回 `MyService`。                                                                                                                                   |
+   | `dasherize()`      | 接收一个值，并以小写加连字符的形式返回。例如，如果提供的名称是 MyService，则返回 `my-service`。                                                                                                                                                  |
+   | `move()`           | 在应用原理图时，把提供的源文件移动到目标位置。                                                                                                                                                                                                   |
 
-1. Finally, the rule factory must return a rule.
+1. 最后，规则工厂必须返回一个规则。
 
    ```ts [projects/my-lib/schematics/my-service/index.ts (Chain Rule)]
    return chain([mergeWith(templateSource)]);
    ```
 
-   The `chain()` method lets you combine multiple rules into a single rule, so that you can perform multiple operations in a single schematic.
-   Here you are only merging the template rules with any code executed by the schematic.
+   `chain()` 方法可以把多个规则组合成一个规则，这样你就能在一个原理图中执行多个操作。
+   这里只是把模板规则与原理图执行的其他代码合并在一起。
 
-See a complete example of the following schematic rule function.
+下面是这个原理图规则函数的完整示例。
 
 ```ts [projects/my-lib/schematics/my-service/index.ts]
 // #docplaster
@@ -589,16 +585,16 @@ export function myService(options: MyServiceSchema): Rule {
 }
 ```
 
-For more information about rules and utility methods, see [Provided Rules](https://github.com/angular/angular-cli/tree/main/packages/angular_devkit/schematics#provided-rules).
+关于规则和工具方法的更多信息，请参阅[内置规则（Provided Rules）](https://github.com/angular/angular-cli/tree/main/packages/angular_devkit/schematics#provided-rules)。
 
-## Running your library schematic
+## 运行库的原理图 {#running-your-library-schematic}
 
-After you build your library and schematics, you can install the schematics collection to run against your project.
-The following steps show you how to generate a service using the schematic you created earlier.
+构建好库和原理图之后，就可以安装原理图集合并在项目中运行了。
+下面的步骤演示如何使用之前创建的原理图生成一个服务。
 
-### Build your library and schematics
+### 构建库和原理图 {#build-your-library-and-schematics}
 
-From the root of your workspace, run the `ng build` command for your library.
+在工作区的根目录下，为你的库运行 `ng build` 命令。
 
 ```shell
 
@@ -606,7 +602,7 @@ ng build my-lib
 
 ```
 
-Then, you change into your library directory to build the schematic
+然后，进入库的目录来构建原理图
 
 ```shell
 
@@ -615,11 +611,11 @@ npm run build
 
 ```
 
-### Link the library
+### 链接库 {#link-the-library}
 
-Your library and schematics are packaged and placed in the `dist/my-lib` folder at the root of your workspace.
-For running the schematic, you need to link the library into your `node_modules` folder.
-From the root of your workspace, run the `npm link` command with the path to your distributable library.
+你的库和原理图会被打包并放到工作区根目录下的 `dist/my-lib` 文件夹中。
+要运行原理图，需要把库链接到你的 `node_modules` 文件夹中。
+在工作区的根目录下，运行 `npm link` 命令，并传入可分发库的路径。
 
 ```shell
 
@@ -627,9 +623,9 @@ npm link dist/my-lib
 
 ```
 
-### Run the schematic
+### 运行原理图 {#run-the-schematic}
 
-Now that your library is installed, run the schematic using the `ng generate` command.
+库已经安装好了，现在使用 `ng generate` 命令运行原理图。
 
 ```shell
 
@@ -637,7 +633,7 @@ ng generate my-lib:my-service --name my-data
 
 ```
 
-In the console, you see that the schematic was run and the `my-data.service.ts` file was created in your application folder.
+在控制台中，你会看到原理图已运行，并且在应用文件夹中创建了 `my-data.service.ts` 文件。
 
 ```shell
 

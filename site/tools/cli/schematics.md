@@ -1,27 +1,23 @@
----
-untranslated: true
----
+# 使用原理图生成代码 {#generating-code-using-schematics}
 
-# Generating code using schematics
+原理图（Schematic）是一种基于模板、支持复杂逻辑的代码生成器。
+它是一组指令，通过生成或修改代码来转换软件项目。
+原理图会被打包成集合（collection），并通过 npm 安装。
 
-A schematic is a template-based code generator that supports complex logic.
-It is a set of instructions for transforming a software project by generating or modifying code.
-Schematics are packaged into collections and installed with npm.
+原理图集合可以成为创建、修改和维护任何软件项目的强大工具，尤其适合按照你所在组织的特定需求来定制 Angular 项目。
+例如，你可以使用原理图，基于预定义的模板或布局，生成常用的 UI 模式或特定的组件（Component）。
+你还可以用原理图来强制执行架构规则和约定，让你的项目保持一致并且可以互相协作。
 
-The schematic collection can be a powerful tool for creating, modifying, and maintaining any software project, but is particularly useful for customizing Angular projects to suit the particular needs of your own organization.
-You might use schematics, for example, to generate commonly-used UI patterns or specific components, using predefined templates or layouts.
-Use schematics to enforce architectural rules and conventions, making your projects consistent and interoperative.
+## Angular CLI 的原理图 {#schematics-for-the-angular-cli}
 
-## Schematics for the Angular CLI
+原理图是 Angular 生态系统的一部分。
+Angular CLI 使用原理图对 Web 应用项目进行转换。
+你可以修改这些原理图，也可以定义新的原理图来完成各种工作，例如更新代码以修复某个依赖中的破坏性变更，或者为现有项目添加新的配置选项或框架。
 
-Schematics are part of the Angular ecosystem.
-The Angular CLI uses schematics to apply transforms to a web-app project.
-You can modify these schematics, and define new ones to do things like update your code to fix breaking changes in a dependency, for example, or to add a new configuration option or framework to an existing project.
-
-Schematics that are included in the `@schematics/angular` collection are run by default by the commands `ng generate` and `ng add`.
-The package contains named schematics that configure the options that are available to the CLI for `ng generate` sub-commands, such as `ng generate component` and `ng generate service`.
-The sub-commands for `ng generate` are shorthand for the corresponding schematic.
-To specify and generate a particular schematic, or a collection of schematics, using the long form:
+`@schematics/angular` 集合中包含的原理图，默认会由 `ng generate` 和 `ng add` 命令运行。
+该包中包含一些具名原理图，它们负责配置 CLI 中 `ng generate` 子命令（如 `ng generate component` 和 `ng generate service`）可用的选项。
+`ng generate` 的子命令就是对应原理图的简写。
+要使用完整形式来指定并生成某个原理图或原理图集合：
 
 ```shell
 
@@ -29,55 +25,55 @@ ng generate my-schematic-collection:my-schematic-name
 
 ```
 
-### Configuring CLI schematics
+### 配置 CLI 原理图 {#configuring-cli-schematics}
 
-A JSON schema associated with a schematic tells the Angular CLI what options are available to commands and sub-commands, and determines the defaults.
-These defaults can be overridden by providing a different value for an option on the command line.
-See [Workspace Configuration](/reference/configs/workspace-config) for information about how to change the generation option defaults for your workspace.
+与原理图关联的 JSON Schema 会告诉 Angular CLI，命令和子命令有哪些可用选项，并决定这些选项的默认值。
+你可以在命令行中为选项提供不同的值来覆盖这些默认值。
+关于如何修改工作区中生成选项的默认值，请参阅 [工作区配置](/reference/configs/workspace-config)。
 
-The JSON schemas for the default schematics used by the CLI to generate projects and parts of projects are collected in the package [`@schematics/angular`](https://github.com/angular/angular-cli/tree/main/packages/schematics/angular).
-The schema describes the options available to the CLI for each of the `ng generate` sub-commands, as shown in the `--help` output.
+CLI 用于生成项目及项目各部分的默认原理图，其 JSON Schema 都收集在 [`@schematics/angular`](https://github.com/angular/angular-cli/tree/main/packages/schematics/angular) 包中。
+这些 Schema 描述了 CLI 中每个 `ng generate` 子命令可用的选项，就像 `--help` 输出中显示的那样。
 
-### Automatic formatting
+### 自动格式化 {#automatic-formatting}
 
-If [Prettier](https://prettier.io/) or [Oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) is installed in your workspace, the Angular CLI automatically formats any files created or modified by schematics and `ng update` migrations.
-The CLI only formats the affected files and leaves all other files untouched.
+如果你的工作区中安装了 [Prettier](https://prettier.io/) 或 [Oxfmt](https://oxc.rs/docs/guide/usage/formatter.html)，Angular CLI 会自动格式化由原理图和 `ng update` 迁移创建或修改的所有文件。
+CLI 只会格式化受影响的文件，其他文件保持不变。
 
-## Developing schematics for libraries
+## 为库开发原理图 {#developing-schematics-for-libraries}
 
-As a library developer, you can create your own collections of custom schematics to integrate your library with the Angular CLI.
+作为库的开发者，你可以创建自己的自定义原理图集合，把你的库与 Angular CLI 集成起来。
 
-- An _add schematic_ lets developers install your library in an Angular workspace using `ng add`
-- _Generation schematics_ can tell the `ng generate` sub-commands how to modify projects, add configurations and scripts, and scaffold artifacts that are defined in your library
-- An _update schematic_ can tell the `ng update` command how to update your library's dependencies and adjust for breaking changes when you release a new version
+- _add 原理图_ 让开发者可以使用 `ng add` 在 Angular 工作区中安装你的库
+- _生成原理图_ 可以告诉 `ng generate` 子命令如何修改项目、添加配置和脚本，以及为库中定义的各种构件搭建脚手架
+- _update 原理图_ 可以告诉 `ng update` 命令，在你发布新版本时如何更新库的依赖，并针对破坏性变更进行调整
 
-For more details of what these look like and how to create them, see:
+关于这些原理图的具体形式以及如何创建它们，请参阅：
 
-- [Authoring Schematics](/tools/cli/schematics-authoring)
-- [Schematics for Libraries](/tools/cli/schematics-for-libraries)
+- [编写原理图](/tools/cli/schematics-authoring)
+- [库的原理图](/tools/cli/schematics-for-libraries)
 
 
-### Add schematics
+### add 原理图 {#add-schematics}
 
-An _add schematic_ is typically supplied with a library, so that the library can be added to an existing project with `ng add`.
-The `add` command uses your package manager to download new dependencies, and invokes an installation script that is implemented as a schematic.
+_add 原理图_ 通常随库一起提供，这样就可以用 `ng add` 把库添加到现有项目中。
+`add` 命令会使用你的包管理器下载新的依赖，并调用一个以原理图形式实现的安装脚本。
 
-For example, the [`@angular/material`](https://material.angular.dev/guide/schematics) schematic tells the `add` command to install and set up Angular Material and theming, and register new starter components that can be created with `ng generate`.
-Look at this one as an example and model for your own add schematic.
+例如，[`@angular/material`](https://material.angular.dev/guide/schematics) 原理图会告诉 `add` 命令安装并设置 Angular Material 和主题，并注册一些可以用 `ng generate` 创建的新起步组件。
+你可以把它作为编写自己的 add 原理图时的示例和范本。
 
-Partner and third party libraries also support the Angular CLI with add schematics.
-For example, `@ng-bootstrap/schematics` adds [ng-bootstrap](https://ng-bootstrap.github.io) to an app, and `@clr/angular` installs and sets up [Clarity from VMWare](https://clarity.design/documentation/get-started).
+合作伙伴和第三方库也通过 add 原理图来支持 Angular CLI。
+例如，`@ng-bootstrap/schematics` 会把 [ng-bootstrap](https://ng-bootstrap.github.io) 添加到应用中，而 `@clr/angular` 会安装并设置 [VMWare 的 Clarity](https://clarity.design/documentation/get-started)。
 
-An _add schematic_ can also update a project with configuration changes, add additional dependencies \(such as polyfills\), or scaffold package-specific initialization code.
-For example, the `@angular/pwa` schematic turns your application into a PWA by adding an application manifest and service worker.
+_add 原理图_ 还可以通过配置变更来更新项目、添加额外的依赖（例如 polyfill），或者为特定包搭建初始化代码。
+例如，`@angular/pwa` 原理图会添加应用清单（manifest）和 Service Worker，把你的应用变成一个 PWA。
 
-### Generation schematics
+### 生成原理图 {#generation-schematics}
 
-Generation schematics are instructions for the `ng generate` command.
-The documented sub-commands use the default Angular generation schematics, but you can specify a different schematic \(in place of a sub-command\) to generate an artifact defined in your library.
+生成原理图是供 `ng generate` 命令使用的指令。
+文档中列出的子命令使用的是 Angular 默认的生成原理图，但你也可以指定一个不同的原理图（代替子命令）来生成库中定义的构件。
 
-Angular Material, for example, supplies generation schematics for the UI components that it defines.
-The following command uses one of these schematics to render an Angular Material `<mat-table>` that is pre-configured with a datasource for sorting and pagination.
+例如，Angular Material 为它定义的 UI 组件提供了生成原理图。
+下面的命令使用其中一个原理图来渲染一个 Angular Material `<mat-table>`，它预先配置好了支持排序和分页的数据源。
 
 ```shell
 
@@ -85,10 +81,10 @@ ng generate @angular/material:table <component-name>
 
 ```
 
-### Update schematics
+### update 原理图 {#update-schematics}
 
-The `ng update` command can be used to update your workspace's library dependencies.
-If you supply no options or use the help option, the command examines your workspace and suggests libraries to update.
+`ng update` 命令可以用来更新工作区中的库依赖。
+如果你不提供任何选项，或者使用了 help 选项，该命令会检查你的工作区并建议需要更新的库。
 
 ```shell
 
@@ -105,25 +101,25 @@ We analyzed your package.json, there are some packages to update:
 
 ```
 
-If you pass the command a set of libraries to update, it updates those libraries, their peer dependencies, and the peer dependencies that depend on them.
+如果你向该命令传入一组要更新的库，它会更新这些库、它们的对等依赖（peer dependency），以及依赖于它们的对等依赖。
 
-::: tip HELPFUL
-If there are inconsistencies \(for example, if peer dependencies cannot be matched by a simple [semver](https://semver.org) range\), the command generates an error and does not change anything in the workspace.
+::: tip 提示
+如果存在不一致的情况（例如，对等依赖无法用简单的 [semver](https://semver.org) 范围来匹配），该命令会报错，并且不会对工作区做任何修改。
 
 :::
 
-We recommend that you do not force an update of all dependencies by default.
-Try updating specific dependencies first.
+我们建议你不要默认强制更新所有依赖。
+请先尝试更新特定的依赖。
 
-For more about how the `ng update` command works, see [Update Command](https://github.com/angular/angular-cli/blob/main/docs/specifications/update.md).
+关于 `ng update` 命令工作原理的更多信息，请参阅 [Update 命令](https://github.com/angular/angular-cli/blob/main/docs/specifications/update.md)。
 
-If you create a new version of your library that introduces potential breaking changes, you can provide an _update schematic_ to enable the `ng update` command to automatically resolve any such changes in the project being updated.
+如果你为库创建了一个可能带来破坏性变更的新版本，可以提供一个 _update 原理图_，让 `ng update` 命令在被更新的项目中自动处理这些变更。
 
-For example, suppose you want to update the Angular Material library.
+例如，假设你要更新 Angular Material 库。
 
 ```shell
 ng update @angular/material
 ```
 
-This command updates both `@angular/material` and its dependency `@angular/cdk` in your workspace's `package.json`.
-If either package contains an update schematic that covers migration from the existing version to a new version, the command runs that schematic on your workspace.
+该命令会同时更新工作区 `package.json` 中的 `@angular/material` 及其依赖 `@angular/cdk`。
+如果其中任何一个包包含覆盖从现有版本迁移到新版本的 update 原理图，该命令就会在你的工作区中运行该原理图。

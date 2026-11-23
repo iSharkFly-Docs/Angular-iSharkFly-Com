@@ -1,37 +1,33 @@
----
-untranslated: true
----
+# 检查路由树 {#inspect-the-router-tree}
 
-# Inspect the Router Tree
-
-The **Router Tree** tab lets you visualize the routing tree of your application. You can explore how routes are nested and view details about specific routes.
+**Router Tree**（路由树）标签页可以让你可视化应用的路由树。你可以浏览路由的嵌套方式，并查看特定路由的详细信息。
 
 <img src="/assets/images/guide/devtools/router-tree.png" alt="A screenshot of the 'Router Tree' tab in Angular DevTools showing a tree of configured routes. The active routes are highlighted in green, while inactive ones are white.">
 
-### View route details
+### 查看路由详情 {#view-route-details}
 
-When you select a specific route in the tree, Angular DevTools displays its properties in the sidebar on the right. This information includes:
+当你在树中选中某个路由时，Angular DevTools 会在右侧边栏中显示它的属性。这些信息包括：
 
-- **Path**: The URL path for the route. If the route uses a custom URL matcher, DevTools displays the **Matcher** instead.
-- **Component**: The component rendered for this route. If the route is a redirect, DevTools displays the **Redirect to** target instead.
-- **Path Match**: The path matching strategy (`prefix` or `full`), if configured.
-- **Data**: Static data associated with the route, displayed as a JSON tree.
-- **Resolvers**: Route resolvers, displayed as key-value pairs.
-- **Guards**: Any guards configured on the route, grouped by type — `canActivate`, `canActivateChild`, `canDeactivate`, and `canMatch`.
-- **Providers**: Route-level providers, if configured.
-- **Title**: The route title, if configured.
-- **RunGuardsAndResolvers**: The re-run strategy for guards and resolvers, if configured.
-- **Active**: Whether this route is currently active.
-- **Auxiliary**: Indicates if the route is an auxiliary route (e.g., in a named outlet).
-- **Lazy**: Indicates if the route is lazily loaded.
+- **Path**：该路由的 URL 路径。如果路由使用了自定义 URL 匹配器，DevTools 会改为显示 **Matcher**。
+- **Component**：该路由所渲染的组件（Component）。如果路由是一个重定向，DevTools 会改为显示 **Redirect to** 目标。
+- **Path Match**：路径匹配策略（`prefix` 或 `full`），仅在配置时显示。
+- **Data**：与该路由关联的静态数据，以 JSON 树的形式显示。
+- **Resolvers**：路由解析器，以键值对的形式显示。
+- **Guards**：路由上配置的所有守卫，按类型分组——`canActivate`、`canActivateChild`、`canDeactivate` 和 `canMatch`。
+- **Providers**：路由级的提供者（Provider），仅在配置时显示。
+- **Title**：路由标题，仅在配置时显示。
+- **RunGuardsAndResolvers**：守卫和解析器的重新运行策略，仅在配置时显示。
+- **Active**：该路由当前是否处于激活状态。
+- **Auxiliary**：表示该路由是否为辅助路由（例如位于具名出口中）。
+- **Lazy**：表示该路由是否为延迟加载（Lazy Loading）的。
 
-::: info NOTE
-Properties like Path Match, Data, Resolvers, Guards, Providers, Title, and RunGuardsAndResolvers only appear in the sidebar when they are configured on the selected route.
+::: info 注意
+Path Match、Data、Resolvers、Guards、Providers、Title 和 RunGuardsAndResolvers 等属性，只有在所选路由上配置了它们时才会出现在侧边栏中。
 
 :::
 
-### Navigate to a specific route
+### 导航到特定路由 {#navigate-to-a-specific-route}
 
-You can easily trigger navigation directly from the DevTools. While inspecting a route's details in the right sidebar, click on the **Navigate** icon next to the path string. This triggers the Angular router to navigate to that URL in your application.
+你可以直接从 DevTools 中轻松触发导航。在右侧边栏查看路由详情时，点击路径字符串旁边的 **Navigate**（导航）图标，就会让 Angular 路由器（Router）在应用中导航到该 URL。
 
 <img src="/assets/images/guide/devtools/router-tree-navigate.png" alt="A screenshot showing the 'Navigate to' tooltip on the route path in the 'Routes Details' sidebar.">

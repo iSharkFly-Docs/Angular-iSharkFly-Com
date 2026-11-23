@@ -1,30 +1,26 @@
----
-untranslated: true
----
+# 检查注入器 {#inspect-your-injectors}
 
-# Inspect your injectors
-
-::: info NOTE
-The Injector Tree is available for Angular Applications built with version 17 or higher.
+::: info 注意
+注入器树适用于使用 17 或更高版本构建的 Angular 应用。
 
 :::
 
-## View the injector hierarchy of your application
+## 查看应用的注入器层级 {#view-the-injector-hierarchy-of-your-application}
 
-The **Injector Tree** tab lets you explore the structure of the Injectors configured in your application. Here you will see two trees representing the [injector hierarchy](/guide/di/hierarchical-dependency-injection) of your application. One tree is your environment hierarchy, the other is your element hierarchy.
+**Injector Tree**（注入器树）标签页可以让你浏览应用中所配置的注入器（Injector）的结构。在这里你会看到两棵树，它们表示应用的[注入器层级](/guide/di/hierarchical-dependency-injection)。一棵是环境层级，另一棵是元素层级。
 
 <img src="/assets/images/guide/devtools/di-injector-tree.png" alt="A screenshot of the 'Profiler' tab displaying the injector tree tab in Angular Devtools visualizing the injector graph for an example application.">
 
-## Visualize resolution paths
+## 可视化解析路径 {#visualize-resolution-paths}
 
-When a specific injector is selected, the path that Angular's dependency injection algorithm traverses from that injector to the root is highlighted. For element injectors, this includes highlighting the environment injectors that the dependency injection algorithm jumps to when a dependency cannot be resolved in the element hierarchy.
+选中某个注入器后，Angular 依赖注入（Dependency Injection）算法从该注入器到根注入器所遍历的路径会被高亮显示。对于元素注入器，当某个依赖无法在元素层级中解析时，依赖注入算法会跳转到环境注入器，这些环境注入器也会被高亮显示。
 
-See [resolution rules](/guide/di/hierarchical-dependency-injection#resolution-rules) for more details about how Angular resolves resolution paths.
+关于 Angular 如何确定解析路径的更多详情，请参阅[解析规则](/guide/di/hierarchical-dependency-injection#resolution-rules)。
 
 <img src="/assets/images/guide/devtools/di-injector-tree-selected.png" alt="A screenshot of the 'Profiler' tab displaying how the injector tree visualize highlights resolution paths when an injector is selected.">
 
-## View injector providers
+## 查看注入器的提供者 {#view-injector-providers}
 
-Clicking an injector that has configured providers will display those providers in a list on the right of the injector tree view. Here you can view the provided token and it's type. The button on the right of each provider allows you to log the provider in the console.
+点击一个配置了提供者（Provider）的注入器后，这些提供者会以列表形式显示在注入器树视图的右侧。你可以在这里查看所提供的令牌及其类型。每个提供者右侧的按钮可以把该提供者输出到控制台中。
 
 <img src="/assets/images/guide/devtools/di-injector-tree-providers.png" alt="A screenshot of the 'Profiler' tab displaying how providers are made visible when an injector is selected.">

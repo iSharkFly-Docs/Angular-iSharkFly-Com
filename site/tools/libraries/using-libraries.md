@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 使用发布到 npm 的 Angular 库 {#usage-of-angular-libraries-published-to-npm}
 
-# Usage of Angular libraries published to npm
+构建 Angular 应用时，你可以充分利用成熟的官方库，以及丰富的第三方库生态。
+[Angular Material][AngularMaterialMain] 就是一个成熟官方库的例子。
 
-When you build your Angular application, take advantage of sophisticated first-party libraries, as well as a rich ecosystem of third-party libraries.
-[Angular Material][AngularMaterialMain] is an example of a sophisticated first-party library.
+## 安装库 {#install-libraries}
 
-## Install libraries
+库以 [npm 包][GuideNpmPackages]的形式发布，通常还会附带用于将其与 Angular CLI 集成的原理图（Schematic）。
+要把可复用的库代码集成到应用中，你需要安装这个包，并在使用的位置导入它提供的功能。
+对于大多数已发布的 Angular 库，可以使用 Angular CLI 命令 `ng add <lib_name>`。
 
-Libraries are published as [npm packages][GuideNpmPackages], usually together with schematics that integrate them with the Angular CLI.
-To integrate reusable library code into an application, you need to install the package and import the provided functionality in the location you use it.
-For most published Angular libraries, use the `ng add <lib_name>` Angular CLI command.
+Angular CLI 命令 `ng add` 会使用包管理器安装库包，并调用包中附带的原理图，在项目代码中生成其他脚手架内容。
+包管理器的例子包括 [npm][NpmjsMain] 或 [yarn][YarnpkgMain]。
+项目代码中额外生成的脚手架内容包括 import 语句、字体和主题。
 
-The `ng add` Angular CLI command uses a package manager to install the library package and invokes schematics that are included in the package to other scaffolding within the project code.
-Examples of package managers include [npm][NpmjsMain] or [yarn][YarnpkgMain].
-Additional scaffolding within the project code includes import statements, fonts, and themes.
+已发布的库通常会提供一个 `README` 文件或其他文档，说明如何将该库添加到你的应用中。
+例如，请参阅 [Angular Material][AngularMaterialMain] 的文档。
 
-A published library typically provides a `README` file or other documentation on how to add that library to your application.
-For an example, see the [Angular Material][AngularMaterialMain] documentation.
+### 库的类型定义 {#library-typings}
 
-### Library typings
+通常，库包会在 `.d.ts` 文件中包含类型定义；可以参考 `node_modules/@angular/material` 中的例子。
+如果你的库包中没有包含类型定义，并且 IDE 报错，你可能需要在安装库的同时安装 `@types/<lib_name>` 包。
 
-Typically, library packages include typings in `.d.ts` files; see examples in `node_modules/@angular/material`.
-If the package of your library does not include typings and your IDE complains, you might need to install the `@types/<lib_name>` package with the library.
-
-For example, suppose you have a library named `d3`:
+例如，假设你有一个名为 `d3` 的库：
 
 ```shell
 
@@ -34,16 +30,16 @@ npm install @types/d3 --save-dev
 
 ```
 
-Types defined in a `@types/` package for a library installed into the workspace are automatically added to the TypeScript configuration for the project that uses that library.
-TypeScript looks for types in the `node_modules/@types` directory by default, so you do not have to add each type package individually.
+对于安装到工作区中的库，其 `@types/` 包中定义的类型会被自动添加到使用该库的项目的 TypeScript 配置中。
+TypeScript 默认会在 `node_modules/@types` 目录中查找类型，因此你不必逐个添加每个类型包。
 
-If a library does not have typings available at `@types/`, you may use it by manually adding typings for it.
-To do this:
+如果某个库在 `@types/` 中没有可用的类型定义，你可以手动为它添加类型定义后再使用。
+具体做法如下：
 
-1. Create a `typings.d.ts` file in your `src/` directory.
-   This file is automatically included as global type definition.
+1. 在 `src/` 目录中创建一个 `typings.d.ts` 文件。
+   该文件会被自动作为全局类型定义包含进来。
 
-1. Add the following code in `src/typings.d.ts`:
+1. 在 `src/typings.d.ts` 中添加以下代码：
 
    ```ts
    declare module 'host' {
@@ -56,7 +52,7 @@ To do this:
    }
    ```
 
-1. In the component or file that uses the library, add the following code:
+1. 在使用该库的组件（Component）或文件中，添加以下代码：
 
    ```ts
    import * as host from 'host';
@@ -64,28 +60,28 @@ To do this:
    console.log(parsedUrl.hostname);
    ```
 
-Define more typings as needed.
+根据需要定义更多类型。
 
-## Updating libraries
+## 更新库 {#updating-libraries}
 
-A library is able to be updated by the publisher, and also has individual dependencies which need to be kept current.
-To check for updates to your installed libraries, use the [`ng update`][CliUpdate] Angular CLI command.
+库可以由发布者进行更新，并且它自身也有各自的依赖项需要保持最新。
+要检查已安装的库是否有更新，请使用 Angular CLI 命令 [`ng update`][CliUpdate]。
 
-Use `ng update <lib_name>` Angular CLI command to update individual library versions.
-The Angular CLI checks the latest published release of the library, and if the latest version is newer than your installed version, downloads it and updates your `package.json` to match the latest version.
+使用 Angular CLI 命令 `ng update <lib_name>` 更新单个库的版本。
+Angular CLI 会检查该库最新发布的版本，如果最新版本比你已安装的版本更新，就会下载它并更新你的 `package.json` 以匹配最新版本。
 
-When you update Angular to a new version, you need to make sure that any libraries you are using are current.
-If libraries have interdependencies, you might have to update them in a particular order.
-See the [Angular Update Guide][AngularUpdateMain] for help.
+当你将 Angular 更新到新版本时，需要确保你所使用的所有库都是最新的。
+如果库之间存在相互依赖，你可能需要按特定顺序更新它们。
+如需帮助，请参阅 [Angular 更新指南][AngularUpdateMain]。
 
-## Adding a library to the runtime global scope
+## 将库添加到运行时全局作用域 {#adding-a-library-to-the-runtime-global-scope}
 
-If a legacy JavaScript library is not imported into an application, you may add it to the runtime global scope and load it as if it was added in a script tag.
-Configure the Angular CLI to do this at build time using the `scripts` and `styles` options of the build target in the [`angular.json`][GuideWorkspaceConfig] workspace build configuration file.
+如果某个旧式 JavaScript 库没有被导入到应用中，你可以把它添加到运行时全局作用域，并像通过 script 标签添加一样加载它。
+可以在 [`angular.json`][GuideWorkspaceConfig] 工作区构建配置文件中，使用构建目标的 `scripts` 和 `styles` 选项，让 Angular CLI 在构建时完成这项工作。
 
-For example, to use the [Bootstrap 4][GetbootstrapDocs40GettingStartedIntroduction] library
+例如，要使用 [Bootstrap 4][GetbootstrapDocs40GettingStartedIntroduction] 库：
 
-1. Install the library and the associated dependencies using the npm package manager:
+1. 使用 npm 包管理器安装该库及相关依赖：
 
    ```shell
      npm install jquery --save
@@ -93,7 +89,7 @@ For example, to use the [Bootstrap 4][GetbootstrapDocs40GettingStartedIntroducti
      npm install bootstrap --save
    ```
 
-1. In the `angular.json` configuration file, add the associated script files to the `scripts` array:
+1. 在 `angular.json` 配置文件中，将相关的脚本文件添加到 `scripts` 数组中：
 
    ```json
      "scripts": [
@@ -103,7 +99,7 @@ For example, to use the [Bootstrap 4][GetbootstrapDocs40GettingStartedIntroducti
        ],
    ```
 
-1. Add the `bootstrap.css` CSS file to the `styles` array:
+1. 将 CSS 文件 `bootstrap.css` 添加到 `styles` 数组中：
 
    ```json
      "styles": [
@@ -112,41 +108,41 @@ For example, to use the [Bootstrap 4][GetbootstrapDocs40GettingStartedIntroducti
      ],
    ```
 
-1. Run or restart the `ng serve` Angular CLI command to see Bootstrap 4 work in your application.
+1. 运行或重启 Angular CLI 命令 `ng serve`，即可看到 Bootstrap 4 在你的应用中生效。
 
-### Using runtime-global libraries inside your app
+### 在应用中使用运行时全局库 {#using-runtime-global-libraries-inside-your-app}
 
-After you import a library using the "scripts" array, do **not** import it using an import statement in your TypeScript code.
-The following code snippet is an example import statement.
+通过 "scripts" 数组导入库之后，**不要**再在 TypeScript 代码中使用 import 语句导入它。
+下面的代码片段就是一个 import 语句的例子。
 
 ```ts
 import * as $ from 'jquery';
 ```
 
-If you import it using import statements, you have two different copies of the library: one imported as a global library, and one imported as a module.
-This is especially bad for libraries with plugins, like jQuery, because each copy includes different plugins.
+如果你用 import 语句导入它，就会存在该库的两个不同副本：一个作为全局库导入，另一个作为模块导入。
+对于像 jQuery 这样带插件的库来说，这种情况尤其糟糕，因为每个副本包含的插件各不相同。
 
-Instead, run `npm install @types/jquery` to download typings for your library, add `"jquery"` to the `types` array in `tsconfig.app.json`, and then follow the library installation steps.
-This gives you access to the global variables exposed by that library.
+正确的做法是运行 `npm install @types/jquery` 下载该库的类型定义，将 `"jquery"` 添加到 `tsconfig.app.json` 的 `types` 数组中，然后按照库的安装步骤操作。
+这样你就可以访问该库所暴露的全局变量了。
 
-### Defining typings for runtime-global libraries
+### 为运行时全局库定义类型 {#defining-typings-for-runtime-global-libraries}
 
-If the global library you need to use does not have global typings, you can declare them manually as `any` in `src/typings.d.ts`.
+如果你要使用的全局库没有全局类型定义，可以在 `src/typings.d.ts` 中手动将它们声明为 `any`。
 
-For example:
+例如：
 
 ```ts
 declare var libraryName: any;
 ```
 
-Some scripts extend other libraries; for instance with jQuery plugins:
+有些脚本会扩展其他库，例如 jQuery 插件：
 
 ```ts
 $('.test').myPlugin();
 ```
 
-In this case, the installed `@types/jquery` does not include `myPlugin`, so you need to add an interface in `src/typings.d.ts`.
-For example:
+在这种情况下，已安装的 `@types/jquery` 并不包含 `myPlugin`，因此你需要在 `src/typings.d.ts` 中添加一个接口。
+例如：
 
 ```ts
 interface JQuery {
@@ -154,7 +150,7 @@ interface JQuery {
 }
 ```
 
-If you do not add the interface for the script-defined extension, your IDE shows an error:
+如果不为脚本定义的扩展添加接口，IDE 就会显示错误：
 
 ```text
 

@@ -1,50 +1,46 @@
----
-untranslated: true
----
+# Angular 应用构建系统 {#angular-application-build-system}
 
-# Angular application build system
+从 v17 开始，新的构建系统为构建 Angular 应用提供了一种更好的方式。这个新构建系统包括：
 
-In v17 and higher, the new build system provides an improved way to build Angular applications. This new build system includes:
+- 使用 ESM 的现代输出格式，并通过动态导入表达式支持模块的延迟加载（Lazy Loading）。
+- 更快的构建性能，无论是首次构建还是增量重建。
+- 更新的 JavaScript 生态工具，例如 [esbuild](https://esbuild.github.io/) 和 [Vite](https://vitejs.dev/)。
+- 集成的服务端渲染（SSR）和预渲染能力。
+- 全局样式表和组件样式表的自动热替换。
 
-- A modern output format using ESM, with dynamic import expressions to support lazy module loading.
-- Faster build-time performance for both initial builds and incremental rebuilds.
-- Newer JavaScript ecosystem tools such as [esbuild](https://esbuild.github.io/) and [Vite](https://vitejs.dev/).
-- Integrated SSR and prerendering capabilities.
-- Automatic global and component stylesheet hot replacement.
+这个新构建系统已经稳定，并完全支持用于 Angular 应用。
+使用 `browser` 构建器的应用可以迁移到新构建系统。
+如果你使用的是自定义构建器，请查阅该构建器的文档，了解可能的迁移方式。
 
-This new build system is stable and fully supported for use with Angular applications.
-You can migrate to the new build system with applications that use the `browser` builder.
-If using a custom builder, please refer to the documentation for that builder on possible migration options.
-
-::: warning IMPORTANT
-The existing webpack-based build system and `browser` builder are deprecated.
-Applications can temporarily continue to use the `browser` builder and projects can opt-out of migrating during an update, but the Angular team recommends migrating to the new build system.
+::: warning 重要
+现有的基于 webpack 的构建系统和 `browser` 构建器均已弃用。
+应用暂时可以继续使用 `browser` 构建器，项目也可以在升级时选择不迁移，但 Angular 团队建议迁移到新构建系统。
 
 :::
 
-## For new applications
+## 新应用 {#for-new-applications}
 
-New applications will use this new build system by default via the `application` builder.
+新应用默认会通过 `application` 构建器使用这个新构建系统。
 
-## For existing applications
+## 现有应用 {#for-existing-applications}
 
-Both automated and manual procedures are available depending on the requirements of the project.
-Since v18, the update process to a new major version asks if you would like to migrate existing applications to use the new build system via the automated migration.
-Prior to migrating, please consider reviewing the [Known Issues](#known-issues) section as it may contain relevant information for your project.
+根据项目的需求，可以选择自动迁移或手动迁移。
+从 v18 开始，升级到新的主版本时，升级流程会询问你是否要通过自动迁移让现有应用使用新构建系统。
+迁移之前，请先查看[已知问题](#known-issues)一节，其中可能包含与你的项目相关的信息。
 
-::: tip HELPFUL
-Remember to remove any CommonJS assumptions in the application server code if using SSR such as `require`, `__filename`, `__dirname`, or other constructs from the [CommonJS module scope](https://nodejs.org/api/modules.html#the-module-scope). All application code should be ESM compatible. This does not apply to third-party dependencies.
+::: tip 提示
+如果使用了 SSR，请记得移除应用服务端代码中对 CommonJS 的所有假设，例如 `require`、`__filename`、`__dirname`，或 [CommonJS 模块作用域](https://nodejs.org/api/modules.html#the-module-scope)中的其他结构。所有应用代码都应兼容 ESM。这一点不适用于第三方依赖。
 
 :::
 
-### Automated migration (Recommended)
+### 自动迁移（推荐） {#automated-migration-recommended}
 
-The automated migration will adjust both the application configuration within `angular.json` as well as code and stylesheets to remove previous webpack-specific feature usage.
-While many changes can be automated and most applications will not require any further changes, each application is unique and there may be some manual changes required.
-After the migration, please attempt a build of the application as there could be new errors that will require adjustments within the code.
-The errors will attempt to provide solutions to the problem when possible and the later sections of this guide describe some of the more common situations that you may encounter.
-When updating to a new major version via `ng update`, you will be asked to execute the migration.
-This migration is entirely optional and can also be run manually at anytime after an update via the following command:
+自动迁移会调整 `angular.json` 中的应用配置，同时修改代码和样式表，移除之前对 webpack 专有功能的使用。
+虽然许多改动都可以自动完成，大多数应用也不需要再做其他修改，但每个应用都各不相同，可能仍需要一些手动修改。
+迁移完成后，请尝试构建一次应用，因为可能会出现需要调整代码的新错误。
+这些错误会尽可能给出问题的解决方案，本指南后面的章节也介绍了一些你可能遇到的常见情况。
+通过 `ng update` 升级到新的主版本时，系统会询问你是否执行该迁移。
+这项迁移完全是可选的，也可以在升级后的任何时候通过以下命令手动运行：
 
 ```shell
 
@@ -52,41 +48,41 @@ ng update @angular/cli --name use-application-builder
 
 ```
 
-The migration does the following:
+该迁移会执行以下操作：
 
-- Converts existing `browser` or `browser-esbuild` target to `application`
-- Removes any previous SSR builders (because `application` does that now).
-- Updates configuration accordingly.
-- Merges `tsconfig.server.json` with `tsconfig.app.json` and adds the TypeScript option `"esModuleInterop": true` to ensure `express` imports are [ESM compliant](#esm-default-imports-vs-namespace-imports).
-- Updates application server code to use new bootstrapping and output directory structure.
-- Removes any webpack-specific builder stylesheet usage such as the tilde or caret in `@import`/`url()` and updates the configuration to provide equivalent behavior
-- Converts to use the new lower dependency `@angular/build` Node.js package if no other `@angular-devkit/build-angular` usage is found.
+- 把现有的 `browser` 或 `browser-esbuild` 目标转换为 `application`
+- 移除之前所有的 SSR 构建器（因为现在由 `application` 负责这些工作）。
+- 相应地更新配置。
+- 把 `tsconfig.server.json` 合并到 `tsconfig.app.json` 中，并添加 TypeScript 选项 `"esModuleInterop": true`，以确保 `express` 的导入[符合 ESM 规范](#esm-default-imports-vs-namespace-imports)。
+- 更新应用服务端代码，以使用新的引导方式和输出目录结构。
+- 移除样式表中对 webpack 专有构建器特性的使用，例如 `@import`/`url()` 中的波浪号或脱字符，并更新配置以提供等效的行为
+- 如果没有发现对 `@angular-devkit/build-angular` 的其他使用，则改为使用依赖更少的新 Node.js 包 `@angular/build`。
 
-### Manual migration
+### 手动迁移 {#manual-migration}
 
-Additionally for existing projects, you can manually opt-in to use the new builder on a per-application basis with two different options.
-Both options are considered stable and fully supported by the Angular team.
-The choice of which option to use is a factor of how many changes you will need to make to migrate and what new features you would like to use in the project.
+此外，对于现有项目，你也可以按应用逐个手动启用新构建器，有两种不同的选项。
+这两种选项都被视为稳定版本，并得到 Angular 团队的完整支持。
+选择哪一种，取决于迁移需要做多少修改，以及你希望在项目中使用哪些新功能。
 
-- The `browser-esbuild` builder builds only the client-side bundle of an application designed to be compatible with the existing `browser` builder that provides the preexisting build system.
-  This builder provides equivalent build options, and in many cases, it serves as a drop-in replacement for existing `browser` applications.
-- The `application` builder covers an entire application, such as the client-side bundle, as well as optionally building a server for server-side rendering and performing build-time prerendering of static pages.
+- `browser-esbuild` 构建器只构建应用的客户端包，它被设计为与提供旧构建系统的现有 `browser` 构建器兼容。
+  该构建器提供了等效的构建选项，在很多情况下，可以直接替换现有的 `browser` 应用。
+- `application` 构建器覆盖整个应用，例如客户端包，还可以选择为服务端渲染构建服务器，并在构建时预渲染静态页面。
 
-The `application` builder is generally preferred as it improves server-side rendered (SSR) builds, and makes it easier for client-side rendered projects to adopt SSR in the future.
-However it requires a little more migration effort, particularly for existing SSR applications if performed manually.
-If the `application` builder is difficult for your project to adopt, `browser-esbuild` can be an easier solution which gives most of the build performance benefits with fewer breaking changes.
+通常更推荐使用 `application` 构建器，因为它改进了服务端渲染（SSR）的构建，也让客户端渲染的项目将来更容易采用 SSR。
+不过它需要稍多一些的迁移工作，尤其是对手动迁移的现有 SSR 应用而言。
+如果你的项目难以采用 `application` 构建器，`browser-esbuild` 可能是更简单的方案，它能带来大部分构建性能上的好处，同时破坏性变更更少。
 
-#### Manual migration to the compatibility builder
+#### 手动迁移到兼容构建器 {#manual-migration-to-the-compatibility-builder}
 
-A builder named `browser-esbuild` is available within the `@angular-devkit/build-angular` package that applications using the `browser` builder already depend on.
-You can try out the new build system for applications that use the `browser` builder.
-If using a custom builder, please refer to the documentation for that builder on possible migration options.
+`@angular-devkit/build-angular` 包中提供了一个名为 `browser-esbuild` 的构建器，使用 `browser` 构建器的应用本来就已经依赖这个包。
+你可以在使用 `browser` 构建器的应用中试用新构建系统。
+如果你使用的是自定义构建器，请查阅该构建器的文档，了解可能的迁移方式。
 
-The compatibility option was implemented to minimize the amount of changes necessary to initially migrate your applications.
-This is provided via an alternate builder (`browser-esbuild`).
-You can update the `build` target for any application target to migrate to the new build system.
+兼容选项的目的是尽量减少应用初次迁移时所需的改动。
+它通过一个替代构建器（`browser-esbuild`）提供。
+你可以更新任意应用目标的 `build` 目标，以迁移到新构建系统。
 
-The following is what you would typically find in `angular.json` for an application:
+下面是你在 `angular.json` 中通常会看到的应用配置：
 
 ```json
 ...
@@ -96,7 +92,7 @@ The following is what you would typically find in `angular.json` for an applicat
 ...
 ```
 
-Changing the `builder` field is the only change you will need to make.
+只需要修改 `builder` 字段即可。
 
 ```json
 ...
@@ -106,12 +102,12 @@ Changing the `builder` field is the only change you will need to make.
 ...
 ```
 
-#### Manual migration to the new `application` builder
+#### 手动迁移到新的 `application` 构建器 {#manual-migration-to-the-new-application-builder}
 
-A builder named `application` is also available within the `@angular-devkit/build-angular` package.
-New applications created via `ng new` use the same builder from the `@angular/build` package (`@angular/build:application`).
+`@angular-devkit/build-angular` 包中也提供了一个名为 `application` 的构建器。
+通过 `ng new` 创建的新应用则使用 `@angular/build` 包中的同一个构建器（`@angular/build:application`）。
 
-The following is what you would typically find in `angular.json` for an application:
+下面是你在 `angular.json` 中通常会看到的应用配置：
 
 ```json
 ...
@@ -121,7 +117,7 @@ The following is what you would typically find in `angular.json` for an applicat
 ...
 ```
 
-Changing the `builder` field is the first change you will need to make.
+第一步要修改的是 `builder` 字段。
 
 ```json
 ...
@@ -131,43 +127,43 @@ Changing the `builder` field is the first change you will need to make.
 ...
 ```
 
-Once the builder name has been changed, options within the `build` target will need to be updated.
-The following list discusses all the `browser` builder options that will need to be adjusted.
+修改构建器名称之后，还需要更新 `build` 目标中的选项。
+下面列出了所有需要调整的 `browser` 构建器选项。
 
-- `main` should be renamed to `browser`.
-- `polyfills` should be an array, rather than a single file.
-- `buildOptimizer` should be removed, as this is covered by the `optimization` option.
-- `resourcesOutputPath` should be removed, this is now always `media`.
-- `vendorChunk` should be removed, as this was a performance optimization which is no longer needed.
-- `commonChunk` should be removed, as this was a performance optimization which is no longer needed.
-- `ngswConfigPath` should be renamed to `serviceWorker`.
+- `main` 应重命名为 `browser`。
+- `polyfills` 应该是一个数组，而不是单个文件。
+- `buildOptimizer` 应移除，因为 `optimization` 选项已经涵盖了它。
+- `resourcesOutputPath` 应移除，现在它始终是 `media`。
+- `vendorChunk` 应移除，因为它是一项已不再需要的性能优化。
+- `commonChunk` 应移除，因为它是一项已不再需要的性能优化。
+- `ngswConfigPath` 应重命名为 `serviceWorker`。
 
-If the application is not using SSR currently, this should be the final step to allow `ng build` to function.
-After executing `ng build` for the first time, there may be new warnings or errors based on behavioral differences or application usage of webpack-specific features.
-Many of the warnings will provide suggestions on how to remedy that problem.
-If it appears that a warning is incorrect or the solution is not apparent, please open an issue on [GitHub](https://github.com/angular/angular-cli/issues).
-Also, the later sections of this guide provide additional information on several specific cases as well as current known issues.
+如果应用目前没有使用 SSR，那么这应该是让 `ng build` 正常工作的最后一步。
+首次执行 `ng build` 后，可能会因为行为差异或应用使用了 webpack 专有功能而出现新的警告或错误。
+许多警告都会给出修复建议。
+如果你认为某个警告有误，或者解决方案不明确，请在 [GitHub](https://github.com/angular/angular-cli/issues) 上提交 issue。
+此外，本指南后面的章节还提供了一些特定情况以及当前已知问题的补充信息。
 
-For applications new to SSR, the [Angular SSR Guide](/guide/ssr) provides additional information regarding the setup process for adding SSR to an application.
+对于新接入 SSR 的应用，[Angular SSR 指南](/guide/ssr)提供了为应用添加 SSR 的设置过程的更多信息。
 
-For applications that are already using SSR, additional adjustments will be needed to update the application server to support the new integrated SSR capabilities.
-The `application` builder now provides the integrated functionality for all of the following preexisting builders:
+对于已经在使用 SSR 的应用，还需要做一些额外调整，以更新应用服务器来支持新的集成 SSR 能力。
+`application` 构建器现在为以下所有旧构建器提供了集成的功能：
 
 - `app-shell`
 - `prerender`
 - `server`
 - `ssr-dev-server`
 
-The `ng update` process will automatically remove usages of the `@nguniversal` scope packages where some of these builders were previously located.
-The new `@angular/ssr` package will also be automatically added and used with configuration and code being adjusted during the update.
-The `@angular/ssr` package supports the `browser` builder as well as the `application` builder.
+`ng update` 流程会自动移除对 `@nguniversal` 作用域下各个包的使用，其中一些构建器以前就位于这些包中。
+升级期间还会自动添加并使用新的 `@angular/ssr` 包，同时调整相关配置和代码。
+`@angular/ssr` 包既支持 `browser` 构建器，也支持 `application` 构建器。
 
-## Executing a build
+## 执行构建 {#executing-a-build}
 
-Once you have updated the application configuration, builds can be performed using `ng build` as was previously done.
-Depending on the choice of builder migration, some of the command line options may be different.
-If the build command is contained in any `npm` or other scripts, ensure they are reviewed and updated.
-For applications that have migrated to the `application` builder and that use SSR and/or prererending, you also may be able to remove extra `ng run` commands from scripts now that `ng build` has integrated SSR support.
+更新应用配置后，可以像以前一样使用 `ng build` 执行构建。
+根据所选的构建器迁移方式，部分命令行选项可能会有所不同。
+如果构建命令包含在 `npm` 或其他脚本中，请确保检查并更新这些脚本。
+对于已迁移到 `application` 构建器并使用 SSR 和/或预渲染的应用，由于 `ng build` 已经集成了 SSR 支持，你或许还可以从脚本中移除多余的 `ng run` 命令。
 
 ```shell
 
@@ -175,10 +171,10 @@ ng build
 
 ```
 
-## Starting the development server
+## 启动开发服务器 {#starting-the-development-server}
 
-The development server will automatically detect the new build system and use it to build the application.
-To start the development server no changes are necessary to the `dev-server` builder configuration or command line.
+开发服务器会自动检测新构建系统，并用它来构建应用。
+要启动开发服务器，无需修改 `dev-server` 构建器的配置或命令行。
 
 ```shell
 
@@ -186,31 +182,31 @@ ng serve
 
 ```
 
-You can continue to use the [command line options](https://angular.dev/cli/serve) you have used in the past with the development server.
+你可以继续在开发服务器中使用以前用过的[命令行选项](https://angular.dev/cli/serve)。
 
-::: tip HELPFUL
-With the development server, you may see a small Flash of Unstyled Content (FOUC) on startup as the server initializes.
-The development server attempts to defer processing of stylesheets until first use to improve rebuild times.
-This will not occur in builds outside the development server.
+::: tip 提示
+使用开发服务器时，在服务器初始化期间，你可能会在启动时看到短暂的无样式内容闪烁（FOUC）。
+开发服务器会尽量把样式表的处理推迟到首次使用时，以缩短重建时间。
+在开发服务器之外的构建中不会出现这种情况。
 
 :::
 
-### Hot module replacement
+### 模块热替换 {#hot-module-replacement}
 
-Hot Module Replacement (HMR) is a technique used by development servers to avoid reloading the entire page when only part of an application is changed.
-The changes in many cases can be immediately shown in the browser which allows for an improved edit/refresh cycle while developing an application.
-While general JavaScript-based hot module replacement (HMR) is currently not supported, several more specific forms of HMR are available:
+模块热替换（HMR）是开发服务器使用的一种技术，用于在应用只有部分内容发生变化时避免重新加载整个页面。
+在很多情况下，变更可以立即显示在浏览器中，从而在开发应用时改善「编辑 / 刷新」的循环体验。
+虽然目前还不支持通用的基于 JavaScript 的模块热替换（HMR），但提供了以下几种更具体的 HMR 形式：
 
-- **global stylesheet** (`styles` build option)
-- **component stylesheet** (inline and file-based)
-- **component template** (inline and file-based)
+- **全局样式表**（`styles` 构建选项）
+- **组件样式表**（内联和基于文件的）
+- **组件模板**（内联和基于文件的）
 
-The HMR capabilities are automatically enabled and require no code or configuration changes to use.
-Angular provides HMR support for both file-based (`templateUrl`/`styleUrl`/`styleUrls`) and inline (`template`/`styles`) component styles and templates.
-The build system will attempt to compile and process the minimal amount of application code when it detects a stylesheet only change.
+HMR 功能会自动启用，无需修改任何代码或配置即可使用。
+无论是基于文件的（`templateUrl`/`styleUrl`/`styleUrls`）还是内联的（`template`/`styles`）组件样式和模板，Angular 都提供 HMR 支持。
+当检测到只有样式表发生变化时，构建系统会尽量只编译和处理最少量的应用代码。
 
-If preferred, the HMR capabilities can be disabled by setting the `hmr` development server option to `false`.
-This can also be changed on the command line via:
+如果需要，可以把开发服务器的 `hmr` 选项设置为 `false` 来禁用 HMR 功能。
+也可以在命令行中通过以下方式修改：
 
 ```shell
 
@@ -218,26 +214,26 @@ ng serve --no-hmr
 
 ```
 
-### Vite as a development server
+### 用 Vite 作为开发服务器 {#vite-as-a-development-server}
 
-The usage of Vite in the Angular CLI is currently within a _development server capacity only_. Even without using the underlying Vite build system, Vite provides a full-featured development server with client side support that has been bundled into a low dependency npm package. This makes it an ideal candidate to provide comprehensive development server functionality. The current development server process uses the new build system to generate a development build of the application in memory and passes the results to Vite to serve the application. The usage of Vite, much like the Webpack-based development server, is encapsulated within the Angular CLI `dev-server` builder and currently cannot be directly configured.
+目前 Angular CLI 对 Vite 的使用_仅限于开发服务器_。即使不使用底层的 Vite 构建系统，Vite 也提供了一个功能完备、支持客户端的开发服务器，并被打包成一个依赖很少的 npm 包。这使它非常适合用来提供全面的开发服务器功能。当前的开发服务器流程会使用新构建系统在内存中生成应用的开发构建，然后把结果交给 Vite 来提供应用服务。与基于 Webpack 的开发服务器一样，Vite 的使用被封装在 Angular CLI 的 `dev-server` 构建器中，目前无法直接配置。
 
-### Prebundling
+### 预打包 {#prebundling}
 
-Prebundling provides improved build and rebuild times when using the development server.
-Vite provides [prebundling capabilities](https://vite.dev/guide/dep-pre-bundling) that are enabled by default when using the Angular CLI.
-The prebundling process analyzes all the third-party project dependencies within a project and processes them the first time the development server is executed.
-This process removes the need to rebuild and bundle the project's dependencies each time a rebuild occurs or the development server is executed.
+预打包可以缩短使用开发服务器时的构建和重建时间。
+Vite 提供了[预打包能力](https://vite.dev/guide/dep-pre-bundling)，在使用 Angular CLI 时默认启用。
+预打包过程会分析项目中所有的第三方依赖，并在第一次运行开发服务器时处理它们。
+这样就不必在每次重建或运行开发服务器时都重新构建和打包项目的依赖。
 
-In most cases, no additional customization is required. However, some situations where it may be needed include:
+大多数情况下无需额外的自定义。不过，以下一些情况可能需要自定义：
 
-- Customizing loader behavior for imports within the dependency such as the [`loader` option](#file-extension-loader-customization)
-- Symlinking a dependency to local code for development such as [`npm link`](https://docs.npmjs.com/cli/v10/commands/npm-link)
-- Working around an error encountered during prebundling of a dependency
+- 自定义依赖内部导入的加载器行为，例如 [`loader` 选项](#file-extension-loader-customization)
+- 在开发时把某个依赖符号链接到本地代码，例如 [`npm link`](https://docs.npmjs.com/cli/v10/commands/npm-link)
+- 绕过某个依赖在预打包时遇到的错误
 
-The prebundling process can be fully disabled or individual dependencies can be excluded if needed by a project.
-The `dev-server` builder's `prebundle` option can be used for these customizations.
-To exclude specific dependencies, the `prebundle.exclude` option is available:
+如果项目需要，可以完全禁用预打包，也可以排除个别依赖。
+可以使用 `dev-server` 构建器的 `prebundle` 选项进行这些自定义。
+要排除特定依赖，可以使用 `prebundle.exclude` 选项：
 
 ```json
     "serve": {
@@ -249,8 +245,8 @@ To exclude specific dependencies, the `prebundle.exclude` option is available:
       },
 ```
 
-By default, `prebundle` is set to `true` but can be set to `false` to fully disable prebundling.
-However, excluding specific dependencies is recommended instead since rebuild times will increase with prebundling disabled.
+`prebundle` 默认设置为 `true`，也可以设置为 `false` 来完全禁用预打包。
+不过，更推荐排除特定依赖，因为禁用预打包会增加重建时间。
 
 ```json
     "serve": {
@@ -260,29 +256,29 @@ However, excluding specific dependencies is recommended instead since rebuild ti
       },
 ```
 
-## New features
+## 新功能 {#new-features}
 
-One of the main benefits of the application build system is the improved build and rebuild speed.
-However, the new application build system also provides additional features not present in the `browser` builder.
+应用构建系统的主要好处之一是构建和重建速度的提升。
+此外，新的应用构建系统还提供了一些 `browser` 构建器所没有的功能。
 
-::: warning IMPORTANT
-The new features of the `application` builder described here are incompatible with the `@angular-devkit/build-angular:karma` test builder by default because it is using the `browser` builder internally.
-Users can opt-in to use the `application` builder by setting the `builderMode` option to `application` for that builder.
-The `@angular/build:karma` and `@angular/build:unit-test` builders always use the `application` builder.
-If you notice any issues, please report them [here](https://github.com/angular/angular-cli/issues).
+::: warning 重要
+这里介绍的 `application` 构建器新功能，默认与 `@angular-devkit/build-angular:karma` 测试构建器不兼容，因为该测试构建器内部使用的是 `browser` 构建器。
+用户可以把该构建器的 `builderMode` 选项设置为 `application`，以选择使用 `application` 构建器。
+`@angular/build:karma` 和 `@angular/build:unit-test` 构建器始终使用 `application` 构建器。
+如果你发现任何问题，请[在这里](https://github.com/angular/angular-cli/issues)报告。
 
 :::
 
-### Build-time value replacement with `define`
+### 使用 `define` 在构建时替换值 {#build-time-value-replacement-with-define}
 
-The `define` option allows identifiers present in the code to be replaced with another value at build time.
-This is similar to the behavior of Webpack's `DefinePlugin` which was previously used with some custom Webpack configurations that used third-party builders.
-The option can either be used within the `angular.json` configuration file or on the command line.
-Configuring `define` within `angular.json` is useful for cases where the values are constant and able to be checked in to source control.
+`define` 选项可以在构建时把代码中出现的标识符替换为另一个值。
+这与 Webpack 的 `DefinePlugin` 的行为类似，以前一些使用第三方构建器的自定义 Webpack 配置会用到它。
+该选项既可以在 `angular.json` 配置文件中使用，也可以在命令行中使用。
+如果值是常量并且可以提交到源代码管理中，那么在 `angular.json` 中配置 `define` 会很有用。
 
-Within the configuration file, the option is in the form of an object.
-The keys of the object represent the identifier to replace and the values of the object represent the corresponding replacement value for the identifier.
-An example is as follows:
+在配置文件中，该选项是一个对象。
+对象的键表示要替换的标识符，对象的值表示该标识符对应的替换值。
+示例如下：
 
 ```json
   "build": {
@@ -298,25 +294,25 @@ An example is as follows:
   }
 ```
 
-::: tip HELPFUL
-All replacement values are defined as strings within the configuration file.
-If the replacement is intended to be an actual string literal, it should be enclosed in single quote marks.
-This allows the flexibility of using any valid JSON type as well as a different identifier as a replacement.
+::: tip 提示
+在配置文件中，所有替换值都以字符串形式定义。
+如果替换值本身应该是一个字符串字面量，就需要用单引号把它括起来。
+这样就可以灵活地使用任意有效的 JSON 类型或另一个标识符作为替换值。
 
 :::
 
-The command line usage is preferred for values that may change per build execution such as the git commit hash or an environment variable.
-The CLI will merge `--define` values from the command line with `define` values from `angular.json`, including both in a build.
-Command line usage takes precedence if the same identifier is present for both.
-For command line usage, the `--define` option uses the format of `IDENTIFIER=VALUE`.
+对于每次构建可能都不同的值，例如 git 提交哈希或环境变量，更推荐使用命令行方式。
+CLI 会把命令行中的 `--define` 值与 `angular.json` 中的 `define` 值合并，在构建中同时使用两者。
+如果同一个标识符在两处都存在，则命令行中的值优先。
+在命令行中使用时，`--define` 选项的格式为 `IDENTIFIER=VALUE`。
 
 ```shell
 ng build --define SOME_NUMBER=5 --define "ANOTHER='these will overwrite existing'"
 ```
 
-Environment variables can also be selectively included in a build.
-For non-Windows shells, the quotes around the hash literal can be escaped directly if preferred.
-This example assumes a bash-like shell but similar behavior is available for other shells as well.
+也可以有选择地把环境变量包含到构建中。
+对于非 Windows 的 shell，如果愿意，可以直接对哈希字面量两侧的引号进行转义。
+这个示例假设使用类 bash 的 shell，不过其他 shell 也有类似的用法。
 
 ```shell
 export MY_APP_API_HOST="http://example.com"
@@ -324,8 +320,8 @@ export API_RETRY=3
 ng build --define API_HOST=\'$MY_APP_API_HOST\' --define API_RETRY=$API_RETRY
 ```
 
-For either usage, TypeScript needs to be aware of the types for the identifiers to prevent type-checking errors during the build.
-This can be accomplished with an additional type definition file within the application source code (`src/types.d.ts`, for example) with similar content:
+无论采用哪种方式，TypeScript 都需要知道这些标识符的类型，以免在构建时出现类型检查错误。
+可以在应用源代码中添加一个类型定义文件（例如 `src/types.d.ts`）来实现，内容类似于：
 
 ```ts
 declare const SOME_NUMBER: number;
@@ -335,41 +331,41 @@ declare const API_HOST: string;
 declare const API_RETRY: number;
 ```
 
-The default project configuration is already setup to use any type definition files present in the project source directories.
-If the TypeScript configuration for the project has been altered, it may need to be adjusted to reference this newly added type definition file.
+默认的项目配置已经设置为使用项目源代码目录中的所有类型定义文件。
+如果修改过项目的 TypeScript 配置，可能需要调整配置以引用这个新添加的类型定义文件。
 
-::: warning IMPORTANT
-This option will not replace identifiers contained within Angular metadata such as a Component or Directive decorator.
-
-:::
-
-### File extension loader customization
-
-::: warning IMPORTANT
-This feature is only available with the `application` builder.
+::: warning 重要
+该选项不会替换 Angular 元数据中的标识符，例如组件（Component）或指令（Directive）装饰器中的标识符。
 
 :::
 
-Some projects may need to control how all files with a specific file extension are loaded and bundled into an application.
-When using the `application` builder, the `loader` option can be used to handle these cases.
-The option allows a project to define the type of loader to use with a specified file extension.
-A file with the defined extension can then be used within the application code via an import statement or dynamic import expression.
-The available loaders that can be used are:
+### 按文件扩展名自定义加载器 {#file-extension-loader-customization}
 
-- `text` - inlines the content as a `string` available as the default export
-- `binary` - inlines the content as a `Uint8Array` available as the default export
-- `file` - emits the file at the application output path and provides the runtime location of the file as the default export
-- `dataurl` - inlines the content as a [data URL](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
-- `base64` - inlines the content as a Base64-encoded string.
-- `empty` - considers the content to be empty and will not include it in bundles
+::: warning 重要
+此功能仅在 `application` 构建器中可用。
 
-The `empty` value, while less common, can be useful for compatibility of third-party libraries that may contain bundler-specific import usage that needs to be removed.
-One case for this is side-effect imports (`import 'my.css';`) of CSS files which has no effect in a browser.
-Instead, the project can use `empty` and then the CSS files can be added to the `styles` build option or use some other injection method.
+:::
 
-The loader option is an object-based option with the keys used to define the file extension and the values used to define the loader type.
+有些项目可能需要控制具有特定扩展名的所有文件如何被加载并打包进应用。
+使用 `application` 构建器时，可以用 `loader` 选项来处理这些情况。
+该选项允许项目为指定的文件扩展名定义要使用的加载器类型。
+之后，就可以在应用代码中通过 import 语句或动态导入表达式使用具有该扩展名的文件。
+可用的加载器有：
 
-An example of the build option usage to inline the content of SVG files into the bundled application would be as follows:
+- `text` - 把内容内联为 `string`，作为默认导出提供
+- `binary` - 把内容内联为 `Uint8Array`，作为默认导出提供
+- `file` - 把文件输出到应用的输出路径，并把该文件的运行时位置作为默认导出提供
+- `dataurl` - 把内容内联为 [data URL](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)。
+- `base64` - 把内容内联为 Base64 编码的字符串。
+- `empty` - 把内容视为空，不会将其包含在包中
+
+`empty` 值虽然不太常用，但对于兼容某些第三方库很有用，这些库可能包含需要移除的、特定于打包器的导入用法。
+一个例子是对 CSS 文件的副作用导入（`import 'my.css';`），这种导入在浏览器中不起任何作用。
+这时项目可以使用 `empty`，然后把这些 CSS 文件添加到 `styles` 构建选项中，或者使用其他注入方式。
+
+loader 选项是一个对象形式的选项，其中键用于定义文件扩展名，值用于定义加载器类型。
+
+下面这个构建选项示例会把 SVG 文件的内容内联到打包后的应用中：
 
 ```json
   "build": {
@@ -383,7 +379,7 @@ An example of the build option usage to inline the content of SVG files into the
   }
 ```
 
-An SVG file can then be imported:
+然后就可以导入 SVG 文件了：
 
 ```ts
 import contents from './some-file.svg';
@@ -391,7 +387,7 @@ import contents from './some-file.svg';
 console.log(contents); // <svg>...</svg>
 ```
 
-Additionally, TypeScript needs to be aware of the module type for the import to prevent type-checking errors during the build. This can be accomplished with an additional type definition file within the application source code (`src/types.d.ts`, for example) with the following or similar content:
+此外，TypeScript 还需要知道导入的模块类型，以免在构建时出现类型检查错误。可以在应用源代码中添加一个类型定义文件（例如 `src/types.d.ts`）来实现，内容如下或类似：
 
 ```ts
 declare module '*.svg' {
@@ -400,104 +396,104 @@ declare module '*.svg' {
 }
 ```
 
-The default project configuration is already setup to use any type definition files (`.d.ts` files) present in the project source directories. If the TypeScript configuration for the project has been altered, the tsconfig may need to be adjusted to reference this newly added type definition file.
+默认的项目配置已经设置为使用项目源代码目录中的所有类型定义文件（`.d.ts` 文件）。如果修改过项目的 TypeScript 配置，可能需要调整 tsconfig 以引用这个新添加的类型定义文件。
 
-### Import attribute loader customization
+### 通过导入属性自定义加载器 {#import-attribute-loader-customization}
 
-For cases where only certain files should be loaded in a specific way, per file control over loading behavior is available.
-This is accomplished with a `loader` [import attribute](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import/with) that can be used with both import statements and expressions.
-The presence of the import attribute takes precedence over all other loading behavior including JS/TS and any `loader` build option values.
-For general loading for all files of an otherwise unsupported file type, the [`loader`](#file-extension-loader-customization) build option is recommended.
+如果只有某些特定文件需要以特定方式加载，可以对加载行为进行逐文件的控制。
+这是通过 `loader` [导入属性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import/with)实现的，它既可用于 import 语句，也可用于 import 表达式。
+导入属性的优先级高于所有其他加载行为，包括 JS/TS 以及任何 `loader` 构建选项的值。
+如果要对某种原本不受支持的文件类型的所有文件进行统一加载，推荐使用 [`loader`](#file-extension-loader-customization) 构建选项。
 
-For the import attribute, the following loader values are supported:
+导入属性支持以下加载器值：
 
-- `text` - inlines the content as a `string` available as the default export
-- `binary` - inlines the content as a `Uint8Array` available as the default export
-- `file` - emits the file at the application output path and provides the runtime location of the file as the default export
-- `dataurl` - inlines the content as a [data URL](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
-- `base64` - inlines the content as a Base64-encoded string.
+- `text` - 把内容内联为 `string`，作为默认导出提供
+- `binary` - 把内容内联为 `Uint8Array`，作为默认导出提供
+- `file` - 把文件输出到应用的输出路径，并把该文件的运行时位置作为默认导出提供
+- `dataurl` - 把内容内联为 [data URL](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)。
+- `base64` - 把内容内联为 Base64 编码的字符串。
 
-An additional requirement to use import attributes is that the TypeScript `module` option must be set to `esnext` or `preserve` to allow TypeScript to successfully build the application code.
-New projects use `preserve` by default, so no change is needed.
+使用导入属性还有一个额外要求：TypeScript 的 `module` 选项必须设置为 `esnext` 或 `preserve`，TypeScript 才能成功构建应用代码。
+新项目默认使用 `preserve`，因此无需修改。
 
-At this time, TypeScript does not support type definitions that are based on import attribute values.
-The use of `@ts-expect-error`/`@ts-ignore` or the use of individual type definition files (assuming the file is only imported with the same loader attribute) is currently required.
-As an example, an SVG file can be imported as text via:
+目前，TypeScript 还不支持基于导入属性值的类型定义。
+目前需要使用 `@ts-expect-error`/`@ts-ignore`，或者使用单独的类型定义文件（前提是该文件只会以相同的 loader 属性导入）。
+例如，可以通过以下方式把 SVG 文件作为文本导入：
 
 ```ts
-// @ts-expect-error TypeScript cannot provide types based on attributes yet
+// @ts-expect-error TypeScript 目前还无法基于属性提供类型
 import contents from './some-file.svg' with {loader: 'text'};
 ```
 
-The same can be accomplished with an import expression inside an async function.
+在异步函数中使用 import 表达式也可以实现同样的效果。
 
 ```ts
 async function loadSvg(): Promise<string> {
-  // @ts-expect-error TypeScript cannot provide types based on attributes yet
+  // @ts-expect-error TypeScript 目前还无法基于属性提供类型
   return import('./some-file.svg', {with: {loader: 'text'}}).then((m) => m.default);
 }
 ```
 
-For the import expression, the `loader` value must be a string literal to be statically analyzed.
-A warning will be issued if the value is not a string literal.
+对于 import 表达式，`loader` 的值必须是字符串字面量，以便进行静态分析。
+如果该值不是字符串字面量，会发出警告。
 
-The `file` loader is useful when a file will be loaded at runtime through either a `fetch()`, setting to an image elements `src`, or other similar method.
+当文件需要在运行时通过 `fetch()`、设置为图片元素的 `src` 或其他类似方式加载时，`file` 加载器非常有用。
 
 ```ts
-// @ts-expect-error TypeScript cannot provide types based on attributes yet
+// @ts-expect-error TypeScript 目前还无法基于属性提供类型
 import imagePath from './image.webp' with {loader: 'file'};
 
 console.log(imagePath); // media/image-ULK2SIIB.webp
 ```
 
-The `base64` loader is useful when a file needs to be embedded directly into the bundle as an encoded string that can later be used to construct a Data URL.
+当需要把文件作为编码字符串直接嵌入包中，以便之后用来构造 Data URL 时，`base64` 加载器非常有用。
 
 ```ts
-// @ts-expect-error TypeScript cannot provide types based on attributes yet
+// @ts-expect-error TypeScript 目前还无法基于属性提供类型
 import logo from './logo.png' with {loader: 'base64'};
 
 console.log(logo); // "iVBORw0KGgoAAAANSUhEUgAA..."
 ```
 
-The `dataurl` loader to inline assets as complete Data URLs.
+`dataurl` 加载器用于把资源内联为完整的 Data URL。
 
 ```ts
-// @ts-expect-error TypeScript cannot provide types based on attributes yet
+// @ts-expect-error TypeScript 目前还无法基于属性提供类型
 import icon from './icon.svg' with {loader: 'dataurl'};
 
 console.log(icon); // "data:image/svg+xml;..."
 ```
 
-For production builds as shown in the code comment above, hashing will be automatically added to the path for long-term caching.
+对于生产构建，如上面代码注释所示，路径中会自动加上哈希值，以便进行长期缓存。
 
-::: tip HELPFUL
-When using the development server and using a `loader` attribute to import a file from a Node.js package, that package must be excluded from prebundling via the development server `prebundle` option.
+::: tip 提示
+使用开发服务器时，如果通过 `loader` 属性从某个 Node.js 包中导入文件，就必须通过开发服务器的 `prebundle` 选项把该包排除在预打包之外。
 
 :::
 
-### Import/export conditions
+### 导入 / 导出条件 {#import-export-conditions}
 
-Projects may need to map certain import paths to different files based on the type of build.
-This can be particularly useful for cases such as `ng serve` needing to use debug/development specific code but `ng build` needing to use code without any development features/information.
-Several import/export [conditions](https://nodejs.org/api/packages.html#community-conditions-definitions) are automatically applied to support these project needs:
+项目可能需要根据构建类型，把某些导入路径映射到不同的文件。
+这在某些场景下特别有用，例如 `ng serve` 需要使用调试 / 开发专用的代码，而 `ng build` 需要使用不包含任何开发功能 / 信息的代码。
+为了满足这些项目需求，系统会自动应用以下几种导入 / 导出[条件](https://nodejs.org/api/packages.html#community-conditions-definitions)：
 
-- For optimized builds, the `production` condition is enabled.
-- For non-optimized builds, the `development` condition is enabled.
-- For browser output code, the `browser` condition is enabled.
+- 对于优化构建，会启用 `production` 条件。
+- 对于非优化构建，会启用 `development` 条件。
+- 对于浏览器端输出代码，会启用 `browser` 条件。
 
-An optimized build is determined by the value of the `optimization` option.
-When `optimization` is set to `true` or more specifically if `optimization.scripts` is set to `true`, then the build is considered optimized.
-This classification applies to both `ng build` and `ng serve`.
-In a new project, `ng build` defaults to optimized and `ng serve` defaults to non-optimized.
+是否为优化构建由 `optimization` 选项的值决定。
+当 `optimization` 设置为 `true`，或者更具体地说 `optimization.scripts` 设置为 `true` 时，该构建就被视为优化构建。
+这一分类同时适用于 `ng build` 和 `ng serve`。
+在新项目中，`ng build` 默认是优化构建，而 `ng serve` 默认是非优化构建。
 
-A useful method to leverage these conditions within application code is to combine them with [subpath imports](https://nodejs.org/api/packages.html#subpath-imports).
-By using the following import statement:
+在应用代码中利用这些条件的一个实用方法，是把它们与[子路径导入](https://nodejs.org/api/packages.html#subpath-imports)结合起来。
+使用如下 import 语句：
 
 ```ts
 import {verboseLogging} from '#logger';
 ```
 
-The file can be switched in the `imports` field in `package.json`:
+就可以在 `package.json` 的 `imports` 字段中切换对应的文件：
 
 ```json
 {
@@ -511,7 +507,7 @@ The file can be switched in the `imports` field in `package.json`:
 }
 ```
 
-For applications that are also using SSR, browser and server code can be switched by using the `browser` condition:
+对于同时使用 SSR 的应用，可以通过 `browser` 条件切换浏览器端和服务端代码：
 
 ```json
 {
@@ -525,34 +521,34 @@ For applications that are also using SSR, browser and server code can be switche
 }
 ```
 
-These conditions also apply to Node.js packages and any defined [`exports`](https://nodejs.org/api/packages.html#conditional-exports) within the packages.
+这些条件同样适用于 Node.js 包，以及包中定义的任何 [`exports`](https://nodejs.org/api/packages.html#conditional-exports)。
 
-::: tip HELPFUL
-If currently using the `fileReplacements` build option, this feature may be able to replace its usage.
+::: tip 提示
+如果目前正在使用 `fileReplacements` 构建选项，这个功能或许可以取代它。
 
 :::
 
-## Known Issues
+## 已知问题 {#known-issues}
 
-There are currently several known issues that you may encounter when trying the new build system. This list will be updated to stay current. If any of these issues are currently blocking you from trying out the new build system, please check back in the future as it may have been solved.
+试用新构建系统时，目前可能会遇到几个已知问题。此列表会持续更新。如果其中任何问题当前阻碍了你试用新构建系统，请以后再来查看，因为它可能已经被解决了。
 
-### Type-checking of Web Worker code and processing of nested Web Workers
+### Web Worker 代码的类型检查与嵌套 Web Worker 的处理 {#type-checking-of-web-worker-code-and-processing-of-nested-web-workers}
 
-Web Workers can be used within application code using the same syntax (`new Worker(new URL('<workerfile>', import.meta.url))`) that is supported with the `browser` builder.
-However, the code within the Worker will not currently be type-checked by the TypeScript compiler. TypeScript code is supported just not type-checked.
-Additionally, any nested workers will not be processed by the build system. A nested worker is a Worker instantiation within another Worker file.
+在应用代码中可以使用 Web Worker，语法（`new Worker(new URL('<workerfile>', import.meta.url))`）与 `browser` 构建器所支持的相同。
+不过，Worker 内部的代码目前不会经过 TypeScript 编译器的类型检查。TypeScript 代码是受支持的，只是不进行类型检查。
+此外，构建系统不会处理任何嵌套的 Worker。嵌套 Worker 是指在另一个 Worker 文件中实例化的 Worker。
 
-### ESM default imports vs. namespace imports
+### ESM 默认导入与命名空间导入 {#esm-default-imports-vs-namespace-imports}
 
-TypeScript by default allows default exports to be imported as namespace imports and then used in call expressions.
-This is unfortunately a divergence from the ECMAScript specification.
-The underlying bundler (`esbuild`) within the new build system expects ESM code that conforms to the specification.
-The build system will now generate a warning if your application uses an incorrect type of import of a package.
-However, to allow TypeScript to accept the correct usage, a TypeScript option must be enabled within the application's `tsconfig` file.
-When enabled, the [`esModuleInterop`](https://www.typescriptlang.org/tsconfig#esModuleInterop) option provides better alignment with the ECMAScript specification and is also recommended by the TypeScript team.
-Once enabled, you can update package imports where applicable to an ECMAScript conformant form.
+TypeScript 默认允许把默认导出作为命名空间导入，并在调用表达式中使用。
+遗憾的是，这与 ECMAScript 规范存在差异。
+新构建系统中的底层打包器（`esbuild`）期望的是符合规范的 ESM 代码。
+如果你的应用对某个包使用了不正确的导入类型，构建系统现在会生成警告。
+不过，要让 TypeScript 接受正确的用法，必须在应用的 `tsconfig` 文件中启用一个 TypeScript 选项。
+启用后，[`esModuleInterop`](https://www.typescriptlang.org/tsconfig#esModuleInterop) 选项能更好地与 ECMAScript 规范保持一致，这也是 TypeScript 团队推荐的做法。
+启用之后，你就可以在适用的地方把包的导入更新为符合 ECMAScript 规范的形式。
 
-Using the [`moment`](https://npmjs.com/package/moment) package as an example, the following application code will cause runtime errors:
+以 [`moment`](https://npmjs.com/package/moment) 包为例，下面的应用代码会导致运行时错误：
 
 ```ts
 import * as moment from 'moment';
@@ -560,7 +556,7 @@ import * as moment from 'moment';
 console.log(moment().format());
 ```
 
-The build will generate a warning to notify you that there is a potential problem. The warning will be similar to:
+构建会生成一条警告，提示你存在潜在问题。警告内容类似于：
 
 ```text
 ▲ [WARNING] Calling "moment" will crash at run-time because it's an import namespace object, not a function [call-import-namespace]
@@ -578,7 +574,7 @@ Consider changing "moment" to a default import instead:
 
 ```
 
-However, you can avoid the runtime errors and the warning by enabling the `esModuleInterop` TypeScript option for the application and changing the import to the following:
+不过，只要为应用启用 `esModuleInterop` TypeScript 选项，并把导入改为如下形式，就可以避免运行时错误和警告：
 
 ```ts
 import moment from 'moment';
@@ -586,24 +582,24 @@ import moment from 'moment';
 console.log(moment().format());
 ```
 
-### Order-dependent side-effectful imports in lazy modules
+### 延迟加载模块中依赖顺序的副作用导入 {#order-dependent-side-effectful-imports-in-lazy-modules}
 
-Import statements that are dependent on a specific ordering and are also used in multiple lazy modules can cause top-level statements to be executed out of order.
-This is not common as it depends on the usage of side-effectful modules and does not apply to the `polyfills` option.
-This is caused by a [defect](https://github.com/evanw/esbuild/issues/399) in the underlying bundler but will be addressed in a future update.
+如果某些 import 语句依赖特定的顺序，并且同时被多个延迟加载模块使用，可能会导致顶层语句以错误的顺序执行。
+这种情况并不常见，因为它取决于是否使用了带副作用的模块，并且不适用于 `polyfills` 选项。
+这是由底层打包器的一个[缺陷](https://github.com/evanw/esbuild/issues/399)引起的，会在未来的更新中修复。
 
-::: warning IMPORTANT
-Avoiding the use of modules with non-local side effects (outside of polyfills) is recommended whenever possible regardless of the build system being used and avoids this particular issue. Modules with non-local side effects can have a negative effect on both application size and runtime performance as well.
+::: warning 重要
+无论使用哪种构建系统，都建议尽量避免使用具有非局部副作用的模块（polyfills 除外），这样也能避免这个问题。具有非局部副作用的模块还可能对应用体积和运行时性能产生负面影响。
 
 :::
 
-### Output location changes
+### 输出位置的变化 {#output-location-changes}
 
-By default, after a successful build by the application builder the bundle is located in a `dist/<project-name>/browser` directory (instead of `dist/<project-name>` for the browser builder).
-This might break some of the toolchains that rely the previous location. In this case, you can [configure the output path](/reference/configs/workspace-config#output-path-configuration) to suit your needs.
+默认情况下，application 构建器构建成功后，包会位于 `dist/<project-name>/browser` 目录中（而不是 browser 构建器所用的 `dist/<project-name>`）。
+这可能会破坏一些依赖之前位置的工具链。这种情况下，你可以[配置输出路径](/reference/configs/workspace-config#output-path-configuration)以满足需求。
 
-## Bug reports
+## 缺陷报告 {#bug-reports}
 
-Report issues and feature requests on [GitHub](https://github.com/angular/angular-cli/issues).
+请在 [GitHub](https://github.com/angular/angular-cli/issues) 上报告问题和提交功能请求。
 
-Please provide a minimal reproduction where possible to aid the team in addressing issues.
+请尽可能提供一个最小复现，以帮助团队处理问题。

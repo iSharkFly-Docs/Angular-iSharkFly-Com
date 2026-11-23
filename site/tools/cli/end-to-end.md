@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 端到端测试 {#end-to-end-testing}
 
-# End to End Testing
+端到端（E2E）测试是一种测试形式，用于断言整个应用从头到尾（即 _“端到端”_）都能按预期工作。E2E 测试与单元测试的不同之处在于，它与代码的底层实现细节完全解耦。它通常以模拟用户与应用交互的方式来验证应用。本页将作为指南，介绍如何使用 Angular CLI 在 Angular 中开始进行端到端测试。
 
-End-to-end or (E2E) testing is a form of testing used to assert your entire application works as expected from start to finish or _"end-to-end"_. E2E testing differs from unit testing in that it is completely decoupled from the underlying implementation details of your code. It is typically used to validate an application in a way that mimics the way a user would interact with it. This page serves as a guide to getting started with end-to-end testing in Angular using the Angular CLI.
+## 设置 E2E 测试 {#set-up-e2e-testing}
 
-## Set Up E2E Testing
-
-The Angular CLI downloads and installs everything you need to run end-to-end tests for your Angular application.
+Angular CLI 会下载并安装为 Angular 应用运行端到端测试所需的一切。
 
 ```shell
 
@@ -16,7 +12,7 @@ ng e2e
 
 ```
 
-The `ng e2e` command will first check your project for the "e2e" target. If it can't locate it, the CLI will then prompt you which e2e package you would like to use and walk you through the setup.
+`ng e2e` 命令会先检查你的项目中是否有 "e2e" 目标。如果找不到，CLI 会提示你选择要使用的 e2e 包，并引导你完成设置。
 
 ```text
 
@@ -40,11 +36,11 @@ Puppeteer
 
 ```
 
-If you don't find the test runner you would like to use from the list above, you can manually add a package using `ng add`.
+如果上面的列表中没有你想使用的测试运行器，可以使用 `ng add` 手动添加一个包。
 
-## Running E2E Tests
+## 运行 E2E 测试 {#running-e2e-tests}
 
-Now that your application is configured for end-to-end testing we can now run the same command to execute your tests.
+现在应用已经配置好了端到端测试，我们可以运行同一个命令来执行测试。
 
 ```shell
 
@@ -52,14 +48,14 @@ ng e2e
 
 ```
 
-Note, there isn't anything "special" about running your tests with any of the integrated e2e packages. The `ng e2e` command is really just running the `e2e` builder under the hood. You can always [create your own custom builder](/tools/cli/cli-builder#creating-a-builder) named `e2e` and run it using `ng e2e`.
+注意，使用任何集成的 e2e 包运行测试并没有什么“特别”之处。`ng e2e` 命令实际上只是在底层运行 `e2e` 构建器。你随时可以[创建自己的自定义构建器](/tools/cli/cli-builder#creating-a-builder)并命名为 `e2e`，然后用 `ng e2e` 来运行它。
 
-## More information on end-to-end testing tools
+## 有关端到端测试工具的更多信息 {#more-information-on-end-to-end-testing-tools}
 
-| Testing Tool | Details                                                                                                              |
-| :----------- | :------------------------------------------------------------------------------------------------------------------- |
-| Cypress      | [Getting started with Cypress](https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test) |
-| Nightwatch   | [Getting started with Nightwatch](https://nightwatchjs.org/guide/writing-tests/introduction.html)                    |
-| WebdriverIO  | [Getting started with Webdriver.io](https://webdriver.io/docs/gettingstarted)                                        |
-| Playwright   | [Getting started with Playwright](https://playwright.dev/docs/writing-tests)                                         |
-| Puppeteer    | [Getting started with Puppeteer](https://pptr.dev)                                                                   |
+| 测试工具    | 详情                                                                                                    |
+| :---------- | :------------------------------------------------------------------------------------------------------ |
+| Cypress     | [Cypress 入门](https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test) |
+| Nightwatch  | [Nightwatch 入门](https://nightwatchjs.org/guide/writing-tests/introduction.html)                    |
+| WebdriverIO | [Webdriver.io 入门](https://webdriver.io/docs/gettingstarted)                                        |
+| Playwright  | [Playwright 入门](https://playwright.dev/docs/writing-tests)                                         |
+| Puppeteer   | [Puppeteer 入门](https://pptr.dev)                                                                   |

@@ -1,55 +1,51 @@
----
-untranslated: true
----
+# 预先（AOT）编译 {#ahead-of-time-aot-compilation}
 
-# Ahead-of-time (AOT) compilation
+Angular 应用主要由组件（Component）及其 HTML 模板（Template）组成。
+由于浏览器无法直接理解 Angular 提供的组件和模板，Angular 应用在浏览器中运行之前需要先经过编译。
 
-An Angular application consists mainly of components and their HTML templates.
-Because the components and templates provided by Angular cannot be understood by the browser directly, Angular applications require a compilation process before they can run in a browser.
+Angular 的预先（Ahead-of-Time，AOT）编译器会在构建阶段，也就是在浏览器下载并运行代码 _之前_，把你的 Angular HTML 和 TypeScript 代码转换为高效的 JavaScript 代码。
+在构建过程中编译应用，可以让浏览器中的渲染速度更快。
 
-The Angular ahead-of-time (AOT) compiler converts your Angular HTML and TypeScript code into efficient JavaScript code during the build phase _before_ the browser downloads and runs that code.
-Compiling your application during the build process provides a faster rendering in the browser.
+本指南介绍如何指定元数据并应用可用的编译器选项，以便使用 AOT 编译器高效地编译应用。
 
-This guide explains how to specify metadata and apply available compiler options to compile your applications efficiently using the AOT compiler.
-
-::: tip HELPFUL
-[Watch Alex Rickabaugh explain the Angular compiler](https://www.youtube.com/watch?v=anphffaCZrQ) at AngularConnect 2019.
+::: tip 提示
+[观看 Alex Rickabaugh 讲解 Angular 编译器](https://www.youtube.com/watch?v=anphffaCZrQ)（AngularConnect 2019）。
 
 :::
 
-Here are some reasons you might want to use AOT.
+以下是你可能希望使用 AOT 的一些原因。
 
-| Reasons                                 | Details                                                                                                                                                                                                                                            |
+| 原因                                    | 详情                                                                                                                                                                                                                                               |
 | :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Faster rendering                        | With AOT, the browser downloads a pre-compiled version of the application. The browser loads executable code so it can render the application immediately, without waiting to compile the application first.                                       |
-| Fewer asynchronous requests             | The compiler _inlines_ external HTML templates and CSS style sheets within the application JavaScript, eliminating separate ajax requests for those source files.                                                                                  |
-| Smaller Angular framework download size | There's no need to download the Angular compiler if the application is already compiled. The compiler is roughly half of Angular itself, so omitting it dramatically reduces the application payload.                                              |
-| Detect template errors earlier          | The AOT compiler detects and reports template binding errors during the build step before users can see them.                                                                                                                                      |
-| Better security                         | AOT compiles HTML templates and components into JavaScript files long before they are served to the client. With no templates to read and no risky client-side HTML or JavaScript evaluation, there are fewer opportunities for injection attacks. |
+| 更快的渲染                              | 使用 AOT 时，浏览器下载的是应用的预编译版本。浏览器加载的是可执行代码，因此可以立即渲染应用，而无需先等待应用编译完成。                                                                                                                             |
+| 更少的异步请求                          | 编译器会把外部 HTML 模板和 CSS 样式表 _内联_ 到应用的 JavaScript 中，省去了针对这些源文件的单独 ajax 请求。                                                                                                                                          |
+| 更小的 Angular 框架下载体积             | 如果应用已经编译过，就不需要再下载 Angular 编译器。编译器大约占 Angular 本身体积的一半，因此省略它可以大幅减小应用的载荷。                                                                                                                           |
+| 更早发现模板错误                        | AOT 编译器会在构建步骤中检测并报告模板绑定错误，让问题在用户看到之前就被发现。                                                                                                                                                                      |
+| 更好的安全性                            | AOT 会在 HTML 模板和组件发送到客户端之前很久，就把它们编译成 JavaScript 文件。由于没有需要读取的模板，也没有存在风险的客户端 HTML 或 JavaScript 求值，注入攻击的机会也就更少。                                                                     |
 
-## Choosing a compiler
+## 选择编译器 {#choosing-a-compiler}
 
-Angular offers two ways to compile your application:
+Angular 提供了两种编译应用的方式：
 
-| Angular compile       | Details                                                                                           |
+| Angular 编译方式      | 详情                                                                                              |
 | :-------------------- | :------------------------------------------------------------------------------------------------ |
-| Just-in-Time \(JIT\)  | Compiles your application in the browser at runtime. This was the default until Angular 8.        |
-| Ahead-of-Time \(AOT\) | Compiles your application and libraries at build time. This is the default starting in Angular 9. |
+| 即时（JIT）           | 在运行时于浏览器中编译应用。在 Angular 8 之前，这是默认方式。                                     |
+| 预先（AOT）           | 在构建时编译应用和库。从 Angular 9 开始，这是默认方式。                                           |
 
-When you run the [`ng build`](https://angular.dev/cli/build) \(build only\) or [`ng serve`](https://angular.dev/cli/serve) \(build and serve locally\) CLI commands, the type of compilation \(JIT or AOT\) depends on the value of the `aot` property in your build configuration specified in `angular.json`.
-By default, `aot` is set to `true` for new CLI applications.
+当你运行 [`ng build`](https://angular.dev/cli/build)（仅构建）或 [`ng serve`](https://angular.dev/cli/serve)（构建并在本地启动服务）CLI 命令时，编译类型（JIT 或 AOT）取决于 `angular.json` 中构建配置的 `aot` 属性值。
+对于新的 CLI 应用，`aot` 默认设为 `true`。
 
-See the [CLI command reference](/cli) and [Building and serving Angular apps](/tools/cli/build) for more information.
+更多信息请参阅 [CLI 命令参考](/cli)和[构建并运行 Angular 应用](/tools/cli/build)。
 
-## How AOT works
+## AOT 的工作原理 {#how-aot-works}
 
-The Angular AOT compiler extracts **metadata** to interpret the parts of the application that Angular is supposed to manage.
-You can specify the metadata explicitly in **decorators** such as `@Component()`, or implicitly in the constructor declarations of the decorated classes.
-The metadata tells Angular how to construct instances of your application classes and interact with them at runtime.
+Angular AOT 编译器会提取 **元数据**，以解读应用中应由 Angular 管理的部分。
+你可以在 `@Component()` 等 **装饰器** 中显式指定元数据，也可以在被装饰类的构造函数声明中隐式指定。
+元数据告诉 Angular 如何构造应用类的实例，以及如何在运行时与它们交互。
 
-The code generated by the AOT compiler depends on a set of internal runtime APIs known as the **Compiler ABI (Application Binary Interface)**. Angular maintains ABI stability across all patch versions within a single minor version of the framework. This ensures that different applications or libraries built with different patch versions of the same minor version can safely share a single Angular runtime at execution time.
+AOT 编译器生成的代码依赖于一组内部运行时 API，称为 **编译器 ABI（Application Binary Interface，应用二进制接口）**。Angular 在框架同一个次版本内的所有补丁版本之间保持 ABI 的稳定。这确保了使用同一次版本的不同补丁版本构建的不同应用或库，可以在执行时安全地共享同一个 Angular 运行时。
 
-In the following example, the `@Component()` metadata object and the class constructor tell Angular how to create and display an instance of `Typical`.
+在下面的示例中，`@Component()` 元数据对象和类的构造函数告诉 Angular 如何创建和显示 `Typical` 的实例。
 
 ```ts
 @Component({
@@ -62,82 +58,82 @@ export class Typical {
 }
 ```
 
-The Angular compiler extracts the metadata _once_ and generates a _factory_ for `Typical`.
-When it needs to create a `Typical` instance, Angular calls the factory, which produces a new visual element, bound to a new instance of the component class with its injected dependency.
+Angular 编译器会 _一次性_ 提取元数据，并为 `Typical` 生成一个 _工厂_。
+当需要创建 `Typical` 实例时，Angular 会调用该工厂，工厂会生成一个新的可视元素，并把它绑定到组件类的一个新实例上，同时注入其依赖。
 
-### Compilation phases
+### 编译阶段 {#compilation-phases}
 
-There are three phases of AOT compilation.
+AOT 编译分为三个阶段。
 
-|     | Phase                  | Details                                                                                                                                                                                                                                                                                                                     |
+|     | 阶段                   | 详情                                                                                                                                                                                                                                                                                                                        |
 | :-- | :--------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | code analysis          | In this phase, the TypeScript compiler and _AOT collector_ create a representation of the source. The collector does not attempt to interpret the metadata it collects. It represents the metadata as best it can and records errors when it detects a metadata syntax violation.                                           |
-| 2   | code generation        | In this phase, the compiler's `StaticReflector` interprets the metadata collected in phase 1, performs additional validation of the metadata, and throws an error if it detects a metadata restriction violation.                                                                                                           |
-| 3   | template type checking | In this phase, the Angular _template compiler_ uses the TypeScript compiler to validate the binding expressions in templates. Strict checking in this phase is enabled by default and controlled by the `strictTemplates` configuration option; see [Angular compiler options](/reference/configs/angular-compiler-options). |
+| 1   | 代码分析               | 在这一阶段，TypeScript 编译器和 _AOT 收集器_ 会创建源码的一种表示形式。收集器不会尝试解读它收集到的元数据，而是尽可能地表示这些元数据，并在检测到元数据语法违规时记录错误。                                                                                                                                                 |
+| 2   | 代码生成               | 在这一阶段，编译器的 `StaticReflector` 会解读第 1 阶段收集到的元数据，对元数据进行额外的验证，并在检测到违反元数据限制时抛出错误。                                                                                                                                                                                           |
+| 3   | 模板类型检查           | 在这一阶段，Angular _模板编译器_ 会使用 TypeScript 编译器来验证模板中的绑定表达式。这一阶段默认启用严格检查，由 `strictTemplates` 配置选项控制；参见 [Angular 编译器选项](/reference/configs/angular-compiler-options)。                                                                                                     |
 
-### Metadata restrictions
+### 元数据限制 {#metadata-restrictions}
 
-You write metadata in a _subset_ of TypeScript that must conform to the following general constraints:
+你需要用 TypeScript 的一个 _子集_ 来编写元数据，并且必须满足以下一般约束：
 
-- Limit [expression syntax](#expression-syntax-limitations) to the supported subset of JavaScript
-- Only reference exported symbols after [code folding](#code-folding)
-- Only call [functions supported](#supported-classes-and-functions) by the compiler
-- Input/Outputs and data-bound class members must be public or protected.For additional guidelines and instructions on preparing an application for AOT compilation, see [Angular: Writing AOT-friendly applications](https://medium.com/sparkles-blog/angular-writing-aot-friendly-applications-7b64c8afbe3f).
+- 把[表达式语法](#expression-syntax-limitations)限制在受支持的 JavaScript 子集内
+- [代码折叠](#code-folding)之后只引用已导出的符号
+- 只调用编译器[支持的函数](#supported-classes-and-functions)
+- 输入 / 输出以及参与数据绑定的类成员必须是 public 或 protected 的。有关为 AOT 编译准备应用的更多指南和说明，请参阅 [Angular: Writing AOT-friendly applications](https://medium.com/sparkles-blog/angular-writing-aot-friendly-applications-7b64c8afbe3f)。
 
-::: tip HELPFUL
-Errors in AOT compilation commonly occur because of metadata that does not conform to the compiler's requirements \(as described more fully below\).
-For help in understanding and resolving these problems, see [AOT Metadata Errors](/tools/cli/aot-metadata-errors).
-
-:::
-
-### Configuring AOT compilation
-
-You can provide options in the [TypeScript configuration file](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) that controls the compilation process.
-See [Angular compiler options](/reference/configs/angular-compiler-options) for a complete list of available options.
-
-## Phase 1: Code analysis
-
-The TypeScript compiler does some of the analytic work of the first phase.
-It emits the `.d.ts` _type definition files_ with type information that the AOT compiler needs to generate application code.
-At the same time, the AOT **collector** analyzes the metadata recorded in the Angular decorators and outputs metadata information in **`.metadata.json`** files, one per `.d.ts` file.
-
-You can think of `.metadata.json` as a diagram of the overall structure of a decorator's metadata, represented as an [abstract syntax tree (AST)](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
-
-::: tip HELPFUL
-Angular's [schema.ts](https://github.com/angular/angular/blob/12.2.x/packages/compiler-cli/src/metadata/schema.ts) describes the JSON format as a collection of TypeScript interfaces.
+::: tip 提示
+AOT 编译中的错误，通常是由于元数据不符合编译器的要求造成的（下文会有更完整的说明）。
+如需帮助理解和解决这些问题，请参阅 [AOT 元数据错误](/tools/cli/aot-metadata-errors)。
 
 :::
 
-### Expression syntax limitations
+### 配置 AOT 编译 {#configuring-aot-compilation}
 
-The AOT collector only understands a subset of JavaScript.
-Define metadata objects with the following limited syntax:
+你可以在 [TypeScript 配置文件](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)中提供控制编译过程的选项。
+完整的可用选项列表请参阅 [Angular 编译器选项](/reference/configs/angular-compiler-options)。
 
-| Syntax                    | Example                                                    |
+## 第 1 阶段：代码分析 {#phase-1-code-analysis}
+
+TypeScript 编译器承担了第一阶段的部分分析工作。
+它会生成带有类型信息的 `.d.ts` _类型定义文件_，AOT 编译器需要这些信息来生成应用代码。
+与此同时，AOT **收集器** 会分析 Angular 装饰器中记录的元数据，并把元数据信息输出到 **`.metadata.json`** 文件中，每个 `.d.ts` 文件对应一个。
+
+你可以把 `.metadata.json` 看作装饰器元数据整体结构的一张图，它以[抽象语法树（AST）](https://en.wikipedia.org/wiki/Abstract_syntax_tree)的形式表示。
+
+::: tip 提示
+Angular 的 [schema.ts](https://github.com/angular/angular/blob/12.2.x/packages/compiler-cli/src/metadata/schema.ts) 以一组 TypeScript 接口的形式描述了这种 JSON 格式。
+
+:::
+
+### 表达式语法限制 {#expression-syntax-limitations}
+
+AOT 收集器只能理解 JavaScript 的一个子集。
+请使用以下有限的语法来定义元数据对象：
+
+| 语法                      | 示例                                                       |
 | :------------------------ | :--------------------------------------------------------- |
-| Literal object            | `{cherry: true, apple: true, mincemeat: false}`            |
-| Literal array             | `['cherries', 'flour', 'sugar']`                           |
-| Spread in literal array   | `['apples', 'flour', …]`                                   |
-| Calls                     | `bake(ingredients)`                                        |
+| 对象字面量                | `{cherry: true, apple: true, mincemeat: false}`            |
+| 数组字面量                | `['cherries', 'flour', 'sugar']`                           |
+| 数组字面量中的展开        | `['apples', 'flour', …]`                                   |
+| 函数调用                  | `bake(ingredients)`                                        |
 | New                       | `new Oven()`                                               |
-| Property access           | `pie.slice`                                                |
-| Array index               | `ingredients[0]`                                           |
-| Identity reference        | `Component`                                                |
-| A template string         | <code>`pie is ${multiplier} times better than cake`</code> |
-| Literal string            | `'pi'`                                                     |
-| Literal number            | `3.14153265`                                               |
-| Literal boolean           | `true`                                                     |
-| Literal null              | `null`                                                     |
-| Supported prefix operator | `!cake`                                                    |
-| Supported binary operator | `a+b`                                                      |
-| Conditional operator      | `a ? b : c`                                                |
-| Parentheses               | `(a+b)`                                                    |
+| 属性访问                  | `pie.slice`                                                |
+| 数组索引                  | `ingredients[0]`                                           |
+| 标识符引用                | `Component`                                                |
+| 模板字符串                | <code>`pie is ${multiplier} times better than cake`</code> |
+| 字符串字面量              | `'pi'`                                                     |
+| 数字字面量                | `3.14153265`                                               |
+| 布尔字面量                | `true`                                                     |
+| null 字面量               | `null`                                                     |
+| 受支持的前缀运算符        | `!cake`                                                    |
+| 受支持的二元运算符        | `a+b`                                                      |
+| 条件运算符                | `a ? b : c`                                                |
+| 括号                      | `(a+b)`                                                    |
 
-If an expression uses unsupported syntax, the collector writes an error node to the `.metadata.json` file.
-The compiler later reports the error if it needs that piece of metadata to generate the application code.
+如果表达式使用了不受支持的语法，收集器会向 `.metadata.json` 文件写入一个错误节点。
+之后，如果编译器需要这部分元数据来生成应用代码，就会报告该错误。
 
-::: tip HELPFUL
-If you want `ngc` to report syntax errors immediately rather than produce a `.metadata.json` file with errors, set the `strictMetadataEmit` option in the TypeScript configuration file.
+::: tip 提示
+如果你希望 `ngc` 立即报告语法错误，而不是生成带有错误的 `.metadata.json` 文件，请在 TypeScript 配置文件中设置 `strictMetadataEmit` 选项。
 
 :::
 
@@ -150,21 +146,21 @@ If you want `ngc` to report syntax errors immediately rather than produce a `.me
 
 ```
 
-Angular libraries have this option to ensure that all Angular `.metadata.json` files are clean and it is a best practice to do the same when building your own libraries.
+Angular 库都启用了这个选项，以确保所有 Angular `.metadata.json` 文件都是干净的；在构建你自己的库时，这样做也是一种最佳实践。
 
-### Code folding
+### 代码折叠 {#code-folding}
 
-The compiler can only resolve references to **_exported_** symbols.
-The collector, however, can evaluate an expression during collection and record the result in the `.metadata.json`, rather than the original expression.
-This allows you to make limited use of non-exported symbols within expressions.
+编译器只能解析对 **_已导出_** 符号的引用。
+不过，收集器可以在收集期间对表达式求值，并把结果而不是原始表达式记录到 `.metadata.json` 中。
+这让你可以在表达式中有限地使用未导出的符号。
 
-For example, the collector can evaluate the expression `1 + 2 + 3 + 4` and replace it with the result, `10`.
-This process is called _folding_.
-An expression that can be reduced in this manner is _foldable_.
+例如，收集器可以对表达式 `1 + 2 + 3 + 4` 求值，并用结果 `10` 替换它。
+这个过程称为 _折叠_。
+能以这种方式化简的表达式就是 _可折叠的_。
 
-The collector can evaluate references to module-local `const` declarations and initialized `var` and `let` declarations, effectively removing them from the `.metadata.json` file.
+收集器可以对模块内局部的 `const` 声明以及已初始化的 `var` 和 `let` 声明的引用进行求值，从而有效地把它们从 `.metadata.json` 文件中移除。
 
-Consider the following component definition:
+请看下面的组件定义：
 
 ```ts
 const template = '<div>{{hero().name}}</div>';
@@ -178,9 +174,9 @@ export class Hero {
 }
 ```
 
-The compiler could not refer to the `template` constant because it isn't exported.
-The collector, however, can fold the `template` constant into the metadata definition by in-lining its contents.
-The effect is the same as if you had written:
+编译器无法引用 `template` 常量，因为它没有被导出。
+不过，收集器可以通过内联其内容，把 `template` 常量折叠到元数据定义中。
+效果与你这样写完全相同：
 
 ```ts
 @Component({
@@ -192,9 +188,9 @@ export class Hero {
 }
 ```
 
-There is no longer a reference to `template` and, therefore, nothing to trouble the compiler when it later interprets the _collector's_ output in `.metadata.json`.
+这样就不再有对 `template` 的引用，因此编译器之后解读 `.metadata.json` 中 _收集器_ 的输出时，也就不会遇到麻烦。
 
-You can take this example a step further by including the `template` constant in another expression:
+你还可以更进一步，把 `template` 常量用在另一个表达式中：
 
 ```ts
 const template = '<div>{{hero().name}}</div>';
@@ -208,74 +204,74 @@ export class Hero {
 }
 ```
 
-The collector reduces this expression to its equivalent _folded_ string:
+收集器会把这个表达式化简为等价的 _折叠后_ 字符串：
 
 ```ts
 '<div>{{hero().name}}</div><div>{{hero().title}}</div>';
 ```
 
-#### Foldable syntax
+#### 可折叠的语法 {#foldable-syntax}
 
-The following table describes which expressions the collector can and cannot fold:
+下表列出了收集器能够折叠和不能折叠的表达式：
 
-| Syntax                           | Foldable                                 |
+| 语法                             | 是否可折叠                               |
 | :------------------------------- | :--------------------------------------- |
-| Literal object                   | yes                                      |
-| Literal array                    | yes                                      |
-| Spread in literal array          | no                                       |
-| Calls                            | no                                       |
-| New                              | no                                       |
-| Property access                  | yes, if target is foldable               |
-| Array index                      | yes, if target and index are foldable    |
-| Identity reference               | yes, if it is a reference to a local     |
-| A template with no substitutions | yes                                      |
-| A template with substitutions    | yes, if the substitutions are foldable   |
-| Literal string                   | yes                                      |
-| Literal number                   | yes                                      |
-| Literal boolean                  | yes                                      |
-| Literal null                     | yes                                      |
-| Supported prefix operator        | yes, if operand is foldable              |
-| Supported binary operator        | yes, if both left and right are foldable |
-| Conditional operator             | yes, if condition is foldable            |
-| Parentheses                      | yes, if the expression is foldable       |
+| 对象字面量                       | 是                                       |
+| 数组字面量                       | 是                                       |
+| 数组字面量中的展开               | 否                                       |
+| 函数调用                         | 否                                       |
+| New                              | 否                                       |
+| 属性访问                         | 是，如果目标是可折叠的                   |
+| 数组索引                         | 是，如果目标和索引都是可折叠的           |
+| 标识符引用                       | 是，如果它引用的是局部符号               |
+| 没有替换的模板字符串             | 是                                       |
+| 带有替换的模板字符串             | 是，如果替换部分是可折叠的               |
+| 字符串字面量                     | 是                                       |
+| 数字字面量                       | 是                                       |
+| 布尔字面量                       | 是                                       |
+| null 字面量                      | 是                                       |
+| 受支持的前缀运算符               | 是，如果操作数是可折叠的                 |
+| 受支持的二元运算符               | 是，如果左右两侧都是可折叠的             |
+| 条件运算符                       | 是，如果条件是可折叠的                   |
+| 括号                             | 是，如果其中的表达式是可折叠的           |
 
-If an expression is not foldable, the collector writes it to `.metadata.json` as an [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) for the compiler to resolve.
+如果表达式不可折叠，收集器会把它以 [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) 的形式写入 `.metadata.json`，交由编译器解析。
 
-## Phase 2: code generation
+## 第 2 阶段：代码生成 {#phase-2-code-generation}
 
-The collector makes no attempt to understand the metadata that it collects and outputs to `.metadata.json`.
-It represents the metadata as best it can and records errors when it detects a metadata syntax violation.
-It's the compiler's job to interpret the `.metadata.json` in the code generation phase.
+收集器不会尝试理解它收集并输出到 `.metadata.json` 中的元数据。
+它会尽可能地表示这些元数据，并在检测到元数据语法违规时记录错误。
+在代码生成阶段解读 `.metadata.json` 是编译器的工作。
 
-The compiler understands all syntax forms that the collector supports, but it may reject _syntactically_ correct metadata if the _semantics_ violate compiler rules.
+编译器能理解收集器支持的所有语法形式，但如果元数据的 _语义_ 违反了编译器规则，即使它在 _语法_ 上是正确的，编译器也可能拒绝它。
 
-### Public or protected symbols
+### public 或 protected 符号 {#public-or-protected-symbols}
 
-The compiler can only reference _exported symbols_.
+编译器只能引用 _已导出的符号_。
 
-- Decorated component class members must be public or protected.
-  You cannot make an `input()` property private.
+- 被装饰的组件类成员必须是 public 或 protected 的。
+  你不能把 `input()` 属性设为 private。
 
-- Data bound properties must also be public or protected
+- 参与数据绑定的属性也必须是 public 或 protected 的
 
-### Supported classes and functions
+### 受支持的类和函数 {#supported-classes-and-functions}
 
-The collector can represent a function call or object creation with `new` as long as the syntax is valid.
-The compiler, however, can later refuse to generate a call to a _particular_ function or creation of a _particular_ object.
+只要语法有效，收集器就可以表示函数调用或使用 `new` 创建对象。
+不过，编译器之后可能会拒绝生成对 _某个特定_ 函数的调用或 _某个特定_ 对象的创建。
 
-The compiler can only create instances of certain classes, supports only core decorators, and only supports calls to macros \(functions or static methods\) that return expressions.
+编译器只能创建某些类的实例，只支持核心装饰器，并且只支持调用返回表达式的宏（函数或静态方法）。
 
-| Compiler action      | Details                                                                                                              |
+| 编译器行为           | 详情                                                                                                                 |
 | :------------------- | :------------------------------------------------------------------------------------------------------------------- |
-| New instances        | The compiler only allows metadata that create instances of the class `InjectionToken` from `@angular/core`.          |
-| Supported decorators | The compiler only supports metadata for the [Angular decorators in the `@angular/core` module](/api?type=decorator). |
+| 新建实例             | 编译器只允许创建 `@angular/core` 中 `InjectionToken` 类实例的元数据。                                                |
+| 受支持的装饰器       | 编译器只支持 [`@angular/core` 模块中的 Angular 装饰器](/api?type=decorator)的元数据。                                |
 
-### Functions and static method calls
+### 函数和静态方法调用 {#functions-and-static-method-calls}
 
-The collector accepts any function or static method that contains a single `return` statement.
-The compiler, however, only supports macros in the form of functions or static methods that return an _expression_.
+收集器接受任何只包含一条 `return` 语句的函数或静态方法。
+不过，编译器只支持以返回 _表达式_ 的函数或静态方法形式出现的宏。
 
-For example, consider the following function:
+例如，请看下面的函数：
 
 ```ts
 export function wrapInArray<T>(value: T): T[] {
@@ -283,9 +279,9 @@ export function wrapInArray<T>(value: T): T[] {
 }
 ```
 
-You can call the `wrapInArray` in a metadata definition because it returns the value of an expression that conforms to the compiler's restrictive JavaScript subset.
+你可以在元数据定义中调用 `wrapInArray`，因为它返回的是一个符合编译器受限 JavaScript 子集的表达式的值。
 
-You might use `wrapInArray()` like this:
+你可以这样使用 `wrapInArray()`：
 
 ```ts
 @NgModule({
@@ -294,7 +290,7 @@ You might use `wrapInArray()` like this:
 export class TypicalModule {}
 ```
 
-The compiler treats this usage as if you had written:
+编译器会把这种用法视为你写了如下代码：
 
 ```ts
 @NgModule({
@@ -303,23 +299,22 @@ The compiler treats this usage as if you had written:
 export class TypicalModule {}
 ```
 
-The Angular [`RouterModule`](https://angular.dev/api/router/RouterModule) exports two macro static methods, `forRoot` and `forChild`, to help declare root and child routes.
-Review the [source code](https://github.com/angular/angular/blob/main/packages/router/src/router_module.ts#L139 'RouterModule.forRoot source code')
-for these methods to see how macros can simplify configuration of complex [NgModules](/guide/ngmodules/overview).
+Angular 的 [`RouterModule`](https://angular.dev/api/router/RouterModule) 导出了两个宏静态方法 `forRoot` 和 `forChild`，用于帮助声明根路由和子路由。
+查看这些方法的[源代码](https://github.com/angular/angular/blob/main/packages/router/src/router_module.ts#L139 'RouterModule.forRoot source code')，
+了解宏如何简化复杂 [NgModule](/guide/ngmodules/overview) 的配置。
 
-## Phase 3: Template type checking
+## 第 3 阶段：模板类型检查 {#phase-3-template-type-checking}
 
-One of the Angular compiler's most helpful features is the ability to type-check expressions within templates, and catch any errors before they cause crashes at runtime.
-In the template type-checking phase, the Angular template compiler uses the TypeScript compiler to validate the binding expressions in templates.
+Angular 编译器最有用的功能之一，就是能够对模板中的表达式进行类型检查，在错误导致运行时崩溃之前就把它们捕获。
+在模板类型检查阶段，Angular 模板编译器会使用 TypeScript 编译器来验证模板中的绑定表达式。
 
-Strict checking in this phase is enabled by default and controlled by the compiler option `"strictTemplates"` in the `"angularCompilerOptions"` of the project's TypeScript configuration file
-(see [Angular Compiler Options](/reference/configs/angular-compiler-options)).
+这一阶段默认启用严格检查，由项目 TypeScript 配置文件 `"angularCompilerOptions"` 中的编译器选项 `"strictTemplates"` 控制
+（参见 [Angular 编译器选项](/reference/configs/angular-compiler-options)）。
 
-Template validation produces error messages when a type error is detected in a template binding
-expression, similar to how type errors are reported by the TypeScript compiler against code in a `.ts`
-file.
+当在模板绑定表达式中检测到类型错误时，模板验证会产生错误消息，
+这与 TypeScript 编译器针对 `.ts` 文件中的代码报告类型错误的方式类似。
 
-For example, consider the following component:
+例如，请看下面的组件：
 
 ```ts
 @Component({
@@ -331,7 +326,7 @@ class MyComponent {
 }
 ```
 
-This produces the following error:
+这会产生以下错误：
 
 ```shell
 
@@ -339,18 +334,18 @@ my.component.ts.MyComponent.html(1,1): : Property 'addresss' does not exist on t
 
 ```
 
-The file name reported in the error message, `my.component.ts.MyComponent.html`, is a synthetic file
-generated by the template compiler that holds contents of the `MyComponent` class template.
-The compiler never writes this file to disk.
-The line and column numbers are relative to the template string in the `@Component` annotation of the class, `MyComponent` in this case.
-If a component uses `templateUrl` instead of `template`, the errors are reported in the HTML file referenced by the `templateUrl` instead of a synthetic file.
+错误消息中报告的文件名 `my.component.ts.MyComponent.html` 是一个合成文件，
+由模板编译器生成，用于保存 `MyComponent` 类模板的内容。
+编译器永远不会把这个文件写入磁盘。
+行号和列号是相对于该类 `@Component` 注解中的模板字符串而言的，在本例中即 `MyComponent`。
+如果组件使用的是 `templateUrl` 而不是 `template`，错误会在 `templateUrl` 引用的 HTML 文件中报告，而不是在合成文件中。
 
-The error location is the beginning of the text node that contains the interpolation expression with the error.
-If the error is in an attribute binding such as `[value]="person.address.street"`, the error
-location is the location of the attribute that contains the error.
+错误位置是包含出错插值（Interpolation）表达式的文本节点的起始处。
+如果错误出现在 `[value]="person.address.street"` 这样的属性绑定中，错误
+位置就是包含该错误的属性所在的位置。
 
-The validation uses the TypeScript type checker and the options supplied to the TypeScript compiler to control how detailed the type validation is.
-For example, if the `strictNullChecks` TypeScript option is enabled, the error
+验证过程使用 TypeScript 类型检查器以及提供给 TypeScript 编译器的选项，来控制类型验证的详细程度。
+例如，如果启用了 TypeScript 的 `strictNullChecks` 选项，那么除了上面的错误消息外，
 
 ```shell
 
@@ -358,13 +353,13 @@ my.component.ts.MyComponent.html(1,1): : Object is possibly 'undefined'
 
 ```
 
-is reported as well as the above error message.
+这个错误也会被报告。
 
-### Type narrowing
+### 类型收窄 {#type-narrowing}
 
-The expression used in an `ngIf` directive is used to narrow type unions in the Angular
-template compiler, the same way the `if` expression does in TypeScript.
-For example, to avoid `Object is possibly 'undefined'` error in the template above, modify it to only emit the interpolation if the value of `person` is initialized as shown below:
+在 Angular 模板编译器中，`ngIf` 指令（Directive）里使用的表达式会被用来收窄联合类型，
+这与 TypeScript 中 `if` 表达式的作用相同。
+例如，为了避免上面模板中的 `Object is possibly 'undefined'` 错误，可以修改模板，使其只在 `person` 的值已初始化时才输出插值，如下所示：
 
 ```ts
 @Component({
@@ -376,16 +371,16 @@ class MyComponent {
 }
 ```
 
-Using `*ngIf` allows the TypeScript compiler to infer that the `person` used in the binding expression will never be `undefined`.
+使用 `*ngIf` 能让 TypeScript 编译器推断出绑定表达式中使用的 `person` 永远不会是 `undefined`。
 
-For more information about input type narrowing, see [Improving template type checking for custom directives](/guide/directives/structural-directives#improving-template-type-checking-for-custom-directives).
+有关输入类型收窄的更多信息，请参阅[改进自定义指令的模板类型检查](/guide/directives/structural-directives#improving-template-type-checking-for-custom-directives)。
 
-### Non-null type assertion operator
+### 非空类型断言运算符 {#non-null-type-assertion-operator}
 
-Use the non-null type assertion operator to suppress the `Object is possibly 'undefined'` error when it is inconvenient to use `*ngIf` or when some constraint in the component ensures that the expression is always non-null when the binding expression is interpolated.
+当不方便使用 `*ngIf`，或者组件中的某些约束可以确保绑定表达式在插值时始终为非空时，可以使用非空类型断言运算符来抑制 `Object is possibly 'undefined'` 错误。
 
-In the following example, the `person` and `address` properties are always set together, implying that `address` is always non-null if `person` is non-null.
-There is no convenient way to describe this constraint to TypeScript and the template compiler, but the error is suppressed in the example by using `address!.street`.
+在下面的示例中，`person` 和 `address` 属性总是同时被设置，这意味着只要 `person` 非空，`address` 就一定非空。
+没有方便的方式向 TypeScript 和模板编译器描述这一约束，但示例中通过使用 `address!.street` 抑制了该错误。
 
 ```ts
 @Component({
@@ -403,9 +398,9 @@ class MyComponent {
 }
 ```
 
-The non-null assertion operator should be used sparingly as refactoring of the component might break this constraint.
+应谨慎使用非空断言运算符，因为对组件的重构可能会破坏这一约束。
 
-In this example it is recommended to include the checking of `address` in the `*ngIf` as shown below:
+在这个示例中，建议像下面这样在 `*ngIf` 中加入对 `address` 的检查：
 
 ```ts
 @Component({
