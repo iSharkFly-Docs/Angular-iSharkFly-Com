@@ -1,15 +1,11 @@
----
-untranslated: true
----
+# 教程 {#tutorials}
 
-# Tutorials
+欢迎来到 Angular 教程！这些教程将引导你了解框架的核心概念，帮助你开始构建高性能、可扩展的应用。
 
-Welcome to the Angular tutorials! These tutorials will guide you through the core concepts of the framework, and get you started building performant, scalable apps.
-
-- [**Learn Angular in your browser**](/tutorials/learn-angular): via the Playground
-- [**Angular AI Tutor**](/ai/ai-tutor): via MCP Server
-- [**Build your first Angular app locally**](/tutorials/first-app): via npm
-- [**Learn signals**](/tutorials/signals): via the Playground
-- [**Deferrable views**](/tutorials/deferrable-views): via the Playground
-- [**Learn signals forms**](/tutorials/signal-forms): via the Playground
+- [**在浏览器中学习 Angular**](/tutorials/learn-angular)：通过 Playground
+- [**Angular AI 导师**](/ai/ai-tutor)：通过 MCP Server
+- [**在本地构建你的第一个 Angular 应用**](/tutorials/first-app)：通过 npm
+- [**学习信号（Signal）**](/tutorials/signals)：通过 Playground
+- [**可延迟视图（Deferrable Views）**](/tutorials/deferrable-views)：通过 Playground
+- [**学习信号表单（Signal Forms）**](/tutorials/signal-forms)：通过 Playground
 

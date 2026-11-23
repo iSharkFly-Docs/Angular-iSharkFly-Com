@@ -1,19 +1,15 @@
----
-untranslated: true
----
+# 模板 {#templates}
 
-# Templates
-
-Use Angular's template syntax to create dynamic user interfaces.
+使用 Angular 的模板语法创建动态用户界面。
 
 
-Component templates aren't just static HTML— they can use data from your component class and set up handlers for user interaction.
+组件（Component）模板（Template）不只是静态 HTML——它们可以使用组件类中的数据，并为用户交互设置处理器。
 
-## Showing dynamic text
+## 显示动态文本 {#showing-dynamic-text}
 
-In Angular, a _binding_ creates a dynamic connection between a component's template and its data. This connection ensures that changes to the component's data automatically update the rendered template.
+在 Angular 中，_绑定（Binding）_会在组件的模板与其数据之间建立动态连接。这种连接确保组件数据的变化会自动更新渲染出的模板。
 
-You can create a binding to show some dynamic text in a template by using double curly-braces:
+你可以使用双花括号创建绑定，在模板中显示动态文本：
 
 ```ts
 @Component({
@@ -25,33 +21,33 @@ export class UserProfile {
 }
 ```
 
-When Angular renders the component, you see:
+当 Angular 渲染该组件时，你会看到：
 
 ```html
 <h1>Profile for pro_programmer_123</h1>
 ```
 
-Angular automatically keeps the binding up-to-date when the value of the signal changes. Building on
-the example above, if we update the value of the `userName` signal:
+当信号（Signal）的值发生变化时，Angular 会自动让绑定保持最新。在上面示例的
+基础上，如果我们更新 `userName` 信号的值：
 
 ```ts
 this.userName.set('cool_coder_789');
 ```
 
-The rendered page updates to reflect the new value:
+渲染出的页面会随之更新，反映新的值：
 
 ```html
 <h1>Profile for cool_coder_789</h1>
 ```
 
-## Setting dynamic properties and attributes
+## 设置动态属性和特性 {#setting-dynamic-properties-and-attributes}
 
-Angular supports binding dynamic values into DOM properties with square brackets:
+Angular 支持使用方括号将动态值绑定到 DOM 属性（property）上：
 
 ```ts
 @Component({
   /*...*/
-  // Set the `disabled` property of the button based on the value of `isValidUserId`.
+  // 根据 `isValidUserId` 的值设置按钮的 `disabled` 属性。
   template: `<button [disabled]="!isValidUserId()">Save changes</button>`,
 })
 export class UserProfile {
@@ -59,54 +55,54 @@ export class UserProfile {
 }
 ```
 
-You can also bind to HTML _attributes_ by prefixing the attribute name with `attr.`:
+你也可以在特性名前加上 `attr.` 前缀，以绑定到 HTML _特性（attribute）_：
 
 ```html
-<!-- Bind the `role` attribute on the `<ul>` element to value of `listRole`. -->
+<!-- 将 `<ul>` 元素上的 `role` 特性绑定到 `listRole` 的值。 -->
 <ul [attr.role]="listRole()"></ul>
 ```
 
-Angular automatically updates DOM properties and attributes when the bound value changes.
+当绑定的值发生变化时，Angular 会自动更新 DOM 属性和特性。
 
-## Handling user interaction
+## 处理用户交互 {#handling-user-interaction}
 
-Angular lets you add event listeners to an element in your template with parentheses:
+Angular 允许你使用圆括号为模板中的元素添加事件监听器：
 
 ```ts
 @Component({
   /*...*/
-  // Add an 'click' event handler that calls the `cancelSubscription` method.
+  // 添加一个调用 `cancelSubscription` 方法的 'click' 事件处理器。
   template: `<button (click)="cancelSubscription()">Cancel subscription</button>`,
 })
 export class UserProfile {
   /* ... */
 
   cancelSubscription() {
-    /* Your event handling code goes here. */
+    /* 你的事件处理代码写在这里。 */
   }
 }
 ```
 
-If you need to pass the [event](https://developer.mozilla.org/docs/Web/API/Event) object to your listener, you can use Angular's built-in `$event` variable inside the function call:
+如果你需要将 [event](https://developer.mozilla.org/docs/Web/API/Event) 对象传递给监听器，可以在函数调用中使用 Angular 内置的 `$event` 变量：
 
 ```ts
 @Component({
   /*...*/
-  // Add an 'click' event handler that calls the `cancelSubscription` method.
+  // 添加一个调用 `cancelSubscription` 方法的 'click' 事件处理器。
   template: `<button (click)="cancelSubscription($event)">Cancel subscription</button>`,
 })
 export class UserProfile {
   /* ... */
 
   cancelSubscription(event: Event) {
-    /* Your event handling code goes here. */
+    /* 你的事件处理代码写在这里。 */
   }
 }
 ```
 
-## Control flow with `@if` and `@for`
+## 使用 `@if` 和 `@for` 进行控制流 {#control-flow-with-if-and-for}
 
-You can conditionally hide and show parts of a template with Angular's `@if` block:
+你可以使用 Angular 的 `@if` 块有条件地隐藏和显示模板的某些部分：
 
 ```html
 <h1>User profile</h1>
@@ -117,7 +113,7 @@ You can conditionally hide and show parts of a template with Angular's `@if` blo
 }
 ```
 
-The `@if` block also supports an optional `@else` block:
+`@if` 块还支持一个可选的 `@else` 块：
 
 ```html
 <h1>User profile</h1>
@@ -131,7 +127,7 @@ The `@if` block also supports an optional `@else` block:
 }
 ```
 
-You can repeat part of a template multiple times with Angular's `@for` block:
+你可以使用 Angular 的 `@for` 块将模板的某一部分重复多次：
 
 ```html
 <h1>User profile</h1>
@@ -143,17 +139,17 @@ You can repeat part of a template multiple times with Angular's `@for` block:
 </ul>
 ```
 
-Angular uses the `track` keyword, shown in the example above, to associate data with the DOM elements created by `@for`. See [_Why is track in @for blocks important?_](/guide/templates/control-flow#why-is-track-in-for-blocks-important) for more info.
+Angular 使用上例中所示的 `track` 关键字，将数据与 `@for` 创建的 DOM 元素关联起来。更多信息请参阅[_为什么 @for 块中的 track 很重要？_](/guide/templates/control-flow#why-is-track-in-for-blocks-important)。
 
-::: tip TIP
-Want to know more about Angular templates? See the [In-depth Templates guide](/guide/templates) for the full details.
+::: tip 提示
+想进一步了解 Angular 模板吗？完整细节请参阅[深入模板指南](/guide/templates)。
 
 :::
 
-## Next Step
+## 下一步 {#next-step}
 
-Now that you have dynamic data and templates in the application, it's time to learn how to enhance templates by conditionally hiding or showing certain elements, looping over elements, and more.
+现在应用中已经有了动态数据和模板，接下来该学习如何增强模板，例如有条件地隐藏或显示某些元素、遍历元素等。
 
-- [Forms with Signals](/essentials/signal-forms)
-- [In-depth template guide](/guide/templates)
+- [使用信号构建表单](/essentials/signal-forms)
+- [深入模板指南](/guide/templates)
 

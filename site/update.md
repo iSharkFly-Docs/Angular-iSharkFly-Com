@@ -1,71 +1,67 @@
----
-untranslated: true
----
+# 让你的 Angular 项目保持最新 {#keeping-your-angular-projects-up-to-date}
 
-# Keeping your Angular projects up-to-date
+就像 Web 以及整个 Web 生态系统一样，Angular 也在不断改进。
+Angular 在持续改进的同时，也高度重视稳定性，并力求让更新过程简单直接。
+让你的 Angular 应用保持最新，可以让你享受到前沿的新特性，以及各种优化和 bug 修复。
 
-Just like Web and the entire web ecosystem, Angular is continuously improving.
-Angular balances continuous improvement with a strong focus on stability and making updates straightforward.
-Keeping your Angular application up-to-date enables you to take advantage of leading-edge new features, as well as optimizations and bug fixes.
+本文档包含的信息和资源可以帮助你让 Angular 应用和库保持最新。
 
-This document contains information and resources to help you keep your Angular applications and libraries up-to-date.
+有关我们的版本策略和实践（包括支持和弃用实践以及发布计划），请参阅 [Angular 版本与发布](/reference/releases 'Angular 版本与发布')。
 
-For information about our versioning policy and practices — including support and deprecation practices, as well as the release schedule — see [Angular versioning and releases](/reference/releases 'Angular versioning and releases').
-
-::: tip HELPFUL
-If you are currently using AngularJS, see [Upgrading from AngularJS](https://angular.io/guide/upgrade 'Upgrading from AngularJS').
-_AngularJS_ is the name for all v1.x versions of Angular.
+::: tip 提示
+如果你目前在使用 AngularJS，请参阅[从 AngularJS 升级](https://angular.io/guide/upgrade '从 AngularJS 升级')。
+_AngularJS_ 是 Angular 所有 v1.x 版本的名称。
 
 :::
 
-## Getting notified of new releases
+## 获取新版本发布通知 {#getting-notified-of-new-releases}
 
-To be notified when new releases are available, follow [@angular](https://x.com/angular '@angular on X') on X (formerly Twitter) or subscribe to the [Angular blog](https://blog.angular.dev 'Angular blog').
+要在新版本发布时收到通知，请在 X（原 Twitter）上关注 [@angular](https://x.com/angular 'X 上的 @angular')，或订阅 [Angular 博客](https://blog.angular.dev 'Angular 博客')。
 
-## Learning about new features
+## 了解新特性 {#learning-about-new-features}
 
-What's new? What's changed? We share the most important things you need to know on the Angular blog in [release announcements](https://blog.angular.dev/ 'Angular blog - release announcements').
+有什么新内容？有什么变化？我们会在 Angular 博客的[发布公告](https://blog.angular.dev/ 'Angular 博客 - 发布公告')中分享你需要了解的最重要信息。
 
-To review a complete list of changes, organized by version, see the [Angular change log](https://github.com/angular/angular/blob/main/CHANGELOG.md 'Angular change log').
+要查看按版本组织的完整变更列表，请参阅 [Angular 变更日志](https://github.com/angular/angular/blob/main/CHANGELOG.md 'Angular 变更日志')。
 
-## Checking your version of Angular
+## 检查你的 Angular 版本 {#checking-your-version-of-angular}
 
-To check your application's version of Angular use the `ng version` command from within your project directory.
+要检查应用所使用的 Angular 版本，请在项目目录中运行 `ng version` 命令。
 
-## Finding the current version of Angular
+## 查找 Angular 的当前版本 {#finding-the-current-version-of-angular}
 
-The most recent stable released version of Angular appears [on npm](https://www.npmjs.com/package/@angular/core 'Angular on npm') under "Version." For example, `16.2.4`.
+Angular 最新的稳定发布版本显示在 [npm 上](https://www.npmjs.com/package/@angular/core 'npm 上的 Angular')的 "Version" 下方。例如 `16.2.4`。
 
-You can also find the most current version of Angular by using the CLI command [`ng update`](https://angular.dev/cli/update).
-By default, [`ng update`](https://angular.dev/cli/update) (without additional arguments) lists the updates that are available to you.
+你也可以使用 CLI 命令 [`ng update`](https://angular.dev/cli/update) 来查找 Angular 的最新版本。
+默认情况下，[`ng update`](https://angular.dev/cli/update)（不带额外参数）会列出你可用的更新。
 
-## Updating your environment and apps
+## 更新你的环境和应用 {#updating-your-environment-and-apps}
 
-To make updating uncomplicated, we provide complete instructions in the interactive [Angular Update Guide](https://angular.dev/update-guide).
+为了让更新变得简单，我们在交互式的 [Angular 更新指南](https://angular.dev/update-guide)中提供了完整的说明。
 
-The Angular Update Guide provides customized update instructions, based on the current and target versions that you specify.
-It includes basic and advanced update paths, to match the complexity of your applications.
-It also includes troubleshooting information and any recommended manual changes to help you get the most out of the new release.
+Angular 更新指南会根据你指定的当前版本和目标版本，提供定制化的更新说明。
+它包含基础和高级两种更新路径，以匹配你的应用的复杂程度。
+它还包含故障排除信息以及推荐的手动修改，帮助你充分利用新版本。
 
-For simple updates, the CLI command [`ng update`](https://angular.dev/cli/update) is all you need.
-Without additional arguments, [`ng update`](https://angular.dev/cli/update) lists the updates that are available to you and provides recommended steps to update your application to the most current version.
+对于简单的更新，你只需要 CLI 命令 [`ng update`](https://angular.dev/cli/update)。
+不带额外参数时，[`ng update`](https://angular.dev/cli/update) 会列出你可用的更新，并提供将应用更新到最新版本的推荐步骤。
 
-[Angular Versioning and Releases](/reference/releases#angular-versioning 'Angular Release Practices, Versioning') describes the level of change that you can expect based on a release's version number.
-It also describes supported update paths.
+[Angular 版本与发布](/reference/releases#angular-versioning 'Angular 发布实践与版本')描述了根据发布版本号你可以预期的变更程度。
+它还描述了受支持的更新路径。
 
-## Resource summary
+## 资源汇总 {#resource-summary}
 
-- Release announcements:
-  [Angular blog - release announcements](https://blog.angular.dev/ 'Angular blog announcements about recent releases')
+- 发布公告：
+  [Angular 博客 - 发布公告](https://blog.angular.dev/ 'Angular 博客上关于近期发布的公告')
 
-- Release details:
-  [Angular change log](https://github.com/angular/angular/blob/main/CHANGELOG.md 'Angular change log')
+- 发布详情：
+  [Angular 变更日志](https://github.com/angular/angular/blob/main/CHANGELOG.md 'Angular 变更日志')
 
-- Update instructions:
-  [Angular Update Guide](https://angular.dev/update-guide)
+- 更新说明：
+  [Angular 更新指南](https://angular.dev/update-guide)
 
-- Update command reference:
-  [Angular CLI `ng update` command reference](https://angular.dev/cli/update)
+- 更新命令参考：
+  [Angular CLI `ng update` 命令参考](https://angular.dev/cli/update)
 
-- Versioning, release, support, and deprecation practices:
-  [Angular versioning and releases](/reference/releases 'Angular versioning and releases')
+- 版本、发布、支持和弃用实践：
+  [Angular 版本与发布](/reference/releases 'Angular 版本与发布')

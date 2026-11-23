@@ -1,21 +1,17 @@
----
-untranslated: true
----
-
-# Forms with signals
+# 使用信号构建表单 {#forms-with-signals}
 
 
 
 
-Signal Forms manage form state using Angular signals to provide automatic synchronization between your data model and the UI with Angular Signals.
+信号表单（Signal Forms）使用 Angular 信号（Signal）来管理表单状态，借助 Angular Signals 在数据模型与 UI 之间实现自动同步。
 
-This guide walks you through the core concepts to create forms with Signal Forms. Here's how it works:
+本指南将带你了解使用信号表单创建表单的核心概念。具体流程如下：
 
-## Creating your first form
+## 创建你的第一个表单 {#creating-your-first-form}
 
-### 1. Create a form model with `signal()`
+### 1. 使用 `signal()` 创建表单模型 {#_1-create-a-form-model-with-signal}
 
-Every form starts by creating a signal that holds your form's data model:
+每个表单都从创建一个保存表单数据模型的信号开始：
 
 ```ts
 interface LoginData {
@@ -29,74 +25,74 @@ const loginModel = signal<LoginData>({
 });
 ```
 
-### 2. Pass the form model to `form()` to create a `FieldTree`
+### 2. 将表单模型传给 `form()` 以创建 `FieldTree` {#_2-pass-the-form-model-to-form-to-create-a-fieldtree}
 
-Then, you pass your form model into the `form()` function to create a **field tree** - an object structure that mirrors your model's shape, allowing you to access fields with dot notation.
+接着，把表单模型传入 `form()` 函数，创建一个**字段树（field tree）**——这是一个与模型结构相对应的对象结构，让你可以通过点号语法访问各个字段。
 
-Both the root form object and its nested properties are `FieldTree` nodes:
+根表单对象及其嵌套属性都是 `FieldTree` 节点：
 
 ```ts
 const loginForm = form(loginModel);
 
-loginForm; // is a FieldTree
-loginForm.email; // is also a FieldTree
+loginForm; // 是一个 FieldTree
+loginForm.email; // 也是一个 FieldTree
 ```
 
-### 3. Bind HTML inputs with `[formField]` directive
+### 3. 使用 `[formField]` 指令绑定 HTML 输入框 {#_3-bind-html-inputs-with-formfield-directive}
 
-Next, you bind your HTML inputs to the form using the `[formField]` directive, which creates two-way binding between them:
+然后，使用 `[formField]` 指令（Directive）将 HTML 输入框绑定到表单，它会在两者之间建立双向绑定：
 
 ```html
 <input type="email" [formField]="loginForm.email" />
 <input type="password" [formField]="loginForm.password" />
 ```
 
-As a result, user changes (such as typing in the field) automatically updates the form.
+这样，用户的修改（例如在字段中输入内容）会自动更新表单。
 
-::: info NOTE
-The `[formField]` directive also syncs field state for attributes like `required`, `disabled`, and `readonly` when appropriate.
+::: info 注意
+`[formField]` 指令还会在适当的时候同步 `required`、`disabled` 和 `readonly` 等属性的字段状态。
 
 :::
 
-### 4. Read state with `FieldTree` signals
+### 4. 通过 `FieldTree` 信号读取状态 {#_4-read-state-with-fieldtree-signals}
 
-You can access state for any part of the tree by calling the `FieldTree` node as a function. This returns a state object containing reactive signals for the value, validation status, and interaction state:
+你可以把 `FieldTree` 节点当作函数调用，来访问树中任意部分的状态。它会返回一个状态对象，其中包含表示值、校验状态和交互状态的响应式信号：
 
 ```ts
-loginForm(); // Returns state for the whole form
-loginForm.email(); // Returns state for the email field
+loginForm(); // 返回整个表单的状态
+loginForm.email(); // 返回 email 字段的状态
 ```
 
-To read the current value, access the `value()` signal:
+要读取当前值，可以访问 `value()` 信号：
 
 ```html
-<!-- Render values that update automatically as user types -->
+<!-- 渲染会随用户输入自动更新的值 -->
 <p>Form value: {{ loginForm().value() | json }}</p>
 <p>Email: {{ loginForm.email().value() }}</p>
 ```
 
 ```ts
-// Get the current value
+// 获取当前值
 const currentEmail = loginForm.email().value();
 ```
 
-### 5. Update values with `set()`
+### 5. 使用 `set()` 更新值 {#_5-update-values-with-set}
 
-You can programmatically update values using the `value.set()` method on any node. This updates both the `FieldTree` and the underlying model signal:
+你可以在任意节点上调用 `value.set()` 方法，以编程方式更新值。这会同时更新 `FieldTree` 和底层的模型信号：
 
 ```ts
-// Update the value programmatically
+// 以编程方式更新值
 loginForm.email().value.set('alice@wonderland.com');
 ```
 
-As a result, both the field value and the model signal are updated automatically:
+这样，字段值和模型信号都会被自动更新：
 
 ```ts
-// The model signal is also updated
+// 模型信号也会被更新
 console.log(loginModel().email); // 'alice@wonderland.com'
 ```
 
-### Complete example
+### 完整示例 {#complete-example}
 
 ::: code-group
 
@@ -126,11 +122,11 @@ export class App {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    // Perform login logic here
+    // 在这里执行登录逻辑
     const credentials = this.loginModel();
     console.log('Logging in with:', credentials);
 
-    // e.g., await this.authService.login(credentials);
+    // 例如：await this.authService.login(credentials);
   }
 }
 ```
@@ -186,69 +182,69 @@ p {
 
 :::
 
-## Basic usage
+## 基本用法 {#basic-usage}
 
-The `[formField]` directive works with all standard HTML input types. Here are the most common patterns:
+`[formField]` 指令适用于所有标准的 HTML 输入类型。以下是最常见的几种用法：
 
-### Text inputs
+### 文本输入框 {#text-inputs}
 
-Text inputs work with various `type` attributes and textareas:
+文本输入框支持多种 `type` 属性，也适用于 textarea：
 
 ```html
-<!-- Text and email -->
+<!-- 文本和邮箱 -->
 <input type="text" [formField]="form.name" />
 <input type="email" [formField]="form.email" />
 ```
 
-#### Numbers
+#### 数字 {#numbers}
 
-Number inputs automatically convert between strings and numbers:
+数字输入框会在字符串和数字之间自动转换：
 
 ```html
-<!-- Number - automatically converts to number type -->
+<!-- 数字：自动转换为 number 类型 -->
 <input type="number" [formField]="form.age" />
 ```
 
-#### Date and time
+#### 日期和时间 {#date-and-time}
 
-Date inputs store values as `YYYY-MM-DD` strings, and time inputs use `HH:mm` format:
+日期输入框以 `YYYY-MM-DD` 格式的字符串存储值，时间输入框使用 `HH:mm` 格式：
 
 ```html
-<!-- Date and time - stores as ISO format strings -->
+<!-- 日期和时间：以 ISO 格式字符串存储 -->
 <input type="date" [formField]="form.eventDate" />
 <input type="time" [formField]="form.eventTime" />
 ```
 
-If you need to convert date strings to Date objects, you can do so by passing the field value into `Date()`:
+如果需要把日期字符串转换为 Date 对象，可以把字段值传入 `Date()`：
 
 ```ts
 const dateObject = new Date(form.eventDate().value());
 ```
 
-#### Multiline text
+#### 多行文本 {#multiline-text}
 
-Textareas work the same way as text inputs:
+textarea 的用法与文本输入框相同：
 
 ```html
 <!-- Textarea -->
 <textarea [formField]="form.message" rows="4"></textarea>
 ```
 
-### Checkboxes
+### 复选框 {#checkboxes}
 
-Checkboxes bind to boolean values:
+复选框绑定到布尔值：
 
 ```html
-<!-- Single checkbox -->
+<!-- 单个复选框 -->
 <label>
   <input type="checkbox" [formField]="form.agreeToTerms" />
   I agree to the terms
 </label>
 ```
 
-#### Multiple checkboxes
+#### 多个复选框 {#multiple-checkboxes}
 
-For multiple options, create a separate boolean `formField` for each:
+如果有多个选项，为每个选项分别创建一个布尔类型的 `formField`：
 
 ```html
 <label>
@@ -261,9 +257,9 @@ For multiple options, create a separate boolean `formField` for each:
 </label>
 ```
 
-### Radio buttons
+### 单选按钮 {#radio-buttons}
 
-Radio buttons work similarly to checkboxes. As long as the radio buttons use the same `[formField]` value, Signal Forms will automatically bind the same `name` attribute to all of them:
+单选按钮的用法与复选框类似。只要这些单选按钮使用相同的 `[formField]` 值，信号表单就会自动为它们绑定相同的 `name` 属性：
 
 ```html
 <label>
@@ -276,21 +272,21 @@ Radio buttons work similarly to checkboxes. As long as the radio buttons use the
 </label>
 ```
 
-When a user selects a radio button, the form `formField` stores the value from that radio button's `value` attribute. For example, selecting "Premium" sets `form.plan().value()` to `"premium"`.
+当用户选中某个单选按钮时，表单的 `formField` 会存储该单选按钮 `value` 属性的值。例如，选中「Premium」会把 `form.plan().value()` 设为 `"premium"`。
 
-### Select dropdowns
+### 下拉选择框 {#select-dropdowns}
 
-Select elements work with both static and dynamic options:
+select 元素同时支持静态选项和动态选项：
 
 ```html
-<!-- Static options -->
+<!-- 静态选项 -->
 <select [formField]="form.country">
   <option value="">Select a country</option>
   <option value="us">United States</option>
   <option value="ca">Canada</option>
 </select>
 
-<!-- Dynamic options with @for -->
+<!-- 使用 @for 生成动态选项 -->
 <select [formField]="form.productId">
   <option value="">Select a product</option>
   @for (product of products; track product.id) {
@@ -299,14 +295,14 @@ Select elements work with both static and dynamic options:
 </select>
 ```
 
-::: info NOTE
-Multiple select (`<select multiple>`) is not supported by the `[formField]` directive at this time.
+::: info 注意
+`[formField]` 指令目前不支持多选框（`<select multiple>`）。
 
 :::
 
-## Validation and state
+## 校验与状态 {#validation-and-state}
 
-Signal Forms provides built-in validators that you can apply to your form fields. To add validation, pass a schema function as the second argument to `form()`:
+信号表单提供了内置的校验器，你可以把它们应用到表单字段上。要添加校验，请把一个 schema 函数作为第二个参数传给 `form()`：
 
 ```ts
 const loginForm = form(loginModel, (schemaPath) => {
@@ -316,41 +312,41 @@ const loginForm = form(loginModel, (schemaPath) => {
 });
 ```
 
-The schema function receives a **schema path** parameter that provides paths to your fields for configuring validation rules.
+schema 函数会接收一个 **schema 路径（schema path）** 参数，它提供了指向各个字段的路径，用于配置校验规则。
 
-Common validators include:
+常用的校验器包括：
 
-- **`required()`** - Ensures the field has a value
-- **`email()`** - Validates email format
-- **`min()`** / **`max()`** - Validates number ranges
-- **`minLength()`** / **`maxLength()`** - Validates string or collection length
-- **`pattern()`** - Validates against a regex pattern
+- **`required()`** - 确保字段有值
+- **`email()`** - 校验邮箱格式
+- **`min()`** / **`max()`** - 校验数字范围
+- **`minLength()`** / **`maxLength()`** - 校验字符串或集合的长度
+- **`pattern()`** - 按正则表达式进行校验
 
-You can also customize error messages by passing an options object as the second argument to the validator:
+你也可以把一个选项对象作为第二个参数传给校验器，以自定义错误信息：
 
 ```ts
 required(schemaPath.email, {message: 'Email is required'});
 email(schemaPath.email, {message: 'Please enter a valid email address'});
 ```
 
-Each node in the `FieldTree` exposes its validation and interaction state through reactive signals.
+`FieldTree` 中的每个节点都会通过响应式信号暴露其校验状态和交互状态。
 
-### FieldTree State Signals
+### FieldTree 状态信号 {#fieldtree-state-signals}
 
-Every node in the tree, including the root form object, provides the same signals to track its state. Since every node is a `FieldTree`, the API for monitoring validity and interaction is identical at every level.
+树中的每个节点（包括根表单对象）都提供相同的一组信号来跟踪自身状态。由于每个节点都是 `FieldTree`，因此在任何层级上，用于监控有效性和交互的 API 都是完全一致的。
 
-| State        | Description                                                                     |
+| 状态         | 说明                                                                            |
 | ------------ | ------------------------------------------------------------------------------- |
-| `valid()`    | Returns `true` if the node passes all validation rules                          |
-| `invalid()`  | Returns `true` if there are validation errors                                   |
-| `pending()`  | Returns `true` if async validation is in progress                               |
-| `touched()`  | Returns `true` if the user has focused and blurred the field or any child field |
-| `dirty()`    | Returns `true` if the value has been changed by the user                        |
-| `disabled()` | Returns `true` if the node is disabled                                          |
-| `readonly()` | Returns `true` if the node is readonly                                          |
-| `errors()`   | Returns an array of validation errors with `kind` and `message` properties      |
+| `valid()`    | 如果节点通过了所有校验规则，则返回 `true`                                       |
+| `invalid()`  | 如果存在校验错误，则返回 `true`                                                 |
+| `pending()`  | 如果异步校验正在进行中，则返回 `true`                                           |
+| `touched()`  | 如果用户曾聚焦并离开该字段或其任意子字段，则返回 `true`                         |
+| `dirty()`    | 如果值已被用户修改，则返回 `true`                                               |
+| `disabled()` | 如果节点被禁用，则返回 `true`                                                   |
+| `readonly()` | 如果节点为只读，则返回 `true`                                                   |
+| `errors()`   | 返回一个校验错误数组，每个错误包含 `kind` 和 `message` 属性                     |
 
-### Complete example {#complete-example-validation}
+### 完整示例 {#complete-example-validation}
 
 ::: code-group
 
@@ -384,10 +380,10 @@ export class App {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    // Perform login logic here
+    // 在这里执行登录逻辑
     const credentials = this.loginModel();
     console.log('Logging in with:', credentials);
-    // e.g., await this.authService.login(credentials);
+    // 例如：await this.authService.login(credentials);
   }
 }
 ```
@@ -503,14 +499,14 @@ button:active {
 
 :::
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-To learn more about Signal Forms and how it works, check out the in-depth guides:
+要深入了解信号表单及其工作原理，请查阅以下深度指南：
 
-- [Overview](/guide/forms/signals/overview) - Introduction to Signal Forms and when to use them
-- [Form models](/guide/forms/signals/models) - Creating and managing form data with signals
-- [Field state management](/guide/forms/signals/field-state-management) - Working with validation state, interaction tracking, and field visibility
-- [Validation](/guide/forms/signals/validation) - Built-in validators, custom validation rules, and async validation
+- [概览](/guide/forms/signals/overview) - 信号表单简介及其适用场景
+- [表单模型](/guide/forms/signals/models) - 使用信号创建和管理表单数据
+- [字段状态管理](/guide/forms/signals/field-state-management) - 处理校验状态、交互跟踪和字段可见性
+- [校验](/guide/forms/signals/validation) - 内置校验器、自定义校验规则和异步校验
 
-- [Modular design with dependency injection](/essentials/dependency-injection)
+- [借助依赖注入（Dependency Injection）实现模块化设计](/essentials/dependency-injection)
 

@@ -1,5 +1,4 @@
 ---
-untranslated: true
 layout: home
 title: Angular 中文文档
 
