@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 跳过组件子树 {#skipping-component-subtrees}
 
-# Skipping component subtrees
+默认情况下，JavaScript 使用的是可变数据结构，多个不同的组件可以引用同一个数据结构。Angular 会在整个组件树上运行变更检测（Change Detection），以确保 DOM 中反映的是数据结构的最新状态。
 
-JavaScript, by default, uses mutable data structures that you can reference from multiple different components. Angular runs change detection over your entire component tree to make sure that the most up-to-date state of your data structures is reflected in the DOM.
+对大多数应用来说，变更检测已经足够快了。但是，当应用的组件树特别庞大时，在整个应用上运行变更检测可能会引发性能问题。你可以通过配置变更检测，让它只在组件树的一部分上运行来解决这个问题。
 
-Change detection is sufficiently fast for most applications. However, when an application has an especially large component tree, running change detection across the whole application can cause performance issues. You can address this by configuring change detection to only run on a subset of the component tree.
+## 使用 `OnPush` {#using-onpush}
 
-## Using `OnPush`
+OnPush 是 Angular 的默认变更检测策略（从 v22 开始）。它让 Angular **只**在以下情况下对组件子树运行变更检测：
 
-OnPush is the default change detection strategy in Angular (since v22). It instructs Angular to run change detection for a component subtree **only** when:
+- 子树的根组件因模板绑定而收到新的输入。Angular 使用 `Object.is` 比较输入的当前值和之前的值。
+- Angular 在子树的根组件或它的任何子组件中处理了某个事件 _（例如通过事件绑定、输出绑定或 `@HostListener`）_，无论这些组件是否使用 OnPush 变更检测。
+- 子树中的某个组件被标记为需要检查，例如通过 `ChangeDetectorRef.markForCheck` 或 `AsyncPipe`。
+- 子树中某个组件的模板读取的信号（Signal）发生了变化。此时 Angular 只会刷新读取了该信号的组件。
 
-- The root component of the subtree receives new inputs as the result of a template binding. Angular compares the current and past value of the input with `Object.is`.
-- Angular handles an event _(for example using event binding, output binding, or `@HostListener` )_ in the subtree's root component or any of its children whether they are using OnPush change detection or not.
-- A component in the subtree is marked for check, for example with `ChangeDetectorRef.markForCheck` or by `AsyncPipe`.
-- A signal read in the template of a component in the subtree changes. Angular then refreshes only the components that read the signal.
+## 常见的变更检测场景 {#common-change-detection-scenarios}
 
-## Common change detection scenarios
+本节通过几个常见的变更检测场景来说明 Angular 的行为。
 
-This section examines several common change detection scenarios to illustrate Angular's behavior.
+### 由使用 `Eager` 变更检测的组件处理事件 {#an-event-is-handled-by-a-component-with-eager-change-detection}
 
-### An event is handled by a component with `Eager` change detection
+如果 Angular 在使用 `Eager` 策略的组件中处理了事件，框架会在整个组件树上执行变更检测。对于以使用 `OnPush` 的组件为根、并且没有收到新输入的后代组件子树，Angular 会跳过它们。
 
-If Angular handles an event within a component with the `Eager` strategy, the framework executes change detection on the entire component tree. Angular will skip descendant component subtrees with roots using `OnPush`, which have not received new inputs.
-
-As an example, if we set the change detection strategy of `MainComponent` to `OnPush` and the user interacts with a component outside the subtree with root `MainComponent`, Angular will check all the pink components from the diagram below (`AppComponent`, `HeaderComponent`, `SearchComponent`, `ButtonComponent`) unless `MainComponent` receives new inputs:
+例如，如果我们把 `MainComponent` 的变更检测策略设为 `OnPush`，而用户与以 `MainComponent` 为根的子树之外的组件进行交互，那么 Angular 会检查下图中所有粉色的组件（`AppComponent`、`HeaderComponent`、`SearchComponent`、`ButtonComponent`），除非 `MainComponent` 收到了新的输入：
 
 ```txt
 graph TD;
@@ -44,11 +40,11 @@ class search checkedNode
 class event eventNode
 ```
 
-## An event is handled by a component with OnPush
+## 由使用 OnPush 的组件处理事件 {#an-event-is-handled-by-a-component-with-onpush}
 
-If Angular handles an event within a component with OnPush strategy, the framework will execute change detection within the entire component tree. Angular will ignore component subtrees with roots using OnPush, which have not received new inputs and are outside the component which handled the event.
+如果 Angular 在使用 OnPush 策略的组件中处理了事件，框架会在整个组件树上执行变更检测。对于以使用 OnPush 的组件为根、没有收到新输入、并且位于处理该事件的组件之外的组件子树，Angular 会忽略它们。
 
-As an example, if Angular handles an event within `MainComponent`, the framework will run change detection in the entire component tree. Angular will ignore the subtree with root `LoginComponent` because it has `OnPush` and the event happened outside of its scope.
+例如，如果 Angular 在 `MainComponent` 中处理了一个事件，框架会在整个组件树上运行变更检测。Angular 会忽略以 `LoginComponent` 为根的子树，因为它使用了 `OnPush`，而且事件发生在它的范围之外。
 
 ```txt
 graph TD;
@@ -69,11 +65,11 @@ class details checkedNode
 class event eventNode
 ```
 
-## An event is handled by a descendant of a component with OnPush
+## 由使用 OnPush 的组件的后代处理事件 {#an-event-is-handled-by-a-descendant-of-a-component-with-onpush}
 
-If Angular handles an event in a component with OnPush, the framework will execute change detection in the entire component tree, including the component’s ancestors.
+如果 Angular 在使用 OnPush 的组件中处理了事件，框架会在整个组件树上执行变更检测，包括该组件的祖先组件。
 
-As an example, in the diagram below, Angular handles an event in `LoginComponent` which uses OnPush. Angular will invoke change detection in the entire component subtree including `MainComponent` (`LoginComponent`’s parent), even though `MainComponent` has `OnPush` as well. Angular checks `MainComponent` as well because `LoginComponent` is part of its view.
+例如，在下图中，Angular 在使用 OnPush 的 `LoginComponent` 中处理了一个事件。Angular 会在整个组件子树上调用变更检测，包括 `MainComponent`（`LoginComponent` 的父组件），即使 `MainComponent` 也使用了 `OnPush`。Angular 之所以也会检查 `MainComponent`，是因为 `LoginComponent` 是它视图的一部分。
 
 ```txt
 graph TD;
@@ -95,11 +91,11 @@ class details checkedNode
 class event eventNode
 ```
 
-## New inputs to component with OnPush
+## 使用 OnPush 的组件收到新输入 {#new-inputs-to-component-with-onpush}
 
-Angular will run change detection within a child component with `OnPush` when setting an input property as result of a template binding.
+当模板绑定设置了输入属性时，Angular 会在使用 `OnPush` 的子组件中运行变更检测。
 
-For example, in the diagram below, `AppComponent` passes a new input to `MainComponent`, which has `OnPush`. Angular will run change detection in `MainComponent` but will not run change detection in `LoginComponent`, which also has `OnPush`, unless it receives new inputs as well.
+例如，在下图中，`AppComponent` 向使用 `OnPush` 的 `MainComponent` 传入了一个新输入。Angular 会在 `MainComponent` 中运行变更检测，但不会在同样使用 `OnPush` 的 `LoginComponent` 中运行变更检测，除非它也收到了新的输入。
 
 ```txt
 graph TD;
@@ -120,7 +116,7 @@ class details checkedNode
 class event eventNode
 ```
 
-## Edge cases
+## 边界情况 {#edge-cases}
 
-- **Modifying input properties in TypeScript code**. When you use an API like `@ViewChild` or `@ContentChild` to get a reference to a component in TypeScript and manually modify an `@Input` property, Angular will not automatically run change detection for OnPush components. If you need Angular to run change detection, you can inject `ChangeDetectorRef` in your component and call `changeDetectorRef.markForCheck()` to tell Angular to schedule a change detection.
-- **Modifying object references**. In case an input receives a mutable object as value and you modify the object but preserve the reference, Angular will not invoke change detection. That’s the expected behavior because the previous and the current value of the input point to the same reference.
+- **在 TypeScript 代码中修改输入属性**。当你使用 `@ViewChild` 或 `@ContentChild` 之类的 API 在 TypeScript 中获取某个组件的引用，并手动修改它的 `@Input` 属性时，Angular 不会自动为 OnPush 组件运行变更检测。如果你需要 Angular 运行变更检测，可以在组件中注入 `ChangeDetectorRef`，并调用 `changeDetectorRef.markForCheck()`，告诉 Angular 调度一次变更检测。
+- **修改对象引用**。如果某个输入收到的值是一个可变对象，而你修改了这个对象但保持引用不变，Angular 不会调用变更检测。这是预期的行为，因为输入的之前的值和当前的值指向的是同一个引用。

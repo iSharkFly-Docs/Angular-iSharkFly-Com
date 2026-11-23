@@ -1,30 +1,26 @@
----
-untranslated: true
----
+# 缓慢的计算 {#slow-computations}
 
-# Slow computations
+在每个变更检测（Change Detection）周期中，Angular 会同步地：
 
-On every change detection cycle, Angular synchronously:
+- 根据每个组件的检测策略，计算所有组件中的所有模板表达式（另有指定的除外）
+- 执行 `ngDoCheck`、`ngAfterContentChecked`、`ngAfterViewChecked` 和 `ngOnChanges` 生命周期钩子（Lifecycle Hook）。
+  由于 Angular 是按顺序执行这些计算的，模板或生命周期钩子中只要有一个缓慢的计算，就会拖慢整个变更检测过程。
 
-- Evaluates all template expressions in all components, unless specified otherwise, based on that each component's detection strategy
-- Executes the `ngDoCheck`, `ngAfterContentChecked`, `ngAfterViewChecked`, and `ngOnChanges` lifecycle hooks.
-  A single slow computation within a template or a lifecycle hook can slow down the entire change detection process because Angular runs the computations sequentially.
+## 识别缓慢的计算 {#identifying-slow-computations}
 
-## Identifying slow computations
-
-You can identify heavy computations with Angular DevTools’ profiler. In the performance timeline, click a bar to preview a particular change detection cycle. This displays a bar chart, which shows how long the framework spent in change detection for each component. When you click a component, you can preview how long Angular spent evaluating its template and lifecycle hooks.
+你可以用 Angular DevTools 的性能分析器找出繁重的计算。在性能时间线中，点击某个柱条即可预览对应的变更检测周期。这会显示一个柱状图，展示框架在每个组件的变更检测上花了多长时间。点击某个组件后，你可以看到 Angular 计算它的模板和生命周期钩子分别花了多长时间。
 
 <img alt="Angular DevTools profiler preview showing slow computation" src="/assets/images/best-practices/runtime-performance/slow-computations.png">
 
-For example, in the preceding screenshot, the second recorded change detection cycle is selected. Angular spent over 573 ms on this cycle, with the most time spent in the `EmployeeListComponent`. In the details panel, you can see that Angular spent over 297 ms evaluating the template of the `EmployeeListComponent`.
+例如，在上面的截图中，选中的是记录下来的第二个变更检测周期。Angular 在这个周期上花了超过 573 毫秒，其中大部分时间花在 `EmployeeListComponent` 上。在详情面板中可以看到，Angular 计算 `EmployeeListComponent` 的模板花了超过 297 毫秒。
 
-## Optimizing slow computations
+## 优化缓慢的计算 {#optimizing-slow-computations}
 
-Here are several techniques to remove slow computations:
+下面几种技巧可以消除缓慢的计算：
 
-- **Optimizing the underlying algorithm**. This is the recommended approach. If you can speed up the algorithm that is causing the problem, you can speed up the entire change detection mechanism.
-- **Caching using pure pipes**. You can move the heavy computation to a pure [pipe](/guide/templates/pipes). Angular reevaluates a pure pipe only if it detects that its inputs have changed, compared to the previous time Angular called it.
-- **Using memoization**. [Memoization](https://en.wikipedia.org/wiki/Memoization) is a similar technique to pure pipes, with the difference that pure pipes preserve only the last result from the computation where memoization could store multiple results.
-- **Avoid repaints/reflows in lifecycle hooks**. Certain [operations](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/) cause the browser to either synchronously recalculate the layout of the page or re-render it. Since reflows and repaints are generally slow, you want to avoid performing them in every change detection cycle.
+- **优化底层算法**。这是推荐的做法。如果你能加快导致问题的算法，就能加快整个变更检测机制。
+- **使用纯管道进行缓存**。你可以把繁重的计算移到纯[管道（Pipe）](/guide/templates/pipes)中。只有当 Angular 检测到纯管道的输入与上一次调用时相比发生了变化，才会重新计算它。
+- **使用记忆化**。[记忆化（Memoization）](https://en.wikipedia.org/wiki/Memoization)与纯管道类似，区别在于纯管道只保留上一次计算的结果，而记忆化可以存储多个结果。
+- **避免在生命周期钩子中触发重绘/回流**。某些[操作](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/)会让浏览器同步地重新计算页面布局或重新渲染页面。回流和重绘通常都很慢，所以应该避免在每个变更检测周期中执行它们。
 
-Pure pipes and memoization have different trade-offs. Pure pipes are an Angular built-in concept compared to memoization, which is a general software engineering practice for caching function results. The memory overhead of memoization could be significant if you invoke the heavy computation frequently with different arguments.
+纯管道和记忆化各有取舍。纯管道是 Angular 内置的概念，而记忆化是一种缓存函数结果的通用软件工程实践。如果你频繁地用不同参数调用繁重的计算，记忆化带来的内存开销可能会相当大。

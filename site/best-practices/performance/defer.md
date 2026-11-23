@@ -1,12 +1,8 @@
----
-untranslated: true
----
+# 使用 `@defer` 延迟加载 {#deferred-loading-with-defer}
 
-# Deferred loading with `@defer`
+可延迟视图（Deferrable Views），也就是 `@defer` 块，通过推迟加载那些对页面初始渲染并非绝对必要的代码，来减小应用的初始包体积。这通常能加快初始加载，并改善 Core Web Vitals（CWV），主要是最大内容绘制（LCP）和首字节时间（TTFB）。
 
-Deferrable views, also known as `@defer` blocks, reduce the initial bundle size of your application by deferring the loading of code that is not strictly necessary for the initial rendering of a page. This often results in a faster initial load and improvement in Core Web Vitals (CWV), primarily Largest Contentful Paint (LCP) and Time to First Byte (TTFB).
-
-To use this feature, you can declaratively wrap a section of your template in a @defer block:
+要使用这项功能，你可以用 @defer 块声明式地包裹模板中的一部分：
 
 ```html
 @defer {
@@ -14,32 +10,32 @@ To use this feature, you can declaratively wrap a section of your template in a 
 }
 ```
 
-The code for any components, directives, and pipes inside the `@defer` block is split into a separate JavaScript file and loaded only when necessary, after the rest of the template has been rendered.
+`@defer` 块中所有组件、指令和管道的代码都会被拆分到一个单独的 JavaScript 文件中，只在必要时、在模板其余部分渲染完成之后才加载。
 
-Deferrable views support a variety of triggers, prefetching options, and sub-blocks for placeholder, loading, and error state management.
+可延迟视图支持多种触发器（trigger）、预取选项，以及用于管理占位、加载中和错误状态的子块。
 
-## Which dependencies are deferred?
+## 哪些依赖会被延迟加载？ {#which-dependencies-are-deferred}
 
-Components, directives, pipes, and any component CSS styles can be deferred when loading an application.
+加载应用时，组件、指令、管道以及组件的 CSS 样式都可以被延迟加载。
 
-In order for the dependencies within a `@defer` block to be deferred, they need to meet two conditions:
+要让 `@defer` 块中的依赖被延迟加载，它们需要满足两个条件：
 
-1. **They must be standalone.** Non-standalone dependencies cannot be deferred and are still eagerly loaded, even if they are inside of `@defer` blocks.
-1. **They cannot be referenced outside of `@defer` blocks within the same file.** If they are referenced outside the `@defer` block or referenced within ViewChild queries, the dependencies will be eagerly loaded.
+1. **它们必须是独立的（standalone）。** 非独立的依赖无法被延迟加载，即使位于 `@defer` 块中，也仍然会被立即加载。
+1. **在同一个文件中，不能在 `@defer` 块之外引用它们。** 如果在 `@defer` 块之外引用了它们，或者在 ViewChild 查询中引用了它们，这些依赖就会被立即加载。
 
-The _transitive_ dependencies of the components, directives and pipes used in the `@defer` block do not strictly need to be standalone; transitive dependencies can still be declared in an `NgModule` and participate in deferred loading.
+`@defer` 块中使用的组件、指令和管道的*传递性*依赖不一定必须是独立的；传递性依赖仍然可以在 `NgModule` 中声明，并参与延迟加载。
 
-Angular's compiler produces a [dynamic import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) statement for each component, directive, and pipe used in the `@defer` block. The main content of the block renders after all the imports resolve. Angular does not guarantee any particular order for these imports.
+Angular 编译器会为 `@defer` 块中使用的每个组件、指令和管道生成一条[动态导入](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)语句。所有导入都解析完成后，块的主要内容才会渲染。Angular 不保证这些导入的顺序。
 
-## How to manage different stages of deferred loading
+## 如何管理延迟加载的不同阶段 {#how-to-manage-different-stages-of-deferred-loading}
 
-`@defer` blocks have several sub blocks to allow you to gracefully handle different stages in the deferred loading process.
+`@defer` 块有几个子块，让你可以优雅地处理延迟加载过程中的不同阶段。
 
-### `@defer`
+### `@defer` {#defer}
 
-This is the primary block that defines the section of content that is lazily loaded. It is not rendered initially– deferred content loads and renders once the specified [trigger](#controlling-deferred-content-loading-with-triggers) occurs or the `when` condition is met.
+这是主块，定义了要延迟加载的那部分内容。它一开始不会渲染：只有当指定的[触发器](#controlling-deferred-content-loading-with-triggers)发生，或者满足 `when` 条件时，延迟内容才会加载并渲染。
 
-By default, a `@defer` block is triggered when the browser state becomes [idle](/guide/templates/defer#idle).
+默认情况下，`@defer` 块会在浏览器变为[空闲](/guide/templates/defer#idle)状态时触发。
 
 ```html
 @defer {
@@ -47,11 +43,11 @@ By default, a `@defer` block is triggered when the browser state becomes [idle](
 }
 ```
 
-### Show placeholder content with `@placeholder`
+### 使用 `@placeholder` 显示占位内容 {#show-placeholder-content-with-placeholder}
 
-By default, defer blocks do not render any content before they are triggered.
+默认情况下，defer 块在被触发之前不会渲染任何内容。
 
-The `@placeholder` is an optional block that declares what content to show before the `@defer` block is triggered.
+`@placeholder` 是一个可选块，声明在 `@defer` 块被触发之前要显示什么内容。
 
 ```html
 @defer {
@@ -61,11 +57,11 @@ The `@placeholder` is an optional block that declares what content to show befor
 }
 ```
 
-While optional, certain triggers may require the presence of either a `@placeholder` or a [template reference variable](/guide/templates/variables#template-reference-variables) to function. See the [Triggers](#controlling-deferred-content-loading-with-triggers) section for more details.
+虽然是可选的，但某些触发器可能需要有 `@placeholder` 或[模板引用变量](/guide/templates/variables#template-reference-variables)才能工作。更多细节请参阅[触发器](#controlling-deferred-content-loading-with-triggers)一节。
 
-Angular replaces placeholder content with the main content once loading is complete. You can use any content in the placeholder section including plain HTML, components, directives, and pipes. Keep in mind the _dependencies of the placeholder block are eagerly loaded_.
+加载完成后，Angular 会用主要内容替换占位内容。占位部分可以使用任何内容，包括普通 HTML、组件、指令和管道。请记住，*占位块的依赖会被立即加载*。
 
-The `@placeholder` block accepts an optional parameter to specify the `minimum` amount of time that this placeholder should be shown after the placeholder content initially renders.
+`@placeholder` 块接受一个可选参数，用来指定占位内容首次渲染后至少要显示的时长 `minimum`。
 
 ```html
 @defer {
@@ -75,11 +71,11 @@ The `@placeholder` block accepts an optional parameter to specify the `minimum` 
 }
 ```
 
-This `minimum` parameter is specified in time increments of milliseconds (ms) or seconds (s). You can use this parameter to prevent fast flickering of placeholder content in the case that the deferred dependencies are fetched quickly.
+`minimum` 参数以毫秒（ms）或秒（s）为单位指定。如果延迟依赖获取得很快，可以用这个参数防止占位内容快速闪烁。
 
-### Show loading content with `@loading`
+### 使用 `@loading` 显示加载中内容 {#show-loading-content-with-loading}
 
-The `@loading` block is an optional block that allows you to declare content that is shown while deferred dependencies are loading. It replaces the `@placeholder` block once loading is triggered.
+`@loading` 块是一个可选块，让你声明在延迟依赖加载期间显示的内容。一旦触发加载，它就会替换 `@placeholder` 块。
 
 ```html
 @defer {
@@ -91,12 +87,12 @@ The `@loading` block is an optional block that allows you to declare content tha
 }
 ```
 
-Its dependencies are eagerly loaded (similar to `@placeholder`).
+它的依赖会被立即加载（与 `@placeholder` 类似）。
 
-The `@loading` block accepts two optional parameters to help prevent fast flickering of content that may occur when deferred dependencies are fetched quickly,:
+`@loading` 块接受两个可选参数，用于防止在延迟依赖获取得很快时出现内容快速闪烁：
 
-- `minimum` - the minimum amount of time that this placeholder should be shown
-- `after` - the amount of time to wait after loading begins before showing the loading template
+- `minimum`：这个占位内容至少要显示的时长
+- `after`：开始加载后，等待多长时间才显示加载中模板
 
 ```html
 @defer {
@@ -106,11 +102,11 @@ The `@loading` block accepts two optional parameters to help prevent fast flicke
 }
 ```
 
-Both parameters are specified in time increments of milliseconds (ms) or seconds (s). In addition, the timers for both parameters begin immediately after the loading has been triggered.
+这两个参数都以毫秒（ms）或秒（s）为单位指定。此外，两个参数的计时器都会在触发加载后立即开始。
 
-### Show error state when deferred loading fails with `@error`
+### 使用 `@error` 在延迟加载失败时显示错误状态 {#show-error-state-when-deferred-loading-fails-with-error}
 
-The `@error` block is an optional block that displays if deferred loading fails. Similar to `@placeholder` and `@loading`, the dependencies of the @error block are eagerly loaded.
+`@error` 块是一个可选块，在延迟加载失败时显示。与 `@placeholder` 和 `@loading` 类似，@error 块的依赖也会被立即加载。
 
 ```html
 @defer {
@@ -120,36 +116,36 @@ The `@error` block is an optional block that displays if deferred loading fails.
 }
 ```
 
-## Controlling deferred content loading with triggers
+## 使用触发器控制延迟内容的加载 {#controlling-deferred-content-loading-with-triggers}
 
-You can specify **triggers** that control when Angular loads and displays deferred content.
+你可以指定**触发器**来控制 Angular 何时加载并显示延迟内容。
 
-When a `@defer` block is triggered, it replaces placeholder content with lazily loaded content.
+当 `@defer` 块被触发时，它会用延迟加载的内容替换占位内容。
 
-Multiple event triggers can be defined by separating them with a semicolon, `;` and will be evaluated as OR conditions.
+可以用分号 `;` 分隔来定义多个事件触发器，它们会以「或」条件进行计算。
 
-There are two types of triggers: `on` and `when`.
+触发器有两种类型：`on` 和 `when`。
 
-### `on`
+### `on` {#on}
 
-`on` specifies a condition for when the `@defer` block is triggered.
+`on` 指定 `@defer` 块在什么条件下被触发。
 
-The available triggers are as follows:
+可用的触发器如下：
 
-| Trigger                       | Description                                                            |
+| 触发器 | 说明 |
 | ----------------------------- | ---------------------------------------------------------------------- |
-| [`idle`](#idle)               | Triggers when the browser is idle. Supports an optional timeout.       |
-| [`viewport`](#viewport)       | Triggers when specified content enters the viewport                    |
-| [`interaction`](#interaction) | Triggers when the user interacts with specified element                |
-| [`hover`](#hover)             | Triggers when the mouse hovers over specified area                     |
-| [`immediate`](#immediate)     | Triggers immediately after non-deferred content has finished rendering |
-| [`timer`](#timer)             | Triggers after a specific duration                                     |
+| [`idle`](#idle) | 浏览器空闲时触发。支持可选的超时时间。 |
+| [`viewport`](#viewport) | 指定内容进入视口时触发 |
+| [`interaction`](#interaction) | 用户与指定元素交互时触发 |
+| [`hover`](#hover) | 鼠标悬停在指定区域上时触发 |
+| [`immediate`](#immediate) | 非延迟内容渲染完成后立即触发 |
+| [`timer`](#timer) | 经过指定时长后触发 |
 
-#### `idle`
+#### `idle` {#idle}
 
-The `idle` trigger loads the deferred content once the browser has reached an idle state, based on requestIdleCallback. This is the default behavior with a defer block.
+`idle` 触发器基于 requestIdleCallback，在浏览器进入空闲状态后加载延迟内容。这是 defer 块的默认行为。
 
-You can optionally specify a timeout in milliseconds that is passed to [`requestIdleCallback`](https://developer.mozilla.org/docs/Web/API/Window/requestIdleCallback). If the browser doesn't schedule the callback soon enough, the work will run no later than the specified timeout.
+你可以选择指定一个以毫秒为单位的超时时间，它会被传给 [`requestIdleCallback`](https://developer.mozilla.org/docs/Web/API/Window/requestIdleCallback)。如果浏览器没有及时调度回调，这项工作最迟也会在指定的超时时间到达时运行。
 
 ```html
 <!-- @defer (on idle) -->
@@ -159,26 +155,26 @@ You can optionally specify a timeout in milliseconds that is passed to [`request
   <div>Large component placeholder</div>
 }
 
-<!-- With a 500ms timeout -->
+<!-- 带 500ms 超时 -->
 @defer (on idle(500)) {
   <large-cmp />
 }
 ```
 
-##### Customizing `idle` behavior
+##### 自定义 `idle` 行为 {#customizing-idle-behavior}
 
-You can customize the `idle` trigger by providing your own `IdleService` implementation and registering it with `provideIdleServiceWith` in your application's providers.
+你可以提供自己的 `IdleService` 实现，并在应用的提供者中通过 `provideIdleServiceWith` 注册它，从而自定义 `idle` 触发器。
 
 ```ts
 @Service()
 class CustomIdleService implements IdleService {
   requestOnIdle(callback: (deadline?: IdleDeadline) => void, options?: IdleRequestOptions): number {
-    // Custom idle scheduling logic can be implemented here.
+    // 可以在这里实现自定义的空闲调度逻辑。
     return requestIdleCallback(callback, options);
   }
 
   cancelOnIdle(id: number) {
-    // Implement custom idle cancellation here.
+    // 在这里实现自定义的空闲取消逻辑。
   }
 }
 
@@ -187,11 +183,11 @@ bootstrapApplication(App, {
 });
 ```
 
-#### `viewport`
+#### `viewport` {#viewport}
 
-The `viewport` trigger loads the deferred content when the specified content enters the viewport using the [Intersection Observer API](https://developer.mozilla.org/docs/Web/API/Intersection_Observer_API). Observed content may be `@placeholder` content or an explicit element reference.
+`viewport` 触发器使用 [Intersection Observer API](https://developer.mozilla.org/docs/Web/API/Intersection_Observer_API)，在指定内容进入视口时加载延迟内容。被观察的内容可以是 `@placeholder` 中的内容，也可以是一个显式的元素引用。
 
-By default, the `@defer` watches for the placeholder entering the viewport. Placeholders used this way must have a single root element.
+默认情况下，`@defer` 会观察占位内容是否进入视口。以这种方式使用的占位内容必须只有一个根元素。
 
 ```html
 @defer (on viewport) {
@@ -201,7 +197,7 @@ By default, the `@defer` watches for the placeholder entering the viewport. Plac
 }
 ```
 
-Alternatively, you can specify a [template reference variable](/guide/templates/variables) in the same template as the `@defer` block as the element that is watched to enter the viewport. This variable is passed in as a parameter on the viewport trigger.
+或者，你也可以在 `@defer` 块所在的同一个模板中，指定一个[模板引用变量](/guide/templates/variables)，作为要观察是否进入视口的元素。这个变量作为参数传给 viewport 触发器。
 
 ```html
 <div #greeting>Hello!</div>
@@ -210,19 +206,19 @@ Alternatively, you can specify a [template reference variable](/guide/templates/
 }
 ```
 
-If you want to customize the options of the `IntersectionObserver`, the `viewport` trigger supports passing in an object literal. The literal supports all properties from the second parameter of `IntersectionObserver`, except for `root`. When using the object literal notation, you have to pass your trigger using the `trigger` property.
+如果你想自定义 `IntersectionObserver` 的选项，`viewport` 触发器支持传入一个对象字面量。这个字面量支持 `IntersectionObserver` 第二个参数的所有属性，`root` 除外。使用对象字面量写法时，必须通过 `trigger` 属性传入触发元素。
 
 ```html
 <div #greeting>Hello!</div>
 
-<!-- With options and a trigger -->
+<!-- 带选项和触发元素 -->
 @defer (
   on viewport({trigger: greeting, rootMargin: '100px', scrollMargin: '50px', threshold: 0.5})
 ) {
   <greetings-cmp />
 }
 
-<!-- With options and an implied trigger -->
+<!-- 带选项，触发元素为隐式的占位内容 -->
 @defer (on viewport({rootMargin: '100px', scrollMargin: '50px', threshold: 0.5})) {
   <greetings-cmp />
 } @placeholder {
@@ -230,11 +226,11 @@ If you want to customize the options of the `IntersectionObserver`, the `viewpor
 }
 ```
 
-#### `interaction`
+#### `interaction` {#interaction}
 
-The `interaction` trigger loads the deferred content when the user interacts with the specified element through `click` or `keydown` events.
+`interaction` 触发器在用户通过 `click` 或 `keydown` 事件与指定元素交互时加载延迟内容。
 
-By default, the placeholder acts as the interaction element. Placeholders used this way must have a single root element.
+默认情况下，占位内容充当交互元素。以这种方式使用的占位内容必须只有一个根元素。
 
 ```html
 @defer (on interaction) {
@@ -244,7 +240,7 @@ By default, the placeholder acts as the interaction element. Placeholders used t
 }
 ```
 
-Alternatively, you can specify a [template reference variable](/guide/templates/variables) in the same template as the `@defer` block as the element that is watched for interactions. This variable is passed in as a parameter on the interaction trigger.
+或者，你也可以在 `@defer` 块所在的同一个模板中，指定一个[模板引用变量](/guide/templates/variables)，作为要监听交互的元素。这个变量作为参数传给 interaction 触发器。
 
 ```html
 <div #greeting>Hello!</div>
@@ -253,11 +249,11 @@ Alternatively, you can specify a [template reference variable](/guide/templates/
 }
 ```
 
-#### `hover`
+#### `hover` {#hover}
 
-The `hover` trigger loads the deferred content when the mouse has hovered over the triggered area through the `mouseover` and `focusin` events.
+`hover` 触发器在鼠标通过 `mouseover` 和 `focusin` 事件悬停到触发区域上时加载延迟内容。
 
-By default, the placeholder acts as the interaction element. Placeholders used this way must have a single root element.
+默认情况下，占位内容充当交互元素。以这种方式使用的占位内容必须只有一个根元素。
 
 ```html
 @defer (on hover) {
@@ -267,7 +263,7 @@ By default, the placeholder acts as the interaction element. Placeholders used t
 }
 ```
 
-Alternatively, you can specify a [template reference variable](/guide/templates/variables) in the same template as the `@defer` block as the element that is hovered over. This variable is passed in as a parameter on the hover trigger.
+或者，你也可以在 `@defer` 块所在的同一个模板中，指定一个[模板引用变量](/guide/templates/variables)，作为被悬停的元素。这个变量作为参数传给 hover 触发器。
 
 ```html
 <div #greeting>Hello!</div>
@@ -276,9 +272,9 @@ Alternatively, you can specify a [template reference variable](/guide/templates/
 }
 ```
 
-#### `immediate`
+#### `immediate` {#immediate}
 
-The `immediate` trigger loads the deferred content immediately. This means that the deferred block loads as soon as all other non-deferred content has finished rendering.
+`immediate` 触发器会立即加载延迟内容。也就是说，一旦所有其他非延迟内容渲染完成，延迟块就会开始加载。
 
 ```html
 @defer (on immediate) {
@@ -288,9 +284,9 @@ The `immediate` trigger loads the deferred content immediately. This means that 
 }
 ```
 
-#### `timer`
+#### `timer` {#timer}
 
-The `timer` trigger loads the deferred content after a specified duration.
+`timer` 触发器会在指定时长之后加载延迟内容。
 
 ```html
 @defer (on timer(500ms)) {
@@ -300,11 +296,11 @@ The `timer` trigger loads the deferred content after a specified duration.
 }
 ```
 
-The duration parameter must be specified in milliseconds (`ms`) or seconds (`s`).
+时长参数必须以毫秒（`ms`）或秒（`s`）为单位指定。
 
-### `when`
+### `when` {#when}
 
-The `when` trigger accepts a custom conditional expression and loads the deferred content when the condition becomes truthy.
+`when` 触发器接受一个自定义的条件表达式，并在条件变为真值时加载延迟内容。
 
 ```html
 @defer (when condition) {
@@ -314,17 +310,17 @@ The `when` trigger accepts a custom conditional expression and loads the deferre
 }
 ```
 
-This is a one-time operation– the `@defer` block does not revert back to the placeholder if the condition changes to a falsy value after becoming truthy.
+这是一次性操作：如果条件在变为真值之后又变回假值，`@defer` 块不会恢复为占位内容。
 
-## Prefetching data with `prefetch`
+## 使用 `prefetch` 预取数据 {#prefetching-data-with-prefetch}
 
-In addition to specifying a condition that determines when deferred content is shown, you can optionally specify a **prefetch trigger**. This trigger lets you load the JavaScript associated with the `@defer` block before the deferred content is shown.
+除了指定决定何时显示延迟内容的条件之外，你还可以选择指定一个**预取触发器**。这个触发器让你可以在显示延迟内容之前，就加载与 `@defer` 块相关的 JavaScript。
 
-Prefetching enables more advanced behaviors, such as letting you start to prefetch resources before a user has actually seen or interacted with a defer block, but might interact with it soon, making the resources available faster.
+预取可以实现更高级的行为，例如在用户还没有真正看到或与 defer 块交互、但很可能马上就会交互时，提前开始预取资源，让资源更快可用。
 
-You can specify a prefetch trigger similarly to the block's main trigger, but prefixed with the `prefetch` keyword. The block's main trigger and prefetch trigger are separated with a semi-colon character (`;`).
+你可以像指定块的主触发器一样指定预取触发器，只是要加上 `prefetch` 关键字作为前缀。块的主触发器和预取触发器之间用分号（`;`）分隔。
 
-In the example below, the prefetching starts when a browser becomes idle and the contents of the block is rendered only once the user interacts with the placeholder.
+在下面的示例中，预取会在浏览器空闲时开始，而块的内容只有在用户与占位内容交互后才会渲染。
 
 ```html
 @defer (on interaction; prefetch on idle) {
@@ -333,19 +329,19 @@ In the example below, the prefetching starts when a browser becomes idle and the
   <div>Large component placeholder</div>
 }
 
-<!-- Prefetching with a 500ms idle timeout -->
+<!-- 使用 500ms 空闲超时进行预取 -->
 @defer (on interaction; prefetch on idle(500)) {
   <large-cmp />
 }
 ```
 
-## Testing `@defer` blocks
+## 测试 `@defer` 块 {#testing-defer-blocks}
 
-Angular provides TestBed APIs to simplify the process of testing `@defer` blocks and triggering different states during testing. By default, `@defer` blocks in tests play through like a defer block would behave in a real application. If you want to manually step through states, you can switch the defer block behavior to `Manual` in the TestBed configuration.
+Angular 提供了一些 TestBed API，简化 `@defer` 块的测试，并让你在测试中触发不同的状态。默认情况下，测试中的 `@defer` 块会像在真实应用中一样依次经历各个状态。如果你想手动逐步切换状态，可以在 TestBed 配置中把 defer 块的行为切换为 `Manual`。
 
 ```ts
 it('should render a defer block in different states', async () => {
-  // configures the defer block behavior to start in "paused" state for manual control.
+  // 把 defer 块的行为配置为从「暂停」状态开始，以便手动控制。
   TestBed.configureTestingModule({deferBlockBehavior: DeferBlockBehavior.Manual});
   @Component({
     // ...
@@ -360,38 +356,38 @@ it('should render a defer block in different states', async () => {
     `,
   })
   class ExampleA {}
-  // Create component fixture.
+  // 创建组件测试夹具。
   const componentFixture = TestBed.createComponent(ExampleA);
-  // Retrieve the list of all defer block fixtures and get the first block.
+  // 获取所有 defer 块测试夹具的列表，并取第一个块。
   const deferBlockFixture = (await componentFixture.getDeferBlocks())[0];
-  // Renders placeholder state by default.
+  // 默认渲染占位状态。
   expect(componentFixture.nativeElement.innerHTML).toContain('Placeholder');
-  // Render loading state and verify rendered output.
+  // 渲染加载中状态并验证渲染结果。
   await deferBlockFixture.render(DeferBlockState.Loading);
   expect(componentFixture.nativeElement.innerHTML).toContain('Loading');
-  // Render final state and verify the output.
+  // 渲染最终状态并验证输出。
   await deferBlockFixture.render(DeferBlockState.Complete);
   expect(componentFixture.nativeElement.innerHTML).toContain('large works!');
 });
 ```
 
-## Does `@defer` work with `NgModule`?
+## `@defer` 能与 `NgModule` 一起使用吗？ {#does-defer-work-with-ngmodule}
 
-`@defer` blocks are compatible with both standalone and NgModule-based components, directives and pipes. However, **only standalone components, directives and pipes can be deferred**. NgModule-based dependencies are not deferred and are included in the eagerly loaded bundle.
+`@defer` 块同时兼容独立的以及基于 NgModule 的组件、指令和管道。但是，**只有独立的组件、指令和管道才能被延迟加载**。基于 NgModule 的依赖不会被延迟加载，而是会包含在立即加载的包中。
 
-## Compatibility between `@defer` blocks and Hot Module Reload (HMR)
+## `@defer` 块与热模块重载（HMR）的兼容性 {#compatibility-between-defer-blocks-and-hot-module-reload-hmr}
 
-When Hot Module Replacement (HMR) is active, all `@defer` block chunks are fetched eagerly, overriding any configured triggers. To restore the standard trigger behavior, you must disable HMR by serving your application with the `--no-hmr` flag.
+当热模块替换（HMR）处于启用状态时，所有 `@defer` 块的代码块都会被立即获取，覆盖所有已配置的触发器。要恢复标准的触发器行为，你必须用 `--no-hmr` 标志启动应用，禁用 HMR。
 
-## How does `@defer` work with server-side rendering (SSR) and static-site generation (SSG)?
+## `@defer` 如何与服务端渲染（SSR）和静态站点生成（SSG）配合工作？ {#how-does-defer-work-with-server-side-rendering-ssr-and-static-site-generation-ssg}
 
-By default, when rendering an application on the server (either using SSR or SSG), defer blocks always render their `@placeholder` (or nothing if a placeholder is not specified) and triggers are not invoked. On the client, the content of the `@placeholder` is hydrated and triggers are activated.
+默认情况下，在服务器上渲染应用时（无论使用 SSR 还是 SSG），defer 块总是渲染它的 `@placeholder`（如果没有指定占位内容，则什么也不渲染），并且不会调用触发器。在客户端，`@placeholder` 的内容会被水合（Hydration），触发器随之被激活。
 
-To render the main content of `@defer` blocks on the server (both SSR and SSG), you can enable [the Incremental Hydration feature](/guide/incremental-hydration) and configure `hydrate` triggers for the necessary blocks.
+要在服务器上渲染 `@defer` 块的主要内容（SSR 和 SSG 都适用），你可以启用[增量水合功能](/guide/incremental-hydration)，并为需要的块配置 `hydrate` 触发器。
 
-## Barrel files and lazy chunks
+## 桶文件与延迟加载的代码块 {#barrel-files-and-lazy-chunks}
 
-If you're using `@defer` but not seeing a separate lazy chunk in your build output, check how you're importing the deferred component. Importing through a barrel file (`index.ts`) is a common culprit — bundlers see the barrel as a single module and keep all its exports together, so your component ends up in the main bundle regardless of `@defer`.
+如果你使用了 `@defer`，但在构建输出中没有看到单独的延迟加载代码块，请检查你是如何导入被延迟的组件的。通过桶文件（`index.ts`）导入是一个常见的原因：打包工具会把桶文件视为单个模块，并把它的所有导出放在一起，因此不管有没有 `@defer`，你的组件最终都会进入主包。
 
 ```ts [index.ts]
 export {HeavyComponent} from './heavy.component';
@@ -400,7 +396,7 @@ export {OtherComponent} from './other.component';
 
 ```ts [parent.component.ts]
 import {Component} from '@angular/core';
-import {HeavyComponent} from './index'; // pulls in OtherComponent too
+import {HeavyComponent} from './index'; // 也会把 OtherComponent 一起引入
 
 @Component({
   imports: [HeavyComponent],
@@ -411,32 +407,32 @@ import {HeavyComponent} from './index'; // pulls in OtherComponent too
 export class ParentComponent {}
 ```
 
-The fix is straightforward — import directly from the component's own file:
+解决方法很简单：直接从组件自己的文件中导入：
 
 ```ts
 import {HeavyComponent} from './heavy.component';
 ```
 
-That's enough for the bundler to split it into its own chunk and load it lazily when the trigger fires.
+这样打包工具就能把它拆分到单独的代码块中，并在触发器触发时延迟加载它。
 
-## Best practices for deferring views
+## 延迟加载视图的最佳实践 {#best-practices-for-deferring-views}
 
-### Avoid cascading loads with nested `@defer` blocks
+### 避免嵌套 `@defer` 块引起级联加载 {#avoid-cascading-loads-with-nested-defer-blocks}
 
-When you have nested `@defer` blocks, they should have different triggers in order to avoid loading simultaneously, which causes cascading requests and may negatively impact page load performance.
+如果有嵌套的 `@defer` 块，它们应该使用不同的触发器，以免同时加载。同时加载会引起级联请求，可能对页面加载性能产生负面影响。
 
-### Avoid layout shifts
+### 避免布局偏移 {#avoid-layout-shifts}
 
-Avoid deferring components that are visible in the user’s viewport on initial load. Doing this may negatively affect Core Web Vitals by causing an increase in cumulative layout shift (CLS).
+避免延迟加载那些在初始加载时就出现在用户视口中的组件。这样做会增加累积布局偏移（CLS），从而可能对 Core Web Vitals 产生负面影响。
 
-In the event this is necessary, avoid `immediate`, `timer`, `viewport`, and custom `when` triggers that cause the content to load during the initial page render.
+如果确实需要这样做，请避免使用 `immediate`、`timer`、`viewport` 以及自定义的 `when` 触发器，因为它们会让内容在页面初始渲染期间加载。
 
-### Keep accessibility in mind
+### 关注无障碍 {#keep-accessibility-in-mind}
 
-When using `@defer` blocks, consider the impact on users with assistive technologies like screen readers.
-Screen readers that focus on a deferred section will initially read the placeholder or loading content, but may not announce changes when the deferred content loads.
+使用 `@defer` 块时，要考虑对使用屏幕阅读器等辅助技术的用户的影响。
+聚焦到延迟区域的屏幕阅读器一开始会读出占位内容或加载中内容，但在延迟内容加载完成时，可能不会播报变化。
 
-To ensure deferred content changes are announced to screen readers, you can wrap your `@defer` block in an element with a live region:
+为了确保延迟内容的变化能被屏幕阅读器播报，你可以用一个带有 live 区域的元素包裹 `@defer` 块：
 
 ```html
 <div aria-live="polite" aria-atomic="true">
@@ -452,4 +448,4 @@ To ensure deferred content changes are announced to screen readers, you can wrap
 </div>
 ```
 
-This ensures that changes are announced to the user when transitions (placeholder &rarr; loading &rarr; content/error) occur.
+这样可以确保在状态切换（占位 &rarr; 加载中 &rarr; 内容/错误）时，变化会被播报给用户。
