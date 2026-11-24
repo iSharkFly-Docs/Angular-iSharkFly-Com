@@ -1,37 +1,33 @@
----
-untranslated: true
----
+# 自定义 Service Worker 脚本 {#custom-service-worker-scripts}
 
-# Custom service worker scripts
+虽然 Angular Service Worker 提供了出色的能力，但你可能还需要添加一些自定义功能，例如处理推送通知（push notification）、后台同步或其他 Service Worker 事件。你可以创建一个自定义的 Service Worker 脚本，在其中导入并扩展 Angular Service Worker。
 
-While the Angular service worker provides excellent capabilities, you may need to add custom functionality such as handling push notifications, background sync, or other service worker events. You can create a custom service worker script that imports and extends the Angular service worker.
+## 创建自定义 Service Worker {#creating-a-custom-service-worker}
 
-## Creating a custom service worker
+要创建一个扩展 Angular 功能的自定义 Service Worker：
 
-To create a custom service worker that extends Angular's functionality:
-
-1. Create a custom service worker file (e.g., `custom-sw.js`) in your `src` directory:
+1. 在 `src` 目录中创建一个自定义 Service Worker 文件（例如 `custom-sw.js`）：
 
 ```js
-// Import the Angular service worker
+// 导入 Angular Service Worker
 importScripts('./ngsw-worker.js');
 
 (function () {
   'use strict';
 
-  // Add custom notification click handler
+  // 添加自定义的通知点击处理器
   self.addEventListener('notificationclick', (event) => {
     console.log('Custom notification click handler');
     console.log('Notification details:', event.notification);
 
-    // Handle notification click - open URL if provided
+    // 处理通知点击：如果提供了 URL，就打开它
     if (clients.openWindow && event.notification.data.url) {
       event.waitUntil(clients.openWindow(event.notification.data.url));
       console.log('Opening URL:', event.notification.data.url);
     }
   });
 
-  // Add custom background sync handler
+  // 添加自定义的后台同步处理器
   self.addEventListener('sync', (event) => {
     console.log('Custom background sync handler');
 
@@ -41,7 +37,7 @@ importScripts('./ngsw-worker.js');
   });
 
   function doBackgroundSync() {
-    // Implement your background sync logic here
+    // 在这里实现你的后台同步逻辑
     return fetch('https://example.com/api/sync')
       .then((response) => response.json())
       .then((data) => console.log('Background sync completed:', data))
@@ -50,7 +46,7 @@ importScripts('./ngsw-worker.js');
 })();
 ```
 
-2. Update your `angular.json` file to use the custom service worker:
+2. 更新 `angular.json` 文件，以使用自定义的 Service Worker：
 
 ```json
 {
@@ -74,7 +70,7 @@ importScripts('./ngsw-worker.js');
 }
 ```
 
-3. Configure the service worker registration to use your custom script:
+3. 配置 Service Worker 的注册，以使用你的自定义脚本：
 
 ```ts
 import {ApplicationConfig, isDevMode} from '@angular/core';
@@ -90,20 +86,20 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-### Best practices for custom service workers
+### 自定义 Service Worker 的最佳实践 {#best-practices-for-custom-service-workers}
 
-When extending the Angular service worker:
+扩展 Angular Service Worker 时：
 
-- **Always import the Angular service worker first** using `importScripts('./ngsw-worker.js')` to ensure you get all the caching and update functionality
-- **Wrap your custom code in an IIFE** (Immediately Invoked Function Expression) to avoid polluting the global scope
-- **Use `event.waitUntil()`** for asynchronous operations to ensure they complete before the service worker is terminated
-- **Test thoroughly** in both development and production environments
-- **Handle errors gracefully** to prevent your custom code from breaking the Angular service worker functionality
+- **始终先导入 Angular Service Worker**：使用 `importScripts('./ngsw-worker.js')`，以确保获得所有缓存（cache）和更新功能
+- **将自定义代码包裹在 IIFE 中**（立即调用函数表达式，Immediately Invoked Function Expression），以避免污染全局作用域
+- **对异步操作使用 `event.waitUntil()`**，以确保它们在 Service Worker 终止之前完成
+- 在开发环境和生产环境中都要 **进行充分测试**
+- **妥善处理错误**，防止自定义代码破坏 Angular Service Worker 的功能
 
-### Common use cases
+### 常见用例 {#common-use-cases}
 
-Custom service workers are commonly used for:
+自定义 Service Worker 通常用于：
 
-- **Push notifications**: Handle incoming push messages and display notifications
-- **Background sync**: Sync data when the network connection is restored
-- **Custom navigation**: Handle special routing or offline page scenarios
+- **推送通知**：处理传入的推送消息并显示通知
+- **后台同步**：在网络连接恢复时同步数据
+- **自定义导航**：处理特殊的路由或离线页面场景

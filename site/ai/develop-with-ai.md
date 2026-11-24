@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 大语言模型提示词与 AI IDE 设置 {#llm-prompts-and-ai-ide-setup}
 
-# LLM prompts and AI IDE setup
+使用大语言模型（LLM）生成代码，是开发者日益关注的领域。虽然大语言模型通常能够生成可运行的代码，但要为 Angular 这样持续演进的框架生成代码，仍然颇具挑战。
 
-Generating code with large language models (LLMs) is a rapidly growing area of interest for developers. While LLMs are often capable of generating working code it can be a challenge to generate code for consistently evolving frameworks like Angular.
+高级指令和提示词（Prompt）编写正在成为一种新兴标准，用于在现代代码生成中补充领域特定的细节。本节收集整理了相关内容和资源，帮助大语言模型更准确地生成 Angular 代码。
 
-Advanced instructions and prompting are an emerging standard for supporting modern code generation with domain specific details. This section contains curated content and resources to support more accurate code generation for Angular and LLMs.
+## 自定义提示词和系统指令 {#custom-prompts-and-system-instructions}
 
-## Custom Prompts and System Instructions
+使用下列任一自定义的领域特定文件，可以改善用大语言模型生成代码的体验。
 
-Improve your experience generating code with LLMs by using one of the following custom, domain specific files.
-
-::: info NOTE
-These files will be updated on a regular basis staying up to date with Angular's conventions.
+::: info 注意
+这些文件会定期更新，与 Angular 的约定保持同步。
 
 :::
 
-Here is a set of instructions to help LLMs generate correct code that follows Angular best practices. This file can be included as system instructions to your AI tooling or included along with your prompt as context.
+下面是一组帮助大语言模型生成正确、并遵循 Angular 最佳实践的代码的指令。你可以把这个文件作为 AI 工具的系统指令，也可以把它作为上下文随提示词一起提供。
 
 ```md [best-practices.md]
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
@@ -80,32 +76,32 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the `inject()` function instead of constructor injection
 ```
 
-<a download href="https://angular.dev/assets/context/best-practices.md" target="_blank">Click here to download the best-practices.md file.</a>
+<a download href="https://angular.dev/assets/context/best-practices.md" target="_blank">点击这里下载 best-practices.md 文件。</a>
 
-## Rules Files
+## 规则文件 {#rules-files}
 
-Several tools, such as <a href="https://antigravity.google?utm_source=adev&utm_medium=website&utm_campaign=BUILD_WITH_AI_ANGULAR&utm_term=angular_devrel&utm_content=build_with_ai_angular_antigravity" target="_blank">Antigravity</a> have rules files useful for providing critical context to LLMs.
+一些工具（例如 <a href="https://antigravity.google?utm_source=adev&utm_medium=website&utm_campaign=BUILD_WITH_AI_ANGULAR&utm_term=angular_devrel&utm_content=build_with_ai_angular_antigravity" target="_blank">Antigravity</a>）提供规则文件，可用于向大语言模型提供关键上下文。
 
-| Environment/IDE      | Rules File                                                                                                             | Installation Instructions                                                                                                                                       |
+| 环境/IDE      | 规则文件                                                                                                             | 安装说明                                                                                                                                       |
 | :------------------- | :--------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Antigravity          | <a download href="https://angular.dev/assets/context/GEMINI.md" target="_blank">GEMINI.md</a>                                             | <a href="https://antigravity.google/docs/rules-workflows" target="_blank">Configure `GEMINI.md`</a>                                                             |
-| Copilot powered IDEs | <a download="copilot-instructions.md" href="https://angular.dev/assets/context/guidelines.md" target="_blank">copilot-instructions.md</a> | <a href="https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-instructions" target="_blank">Configure `.github/copilot-instructions.md`</a> |
-| Cursor               | <a download href="https://angular.dev/assets/context/angular-20.mdc" target="_blank">cursor.md</a>                                        | <a href="https://docs.cursor.com/context/rules" target="_blank">Configure `cursorrules.md`</a>                                                                  |
-| JetBrains IDEs       | <a download href="https://angular.dev/assets/context/AGENTS.md" target="_blank">AGENTS.md</a>                                             | <a href="https://junie.jetbrains.com/docs/guidelines-and-memory.html#how-junie-cli-discovers-guidelines" target="_blank">Configure `AGENTS.md`</a>              |
-| VS Code              | <a download=".instructions.md" href="https://angular.dev/assets/context/guidelines.md" target="_blank">.instructions.md</a>               | <a href="https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-instructions" target="_blank">Configure `.instructions.md`</a>                |
-| Windsurf             | <a download href="https://angular.dev/assets/context/guidelines.md" target="_blank">guidelines.md</a>                                     | <a href="https://docs.windsurf.com/windsurf/cascade/memories#rules" target="_blank">Configure `guidelines.md`</a>                                               |
+| Antigravity          | <a download href="https://angular.dev/assets/context/GEMINI.md" target="_blank">GEMINI.md</a>                                             | <a href="https://antigravity.google/docs/rules-workflows" target="_blank">配置 `GEMINI.md`</a>                                                             |
+| 基于 Copilot 的 IDE | <a download="copilot-instructions.md" href="https://angular.dev/assets/context/guidelines.md" target="_blank">copilot-instructions.md</a> | <a href="https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-instructions" target="_blank">配置 `.github/copilot-instructions.md`</a> |
+| Cursor               | <a download href="https://angular.dev/assets/context/angular-20.mdc" target="_blank">cursor.md</a>                                        | <a href="https://docs.cursor.com/context/rules" target="_blank">配置 `cursorrules.md`</a>                                                                  |
+| JetBrains IDE       | <a download href="https://angular.dev/assets/context/AGENTS.md" target="_blank">AGENTS.md</a>                                             | <a href="https://junie.jetbrains.com/docs/guidelines-and-memory.html#how-junie-cli-discovers-guidelines" target="_blank">配置 `AGENTS.md`</a>              |
+| VS Code              | <a download=".instructions.md" href="https://angular.dev/assets/context/guidelines.md" target="_blank">.instructions.md</a>               | <a href="https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-instructions" target="_blank">配置 `.instructions.md`</a>                |
+| Windsurf             | <a download href="https://angular.dev/assets/context/guidelines.md" target="_blank">guidelines.md</a>                                     | <a href="https://docs.windsurf.com/windsurf/cascade/memories#rules" target="_blank">配置 `guidelines.md`</a>                                               |
 
-## Angular CLI MCP Server setup
+## 设置 Angular CLI MCP 服务器 {#angular-cli-mcp-server-setup}
 
-The Angular CLI includes an experimental [Model Context Protocol (MCP) server](https://modelcontextprotocol.io/) that allows AI assistants in your development environment to interact with the Angular CLI.
+Angular CLI 内置了一个实验性的 [Model Context Protocol（MCP）服务器](https://modelcontextprotocol.io/)，让开发环境中的 AI 助手能够与 Angular CLI 交互。
 
-[**Learn how to set up the Angular CLI MCP Server**](/ai/mcp)
+[**了解如何设置 Angular CLI MCP 服务器**](/ai/mcp)
 
-## Providing Context with `llms.txt`
+## 使用 `llms.txt` 提供上下文 {#providing-context-with-llms-txt}
 
-`llms.txt` is a proposed standard for websites designed to help LLMs better understand and process their content. The Angular team has developed two versions of this file to help LLMs and tools that use LLMs for code generation to create better modern Angular code.
+`llms.txt` 是一项面向网站的提议标准，旨在帮助大语言模型更好地理解和处理网站内容。Angular 团队开发了这个文件的两个版本，帮助大语言模型以及基于大语言模型的代码生成工具生成更好的现代 Angular 代码。
 
-- <a href="https://angular.dev/llms.txt" target="_blank">llms.txt</a> - an index file providing links to key files and resources.
-- <a href="https://angular.dev/assets/context/llms-full.txt" target="_blank">llms-full.txt</a> - a more robust compiled set of resources describing how Angular works and how to build Angular applications.
+- <a href="https://angular.dev/llms.txt" target="_blank">llms.txt</a> - 索引文件，提供指向关键文件和资源的链接。
+- <a href="https://angular.dev/assets/context/llms-full.txt" target="_blank">llms-full.txt</a> - 内容更完整的资源合集，介绍 Angular 的工作原理以及如何构建 Angular 应用。
 
-Be sure to check out the [overview page](/ai) for more information on how to integrate AI into your Angular applications.
+另外，请务必查看 [概览页面](/ai)，了解如何将 AI 集成到你的 Angular 应用中的更多信息。

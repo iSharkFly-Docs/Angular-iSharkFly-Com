@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# RxJS 与 Angular 信号的互操作 {#rxjs-interop-with-angular-signals}
 
-# RxJS interop with Angular signals
+`@angular/core/rxjs-interop` 包提供了一些 API，帮助你把 RxJS 与 Angular 信号（Signal）集成在一起。
 
-The `@angular/core/rxjs-interop` package offers APIs that help you integrate RxJS and Angular signals.
+## 使用 `toSignal` 从 RxJS 可观察对象创建信号 {#create-a-signal-from-an-rxjs-observable-with-tosignal}
 
-## Create a signal from an RxJS Observable with `toSignal`
-
-Use the `toSignal` function to create a signal which tracks the value of an Observable. It behaves similarly to the `async` pipe in templates, but is more flexible and can be used anywhere in an application.
+使用 `toSignal` 函数创建一个跟踪可观察对象（Observable）值的信号。它的行为与模板中的 `async` 管道类似，但更加灵活，可以在应用中的任何地方使用。
 
 ```ts
 import {Component} from '@angular/core';
@@ -22,51 +18,51 @@ import {toSignal} from '@angular/core/rxjs-interop';
 export class Ticker {
   counterObservable = interval(1000);
 
-  // Get a `Signal` representing the `counterObservable`'s value.
+  // 获取一个表示 `counterObservable` 值的 `Signal`。
   counter = toSignal(this.counterObservable, {initialValue: 0});
 }
 ```
 
-Like the `async` pipe, `toSignal` subscribes to the Observable immediately, which may trigger side effects. The subscription created by `toSignal` automatically unsubscribes from the given Observable when the component or service which calls `toSignal` is destroyed.
+与 `async` 管道一样，`toSignal` 会立即订阅可观察对象，这可能会触发副作用。当调用 `toSignal` 的组件或服务被销毁时，`toSignal` 创建的订阅会自动取消对该可观察对象的订阅。
 
-::: warning IMPORTANT
-`toSignal` creates a subscription. You should avoid calling it repeatedly for the same Observable, and instead reuse the signal it returns.
+::: warning 重要
+`toSignal` 会创建一个订阅。你应该避免对同一个可观察对象重复调用它，而是复用它返回的信号。
 
 :::
 
-### Injection context
+### 注入上下文 {#injection-context}
 
-`toSignal` by default needs to run in an [injection context](/guide/di/dependency-injection-context), such as during construction of a component or service. If an injection context is not available, you can manually specify the `Injector` to use instead.
+默认情况下，`toSignal` 需要在 [注入上下文](/guide/di/dependency-injection-context) 中运行，例如在组件或服务的构造期间。如果没有可用的注入上下文，你可以手动指定要使用的 `Injector`。
 
-### Initial values
+### 初始值 {#initial-values}
 
-Observables may not produce a value synchronously on subscription, but signals always require a current value. There are several ways to deal with this "initial" value of `toSignal` signals.
+可观察对象在订阅时不一定会同步产生值，但信号始终需要一个当前值。处理 `toSignal` 信号的这个「初始」值有以下几种方式。
 
-#### The `initialValue` option
+#### `initialValue` 选项 {#the-initialvalue-option}
 
-As in the example above, you can specify an `initialValue` option with the value the signal should return before the Observable emits for the first time.
+如上面的示例所示，你可以指定 `initialValue` 选项，作为可观察对象首次发出值之前信号要返回的值。
 
-#### `undefined` initial values
+#### `undefined` 初始值 {#undefined-initial-values}
 
-If you don't provide an `initialValue`, the resulting signal will return `undefined` until the Observable emits. This is similar to the `async` pipe's behavior of returning `null`.
+如果你没有提供 `initialValue`，那么在可观察对象发出值之前，生成的信号将返回 `undefined`。这与 `async` 管道返回 `null` 的行为类似。
 
-#### The `requireSync` option
+#### `requireSync` 选项 {#the-requiresync-option}
 
-Some Observables are guaranteed to emit synchronously, such as `BehaviorSubject`. In those cases, you can specify the `requireSync: true` option.
+有些可观察对象保证会同步发出值，例如 `BehaviorSubject`。在这种情况下，你可以指定 `requireSync: true` 选项。
 
-When `requireSync` is `true`, `toSignal` enforces that the Observable emits synchronously on subscription. This guarantees that the signal always has a value, and no `undefined` type or initial value is required.
+当 `requireSync` 为 `true` 时，`toSignal` 会强制要求可观察对象在订阅时同步发出值。这保证了信号始终有值，因而不需要 `undefined` 类型或初始值。
 
-### `manualCleanup`
+### `manualCleanup` {#manualcleanup}
 
-By default, `toSignal` automatically unsubscribes from the Observable when the component or service that creates it is destroyed.
+默认情况下，当创建 `toSignal` 的组件或服务被销毁时，它会自动取消对可观察对象的订阅。
 
-To override this behavior, you can pass the `manualCleanup` option. You can use this setting for Observables that complete themselves naturally.
+要覆盖这一行为，你可以传入 `manualCleanup` 选项。对于那些会自然完成的可观察对象，可以使用这个设置。
 
-#### Custom equality comparison
+#### 自定义相等性比较 {#custom-equality-comparison}
 
-Some observables may emit values that are **equals** even though they differ by reference or minor detail. The `equal` option lets you define a **custom equal function** to determine when two consecutive values should be considered the same.
+有些可观察对象发出的值可能是 **相等** 的，即使它们的引用或某些细节不同。`equal` 选项允许你定义一个 **自定义相等函数**，用来判断两个连续的值何时应被视为相同。
 
-When two emitted values are considered equal, the resulting signal **does not update**. This prevents redundant computations, DOM updates, or effects from re-running unnecessarily.
+当两个发出的值被视为相等时，生成的信号 **不会更新**。这可以避免冗余的计算、DOM 更新或副作用的不必要重新运行。
 
 ```ts
 import {Component} from '@angular/core';
@@ -76,10 +72,10 @@ import {interval, map} from 'rxjs';
 @Component(/* ... */)
 export class EqualExample {
   temperature$ = interval(1000).pipe(
-    map(() => ({temperature: Math.floor(Math.random() * 3) + 20})), // 20, 21, or 22 randomly
+    map(() => ({temperature: Math.floor(Math.random() * 3) + 20})), // 随机生成 20、21 或 22
   );
 
-  // Only update if the temperature changes
+  // 仅在温度变化时更新
   temperature = toSignal(this.temperature$, {
     initialValue: {temperature: 20},
     equal: (prev, curr) => prev.temperature === curr.temperature,
@@ -87,15 +83,15 @@ export class EqualExample {
 }
 ```
 
-### Error and Completion
+### 错误与完成 {#error-and-completion}
 
-If an Observable used in `toSignal` produces an error, that error is thrown when the signal is read.
+如果 `toSignal` 中使用的可观察对象产生了错误，那么读取该信号时会抛出这个错误。
 
-If an Observable used in `toSignal` completes, the signal continues to return the most recently emitted value before completion.
+如果 `toSignal` 中使用的可观察对象完成了，信号会继续返回完成之前最近发出的值。
 
-## Create an RxJS Observable from a signal with `toObservable`
+## 使用 `toObservable` 从信号创建 RxJS 可观察对象 {#create-an-rxjs-observable-from-a-signal-with-toobservable}
 
-Use the `toObservable` utility to create an `Observable` which tracks the value of a signal. The signal's value is monitored with an `effect` which emits the value to the Observable when it changes.
+使用 `toObservable` 工具函数创建一个跟踪信号值的 `Observable`。信号的值由一个 `effect` 监视，当值发生变化时，它会把该值发送给可观察对象。
 
 ```ts
 import {Component, signal, Signal, inject} from '@angular/core';
@@ -111,17 +107,17 @@ export class SearchResults {
 }
 ```
 
-As the `query` signal changes, the `query$` Observable emits the latest query and triggers a new HTTP request.
+当 `query` 信号发生变化时，`query$` 可观察对象会发出最新的查询，并触发一个新的 HTTP 请求。
 
-### Injection context {#injection-context-to-observable}
+### 注入上下文 {#injection-context-to-observable}
 
-`toObservable` by default needs to run in an [injection context](/guide/di/dependency-injection-context), such as during construction of a component or service. If an injection context is not available, you can manually specify the `Injector` to use instead.
+默认情况下，`toObservable` 需要在 [注入上下文](/guide/di/dependency-injection-context) 中运行，例如在组件或服务的构造期间。如果没有可用的注入上下文，你可以手动指定要使用的 `Injector`。
 
-### Timing of `toObservable`
+### `toObservable` 的时机 {#timing-of-toobservable}
 
-`toObservable` uses an effect to track the value of the signal in a `ReplaySubject`. On subscription, the first value (if available) may be emitted synchronously, and all subsequent values will be asynchronous.
+`toObservable` 使用一个副作用（Effect）在 `ReplaySubject` 中跟踪信号的值。订阅时，第一个值（如果有）可能会同步发出，之后的所有值都将是异步的。
 
-Unlike Observables, signals never provide a synchronous notification of changes. Even if you update a signal's value multiple times, `toObservable` will only emit the value after the signal stabilizes.
+与可观察对象不同，信号从不提供同步的变更通知。即使你多次更新信号的值，`toObservable` 也只会在信号稳定之后才发出值。
 
 ```ts
 const obs$ = toObservable(mySignal);
@@ -132,11 +128,11 @@ mySignal.set(2);
 mySignal.set(3);
 ```
 
-Here, only the last value (3) will be logged.
+在这里，只有最后一个值（3）会被打印出来。
 
-## Using `rxResource` for async data
+## 使用 `rxResource` 处理异步数据 {#using-rxresource-for-async-data}
 
-Angular's [`resource` function](/guide/signals/resource) gives you a way to incorporate async data into your application's signal-based code. Building on top of this pattern, `rxResource` lets you define a resource where the source of your data is defined in terms of an RxJS `Observable`. Instead of accepting a `loader` function, `rxResource` accepts a `stream` function that returns an RxJS `Observable`.
+Angular 的 [`resource` 函数](/guide/signals/resource) 为你提供了一种将异步数据整合到应用中基于信号的代码里的方式。在这种模式的基础上，`rxResource` 让你可以定义一种资源（Resource），其数据源以 RxJS `Observable` 的形式定义。`rxResource` 不接受 `loader` 函数，而是接受一个返回 RxJS `Observable` 的 `stream` 函数。
 
 ```ts
 import {Component, inject, input} from '@angular/core';
@@ -144,7 +140,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component(/* ... */)
 export class UserProfile {
-  // This component relies on a service that exposes data through an RxJS Observable.
+  // 这个组件依赖一个通过 RxJS Observable 暴露数据的服务。
   private userData = inject(MyUserDataClient);
 
   protected userId = input<string>();
@@ -152,15 +148,15 @@ export class UserProfile {
   private userResource = rxResource({
     params: () => ({userId: this.userId()}),
 
-    // The `stream` property expects a factory function that returns
-    // a data stream as an RxJS Observable.
+    // `stream` 属性需要一个工厂函数，该函数返回
+    // 一个以 RxJS Observable 表示的数据流。
     stream: ({params}) => this.userData.load(params.userId),
   });
 }
 ```
 
-The `stream` property accepts a factory function for an RxJS `Observable`. This factory function is passed the resource's `params` value and returns an `Observable`. The resource calls this factory function every time the `params` computation produces a new value. See [Resource loaders](/guide/signals/resource#resource-loaders) for more details on the parameters passed to the factory function.
+`stream` 属性接受一个用于创建 RxJS `Observable` 的工厂函数。该工厂函数会接收资源的 `params` 值，并返回一个 `Observable`。每当 `params` 计算产生新值时，资源都会调用这个工厂函数。关于传给工厂函数的参数的更多细节，请参阅 [资源加载器](/guide/signals/resource#resource-loaders)。
 
-In all other ways, `rxResource` behaves like and provides the same APIs as `resource` for specifying parameters, reading values, checking loading state, and examining errors.
+在其他所有方面，`rxResource` 的行为都与 `resource` 相同，并提供相同的 API，用于指定参数、读取值、检查加载状态和查看错误。
 
-The `Observable` returned from `stream` must always emit a value or an error before it completes; see [`NG0991`](/errors/NG0991) for what happens otherwise and how to avoid it.
+从 `stream` 返回的 `Observable` 在完成之前必须始终发出一个值或一个错误；否则会发生什么以及如何避免，请参阅 [`NG0991`](/errors/NG0991)。

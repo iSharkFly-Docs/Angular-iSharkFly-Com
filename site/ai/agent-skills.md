@@ -1,27 +1,23 @@
----
-untranslated: true
----
+# 智能体技能 {#agent-skills}
 
-# Agent Skills
+智能体技能（Agent Skills）是为 Gemini CLI 等 AI 智能体（Agent）设计的、面向特定领域的专业指令和能力。这些技能可以提供架构指导、生成符合 Angular 惯用写法的代码，并帮助你按照现代最佳实践搭建新项目。
 
-Agent Skills are specialized, domain-specific instructions and capabilities designed for AI agents like Gemini CLI. These skills provide architectural guidance, generate idiomatic Angular code, and help scaffold new projects using modern best practices.
+借助智能体技能，你可以确保与你协作的 AI 智能体掌握有关 Angular 约定、响应式模型（例如信号（Signal））和项目结构的最新信息。
 
-By using Agent Skills, you can ensure that the AI agent you are working with has the most up-to-date information about Angular's conventions, reactivity models (like Signals), and project structure.
+## 可用的技能 {#available-skills}
 
-## Available Skills
+Angular 团队维护着一组官方技能（Skill），并会定期更新，与框架的最新改进保持同步。
 
-The Angular team maintains a collection of official skills that are regularly updated to stay in sync with the latest framework improvements.
-
-| Skill                   | Description                                                                                                                                                                                                                                                                                       |
+| 技能                   | 说明                                                                                                                                                                                                                                                                                       |
 | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`angular-developer`** | Generates Angular code and provides architectural guidance. Useful for creating components, services, or obtaining best practices on reactivity (signals, linkedSignal, resource), forms, dependency injection, routing, SSR, accessibility (ARIA), animations, styling, testing, or CLI tooling. |
-| **`angular-new-app`**   | Creates a new Angular app using the Angular CLI. Provides important guidelines for effectively setting up and structuring a modern Angular application.                                                                                                                                           |
+| **`angular-developer`** | 生成 Angular 代码并提供架构指导。适用于创建组件、服务，或获取以下方面的最佳实践：响应式（signals、linkedSignal、resource）、表单、依赖注入、路由、SSR、无障碍（ARIA）、动画、样式、测试以及 CLI 工具。 |
+| **`angular-new-app`**   | 使用 Angular CLI 创建新的 Angular 应用。提供有效搭建和组织现代 Angular 应用的重要指南。                                                                                                                                           |
 
-## Using Agent Skills
+## 使用智能体技能 {#using-agent-skills}
 
-Agent Skills are designed to be used with agentic coding tools like [Gemini CLI](https://geminicli.com/docs/cli/skills/), [Antigravity](https://antigravity.google/docs/skills) and more. Activating a skill loads the specific instructions and resources needed for that task.
+智能体技能专为 [Gemini CLI](https://geminicli.com/docs/cli/skills/)、[Antigravity](https://antigravity.google/docs/skills) 等智能体式编程工具而设计。激活某个技能时，会加载完成该任务所需的特定指令和资源。
 
-To use these skills in your own environment you may follow the instructions for your specific tool or use a community tool like [skills.sh](https://skills.sh/).
+要在自己的环境中使用这些技能，你可以按照所用工具的说明操作，也可以使用 [skills.sh](https://skills.sh/) 这样的社区工具。
 
 ```bash
 npx skills add https://github.com/angular/skills

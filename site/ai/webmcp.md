@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# WebMCP {#webmcp}
 
-# WebMCP
+WebMCP 是一项 [提议中的 Web 标准](https://github.com/webmachinelearning/webmcp/)，它允许 Web 应用直接向浏览器中原生运行的 AI 智能体（Agent）公开结构化的工具（Tool）。由应用定义的工具让 AI 助手可以直接与应用交互，既为智能体提供了额外的能力，也减少了对 DOM 交互的依赖。
 
-WebMCP is a [proposed web standard](https://github.com/webmachinelearning/webmcp/) that allows web applications to expose structured tools directly to AI agents running natively in the browser. Tools defined by an application allow AI assistants to interact with it directly, providing additional capabilities to the agent and reducing the need for DOM interactions.
+例如，一个用于注册新用户的应用可以提供一个 WebMCP 工具，让浏览器的 AI 智能体直接创建用户，而不必通过 DOM 交互走完一套复杂的向导式 UI。
 
-For example, an application to register a new user might provide a WebMCP tool for a browser's AI agent to create the user directly rather than requiring the agent to go through a complex wizard UI via DOM interactions.
+Angular 为 WebMCP 提供了实验性支持，让你可以轻松注册与应用依赖注入（Dependency Injection）生命周期绑定的工具，并自动把信号表单（Signal Forms）转换成可供 AI 使用的工具。
 
-Angular provides experimental support for WebMCP, allowing you to easily register tools tied to your application's dependency injection lifecycle and automatically turn your Signal Forms into AI-ready tools.
-
-::: warning IMPORTANT
-The WebMCP spec is very early in its lifecycle and is undergoing frequent changes. As such, WebMCP support in Angular is currently [**experimental**](/reference/releases#experimental). APIs are subject to change even outside of major versions.
+::: warning 重要
+WebMCP 规范还处于非常早期的阶段，变化频繁。因此，Angular 对 WebMCP 的支持目前处于 [**实验阶段**](/reference/releases#experimental)。即使不是主版本更新，API 也可能发生变化。
 
 :::
 
-## Provide tools for the application
+## 为应用提供工具 {#provide-tools-for-the-application}
 
-Use [`provideExperimentalWebMcpTools`](https://angular.dev/api/core/provideExperimentalWebMcpTools) in your application config to register tools for the entire lifecycle of the application. Tools provided this way are automatically registered when the application initializes and unregistered when the application is destroyed.
+在应用配置中使用 [`provideExperimentalWebMcpTools`](https://angular.dev/api/core/provideExperimentalWebMcpTools)，可以注册在应用整个生命周期内有效的工具。以这种方式提供的工具会在应用初始化时自动注册，并在应用销毁时自动注销。
 
-The `execute` callback is invoked in the injection context of the associated `Injector`, meaning you can [`inject`](https://angular.dev/api/core/inject) services directly.
+`execute` 回调会在所关联 `Injector` 的注入上下文中调用，这意味着你可以直接 [`inject`](https://angular.dev/api/core/inject) 服务。
 
 ```ts [main.ts]
 import {Service, inject, provideExperimentalWebMcpTools} from '@angular/core';
@@ -50,9 +46,9 @@ bootstrapApplication(AppRoot, {
 });
 ```
 
-### Define tool parameters
+### 定义工具参数 {#define-tool-parameters}
 
-When a tool requires input from the AI assistant, define the expected arguments inside `inputSchema` using [JSON Schema](https://json-schema.org/) syntax. Angular automatically infers the parameter types passed into your `execute` callback based on the schema definition.
+当某个工具需要 AI 助手提供输入时，请使用 [JSON Schema](https://json-schema.org/) 语法在 `inputSchema` 中定义预期的参数。Angular 会根据 schema 定义，自动推断传入 `execute` 回调的参数类型。
 
 ```ts [main.ts]
 import {provideExperimentalWebMcpTools} from '@angular/core';
@@ -95,10 +91,10 @@ bootstrapApplication(AppRoot, {
           additionalProperties: false,
         },
         execute: ({query, maxResults}) => {
-          // Type of `query` is inferred as `string`.
-          // Type of `maxResults` is inferred as `number | undefined`.
+          // `query` 的类型被推断为 `string`。
+          // `maxResults` 的类型被推断为 `number | undefined`。
 
-          // Consider validating this at runtime, since inputs may not be validated to match the schema.
+          // 建议在运行时验证这些值，因为输入不一定会按照 schema 进行验证。
           if (typeof query !== 'string') throw new Error(`Bad query: ${query}`);
           if (typeof maxResults !== 'number' && maxResults !== undefined)
             throw new Error(`Bad maxResults: ${maxResults}`);
@@ -116,14 +112,14 @@ bootstrapApplication(AppRoot, {
 });
 ```
 
-::: tip TIP
-Use `required: ['param1', 'param2', ...]` to remove `undefined` from the types of those parameters and use `additionalProperties: false` to restrict the argument object's type to only these parameters.
+::: tip 提示
+使用 `required: ['param1', 'param2', ...]` 可以从这些参数的类型中去掉 `undefined`；使用 `additionalProperties: false` 可以把参数对象的类型限制为只包含这些参数。
 
 :::
 
-## Provide tools for a route
+## 为路由提供工具 {#provide-tools-for-a-route}
 
-When building complex applications, you may only want certain tools available when the user is viewing specific routes. You can achieve this by providing tools directly in route definitions.
+在构建复杂应用时，你可能希望某些工具只在用户浏览特定路由时才可用。为此，你可以直接在路由定义中提供工具。
 
 ```ts [routes.ts]
 import {provideExperimentalWebMcpTools} from '@angular/core';
@@ -148,8 +144,8 @@ export const routes: Routes = [
 ];
 ```
 
-::: info NOTE
-When registering tools to a particular route, consider configuring the router to use [`withAutoCleanupInjectors`](https://angular.dev/api/router/withAutoCleanupInjectors) to ensure tools are automatically _unregistered_ when the user navigates away from the route. Without this option, WebMCP tools declared on routes will remain accessible to AI agents even after the user has navigated to a different route.
+::: info 注意
+把工具注册到特定路由时，建议把路由器配置为使用 [`withAutoCleanupInjectors`](https://angular.dev/api/router/withAutoCleanupInjectors)，以确保用户离开该路由时工具会被自动 _注销_。如果不使用这个选项，即使用户已经导航到其他路由，在路由上声明的 WebMCP 工具仍会继续对 AI 智能体可用。
 
 :::
 
@@ -163,9 +159,9 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-## Provide tools within services
+## 在服务中提供工具 {#provide-tools-within-services}
 
-For dynamic use cases, the [`declareExperimentalWebMcpTool`](https://angular.dev/api/core/declareExperimentalWebMcpTool) function registers a tool directly within an injection context and automatically unregisters it when that context is destroyed.
+对于动态的使用场景，[`declareExperimentalWebMcpTool`](https://angular.dev/api/core/declareExperimentalWebMcpTool) 函数会直接在某个注入上下文中注册工具，并在该上下文销毁时自动注销它。
 
 ```ts [counter.ts]
 import {Service, declareExperimentalWebMcpTool, signal, inject} from '@angular/core';
@@ -186,15 +182,15 @@ export class Counter {
 }
 ```
 
-While `declareExperimentalWebMcpTool` works in any injection context, watch out for [name collisions](#name-collisions) and prefer using it in root services.
+虽然 `declareExperimentalWebMcpTool` 可以在任何注入上下文中使用，但要注意 [名称冲突](#name-collisions)，并优先在根服务中使用它。
 
-## Implicit tools in Signal Forms
+## 信号表单中的隐式工具 {#implicit-tools-in-signal-forms}
 
-You can create a WebMCP tool implicitly from an existing Angular [Signal Form](/essentials/signal-forms) with minimal configuration. Angular converts your form models into rich WebMCP tools, effectively supporting highly dynamic forms without requiring you to manually write JSON schemas or event handlers.
+只需极少的配置，你就可以从现有的 Angular [信号表单](/essentials/signal-forms) 隐式创建 WebMCP 工具。Angular 会把你的表单模型转换成功能丰富的 WebMCP 工具，从而有效支持高度动态的表单，而无需你手动编写 JSON schema 或事件处理器。
 
-### Enable the WebMCP forms feature
+### 启用 WebMCP 表单特性 {#enable-the-webmcp-forms-feature}
 
-First, add [`provideExperimentalWebMcpForms`](https://angular.dev/api/forms/signals/provideExperimentalWebMcpForms) to your root application providers:
+首先，把 [`provideExperimentalWebMcpForms`](https://angular.dev/api/forms/signals/provideExperimentalWebMcpForms) 添加到根应用的提供者中：
 
 ```ts [main.ts]
 import {bootstrapApplication} from '@angular/platform-browser';
@@ -206,9 +202,9 @@ bootstrapApplication(AppRoot, {
 });
 ```
 
-### Opt in a Signal Form
+### 让信号表单选择启用 {#opt-in-a-signal-form}
 
-Second, when defining a Signal Form using [`form`](https://angular.dev/api/forms/signals/form), pass the `experimentalWebMcpTool` configuration option to opt-in to an implicit WebMCP tool. Angular will inspect your form's data model and automatically generate a JSON schema for connected AI agents.
+其次，在使用 [`form`](https://angular.dev/api/forms/signals/form) 定义信号表单时，传入 `experimentalWebMcpTool` 配置选项，即可选择启用隐式 WebMCP 工具。Angular 会检查表单的数据模型，并自动为已连接的 AI 智能体生成 JSON schema。
 
 ```ts [user-registration.ts]
 import {Component, signal} from '@angular/core';
@@ -233,7 +229,7 @@ export class UserRegistration {
       required(f.lastName, {message: 'Last name is mandatory.'});
     },
     {
-      // Implicitly registers a WebMCP tool named `registerUser` with parameters derived from `model`.
+      // 隐式注册一个名为 `registerUser` 的 WebMCP 工具，其参数派生自 `model`。
       experimentalWebMcpTool: {
         name: 'registerUser',
         description: 'Registers a new user.',
@@ -249,44 +245,44 @@ export class UserRegistration {
 }
 ```
 
-In this example, Angular generates a WebMCP tool with a JSON schema which:
+在这个示例中，Angular 会生成一个 WebMCP 工具，其 JSON schema：
 
-1. includes `firstName`, `lastName`, `age`, and `hobbies` as parameters inferred from the initial value of the `model` signal.
-2. defines `firstName` and `lastName` as _required_ fields as inferred from the [`required`](https://angular.dev/api/forms/signals/required) validator.
-3. defines `hobbies` as an array of strings, allowing the agent to provide an arbitrary amount of hobbies.
+1. 包含 `firstName`、`lastName`、`age` 和 `hobbies` 这几个参数，它们是根据 `model` 信号的初始值推断出来的。
+2. 根据 [`required`](https://angular.dev/api/forms/signals/required) 验证器，将 `firstName` 和 `lastName` 定义为 _必填_ 字段。
+3. 将 `hobbies` 定义为字符串数组，允许智能体提供任意数量的爱好。
 
-Beyond inferring the input schema, Angular also connects the WebMCP tool to the form's validation logic and submission handler. This means the agent will observe any validation errors triggered by its inputs or any failures which happen during submission, allowing it to self-correct and potentially retry.
+除了推断输入 schema 之外，Angular 还会把 WebMCP 工具与表单的验证逻辑和提交处理器连接起来。这意味着智能体能够观察到由其输入触发的任何验证错误，以及提交过程中发生的任何失败，从而进行自我纠正，并可能重试。
 
-::: info NOTE
-By default, async validators don't block submission: the submission action runs before they finish, so their errors aren't reported to the agent. Handle these checks in the submission action instead.
+::: info 注意
+默认情况下，异步验证器不会阻止提交：提交操作会在它们完成之前运行，因此它们的错误不会报告给智能体。请改为在提交操作中处理这些检查。
 
 :::
 
-#### Constraints
+#### 约束 {#constraints}
 
-Angular infers the WebMCP schema from the initial value of your form model. This requires:
+Angular 根据表单模型的初始值推断 WebMCP schema。这要求：
 
-- Concrete initial values (`''`, `0`, `false`): Angular cannot infer data types from `null` or `undefined`.
-- Non-empty arrays (`['Hello!']`): Angular cannot infer data types from an empty array and requires at least one initial value.
+- 具体的初始值（`''`、`0`、`false`）：Angular 无法从 `null` 或 `undefined` 推断数据类型。
+- 非空数组（`['Hello!']`）：Angular 无法从空数组推断数据类型，至少需要一个初始值。
 
-## Best practices
+## 最佳实践 {#best-practices}
 
-Keep the following best practices in mind:
+请牢记以下最佳实践：
 
-### Name collisions
+### 名称冲突 {#name-collisions}
 
-WebMCP requires each tool to have a unique name and will throw an error if the same tool name is registered multiple times. This means calling `declareExperimentalWebMcpTool` or `provideExperimentalWebMcpTools` in a context where they might be registered multiple times (such as a component constructor) may lead to errors at runtime.
+WebMCP 要求每个工具都有唯一的名称，如果同一个工具名称被多次注册，就会抛出错误。这意味着，在可能被多次注册的上下文中（例如组件构造函数中）调用 `declareExperimentalWebMcpTool` 或 `provideExperimentalWebMcpTools`，可能会在运行时导致错误。
 
-Prefer placing tools on application providers, route providers, or root services where possible. When putting tools on a component, including [implicit tools in Signal Forms](#implicit-tools-in-signal-forms), ensure that component is only ever rendered on the page at most _once_ at any given time.
+尽可能把工具放在应用提供者、路由提供者或根服务中。如果要把工具放在组件上（包括 [信号表单中的隐式工具](#implicit-tools-in-signal-forms)），请确保该组件在任意时刻最多只在页面上渲染 _一次_。
 
-### Validate tool inputs
+### 验证工具输入 {#validate-tool-inputs}
 
-Angular does not provide any implicit validation that the inputs provided by an agent actually match the defined JSON schema. Consider explicitly validating arguments to the `execute` function before using them to ensure reliability.
+Angular 不会对智能体提供的输入是否真正符合所定义的 JSON schema 进行任何隐式验证。为确保可靠性，建议在使用 `execute` 函数的参数之前对其进行显式验证。
 
-### Define explicit output schemas
+### 定义显式的输出 schema {#define-explicit-output-schemas}
 
-To make tool execution as predictable as possible for the AI agent, explicitly define an `outputSchema` and ensure your `execute` function returns an object that strictly matches it. Angular does not automatically validate that the returned content matches the defined `outputSchema`. Ensure your data matches the `outputSchema` or consider validating it at runtime to avoid confusing the agent with inconsistent information.
+为了让 AI 智能体执行工具的结果尽可能可预测，请显式定义 `outputSchema`，并确保 `execute` 函数返回的对象严格符合它。Angular 不会自动验证返回的内容是否符合所定义的 `outputSchema`。请确保你的数据符合 `outputSchema`，或者考虑在运行时进行验证，以免向智能体提供不一致的信息而造成混淆。
 
-### Testing
+### 测试 {#testing}
 
-Consider using a mock WebMCP implementation like [`@mcp-b/webmcp-polyfill`](https://www.npmjs.com/package/@mcp-b/webmcp-polyfill) to effectively unit test your tools.
+建议使用 [`@mcp-b/webmcp-polyfill`](https://www.npmjs.com/package/@mcp-b/webmcp-polyfill) 这类模拟的 WebMCP 实现，来有效地对你的工具进行单元测试。
