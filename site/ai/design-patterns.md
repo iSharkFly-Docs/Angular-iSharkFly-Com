@@ -1,93 +1,89 @@
----
-untranslated: true
----
+# AI SDK 与信号 API 的设计模式 {#design-patterns-for-ai-sdks-and-signal-apis}
 
-# Design patterns for AI SDKs and signal APIs
+与 AI 和大语言模型（LLM）API 交互会带来一些独特的挑战，例如管理异步操作、处理流式数据，以及在网络请求可能缓慢或不可靠的情况下设计响应迅速的用户体验。Angular 的 [信号（Signal）](/guide/signals) 和 [`resource`](/guide/signals/resource) API 提供了强大的工具，可以优雅地解决这些问题。
 
-Interacting with AI and Large Language Model (LLM) APIs introduces unique challenges, such as managing asynchronous operations, handling streaming data, and designing a responsive user experience for potentially slow or unreliable network requests. Angular [signals](/guide/signals) and the [`resource`](/guide/signals/resource) API provide powerful tools to solve these problems elegantly.
+## 使用信号触发请求 {#triggering-requests-with-signals}
 
-## Triggering requests with signals
+处理用户提供的提示词（Prompt）时，一种常见的模式是把用户的实时输入与触发 API 调用的已提交值分开。
 
-A common pattern when working with user-provided prompts is to separate the user's live input from the submitted value that triggers the API call.
+1. 在用户输入时，把原始输入存放在一个信号中
+2. 当用户提交时（例如点击按钮），用第一个信号的内容更新第二个信号。
+3. 在 `resource` 的 **`params`** 字段中使用第二个信号。
 
-1. Store the user's raw input in one signal as they type
-2. When the user submits (e.g., by clicking a button), update a second signal with contents of the first signal.
-3. Use the second signal in the **`params`** field of your `resource`.
+这种设置可以确保资源（Resource）的 **`loader`** 函数只在用户明确提交提示词时才会运行，而不是每次按键都运行。你可以在 `loader` 字段中使用其他信号参数，例如 `sessionId` 或 `userId`（可用于创建持久的大语言模型会话）。这样，请求始终使用这些参数的当前值，而不会重新触发 `loader` 字段中定义的异步函数。
 
-This setup ensures the resource's **`loader`** function only runs when the user explicitly submits their prompt, not on every keystroke. You can use additional signal parameters, like a `sessionId` or `userId` (which can be useful for creating persistent LLM sessions), in the `loader` field. This way, the request always uses these parameters' current values without re-triggering the asynchronous function defined in the `loader` field.
+许多 AI SDK 都提供了用于发起 API 调用的辅助方法。例如，Genkit 客户端库公开了用于调用 Genkit 流程的 `runFlow` 方法，你可以在资源的 `loader` 中调用它。对于其他 API，你可以使用 [`httpResource`](/guide/signals/resource#reactive-data-fetching-with-httpresource)。
 
-Many AI SDKs provide helper methods for making API calls. For example, the Genkit client library exposes a `runFlow` method for calling Genkit flows, which you can call from a resource's `loader`. For other APIs, you can use the [`httpResource`](/guide/signals/resource#reactive-data-fetching-with-httpresource).
-
-The following example shows a `resource` that fetches parts of an AI-generated story. The `loader` is triggered only when the `storyInput` signal changes.
+下面的示例展示了一个获取 AI 生成故事片段的 `resource`。只有当 `storyInput` 信号变化时，才会触发 `loader`。
 
 ```ts
-// A resource that fetches three parts of an AI generated story
+// 一个获取 AI 生成故事三个片段的资源
 storyResource = resource({
-  // The default value to use before the first request or on error
+  // 首次请求之前或出错时使用的默认值
   defaultValue: DEFAULT_STORY,
-  // The loader is re-triggered when this signal changes
+  // 当这个信号变化时，会重新触发 loader
   params: () => this.storyInput(),
-  // The async function to fetch data
+  // 用于获取数据的异步函数
   loader: ({params}): Promise<StoryData> => {
-    // The params value is the current value of the storyInput signal
+    // params 的值就是 storyInput 信号的当前值
     const url = this.endpoint();
     return runFlow({
       url,
       input: {
         userInput: params,
-        sessionId: this.storyService.sessionId(), // Read from another signal
+        sessionId: this.storyService.sessionId(), // 从另一个信号读取
       },
     });
   },
 });
 ```
 
-## Preparing LLM data for templates
+## 为模板准备大语言模型数据 {#preparing-llm-data-for-templates}
 
-You can configure LLM APIs to return structured data. Strongly typing your `resource` to match the expected output from the LLM provides better type safety and editor autocompletion.
+你可以把大语言模型 API 配置为返回结构化数据。为 `resource` 设置与大语言模型预期输出相匹配的强类型，可以获得更好的类型安全性和编辑器自动补全。
 
-To manage state derived from a resource, use a `computed` signal or `linkedSignal`. Because `linkedSignal` [provides access to prior values](/guide/signals/linked-signal), it can serve a variety of AI-related use cases, including
+要管理从资源派生的状态，请使用 `computed` 信号或 `linkedSignal`。由于 `linkedSignal` [可以访问先前的值](/guide/signals/linked-signal)，它可以满足多种与 AI 相关的用例，包括
 
-- building a chat history
-- preserving or customizing data that templates display while LLMs generate content
+- 构建聊天历史
+- 在大语言模型生成内容期间，保留或自定义模板所显示的数据
 
-In the example below, `storyParts` is a `linkedSignal` that appends the latest story parts returned from `storyResource` to the existing array of story parts.
+在下面的示例中，`storyParts` 是一个 `linkedSignal`，它会把 `storyResource` 返回的最新故事片段追加到现有的故事片段数组中。
 
 ```ts
 storyParts = linkedSignal<string[], string[]>({
-  // The source signal that triggers the computation
+  // 触发计算的源信号
   source: () => this.storyResource.value().storyParts,
-  // The computation function
+  // 计算函数
   computation: (newStoryParts, previous) => {
-    // Get the previous value of this linkedSignal, or an empty array
+    // 获取这个 linkedSignal 的先前值，或者一个空数组
     const existingStoryParts = previous?.value || [];
-    // Return a new array with the old and new parts
+    // 返回一个包含旧片段和新片段的新数组
     return [...existingStoryParts, ...newStoryParts];
   },
 });
 ```
 
-## Performance and user experience
+## 性能与用户体验 {#performance-and-user-experience}
 
-LLM APIs may be slower and more error-prone than conventional, more deterministic APIs. You can use several Angular features to build a performant and user-friendly interface.
+与传统的、确定性更强的 API 相比，大语言模型 API 可能更慢、更容易出错。你可以借助 Angular 的多项特性构建高性能且用户友好的界面。
 
-- **Scoped Loading:** place the `resource` in the component that directly uses the data. This helps limit change detection cycles (especially in zoneless applications) and prevents blocking other parts of your application. If data needs to be shared across multiple components, provide the `resource` from a service.
-- **SSR and Hydration:** use Server-Side Rendering (SSR) with incremental hydration to render the initial page content quickly. You can show a placeholder for the AI-generated content and defer fetching the data until the component hydrates on the client.
-- **Loading State:** use the `resource` `LOADING` [status](/guide/signals/resource#resource-status) to show an indicator, like a spinner, while the request is in flight. This status covers both initial loads and reloads.
-- **Error Handling and Retries:** use the `resource` [**`reload()`**](/guide/signals/resource#reloading) method as a simple way for users to retry failed requests, may be more prevalent when relying on AI generated content.
+- **限定加载范围：** 把 `resource` 放在直接使用该数据的组件中。这有助于减少变更检测周期（尤其是在 zoneless 应用中），并避免阻塞应用的其他部分。如果数据需要在多个组件之间共享，请通过服务提供 `resource`。
+- **SSR 与水合：** 使用服务端渲染（SSR）配合增量水合（Hydration），快速渲染初始页面内容。你可以为 AI 生成的内容显示占位符，并把数据获取推迟到组件在客户端完成水合之后。
+- **加载状态：** 使用 `resource` 的 `LOADING` [状态](/guide/signals/resource#resource-status)，在请求进行期间显示加载指示器（例如旋转图标）。这一状态同时涵盖初次加载和重新加载。
+- **错误处理与重试：** 使用 `resource` 的 [**`reload()`**](/guide/signals/resource#reloading) 方法，以简单的方式让用户重试失败的请求；在依赖 AI 生成内容时，请求失败可能更为常见。
 
-The following example demonstrates how to create a responsive UI to dynamically display an AI generated image with loading and retry functionality.
+下面的示例演示了如何创建一个响应式 UI，动态显示 AI 生成的图片，并提供加载和重试功能。
 
 ```html
-<!-- Display a loading spinner while the LLM generates the image -->
+<!-- 在大语言模型生成图片期间显示加载旋转图标 -->
 @if (imgResource.isLoading()) {
   <div class="img-placeholder">
     <mat-spinner [diameter]="50" />
   </div>
-  <!-- Dynamically populates the src attribute with the generated image URL -->
+  <!-- 用生成的图片 URL 动态填充 src 属性 -->
 } @else if (imgResource.hasValue()) {
   <img [src]="imgResource.value()" />
-  <!-- Provides a retry option if the request fails  -->
+  <!-- 请求失败时提供重试选项 -->
 } @else {
   <div class="img-placeholder" (click)="imgResource.reload()">
     <mat-icon fontIcon="refresh" />
@@ -96,16 +92,16 @@ The following example demonstrates how to create a responsive UI to dynamically 
 }
 ```
 
-## AI patterns in action: streaming chat responses
+## AI 模式实战：流式聊天响应 {#ai-patterns-in-action-streaming-chat-responses}
 
-Interfaces often display partial results from LLM-based APIs incrementally as response data arrives. Angular's resource API provides the ability to stream responses to support this type of pattern. The `stream` property of `resource` accepts an asynchronous function you can use to apply updates to a signal value over time. The signal being updated represents the data being streamed.
+界面通常会在响应数据到达时，逐步显示基于大语言模型的 API 返回的部分结果。Angular 的资源 API 提供了流式响应的能力，以支持这类模式。`resource` 的 `stream` 属性接受一个异步函数，你可以用它随时间推移不断更新某个信号的值。被更新的信号代表正在流式传输的数据。
 
 ```ts
 characters = resource({
   stream: async () => {
     const data = signal<ResourceStreamItem<string>>({value: ''});
-    // Calls a Genkit streaming flow using the streamFlow method
-    // exposed by the Genkit client SDK
+    // 使用 Genkit 客户端 SDK 公开的 streamFlow 方法
+    // 调用一个 Genkit 流式流程
     const response = streamFlow({
       url: '/streamCharacters',
       input: 10,
@@ -128,7 +124,7 @@ characters = resource({
 });
 ```
 
-The `characters` member is updated asynchronously and can be displayed in the template.
+`characters` 成员会被异步更新，并可以在模板中显示。
 
 ```html
 @if (characters.isLoading()) {
@@ -140,7 +136,7 @@ The `characters` member is updated asynchronously and can be displayed in the te
 }
 ```
 
-On the server side, in `server.ts` for example, the defined endpoint sends the data to be streamed to the client. The following code uses Gemini with the Genkit framework but this technique is applicable to other APIs that support streaming responses from LLMs:
+在服务端（例如在 `server.ts` 中），所定义的端点会把需要流式传输的数据发送给客户端。下面的代码使用 Gemini 和 Genkit 框架，但这一技术同样适用于其他支持大语言模型流式响应的 API：
 
 ```ts
 import {startFlowServer} from '@genkit-ai/express';

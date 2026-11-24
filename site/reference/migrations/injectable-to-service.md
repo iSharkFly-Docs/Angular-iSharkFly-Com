@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 从 `@Injectable` 迁移到 `@Service` {#migration-from-injectable-to-service}
 
-# Migration from `@Injectable` to `@Service`
+此原理图（Schematic）会把符合条件的 `@Injectable` 类转换为使用 [`@Service`](https://angular.dev/api/core/Service) 装饰器，它是 `@Injectable({providedIn: 'root'})` 的一种更便捷的简写形式。
+该原理图从 v22.1 开始可用，并且只会迁移那些被认为可以安全迁移的类。
 
-This schematic converts eligible `@Injectable` classes to the [`@Service`](https://angular.dev/api/core/Service) decorator, an ergonomic shorthand for `@Injectable({providedIn: 'root'})`.
-It is available as of v22.1, and only migrates classes that are considered safe to migrate.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```bash
 ng generate @angular/core:service
 ```
 
-A class declared with `providedIn: 'root'` becomes a `@Service` with no options.
+使用 `providedIn: 'root'` 声明的类会变成不带任何选项的 `@Service`。
 
-#### Before
+#### 迁移前 {#before}
 
 ```ts
 import {Injectable} from '@angular/core';
@@ -24,7 +20,7 @@ import {Injectable} from '@angular/core';
 export class MyService {}
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```ts
 import {Service} from '@angular/core';
@@ -33,10 +29,10 @@ import {Service} from '@angular/core';
 export class MyService {}
 ```
 
-A class declared without options is not provided automatically, so the migration keeps that behavior with `autoProvided: false`.
-You remain responsible for adding it to a `providers` array, as before.
+不带选项声明的类不会被自动提供，因此迁移会通过 `autoProvided: false` 保留这一行为。
+和以前一样，你仍需负责把它添加到某个 `providers` 数组中。
 
-#### Before {#no-options-before}
+#### 迁移前 {#no-options-before}
 
 ```ts
 import {Injectable} from '@angular/core';
@@ -45,7 +41,7 @@ import {Injectable} from '@angular/core';
 export class MyService {}
 ```
 
-#### After {#no-options-after}
+#### 迁移后 {#no-options-after}
 
 ```ts
 import {Service} from '@angular/core';
@@ -54,30 +50,30 @@ import {Service} from '@angular/core';
 export class MyService {}
 ```
 
-For more details, see [Opting out of automatic provisioning](/guide/di/creating-and-using-services#opting-out-of-automatic-provisioning).
+更多详情，请参阅 [选择不自动提供](/guide/di/creating-and-using-services#opting-out-of-automatic-provisioning)。
 
-## Configuration options
+## 配置选项 {#configuration-options}
 
-### `--path`
+### `--path` {#path}
 
-By default, the migration updates your whole Angular CLI workspace, including test files.
-You can limit the migration to a specific sub-directory using this option.
+默认情况下，此迁移（migration）会更新整个 Angular CLI 工作区（workspace），包括测试文件。
+你可以使用此选项把迁移限制在某个特定的子目录中。
 
 ```bash
 ng generate @angular/core:service --path src/app/sub-component
 ```
 
-## Limitations
+## 局限性 {#limitations}
 
-To avoid introducing breakages into your app, the schematic skips a class when:
+为了避免给应用带来破坏，原理图会在以下情况下跳过某个类：
 
-- The class, or the closest ancestor in your own source that defines a constructor, injects dependencies through its constructor.
-- The `@Injectable` decorator receives any option other than `providedIn`.
-- The `providedIn` option is set to anything other than `'root'`.
+- 该类，或者你自己源码中定义了构造函数的最近祖先类，通过构造函数注入依赖。
+- `@Injectable` 装饰器接收了 `providedIn` 以外的任何选项。
+- `providedIn` 选项被设置为 `'root'` 以外的任何值。
 
-When every `@Injectable` in a file migrates, the migration removes the `Injectable` import.
-A file with both migrated and skipped classes keeps both imports.
+当一个文件中的所有 `@Injectable` 都被迁移后，迁移会移除 `Injectable` 导入。
+如果一个文件中既有已迁移的类，也有被跳过的类，则会同时保留两个导入。
 
-If the migration reports that it did not find any files to migrate, it did not change any file.
-Either it found no `@Injectable` class it could convert, or the code is already migrated.
-Constructor injection is the most common reason for a skip, and you can run the [migration to the `inject` function](/reference/migrations/inject-function) first, then run this one again.
+如果迁移报告没有找到任何需要迁移的文件，说明它没有修改任何文件。
+这要么是因为它没有找到可以转换的 `@Injectable` 类，要么是因为代码已经迁移过了。
+构造函数注入是被跳过的最常见原因，你可以先运行 [迁移到 `inject` 函数](/reference/migrations/inject-function)，然后再次运行此迁移。

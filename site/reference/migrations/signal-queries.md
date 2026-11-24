@@ -1,34 +1,30 @@
----
-untranslated: true
----
+# 迁移到信号查询 {#migration-to-signal-queries}
 
-# Migration to signal queries
+Angular 引入了改进的查询（query）API，并从 v19 开始
+认为它们已可用于生产环境。
+请在 [专门的指南](/guide/components/queries) 中进一步了解信号（Signal）查询及其优势。
 
-Angular introduced improved APIs for queries that are considered
-production ready as of v19.
-Read more about signal queries and their benefits in the [dedicated guide](/guide/components/queries).
+为了支持想要使用信号查询的现有团队，Angular 团队
+提供了一个自动化迁移（migration），可以把现有的装饰器查询字段转换为新的 API。
 
-To support existing teams that would like to use signal queries, the Angular team
-provides an automated migration that converts existing decorator query fields to the new API.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图（Schematic）：
 
 ```bash
 ng generate @angular/core:signal-queries-migration
 ```
 
-Alternatively, the migration is available as a [code refactor action](https://code.visualstudio.com/docs/typescript/typescript-refactoring#_refactoring) in VSCode.
-Install the latest version of the VSCode extension and click onto e.g. a `@ViewChild` field.
-See more details in the section [below](#vscode-extension).
+此外，该迁移也可以作为 VSCode 中的 [代码重构操作](https://code.visualstudio.com/docs/typescript/typescript-refactoring#_refactoring) 使用。
+安装最新版本的 VSCode 扩展，然后点击诸如 `@ViewChild` 之类的字段即可。
+更多详情请参阅 [下文](#vscode-extension) 的相应章节。
 
-## What does the migration change?
+## 此迁移会改变什么？ {#what-does-the-migration-change}
 
-1. `@ViewChild()`, `@ViewChildren`, `@ContentChild` and `@ContentChildren` class members
-   are updated to their signal equivalents.
-2. References in your application to migrated queries are updated to call the signal.
-   - This includes references in templates, host bindings or TypeScript code.
+1. `@ViewChild()`、`@ViewChildren`、`@ContentChild` 和 `@ContentChildren` 类成员
+   会被更新为对应的信号形式。
+2. 应用中对已迁移查询的引用会被更新为调用该信号。
+   - 这包括模板、宿主绑定或 TypeScript 代码中的引用。
 
-**Before**
+**迁移前**
 
 ```ts
 import {Component, ContentChild, ElementRef} from '@angular/core';
@@ -47,7 +43,7 @@ export class MyComponent {
 }
 ```
 
-**After**
+**迁移后**
 
 ```ts
 import {Component, contentChild, ElementRef} from '@angular/core';
@@ -67,27 +63,27 @@ export class MyComponent {
 }
 ```
 
-## Configuration options
+## 配置选项 {#configuration-options}
 
-The migration supports a few options for fine tuning the migration to your specific needs.
+此迁移支持一些选项，可以根据你的具体需求进行微调。
 
-### `--path`
+### `--path` {#path}
 
-By default, the migration will update your whole Angular CLI workspace.
-You can limit the migration to a specific sub-directory using this option.
+默认情况下，此迁移会更新整个 Angular CLI 工作区（workspace）。
+你可以使用此选项把迁移限制在某个特定的子目录中。
 
-### `--best-effort-mode`
+### `--best-effort-mode` {#best-effort-mode}
 
-By default, the migration skips queries that cannot be safely migrated.
-The migration tries to refactor code as safely as possible.
+默认情况下，迁移会跳过无法安全迁移的查询。
+迁移会尽可能安全地重构代码。
 
-When the `--best-effort-mode` flag is enabled, the migration eagerly
-tries to migrate as much as possible, even if it could break your build.
+启用 `--best-effort-mode` 标志后，迁移会积极地
+尝试迁移尽可能多的代码，即使这可能会破坏你的构建。
 
-### `--insert-todos`
+### `--insert-todos` {#insert-todos}
 
-When enabled, the migration will add TODOs to queries that couldn't be migrated.
-The TODOs will include reasoning on why queries were skipped. E.g.
+启用后，迁移会为无法迁移的查询添加 TODO。
+这些 TODO 会说明查询被跳过的原因。例如：
 
 ```ts
 // TODO: Skipped for migration because:
@@ -95,25 +91,25 @@ The TODOs will include reasoning on why queries were skipped. E.g.
 @ViewChild('ref') ref?: ElementRef;
 ```
 
-### `--analysis-dir`
+### `--analysis-dir` {#analysis-dir}
 
-In large projects you may use this option to reduce the amount of files being analyzed.
-By default, the migration analyzes the whole workspace, regardless of the `--path` option, in
-order to update all references affected by a query declaration being migrated.
+在大型项目中，你可以使用此选项来减少需要分析的文件数量。
+默认情况下，无论 `--path` 选项如何设置，迁移都会分析整个工作区，
+以便更新受所迁移的查询声明影响的所有引用。
 
-With this option, you can limit analysis to a sub-folder. Note that this means that any
-references outside this directory are silently skipped, potentially breaking your build.
+使用此选项，你可以把分析限制在某个子文件夹中。请注意，这意味着
+该目录之外的任何引用都会被静默跳过，可能会破坏你的构建。
 
-## VSCode extension
+## VSCode 扩展 {#vscode-extension}
 
-![Screenshot of the VSCode extension and clicking on an `@ViewChild` field](/assets/images/migrations/signal-queries-vscode.png 'Screenshot of the VSCode extension and clicking on an `@ViewChild` field.')
+![VSCode 扩展的截图，点击某个 `@ViewChild` 字段](/assets/images/migrations/signal-queries-vscode.png 'VSCode 扩展的截图，点击某个 `@ViewChild` 字段。')
 
-The migration is available as a [code refactor action](https://code.visualstudio.com/docs/typescript/typescript-refactoring#_refactoring) in VSCode.
+该迁移可以作为 VSCode 中的 [代码重构操作](https://code.visualstudio.com/docs/typescript/typescript-refactoring#_refactoring) 使用。
 
-To make use of the migration via VSCode, install the latest version of the VSCode extension and either click:
+要通过 VSCode 使用该迁移，请安装最新版本的 VSCode 扩展，然后点击：
 
-- on a `@ViewChild`, `@ViewChildren`, `@ContentChild`, or `@ContentChildren` field.
-- on a directive/component
+- 某个 `@ViewChild`、`@ViewChildren`、`@ContentChild` 或 `@ContentChildren` 字段；
+- 或者某个指令/组件。
 
-Then, wait for the yellow lightbulb VSCode refactoring button to appear.
-Via this button you can then select the signal queries migration.
+然后，等待 VSCode 黄色灯泡形状的重构按钮出现。
+通过这个按钮，你就可以选择信号查询迁移。

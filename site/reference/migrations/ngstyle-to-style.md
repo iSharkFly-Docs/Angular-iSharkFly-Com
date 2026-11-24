@@ -1,61 +1,57 @@
----
-untranslated: true
----
+# 从 NgStyle 迁移到 style 绑定 {#migration-from-ngstyle-to-style-bindings}
 
-# Migration from NgStyle to style bindings
+此原理图（Schematic）会把应用中 NgStyle 指令的用法迁移为 style 绑定。
+它只会迁移那些被认为可以安全迁移的用法。
 
-This schematic migrates NgStyle directive usages to style bindings in your application.
-It will only migrate usages that are considered safe to migrate.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```bash
 ng generate @angular/core:ngstyle-to-style
 ```
 
-An object with a single key becomes a binding to that one style property.
+只有一个键的对象会变成针对该样式属性的单个绑定。
 
-#### Before
+#### 迁移前 {#before}
 
 ```html
 <div [ngStyle]="{'background-color': 'red'}"></div>
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```html
 <div [style.background-color]="'red'"></div>
 ```
 
-An object with more than one key becomes a single `[style]` binding.
+有多个键的对象会变成单个 `[style]` 绑定。
 
-#### Before {#multiple-keys-before}
+#### 迁移前 {#multiple-keys-before}
 
 ```html
 <div [ngStyle]="{'color': 'blue', 'font-weight': 'bold'}"></div>
 ```
 
-#### After {#multiple-keys-after}
+#### 迁移后 {#multiple-keys-after}
 
 ```html
 <div [style]="{'color': 'blue', 'font-weight': 'bold'}"></div>
 ```
 
-## Configuration options
+## 配置选项 {#configuration-options}
 
-The migration supports a few options for fine tuning the migration to your specific needs.
+此迁移（migration）支持一些选项，可以根据你的具体需求进行微调。
 
-### `--best-effort-mode`
+### `--best-effort-mode` {#best-effort-mode}
 
-By default, the migration avoids migrating object references usages of `NgStyle`
-When the `--best-effort-mode` flag is enabled, `ngStyle` instances binded to object references are also migrated.
-This can be unsafe to migrate, for example if the binded object is mutated.
+默认情况下，迁移会跳过 `NgStyle` 绑定到对象引用的用法。
+启用 `--best-effort-mode` 标志后，绑定到对象引用的 `ngStyle` 实例也会被迁移。
+这种迁移可能并不安全，例如当所绑定的对象会被修改时。
 
 ```html
 <div [ngStyle]="styleObject"></div>
 ```
 
-to
+会变为
 
 ```html
 <div [style]="styleObject"></div>

@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 清理未使用的导入 {#clean-up-unused-imports}
 
-# Clean up unused imports
+从 v19 开始，当组件的 `imports` 数组中包含模板未使用的符号时，Angular 会给出报告。
 
-As of version 19, Angular reports when a component's `imports` array contains symbols that aren't used in its template.
+运行此原理图（Schematic）会清理项目中所有未使用的导入。
 
-Running this schematic will clean up all unused imports within the project.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```shell
 ng generate @angular/core:cleanup-unused-imports
 ```
 
-#### Before
+#### 迁移前 {#before}
 
 ```ts
 import {Component} from '@angular/core';
@@ -27,7 +23,7 @@ import {UnusedDirective} from './unused';
 export class MyComp {}
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```ts
 import {Component} from '@angular/core';

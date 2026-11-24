@@ -1,37 +1,33 @@
----
-untranslated: true
----
+# 推送通知 {#push-notifications}
 
-# Push notifications
+推送通知（push notification）是吸引用户参与的一种有效方式。
+借助 Service Worker 的强大能力，即使你的应用不在焦点上，通知也可以送达设备。
 
-Push notifications are a compelling way to engage users.
-Through the power of service workers, notifications can be delivered to a device even when your application is not in focus.
+Angular Service Worker 支持显示推送通知以及处理通知的点击事件。
 
-The Angular service worker enables the display of push notifications and the handling of notification click events.
-
-::: tip HELPFUL
-When using the Angular service worker, push notification interactions are handled using the `SwPush` service.
-To learn more about the browser APIs involved see [Push API](https://developer.mozilla.org/docs/Web/API/Push_API) and [Using the Notifications API](https://developer.mozilla.org/docs/Web/API/Notifications_API/Using_the_Notifications_API).
+::: tip 提示
+使用 Angular Service Worker 时，推送通知的交互通过 `SwPush` 服务来处理。
+要进一步了解其中涉及的浏览器 API，请参阅 [Push API](https://developer.mozilla.org/docs/Web/API/Push_API) 和 [Using the Notifications API](https://developer.mozilla.org/docs/Web/API/Notifications_API/Using_the_Notifications_API)。
 
 :::
 
-## Notification payload
+## 通知载荷 {#notification-payload}
 
-Invoke push notifications by pushing a message with a valid payload.
-See `SwPush` for guidance.
+通过推送一条带有有效载荷（payload）的消息来触发推送通知。
+相关指导请参阅 `SwPush`。
 
-::: tip HELPFUL
-In Chrome, you can test push notifications without a backend.
-Open Devtools -> Application -> Service Workers and use the `Push` input to send a JSON notification payload.
+::: tip 提示
+在 Chrome 中，你可以在没有后端的情况下测试推送通知。
+打开 Devtools -> Application -> Service Workers，使用 `Push` 输入框发送一个 JSON 格式的通知载荷。
 
 :::
 
-## Notification click handling
+## 处理通知点击 {#notification-click-handling}
 
-The default behavior for the `notificationclick` event is to close the notification and notify `SwPush.notificationClicks`.
+`notificationclick` 事件的默认行为是关闭通知并通知 `SwPush.notificationClicks`。
 
-You can specify an additional operation to be executed on `notificationclick` by adding an `onActionClick` property to the `data` object, and providing a `default` entry.
-This is especially useful for when there are no open clients when a notification is clicked.
+你可以在 `data` 对象中添加 `onActionClick` 属性并提供一个 `default` 条目，来指定在 `notificationclick` 时要执行的额外操作。
+当点击通知时没有任何打开的客户端，这一点尤其有用。
 
 ```json
 {
@@ -46,30 +42,30 @@ This is especially useful for when there are no open clients when a notification
 }
 ```
 
-### Operations
+### 操作 {#operations}
 
-The Angular service worker supports the following operations:
+Angular Service Worker 支持以下操作：
 
-| Operations                  | Details                                                                                                                                          |
+| 操作                  | 详情                                                                                                                                          |
 | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `openWindow`                | Opens a new tab at the specified URL.                                                                                                            |
-| `focusLastFocusedOrOpen`    | Focuses the last focused client. If there is no client open, then it opens a new tab at the specified URL.                                       |
-| `navigateLastFocusedOrOpen` | Focuses the last focused client and navigates it to the specified URL. If there is no client open, then it opens a new tab at the specified URL. |
-| `sendRequest`               | Send a simple GET request to the specified URL.                                                                                                  |
+| `openWindow`                | 在指定的 URL 打开一个新标签页。                                                                                                            |
+| `focusLastFocusedOrOpen`    | 聚焦到上一个获得焦点的客户端。如果没有打开的客户端，则在指定的 URL 打开一个新标签页。                                       |
+| `navigateLastFocusedOrOpen` | 聚焦到上一个获得焦点的客户端，并将其导航到指定的 URL。如果没有打开的客户端，则在指定的 URL 打开一个新标签页。 |
+| `sendRequest`               | 向指定的 URL 发送一个简单的 GET 请求。                                                                                                  |
 
-::: warning IMPORTANT
-URLs are resolved relative to the service worker's registration scope.<br />If an `onActionClick` item does not define a `url`, then the service worker's registration scope is used.
+::: warning 重要
+URL 是相对于 Service Worker 的注册作用域来解析的。<br />如果某个 `onActionClick` 条目没有定义 `url`，则使用 Service Worker 的注册作用域。
 
 :::
 
-### Actions
+### 动作 {#actions}
 
-Actions offer a way to customize how the user can interact with a notification.
+动作（action）提供了一种方式，用于自定义用户与通知的交互方式。
 
-Using the `actions` property, you can define a set of available actions.
-Each action is represented as an action button that the user can click to interact with the notification.
+使用 `actions` 属性，你可以定义一组可用的动作。
+每个动作都表现为一个动作按钮，用户可以点击它来与通知交互。
 
-In addition, using the `onActionClick` property on the `data` object, you can tie each action to an operation to be performed when the corresponding action button is clicked:
+此外，通过 `data` 对象上的 `onActionClick` 属性，你可以把每个动作与一个操作关联起来，在点击相应的动作按钮时执行该操作：
 
 ```json
 {
@@ -95,15 +91,14 @@ In addition, using the `onActionClick` property on the `data` object, you can ti
 }
 ```
 
-::: warning IMPORTANT
-If an action does not have a corresponding `onActionClick` entry, then the notification is closed and `SwPush.notificationClicks` is notified on existing clients.
+::: warning 重要
+如果某个动作没有对应的 `onActionClick` 条目，则会关闭通知，并在现有客户端上通知 `SwPush.notificationClicks`。
 
 :::
 
-## More on Angular service workers
+## 关于 Angular Service Worker 的更多内容 {#more-on-angular-service-workers}
 
-You might also be interested in the following:
+你可能还对以下内容感兴趣：
 
-- [Communicating with the Service Worker](/ecosystem/service-workers/communications)
-- [Service Worker devops](/ecosystem/service-workers/devops)
-
+- [与 Service Worker 通信](/ecosystem/service-workers/communications)
+- [Service Worker 运维](/ecosystem/service-workers/devops)

@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 与 Service Worker 通信 {#communicating-with-the-service-worker}
 
-# Communicating with the Service Worker
+启用 Service Worker 支持不仅仅是注册 Service Worker，它还会提供一些服务，你可以用它们与 Service Worker 交互，并控制应用的缓存（cache）。
 
-Enabling service worker support does more than just register the service worker; it also provides services you can use to interact with the service worker and control the caching of your application.
+## `SwUpdate` 服务 {#swupdate-service}
 
-## `SwUpdate` service
+`SwUpdate` 服务让你可以访问一些事件，这些事件会在 Service Worker 发现并安装应用的可用更新时发出通知。
 
-The `SwUpdate` service gives you access to events that indicate when the service worker discovers and installs an available update for your application.
+`SwUpdate` 服务支持三种独立的操作：
 
-The `SwUpdate` service supports three separate operations:
+- 在服务器上 _检测到_ 新版本、新版本 _已安装并可在本地使用_，或者 _安装失败_ 时接收通知。
+- 要求 Service Worker 检查服务器上是否有新的更新。
+- 要求 Service Worker 为当前标签页激活应用的最新版本。
 
-- Receiving notifications when an updated version is _detected_ on the server, _installed and ready_ to be used locally or when an _installation fails_.
-- Asking the service worker to check the server for new updates.
-- Asking the service worker to activate the latest version of the application for the current tab.
+### 版本更新 {#version-updates}
 
-### Version updates
+`versionUpdates` 是 `SwUpdate` 的一个 `Observable` 属性，会发出四种事件类型：
 
-The `versionUpdates` is an `Observable` property of `SwUpdate` and emits four event types:
-
-| Event types                      | Details                                                                                                                                                                     |
+| 事件类型                      | 详情                                                                                                                                                                     |
 | :------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VersionDetectedEvent`           | Emitted when the service worker has detected a new version of the app on the server and is about to start downloading it.                                                   |
-| `NoNewVersionDetectedEvent`      | Emitted when the service worker has checked the version of the app on the server and did not find a new version.                                                            |
-| `VersionReadyEvent`              | Emitted when a new version of the app is available to be activated by clients. It may be used to notify the user of an available update or prompt them to refresh the page. |
-| `VersionInstallationFailedEvent` | Emitted when the installation of a new version failed. It may be used for logging/monitoring purposes.                                                                      |
+| `VersionDetectedEvent`           | 当 Service Worker 在服务器上检测到应用的新版本并即将开始下载时发出。                                                   |
+| `NoNewVersionDetectedEvent`      | 当 Service Worker 检查了服务器上的应用版本但未发现新版本时发出。                                                            |
+| `VersionReadyEvent`              | 当应用的新版本可供客户端激活时发出。可以用它通知用户有可用的更新，或提示用户刷新页面。 |
+| `VersionInstallationFailedEvent` | 当新版本安装失败时发出。可用于日志记录或监控。                                                                      |
 
 ```ts [log-update.service.ts]
 @Service()
@@ -50,13 +46,13 @@ export class LogUpdateService {
 }
 ```
 
-### Checking for updates
+### 检查更新 {#checking-for-updates}
 
-It's possible to ask the service worker to check if any updates have been deployed to the server.
-The service worker checks for updates during initialization and on each navigation request —that is, when the user navigates from a different address to your application.
-However, you might choose to manually check for updates if you have a site that changes frequently or want updates to happen on a schedule.
+你可以要求 Service Worker 检查服务器上是否部署了任何更新。
+Service Worker 会在初始化期间以及每次导航请求时（即用户从其他地址导航到你的应用时）检查更新。
+不过，如果你的网站变化频繁，或者希望按计划进行更新，也可以选择手动检查更新。
 
-Do this with the `checkForUpdate()` method:
+使用 `checkForUpdate()` 方法来实现：
 
 ```ts [check-for-update.service.ts]
 import {ApplicationRef, inject, Service} from '@angular/core';
@@ -69,8 +65,8 @@ export class CheckForUpdateService {
   private updates = inject(SwUpdate);
 
   constructor() {
-    // Allow the app to stabilize first, before starting
-    // polling for updates with `interval()`.
+    // 先让应用稳定下来，再开始
+    // 使用 `interval()` 轮询更新。
     const appIsStable$ = this.appRef.isStable.pipe(first((isStable) => isStable === true));
     const everySixHours$ = interval(6 * 60 * 60 * 1000);
     const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$);
@@ -87,25 +83,25 @@ export class CheckForUpdateService {
 }
 ```
 
-This method returns a `Promise<boolean>` which indicates if an update is available for activation.
-The check might fail, which will cause a rejection of the `Promise`.
+该方法返回一个 `Promise<boolean>`，表示是否有可供激活的更新。
+检查可能会失败，此时 `Promise` 会被拒绝（reject）。
 
-::: warning Stabilization and service worker registration
-In order to avoid negatively affecting the initial rendering of the page, by default the Angular service worker service waits for up to 30 seconds for the application to stabilize before registering the ServiceWorker script.
+::: warning 稳定性与 Service Worker 注册
+为了避免对页面的初始渲染造成负面影响，默认情况下，Angular Service Worker 服务会等待应用稳定（最多 30 秒）后再注册 ServiceWorker 脚本。
 
-Constantly polling for updates, for example, with [setInterval()](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/setInterval) or RxJS' [interval()](https://rxjs.dev/api/index/function/interval), prevents the application from stabilizing and the ServiceWorker script is not registered with the browser until the 30 seconds upper limit is reached.
+持续轮询更新（例如使用 [setInterval()](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/setInterval) 或 RxJS 的 [interval()](https://rxjs.dev/api/index/function/interval)）会阻止应用进入稳定状态，导致 ServiceWorker 脚本直到达到 30 秒上限时才会向浏览器注册。
 
-This is true for any kind of polling done by your application.
-Check the [isStable](https://angular.dev/api/core/ApplicationRef#isStable) documentation for more information.
+应用中进行的任何形式的轮询都是如此。
+更多信息请参阅 [isStable](https://angular.dev/api/core/ApplicationRef#isStable) 文档。
 
-Avoid that delay by waiting for the application to stabilize first, before starting to poll for updates, as shown in the preceding example.
-Alternatively, you might want to define a different [registration strategy](https://angular.dev/api/service-worker/SwRegistrationOptions#registrationStrategy) for the ServiceWorker.
+如前面的示例所示，先等待应用稳定，再开始轮询更新，就可以避免这种延迟。
+或者，你也可以为 ServiceWorker 定义不同的 [注册策略](https://angular.dev/api/service-worker/SwRegistrationOptions#registrationStrategy)。
 :::
 
-### Updating to the latest version
+### 更新到最新版本 {#updating-to-the-latest-version}
 
-You can update an existing tab to the latest version by reloading the page as soon as a new version is ready.
-To avoid disrupting the user's progress, it is generally a good idea to prompt the user and let them confirm that it is OK to reload the page and update to the latest version:
+你可以在新版本就绪后立即重新加载页面，将现有标签页更新到最新版本。
+为了避免打断用户的操作，通常最好先提示用户，让他们确认可以重新加载页面并更新到最新版本：
 
 ```ts [prompt-update.service.ts]
 @Service()
@@ -116,7 +112,7 @@ export class PromptUpdateService {
       .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
       .subscribe((evt) => {
         if (promptUser(evt)) {
-          // Reload the page to update to the latest version.
+          // 重新加载页面以更新到最新版本。
           document.location.reload();
         }
       });
@@ -124,46 +120,46 @@ export class PromptUpdateService {
 }
 ```
 
-::: warning Safety of updating without reloading
-Calling `activateUpdate()` updates a tab to the latest version without reloading the page, but this could break the application.
+::: warning 不重新加载就更新的安全性
+调用 `activateUpdate()` 可以在不重新加载页面的情况下将标签页更新到最新版本，但这可能会破坏应用。
 
-Updating without reloading can create a version mismatch between the application shell and other page resources, such as lazy-loaded chunks, whose filenames may change between versions.
+不重新加载就更新，可能会导致应用外壳（App Shell）与其他页面资源（例如延迟加载（lazy loading）的代码块，其文件名可能在不同版本之间发生变化）之间出现版本不匹配。
 
-You should only use `activateUpdate()`, if you are certain it is safe for your specific use case.
+只有在确定对你的特定用例而言是安全的情况下，才应该使用 `activateUpdate()`。
 :::
 
-### Handling an unrecoverable state
+### 处理不可恢复的状态 {#handling-an-unrecoverable-state}
 
-In some cases, the version of the application used by the service worker to serve a client might be in a broken state that cannot be recovered from without a full page reload.
+在某些情况下，Service Worker 用来为客户端提供服务的应用版本可能处于损坏状态，不进行整页重新加载就无法恢复。
 
-For example, imagine the following scenario:
+例如，设想以下场景：
 
-1. A user opens the application for the first time and the service worker caches the latest version of the application.
-   Assume the application's cached assets include `index.html`, `main.<main-hash-1>.js` and `lazy-chunk.<lazy-hash-1>.js`.
+1. 用户首次打开应用，Service Worker 缓存了应用的最新版本。
+   假设应用缓存的资源包括 `index.html`、`main.<main-hash-1>.js` 和 `lazy-chunk.<lazy-hash-1>.js`。
 
-1. The user closes the application and does not open it for a while.
-1. After some time, a new version of the application is deployed to the server.
-   This newer version includes the files `index.html`, `main.<main-hash-2>.js` and `lazy-chunk.<lazy-hash-2>.js`.
+1. 用户关闭了应用，并在一段时间内没有再打开。
+1. 一段时间后，应用的新版本被部署到服务器上。
+   这个新版本包含文件 `index.html`、`main.<main-hash-2>.js` 和 `lazy-chunk.<lazy-hash-2>.js`。
 
-::: warning IMPORTANT
-The hashes are different now, because the content of the files changed. The old version is no longer available on the server.
+::: warning 重要
+由于文件内容发生了变化，哈希值现在也不同了。旧版本在服务器上已不再可用。
 
 :::
 
-1. In the meantime, the user's browser decides to evict `lazy-chunk.<lazy-hash-1>.js` from its cache.
-   Browsers might decide to evict specific (or all) resources from a cache in order to reclaim disk space.
+1. 与此同时，用户的浏览器决定将 `lazy-chunk.<lazy-hash-1>.js` 从缓存中清除。
+   浏览器可能会为了回收磁盘空间，而决定从缓存中清除特定（或全部）资源。
 
-1. The user opens the application again.
-   The service worker serves the latest version known to it at this point, namely the old version (`index.html` and `main.<main-hash-1>.js`).
+1. 用户再次打开应用。
+   Service Worker 提供此时它所知道的最新版本，也就是旧版本（`index.html` 和 `main.<main-hash-1>.js`）。
 
-1. At some later point, the application requests the lazy bundle, `lazy-chunk.<lazy-hash-1>.js`.
-1. The service worker is unable to find the asset in the cache (remember that the browser evicted it).
-   Nor is it able to retrieve it from the server (because the server now only has `lazy-chunk.<lazy-hash-2>.js` from the newer version).
+1. 稍后某个时刻，应用请求延迟加载的包 `lazy-chunk.<lazy-hash-1>.js`。
+1. Service Worker 无法在缓存中找到该资源（别忘了浏览器已经把它清除了），
+   也无法从服务器获取它（因为服务器现在只有新版本中的 `lazy-chunk.<lazy-hash-2>.js`）。
 
-In the preceding scenario, the service worker is not able to serve an asset that would normally be cached.
-That particular application version is broken and there is no way to fix the state of the client without reloading the page.
-In such cases, the service worker notifies the client by sending an `UnrecoverableStateEvent` event.
-Subscribe to `SwUpdate#unrecoverable` to be notified and handle these errors.
+在上述场景中，Service Worker 无法提供一个通常本应被缓存的资源。
+这个特定的应用版本已经损坏，除了重新加载页面之外，没有其他办法修复客户端的状态。
+在这种情况下，Service Worker 会通过发送 `UnrecoverableStateEvent` 事件来通知客户端。
+订阅 `SwUpdate#unrecoverable` 即可收到通知并处理这些错误。
 
 ```ts [handle-unrecoverable-state.service.ts]
 @Service()
@@ -181,10 +177,9 @@ export class HandleUnrecoverableStateService {
 }
 ```
 
-## More on Angular service workers
+## 关于 Angular Service Worker 的更多内容 {#more-on-angular-service-workers}
 
-You might also be interested in the following:
+你可能还对以下内容感兴趣：
 
-- [Push notifications](/ecosystem/service-workers/push-notifications)
-- [Service Worker devops](/ecosystem/service-workers/devops)
-
+- [推送通知](/ecosystem/service-workers/push-notifications)
+- [Service Worker 运维](/ecosystem/service-workers/devops)

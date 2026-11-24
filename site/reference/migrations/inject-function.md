@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 迁移到 `inject` 函数 {#migration-to-the-inject-function}
 
-# Migration to the `inject` function
+与基于构造函数的注入相比，Angular 的 [`inject`](https://angular.dev/api/core/inject) 函数提供了更准确的类型，并且与标准装饰器的兼容性更好。
 
-Angular's [`inject`](https://angular.dev/api/core/inject) function offers more accurate types and better compatibility with standard decorators, compared to constructor-based injection.
+此原理图（Schematic）会把类中基于构造函数的注入转换为使用 [`inject`](https://angular.dev/api/core/inject) 函数。
 
-This schematic converts constructor-based injection in your classes to use the [`inject`](https://angular.dev/api/core/inject) function instead.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```shell
 ng generate @angular/core:inject
 ```
 
-#### Before
+#### 迁移前 {#before}
 
 ```ts
 import {Component, Inject, Optional} from '@angular/core';
@@ -30,7 +26,7 @@ export class MyComp {
 }
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -44,31 +40,31 @@ export class MyComp {
 }
 ```
 
-## Migration options
+## 迁移选项 {#migration-options}
 
-The migration includes several options to customize its output.
+此迁移（migration）提供了若干选项，用于自定义其输出。
 
-### `path`
+### `path` {#path}
 
-Determines which sub-path in your project should be migrated. Pass in `.` or leave it blank to
-migrate the entire directory.
+决定要迁移项目中的哪个子路径。传入 `.` 或留空即可
+迁移整个目录。
 
-### `migrateAbstractClasses`
+### `migrateAbstractClasses` {#migrateabstractclasses}
 
-Angular doesn't validate that parameters of abstract classes are injectable. This means that the
-migration can't reliably migrate them to [`inject`](https://angular.dev/api/core/inject) without risking breakages which is why they're
-disabled by default. Enable this option if you want abstract classes to be migrated, but note
-that you may have to **fix some breakages manually**.
+Angular 不会验证抽象类的参数是否可注入。这意味着此
+迁移无法在不冒破坏风险的情况下可靠地把它们迁移到 [`inject`](https://angular.dev/api/core/inject)，因此默认禁用。
+如果你希望迁移抽象类，可以启用此选项，但请注意
+你可能需要**手动修复一些破坏性问题**。
 
-### `backwardsCompatibleConstructors`
+### `backwardsCompatibleConstructors` {#backwardscompatibleconstructors}
 
-By default the migration tries to clean up the code as much as it can, which includes deleting
-parameters from the constructor, or even the entire constructor if it doesn't include any code.
-In some cases this can lead to compilation errors when classes with Angular decorators inherit from
-other classes with Angular decorators. If you enable this option, the migration will generate an
-additional constructor signature to keep it backwards compatible, at the expense of more code.
+默认情况下，此迁移会尽可能地清理代码，包括从构造函数中删除
+参数，如果构造函数不包含任何代码，甚至会删除整个构造函数。
+在某些情况下，当带有 Angular 装饰器的类继承自另一个带有 Angular 装饰器的类时，
+这可能导致编译错误。如果启用此选项，迁移会生成一个
+额外的构造函数签名以保持向后兼容，代价是代码会更多。
 
-#### Before {#backwards-compatible-constructors-before}
+#### 迁移前 {#backwards-compatible-constructors-before}
 
 ```ts
 import {Component} from '@angular/core';
@@ -80,7 +76,7 @@ export class MyComp {
 }
 ```
 
-#### After {#backwards-compatible-constructors-after}
+#### 迁移后 {#backwards-compatible-constructors-after}
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -97,22 +93,22 @@ export class MyComp {
 }
 ```
 
-### `nonNullableOptional`
+### `nonNullableOptional` {#nonnullableoptional}
 
-If injection fails for a parameter with the `@Optional` decorator, Angular returns `null` which
-means that the real type of any `@Optional` parameter will be `| null`. However, because decorators
-cannot influence their types, there is a lot of existing code whose type is incorrect. The type is
-fixed in `inject()` which can cause new compilation errors to show up. If you enable this option,
-the migration will produce a non-null assertion after the `inject()` call to match the old type,
-at the expense of potentially hiding type errors.
+如果带有 `@Optional` 装饰器的参数注入失败，Angular 会返回 `null`，这
+意味着任何 `@Optional` 参数的真实类型都应该是 `| null`。但是，由于装饰器
+无法影响类型，大量现有代码的类型是不正确的。`inject()` 修正了这个类型，
+这可能导致出现新的编译错误。如果启用此选项，
+迁移会在 `inject()` 调用之后添加非空断言，以匹配旧的类型，
+代价是可能会掩盖类型错误。
 
-::: info NOTE
-non-null assertions won't be added to parameters that are already typed to be nullable,
-because the code that depends on them likely already accounts for their nullability.
+::: info 注意
+对于类型已经声明为可空的参数，不会添加非空断言，
+因为依赖这些参数的代码很可能已经考虑到了它们可能为空的情况。
 
 :::
 
-#### Before {#non-nullable-optional-before}
+#### 迁移前 {#non-nullable-optional-before}
 
 ```ts
 import {Component, Inject, Optional} from '@angular/core';
@@ -127,7 +123,7 @@ export class MyComp {
 }
 ```
 
-#### After {#non-nullable-optional-after}
+#### 迁移后 {#non-nullable-optional-after}
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -135,10 +131,10 @@ import {TOKEN_ONE, TOKEN_TWO} from './token';
 
 @Component({template: ''})
 export class MyComp {
-  // Note the `!` at the end.
+  // 注意末尾的 `!`。
   private tokenOne = inject(TOKEN_ONE, {optional: true})!;
 
-  // Does not have `!` at the end, because the type was already nullable.
+  // 末尾没有 `!`，因为该类型本来就是可空的。
   private tokenTwo = inject(TOKEN_TWO, {optional: true});
 }
 ```

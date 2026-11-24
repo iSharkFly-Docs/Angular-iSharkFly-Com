@@ -1,26 +1,22 @@
----
-untranslated: true
----
+# 将 CommonModule 的用法转换为独立导入 {#convert-commonmodule-usage-to-standalone-imports}
 
-# Convert CommonModule usage to standalone imports
+此迁移（migration）通过为每个模板添加其所需的最小指令和管道导入集合（例如 `NgIf`、`NgFor`、`AsyncPipe` 等），帮助项目移除组件中对 `CommonModule` 的导入。
 
-This migration helps projects remove imports of the `CommonModule` inside components by adding the minimal set of directive and pipe imports each template requires (for example, `NgIf`, `NgFor`, `AsyncPipe`, etc.).
-
-Run the schematic using the following command:
+使用以下命令运行该原理图（Schematic）：
 
 ```shell
 ng generate @angular/core:common-to-standalone
 ```
 
-## Options
+## 选项 {#options}
 
-| Option | Details                                                                                                                       |
+| 选项   | 详情                                                                                                                          |
 | :----- | :---------------------------------------------------------------------------------------------------------------------------- |
-| `path` | The path (relative to project root) to migrate. Defaults to `./`. Use this to incrementally migrate a subset of your project. |
+| `path` | 要迁移的路径（相对于项目根目录）。默认为 `./`。可以用它来逐步迁移项目的一部分。 |
 
-## Example
+## 示例 {#example}
 
-Before:
+迁移前：
 
 ```ts
 import {Component} from '@angular/core';
@@ -41,7 +37,7 @@ export class Example {
 }
 ```
 
-After running the migration (component imports added, CommonModule removed):
+运行迁移后（添加了组件导入，移除了 CommonModule）：
 
 ```ts
 import {Component} from '@angular/core';

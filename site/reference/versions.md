@@ -1,15 +1,11 @@
----
-untranslated: true
----
+# 版本兼容性 {#version-compatibility}
 
-# Version compatibility
+下表列出了每个 Angular 版本所需的 Node.js、TypeScript 和 RxJS
+版本。
 
-The following tables describe the versions of Node.js, TypeScript, and RxJS that each version of
-Angular requires.
+## 正在积极支持的版本 {#actively-supported-versions}
 
-## Actively supported versions
-
-This table covers [Angular versions under active support](/reference/releases#actively-supported-versions).
+此表涵盖 [正在积极支持的 Angular 版本](/reference/releases#actively-supported-versions)。
 
 | Angular            | Node.js                             | TypeScript     | RxJS               |
 | ------------------ | ----------------------------------- | -------------- | ------------------ |
@@ -18,11 +14,11 @@ This table covers [Angular versions under active support](/reference/releases#ac
 | 20.2.x \|\| 20.3.x | ^20.19.0 \|\| ^22.12.0 \|\| ^24.0.0 | >=5.8.0 <6.0.0 | ^6.5.3 \|\| ^7.4.0 |
 | 20.0.x \|\| 20.1.x | ^20.19.0 \|\| ^22.12.0 \|\| ^24.0.0 | >=5.8.0 <5.9.0 | ^6.5.3 \|\| ^7.4.0 |
 
-## Unsupported Angular versions
+## 不再支持的 Angular 版本 {#unsupported-angular-versions}
 
-This table covers Angular versions that are no longer under long-term support (LTS). This
-information was correct when each version went out of LTS and is provided without any further
-guarantees. It is listed here for historical reference.
+此表涵盖已不再处于长期支持（LTS）阶段的 Angular 版本。这些
+信息在各版本结束 LTS 时是准确的，此后不再提供任何
+保证，仅作为历史参考列出。
 
 | Angular            | Node.js                              | TypeScript     | RxJS               |
 | ------------------ | ------------------------------------ | -------------- | ------------------ |
@@ -55,9 +51,9 @@ guarantees. It is listed here for historical reference.
 | 9.1.x              | ^10.13.0 \|\| ^12.11.0               | >=3.6.0 <3.9.0 | ^6.5.3             |
 | 9.0.x              | ^10.13.0 \|\| ^12.11.0               | >=3.6.0 <3.8.0 | ^6.5.3             |
 
-### Before v9
+### v9 之前 {#before-v9}
 
-Until Angular v9, Angular and Angular CLI versions were not synced.
+在 Angular v9 之前，Angular 和 Angular CLI 的版本并不同步。
 
 | Angular                     | Angular CLI                 | Node.js             | TypeScript     | RxJS   |
 | --------------------------- | --------------------------- | ------------------- | -------------- | ------ |
@@ -74,64 +70,64 @@ Until Angular v9, Angular and Angular CLI versions were not synced.
 | 4.0.x \|\| 4.1.x            | 1.0.x \|\| 1.1.x \|\| 1.2.x | ^6.9.0              | >=2.1.6 <2.4.0 | ^5.0.1 |
 | 2.x                         | -                           | ^6.9.0              | >=1.8.0 <2.2.0 | ^5.0.1 |
 
-## Browser support
+## 浏览器支持 {#browser-support}
 
-Angular uses the ["widely available" Baseline](https://web.dev/baseline) to define browser
-support. For each major version, Angular supports browsers included in the Baseline of a
-chosen date near the release date for that major.
+Angular 使用 [「广泛可用」Baseline](https://web.dev/baseline) 来界定浏览器
+支持范围。对于每个主版本，Angular 支持该主版本发布日期附近某个
+选定日期的 Baseline 所包含的浏览器。
 
-The "widely available" Baseline includes browsers released less than 30 months (2.5 years)
-of the chosen date within Baseline's core browser set (Chrome, Edge, Firefox, Safari) and
-targets supporting approximately 95% of web users.
+「广泛可用」Baseline 包含 Baseline 核心浏览器集（Chrome、Edge、Firefox、Safari）中，
+在选定日期之前不到 30 个月（2.5 年）内发布的浏览器，
+目标是支持约 95% 的 Web 用户。
 
-| Angular | Baseline Date | Browser Set                 |
+| Angular | Baseline 日期 | 浏览器集                    |
 | ------- | ------------- | --------------------------- |
-| v22     | 2026-05-07    | [Browser Set][browsers-v22] |
-| v21     | 2025-10-20    | [Browser Set][browsers-v21] |
-| v20     | 2025-04-30    | [Browser Set][browsers-v20] |
+| v22     | 2026-05-07    | [浏览器集][browsers-v22]    |
+| v21     | 2025-10-20    | [浏览器集][browsers-v21]    |
+| v20     | 2025-04-30    | [浏览器集][browsers-v20]    |
 
 [browsers-v22]: https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2026-05-07&includeDownstream=false
 [browsers-v21]: https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2025-10-20&includeDownstream=false
 [browsers-v20]: https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2025-04-30&includeDownstream=false
 
-Angular versions prior to v20 support the following specific browser versions:
+v20 之前的 Angular 版本支持以下特定的浏览器版本：
 
-| Browser | Supported versions                          |
+| 浏览器  | 支持的版本                                  |
 | :------ | :------------------------------------------ |
-| Chrome  | 2 most recent versions                      |
-| Firefox | latest and extended support release \(ESR\) |
-| Edge    | 2 most recent major versions                |
-| Safari  | 2 most recent major versions                |
-| iOS     | 2 most recent major versions                |
-| Android | 2 most recent major versions                |
+| Chrome  | 最近的 2 个版本                             |
+| Firefox | 最新版和延长支持版（ESR）                   |
+| Edge    | 最近的 2 个主版本                           |
+| Safari  | 最近的 2 个主版本                           |
+| iOS     | 最近的 2 个主版本                           |
+| Android | 最近的 2 个主版本                           |
 
-## Polyfills
+## 腻子脚本 {#polyfills}
 
-Angular is built on the latest standards of the web platform.
-Targeting such a wide range of browsers is challenging because they do not support all features of modern browsers.
-You compensate by loading polyfill scripts \("polyfills"\) for the browsers that you must support.
-See instructions on how to include polyfills into your project below.
+Angular 基于 Web 平台的最新标准构建。
+要兼容如此广泛的浏览器颇具挑战，因为它们并不支持现代浏览器的所有特性。
+你可以为需要支持的浏览器加载腻子脚本（polyfill）来弥补这些差距。
+下面介绍如何在项目中引入腻子脚本。
 
-::: warning IMPORTANT
-The suggested polyfills are the ones that run full Angular applications.
-You might need additional polyfills to support features not covered by this list.
-
-:::
-
-::: tip HELPFUL
-Polyfills cannot magically transform an old, slow browser into a modern, fast one.
+::: warning 重要
+这里建议的腻子脚本是运行完整 Angular 应用所需的那些。
+要支持此列表未涵盖的特性，你可能还需要额外的腻子脚本。
 
 :::
 
-## Enabling polyfills with CLI projects
+::: tip 提示
+腻子脚本无法神奇地把一个老旧、缓慢的浏览器变成现代、快速的浏览器。
 
-The [Angular CLI](/tools/cli) provides support for polyfills.
-If you are not using the CLI to create your projects, see [Polyfill instructions for non-CLI users](#polyfills-for-non-cli-users).
+:::
 
-The `polyfills` options of the [browser and test builder](/tools/cli/cli-builder) can be a full path for a file \(Example: `src/polyfills.ts`\) or,
-relative to the current workspace or module specifier \(Example: `zone.js`\).
+## 在 CLI 项目中启用腻子脚本 {#enabling-polyfills-with-cli-projects}
 
-If you create a TypeScript file, make sure to include it in the `files` property of your `tsconfig` file.
+[Angular CLI](/tools/cli) 提供了对腻子脚本的支持。
+如果你没有使用 CLI 创建项目，请参阅 [面向非 CLI 用户的腻子脚本说明](#polyfills-for-non-cli-users)。
+
+[浏览器和测试构建器](/tools/cli/cli-builder) 的 `polyfills` 选项可以是文件的完整路径（例如：`src/polyfills.ts`），
+也可以是相对于当前工作区（workspace）的路径或模块说明符（例如：`zone.js`）。
+
+如果你创建了 TypeScript 文件，请确保将其包含在 `tsconfig` 文件的 `files` 属性中。
 
 ```json
 
@@ -148,31 +144,31 @@ If you create a TypeScript file, make sure to include it in the `files` property
 }
 ```
 
-## Polyfills for non-CLI users
+## 面向非 CLI 用户的腻子脚本 {#polyfills-for-non-cli-users}
 
-If you are not using the CLI, add your polyfill scripts directly to the host web page \(`index.html`\).
+如果你没有使用 CLI，请直接把腻子脚本添加到宿主网页（`index.html`）中。
 
-For example:
+例如：
 
 ```html [src/index.html]
-<!-- pre-zone polyfills -->
+<!-- zone 之前的腻子脚本 -->
 <script src="node_modules/core-js/client/shim.min.js"></script>
 <script>
   /**
-   * you can configure some zone flags which can disable zone interception for some
-   * asynchronous activities to improve startup performance - use these options only
-   * if you know what you are doing as it could result in hard to trace down bugs.
+   * 你可以配置一些 zone 标志，对某些异步活动禁用 zone 拦截，
+   * 以提升启动性能。请仅在你清楚自己在做什么时使用这些选项，
+   * 否则可能导致难以追踪的 bug。
    */
-  // __Zone_disable_requestAnimationFrame = true; // disable patch requestAnimationFrame
-  // __Zone_disable_on_property = true; // disable patch onProperty such as onclick
-  // __zone_symbol__UNPATCHED_EVENTS = ['scroll', 'mousemove']; // disable patch specified eventNames
+  // __Zone_disable_requestAnimationFrame = true; // 禁用对 requestAnimationFrame 的补丁
+  // __Zone_disable_on_property = true; // 禁用对 onclick 等 onProperty 的补丁
+  // __zone_symbol__UNPATCHED_EVENTS = ['scroll', 'mousemove']; // 禁用对指定事件名的补丁
   /*
-   * in Edge developer tools, the addEventListener will also be wrapped by zone.js
-   * with the following flag, it will bypass `zone.js` patch for Edge.
+   * 在 Edge 开发者工具中，addEventListener 也会被 zone.js 包装，
+   * 设置以下标志后，将绕过 `zone.js` 对 Edge 的补丁。
    */
   // __Zone_enable_cross_context_check = true;
 </script>
-<!-- zone.js required by Angular -->
+<!-- Angular 所需的 zone.js -->
 <script src="node_modules/zone.js/bundles/zone.umd.js"></script>
-<!-- application polyfills -->
+<!-- 应用的腻子脚本 -->
 ```
