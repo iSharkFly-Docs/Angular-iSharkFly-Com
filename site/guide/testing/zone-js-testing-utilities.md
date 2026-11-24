@@ -1,19 +1,15 @@
----
-untranslated: true
----
+# Zone.js 测试工具函数 {#zone-js-testing-utilities}
 
-# Zone.js Testing Utilities
+本指南介绍主要用于在单元测试中管理和控制异步任务的测试工具函数。这些工具函数本质上是 Zone.js 专用的模拟时钟工具，在测试中控制异步操作的执行流程时尤为有用。
 
-This guide describes testing utilities primarily used for managing and controlling async tasks in unit tests. These utilities are essentially the Zone.js-specific mock clock utilities, particularly relevant for controlling the flow of asynchronous operations within tests.
+关于通用的 Angular 测试工具，包括 `TestBed` 和 `ComponentFixture`，请参阅[测试工具 API](/guide/testing/utility-apis)指南。
 
-For general Angular testing utilities, including `TestBed` and `ComponentFixture`, see the [Testing Utility APIs](/guide/testing/utility-apis) guide.
+下面汇总了 Zone.js 专用的函数：
 
-Here's a summary of Zone.js-specific functions:
-
-| Function               | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 函数 | 详情 |
 | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `waitForAsync`         | Tracks async tasks and completes the tests only once there are no longer any micro or macrotasks remaining in the test zone.                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `fakeAsync`            | Runs the body of a test \(`it`\) within a special _fakeAsync test zone_, enabling a linear control flow coding style.                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `tick`                 | Simulates the passage of time and the completion of pending asynchronous activities by flushing both _timer_ and _micro-task_ queues within the _fakeAsync test zone_. The curious, dedicated reader might enjoy this lengthy blog post, ["_Tasks, microtasks, queues and schedules_"](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules). Accepts an optional argument that moves the virtual clock forward by the specified number of milliseconds, clearing asynchronous activities scheduled within that timeframe. |
-| `discardPeriodicTasks` | Discards any periodic tasks (e.g. `setInterval`) that were created inside the `fakeAsync` Zone.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `flushMicrotasks`      | When a `fakeAsync()` test ends with pending _micro-tasks_ such as unresolved promises, the test fails with a clear error message. <br /> In general, a test should wait for micro-tasks to finish. When pending microtasks are expected, call `flushMicrotasks` to flush the _micro-task_ queue and avoid the error.                                                                                                                                                                                                                       |
+| `waitForAsync` | 跟踪异步任务，只有当测试 zone 中不再有任何微任务或宏任务时才结束测试。 |
+| `fakeAsync` | 在一个特殊的 *fakeAsync 测试 zone* 中运行测试（`it`）的主体，从而可以用线性的控制流风格编写代码。 |
+| `tick` | 通过在 *fakeAsync 测试 zone* 中清空*定时器*队列和*微任务*队列，模拟时间流逝以及待处理异步活动的完成。好奇而用心的读者可能会喜欢这篇长博文：[「*Tasks, microtasks, queues and schedules*」](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules)。它接受一个可选参数，将虚拟时钟向前推进指定的毫秒数，并清除在这段时间内调度的异步活动。 |
+| `discardPeriodicTasks` | 丢弃在 `fakeAsync` Zone 中创建的所有周期性任务（例如 `setInterval`）。 |
+| `flushMicrotasks` | 当 `fakeAsync()` 测试结束时仍有待处理的*微任务*（例如未解决的 Promise），测试会失败并给出清晰的错误信息。<br /> 一般来说，测试应等待微任务完成。如果预期会有待处理的微任务，请调用 `flushMicrotasks` 来清空*微任务*队列，以避免该错误。 |

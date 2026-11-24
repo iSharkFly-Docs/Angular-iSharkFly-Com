@@ -1,25 +1,21 @@
----
-untranslated: true
----
+# 测试管道 {#testing-pipes}
 
-# Testing Pipes
+你可以在不使用 Angular 测试工具的情况下测试[管道（pipe）](/guide/templates/pipes)。
 
-You can test [pipes](/guide/templates/pipes) without the Angular testing utilities.
+## 测试 `TitleCasePipe` {#testing-the-titlecasepipe}
 
-## Testing the `TitleCasePipe`
+管道类只有一个方法 `transform`，它把输入值处理成转换后的输出值。
+`transform` 的实现很少与 DOM 交互。
+除了 `@Pipe` 元数据和一个接口之外，大多数管道都不依赖 Angular。
 
-A pipe class has one method, `transform`, that manipulates the input value into a transformed output value.
-The `transform` implementation rarely interacts with the DOM.
-Most pipes have no dependence on Angular other than the `@Pipe` metadata and an interface.
-
-Consider a `TitleCasePipe` that capitalizes the first letter of each word.
-Here's an implementation with a regular expression.
+来看一个把每个单词的首字母大写的 `TitleCasePipe`。
+下面是一个用正则表达式实现的版本。
 
 ```ts
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({name: 'titlecase', pure: true})
-/** Transform to Title Case: uppercase the first letter of the words in a string. */
+/** 转换为标题格式：把字符串中每个单词的首字母大写。 */
 export class TitleCasePipe implements PipeTransform {
   transform(input: string): string {
     return input.length === 0
@@ -29,11 +25,11 @@ export class TitleCasePipe implements PipeTransform {
 }
 ```
 
-Anything that uses a regular expression is worth testing thoroughly. You can use standard unit testing techniques to explore the expected cases and the edge cases.
+凡是用到正则表达式的代码都值得彻底测试。你可以用标准的单元测试（test）技术来检查预期情况和边界情况。
 
 ```ts
 describe('TitleCasePipe', () => {
-  // This pipe is a pure, stateless function so no need for BeforeEach
+  // 这个管道是纯的、无状态的函数，所以不需要 BeforeEach
   const pipe = new TitleCasePipe();
 
   it('transforms "abc" to "Abc"', () => {
@@ -44,31 +40,31 @@ describe('TitleCasePipe', () => {
     expect(pipe.transform('abc def')).toBe('Abc Def');
   });
 
-  // ... more tests ...
+  // ... 更多测试 ...
 });
 ```
 
-## Writing DOM tests to support a pipe test
+## 编写 DOM 测试来配合管道测试 {#writing-dom-tests-to-support-a-pipe-test}
 
-These are tests of the pipe _in isolation_.
-They can't tell if the `TitleCasePipe` is working properly as applied in the application components.
+这些是对管道的*隔离*测试。
+它们无法判断 `TitleCasePipe` 应用到应用的组件（component）中时是否能正常工作。
 
-Consider adding component tests such as this one:
+可以考虑添加类似下面这样的组件测试：
 
 ```ts
 it('should convert hero name to Title Case', async () => {
-  // get the name's input and display elements from the DOM
+  // 从 DOM 中获取名字的输入框和显示元素
   const hostElement: HTMLElement = harness.routeNativeElement!;
   const nameInput: HTMLInputElement = hostElement.querySelector('input')!;
   const nameDisplay: HTMLElement = hostElement.querySelector('span')!;
 
-  // simulate user entering a new name into the input box
+  // 模拟用户在输入框中输入新名字
   nameInput.value = 'quick BROWN  fOx';
 
-  // Dispatch a DOM event so that Angular learns of input value change.
+  // 派发一个 DOM 事件，让 Angular 知道输入值发生了变化
   nameInput.dispatchEvent(new Event('input'));
 
-  // Wait for Angular to update the display binding through the title pipe
+  // 等待 Angular 通过 title 管道更新显示的绑定
   await harness.fixture.whenStable();
 
   expect(nameDisplay.textContent).toBe('Quick Brown  Fox');

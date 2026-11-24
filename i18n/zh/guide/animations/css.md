@@ -2,7 +2,7 @@
 
 CSS 提供了一套强大的工具，可以在应用中创建美观、吸引人的动画（animation）。
 
-如何用原生 CSS 编写动画
+## 如何用原生 CSS 编写动画
 
 如果你从未写过原生 CSS 动画，有很多优秀的指南可以帮你入门。下面列出其中几篇：
 [MDN 的 CSS 动画指南](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations)

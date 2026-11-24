@@ -1,28 +1,24 @@
----
-untranslated: true
----
+# 用 CSS 为应用添加动画 {#animating-your-application-with-css}
 
-# Animating your Application with CSS
+CSS 提供了一套强大的工具，可以在应用中创建美观、吸引人的动画（animation）。
 
-CSS offers a robust set of tools for you to create beautiful and engaging animations within your application.
+## 如何用原生 CSS 编写动画 {#how-to-write-animations-in-native-css}
 
-## How to write animations in native CSS
+如果你从未写过原生 CSS 动画，有很多优秀的指南可以帮你入门。下面列出其中几篇：
+[MDN 的 CSS 动画指南](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations)
+[W3Schools 的 CSS3 动画指南](https://www.w3schools.com/css/css3_animations.asp)
+[完整的 CSS 动画教程](https://www.lambdatest.com/blog/css-animations-tutorial/)
+[面向初学者的 CSS 动画](https://thoughtbot.com/blog/css-animation-for-beginners)
 
-If you've never written any native CSS animations, there are a number of excellent guides to get you started. Here are a few of them:
-[MDN's CSS Animations guide](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations)
-[W3Schools CSS3 Animations guide](https://www.w3schools.com/css/css3_animations.asp)
-[The Complete CSS Animations Tutorial](https://www.lambdatest.com/blog/css-animations-tutorial/)
-[CSS Animation for Beginners](https://thoughtbot.com/blog/css-animation-for-beginners)
+以及几个视频：
+[9 分钟学会 CSS 动画](https://www.youtube.com/watch?v=z2LQYsZhsFw)
+[Net Ninja 的 CSS 动画教程播放列表](https://www.youtube.com/watch?v=jgw82b5Y2MU&list=PL4cUxeGkcC9iGYgmEd2dm3zAKzyCGDtM5)
 
-and a couple of videos:
-[Learn CSS Animation in 9 Minutes](https://www.youtube.com/watch?v=z2LQYsZhsFw)
-[Net Ninja CSS Animation Tutorial Playlist](https://www.youtube.com/watch?v=jgw82b5Y2MU&list=PL4cUxeGkcC9iGYgmEd2dm3zAKzyCGDtM5)
+看完其中一些指南和教程后，再回到本指南。
 
-Check out some of these guides and tutorials, then come back to this guide.
+## 创建可复用的动画 {#creating-reusable-animations}
 
-## Creating Reusable Animations
-
-You can create reusable animations that can be shared across your application using `@keyframes`. Define keyframe animations in a shared CSS file, and you'll be able to re-use those keyframe animations wherever you want within your application.
+你可以使用 `@keyframes` 创建可在整个应用中共享的可复用动画。在一个共享的 CSS 文件中定义关键帧动画，就可以在应用中任何需要的地方复用这些关键帧动画。
 
 ```css [animations.css]
 @keyframes sharedAnimation {
@@ -38,13 +34,13 @@ You can create reusable animations that can be shared across your application us
 }
 ```
 
-Adding the class `animated-class` to an element would trigger the animation on that element.
+给元素添加 `animated-class` 类，就会在该元素上触发这个动画。
 
-## Animating a Transition
+## 为过渡添加动画 {#animating-a-transition}
 
-### Animating State and Styles
+### 为状态和样式添加动画 {#animating-state-and-styles}
 
-You may want to animate between two different states, for example when an element is opened or closed. You can accomplish this by using CSS classes, either with a keyframe animation or transition styling.
+你可能希望在两种不同状态之间做动画，例如元素打开或关闭时。可以借助 CSS 类来实现，既可以使用关键帧动画，也可以使用过渡（transition）样式。
 
 ```css [animations.css]
 
@@ -63,15 +59,15 @@ You may want to animate between two different states, for example when an elemen
 }
 ```
 
-Triggering the `open` or `closed` state is done by toggling classes on the element in your component. You can find examples of how to do this in our [template guide](/guide/templates/binding#css-class-and-style-property-bindings).
+触发 `open` 或 `closed` 状态的方式是在组件（component）中切换元素上的类。你可以在我们的[模板指南](/guide/templates/binding#css-class-and-style-property-bindings)中找到相关示例。
 
-You can see similar examples in the template guide for [animating styles directly](/guide/templates/binding#css-style-properties).
+在模板指南中，你还可以看到[直接为样式添加动画](/guide/templates/binding#css-style-properties)的类似示例。
 
-### Transitions, Timing, and Easing
+### 过渡、时长与缓动 {#transitions-timing-and-easing}
 
-Animating often requires adjusting timing, delays, and easing behaviors. This can be done using several css properties or shorthand properties.
+动画通常需要调整时长、延迟和缓动行为。这可以通过若干 CSS 属性或简写属性来完成。
 
-Specify `animation-duration`, `animation-delay`, and `animation-timing-function` for a keyframe animation in CSS, or alternatively use the `animation` shorthand property.
+在 CSS 中，可以为关键帧动画指定 `animation-duration`、`animation-delay` 和 `animation-timing-function`，也可以改用 `animation` 简写属性。
 
 ```css [animations.css]
 
@@ -86,7 +82,7 @@ Specify `animation-duration`, `animation-delay`, and `animation-timing-function`
 }
 ```
 
-Similarly, you can use `transition-duration`, `transition-delay`, and `transition-timing-function` and the `transition` shorthand for animations that are not using `@keyframes`.
+同样，对于不使用 `@keyframes` 的动画，可以使用 `transition-duration`、`transition-delay`、`transition-timing-function` 以及 `transition` 简写属性。
 
 ```css [animations.css]
 
@@ -102,9 +98,9 @@ Similarly, you can use `transition-duration`, `transition-delay`, and `transitio
 }
 ```
 
-### Triggering an Animation
+### 触发动画 {#triggering-an-animation}
 
-Animations can be triggered by toggling CSS styles or classes. Once a class is present on an element, the animation will occur. Removing the class will revert the element back to whatever CSS is defined for that element. Here's an example:
+动画可以通过切换 CSS 样式或类来触发。一旦元素上出现某个类，动画就会发生。移除这个类后，元素会恢复为它原本定义的 CSS 样式。下面是一个示例：
 
 ::: code-group
 
@@ -176,11 +172,11 @@ export class OpenClose {
 
 :::
 
-## Transition and Triggers
+## 过渡与触发器 {#transition-and-triggers}
 
-### Animating Auto Height
+### 为自动高度添加动画 {#animating-auto-height}
 
-You can use CSS Grid to animate to auto height.
+你可以使用 CSS Grid 实现到自动高度（auto height）的动画。
 
 ::: code-group
 
@@ -255,11 +251,11 @@ export class AutoHeight {
 
 :::
 
-If you don't have to worry about supporting all browsers, you can also check out `calc-size()`, which is the true solution to animating auto height. See [MDN's docs](https://developer.mozilla.org/en-US/docs/Web/CSS/calc-size) and [this tutorial](https://frontendmasters.com/blog/one-of-the-boss-battles-of-css-is-almost-won-transitioning-to-auto/) for more information.
+如果你不需要考虑兼容所有浏览器，还可以了解一下 `calc-size()`，它才是为自动高度添加动画的真正解决方案。更多信息请参阅 [MDN 文档](https://developer.mozilla.org/en-US/docs/Web/CSS/calc-size)和[这篇教程](https://frontendmasters.com/blog/one-of-the-boss-battles-of-css-is-almost-won-transitioning-to-auto/)。
 
-### Animate entering and leaving a view
+### 为进入和离开视图添加动画 {#animate-entering-and-leaving-a-view}
 
-You can create animations for when an item enters a view or leaves a view. Let's start by looking at how to animate an element entering a view. We'll do this with `animate.enter`, which will apply animation classes when an element enters the view.
+你可以为条目进入视图或离开视图创建动画。我们先来看看如何为元素进入视图添加动画。这里使用 `animate.enter`，它会在元素进入视图时应用动画类。
 
 ::: code-group
 
@@ -341,7 +337,7 @@ export class Insert {
 
 :::
 
-Animating an element when it leaves the view is similar to animating when entering a view. Use `animate.leave` to specify which CSS classes to apply when the element leaves the view.
+为元素离开视图添加动画，与进入视图时的做法类似。使用 `animate.leave` 指定元素离开视图时要应用的 CSS 类。
 
 ::: code-group
 
@@ -421,16 +417,16 @@ export class Remove {
 
 :::
 
-::: info NOTE
-Child `animate.leave` animations fire only within the same component template. Nested component `animate.leave` animations will not fire when a parent element is removed.
+::: info 注意
+子元素上的 `animate.leave` 动画只会在同一个组件模板（template）内触发。当父元素被移除时，嵌套组件中的 `animate.leave` 动画不会触发。
 
 :::
 
-For more information on `animate.enter` and `animate.leave`, see the [Enter and Leave animations guide](/guide/animations).
+关于 `animate.enter` 和 `animate.leave` 的更多信息，请参阅[进入和离开动画指南](/guide/animations)。
 
-### Animating increment and decrement
+### 为递增和递减添加动画 {#animating-increment-and-decrement}
 
-Animating on increment and decrement is a common pattern in applications. Here's an example of how you can accomplish that behavior.
+在递增和递减时播放动画是应用中的常见模式。下面是实现这种行为的一个示例。
 
 ::: code-group
 
@@ -556,11 +552,11 @@ button + button {
 
 :::
 
-### Disabling an animation or all animations
+### 禁用某个动画或全部动画 {#disabling-an-animation-or-all-animations}
 
-If you'd like to disable the animations that you've specified, you have multiple options.
+如果你想禁用已经指定的动画，有多种选择。
 
-1. Create a custom class that forces animation and transition to `none`.
+1. 创建一个自定义类，把 animation 和 transition 强制设为 `none`。
 
 ```css
 .no-animation {
@@ -569,15 +565,15 @@ If you'd like to disable the animations that you've specified, you have multiple
 }
 ```
 
-Applying this class to an element prevents any animation from firing on that element. You could alternatively scope this to your entire DOM or section of your DOM to enforce this behavior. However, this prevents animation events from firing. If you are awaiting animation events for element removal, this solution won't work. A workaround is to set durations to 1 millisecond instead.
+把这个类应用到元素上，就能阻止该元素上触发任何动画。你也可以把它的作用范围扩大到整个 DOM 或 DOM 的某个部分，以强制实现这种行为。不过，这样做也会阻止动画事件触发。如果你要等待动画事件来移除元素，这个方案就行不通了。一个变通办法是把时长设为 1 毫秒。
 
-2. Use the [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query to ensure no animations play for users that prefer less animation.
+2. 使用 [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) 媒体查询，确保偏好减少动画的用户不会看到动画播放。
 
-3. Prevent adding animation classes programmatically
+3. 以编程方式阻止添加动画类
 
-### Animation Callbacks
+### 动画回调 {#animation-callbacks}
 
-If you have actions you would like to execute at certain points during animations, there are a number of available events you can listen to. Here's a few of them.
+如果你希望在动画的特定时间点执行某些操作，可以监听许多可用的事件。下面列出其中一些。
 
 [`OnAnimationStart`](https://developer.mozilla.org/en-US/docs/Web/API/Element/animationstart_event)  
 [`OnAnimationEnd`](https://developer.mozilla.org/en-US/docs/Web/API/Element/animationend_event)  
@@ -589,20 +585,20 @@ If you have actions you would like to execute at certain points during animation
 [`OnTransitionEnd`](https://developer.mozilla.org/en-US/docs/Web/API/Element/transitionend_event)  
 [`OnTransitionCancel`](https://developer.mozilla.org/en-US/docs/Web/API/Element/transitioncancel_event)
 
-The Web Animations API has a lot of additional functionality. [Take a look at the documentation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) to see all the available animation APIs.
+Web Animations API 还有大量其他功能。[请查看相关文档](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API)，了解所有可用的动画 API。
 
-::: info NOTE
-Be aware of bubbling issues with these callbacks. If you are animating children and parents, the events bubble up from children to parents. Consider stopping propagation or looking at more details within the event to determine if you're responding to the desired event target rather than an event bubbling up from a child node. You can examine the `animationname` property or the properties being transitioned to verify you have the right nodes.
+::: info 注意
+请注意这些回调的冒泡问题。如果你同时为子元素和父元素添加了动画，事件会从子元素向上冒泡到父元素。可以考虑阻止事件传播，或者查看事件的更多细节，以确定你响应的是预期的事件目标，而不是从子节点冒泡上来的事件。你可以检查 `animationname` 属性或正在过渡的属性，来确认处理的是正确的节点。
 
 :::
 
-## Complex Sequences
+## 复杂序列 {#complex-sequences}
 
-Animations are often more complicated than just a simple fade in or fade out. You may have lots of complicated sequences of animations you may want to run. Let's take a look at some of those possible scenarios.
+动画往往不只是简单的淡入或淡出。你可能有许多复杂的动画序列需要运行。我们来看看其中一些可能的场景。
 
-### Staggering animations in a list
+### 列表中的交错动画 {#staggering-animations-in-a-list}
 
-One common effect is to stagger the animations of each item in a list to create a cascade effect. This can be accomplished by utilizing `animation-delay` or `transition-delay`. Here is an example of what that CSS might look like.
+一种常见效果是让列表中每一项的动画依次错开，形成级联效果。这可以借助 `animation-delay` 或 `transition-delay` 实现。下面是相应 CSS 的一个示例。
 
 ::: code-group
 
@@ -677,9 +673,9 @@ export class Stagger {
 
 :::
 
-### Parallel Animations
+### 并行动画 {#parallel-animations}
 
-You can apply multiple animations to an element at once using the `animation` shorthand property. Each can have their own durations and delays. This allows you to compose animations together and create complicated effects.
+你可以使用 `animation` 简写属性一次为元素应用多个动画，每个动画都可以有自己的时长和延迟。这样就能把动画组合在一起，创造出复杂的效果。
 
 ```css
 .target-element {
@@ -689,11 +685,11 @@ You can apply multiple animations to an element at once using the `animation` sh
 }
 ```
 
-In this example, the `rotate` and `fade-in` animations fire at the same time, but have different durations.
+在这个例子中，`rotate` 和 `fade-in` 动画同时触发，但时长不同。
 
-### Animating the items of a reordering list
+### 为重新排序的列表项添加动画 {#animating-the-items-of-a-reordering-list}
 
-Items in a `@for` loop will be removed and re-added, which will fire off animations using `@starting-styles` for entry animations. Alternatively, you can use `animate.enter` for this same behavior. Use `animate.leave` to animate elements as they are removed, as seen in the example below.
+`@for` 循环中的条目会被移除并重新添加，这会触发使用 `@starting-styles` 编写的进入动画。你也可以使用 `animate.enter` 实现同样的行为。使用 `animate.leave` 为被移除的元素添加动画，如下例所示。
 
 ::: code-group
 
@@ -779,14 +775,14 @@ export class Reorder {
 
 :::
 
-## Programmatic control of animations
+## 以编程方式控制动画 {#programmatic-control-of-animations}
 
-You can retrieve animations off an element directly using [`Element.getAnimations()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAnimations). This returns an array of every [`Animation`](https://developer.mozilla.org/en-US/docs/Web/API/Animation) on that element. You can use the `Animation` API to do much more than you could with what the `AnimationPlayer` from the animations package offered. From here you can `cancel()`, `play()`, `pause()`, `reverse()` and much more. This native API should provide everything you need to control your animations.
+你可以使用 [`Element.getAnimations()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAnimations) 直接获取元素上的动画。它会返回该元素上所有 [`Animation`](https://developer.mozilla.org/en-US/docs/Web/API/Animation) 组成的数组。借助 `Animation` API，你能做的远比动画包中的 `AnimationPlayer` 所提供的多得多。你可以调用 `cancel()`、`play()`、`pause()`、`reverse()` 等方法。这个原生 API 应该能满足你控制动画的所有需求。
 
-## More on Angular animations
+## 更多 Angular 动画相关内容 {#more-on-angular-animations}
 
-You might also be interested in the following:
+你可能还会对下列内容感兴趣：
 
-- [Enter and Leave animations](/guide/animations)
-- [Route transition animations](/guide/routing/route-transition-animations)
+- [进入和离开动画](/guide/animations)
+- [路由过渡动画](/guide/routing/route-transition-animations)
 

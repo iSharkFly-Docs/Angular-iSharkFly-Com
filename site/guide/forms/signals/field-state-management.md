@@ -1,18 +1,14 @@
----
-untranslated: true
----
+# 字段状态管理 {#field-state-management}
 
-# Field state management
+信号表单（Signal Forms）的字段状态让你能够对用户交互做出响应：它提供了一组响应式信号（Signal），分别表示验证状态（如 `valid`、`invalid`、`errors`）、交互跟踪（如 `touched`、`dirty`）以及可用性（如 `disabled`、`hidden`）。
 
-Signal Forms' field state allows you to react to user interactions by providing reactive signals for validation status (such as `valid`, `invalid`, `errors`), interaction tracking (such as `touched`, `dirty`), and availability (such as `disabled`, `hidden`).
+## 理解字段状态 {#understanding-field-state}
 
-## Understanding field state
+当你用 [`form()`](https://angular.dev/api/forms/signals/form) 函数创建表单时，它会返回一个**字段树**（field tree）——一个与表单模型结构相对应的对象结构。树中的每个字段（field）都可以通过点号语法访问（例如 [`form.email`](https://angular.dev/api/forms/signals/FieldTree)）。
 
-When you create a form with the [`form()`](https://angular.dev/api/forms/signals/form) function, it returns a **field tree** - an object structure that mirrors your form model. Each field in the tree is accessible via dot notation (like [`form.email`](https://angular.dev/api/forms/signals/FieldTree)).
+### 访问字段状态 {#accessing-field-state}
 
-### Accessing field state
-
-When you call any field in the field tree as a function (like [`form.email()`](https://angular.dev/api/forms/signals/FieldState)), it returns a `FieldState` object containing reactive signals that track the field's validation, interaction, and availability state. For example, the `invalid()` signal tells you whether the field has validation errors:
+把字段树中的任意字段当作函数调用（例如 [`form.email()`](https://angular.dev/api/forms/signals/FieldState)），会返回一个 `FieldState` 对象，其中包含一组响应式信号，用于跟踪该字段的验证、交互和可用性状态。例如，`invalid()` 信号会告诉你该字段是否存在验证错误：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -47,45 +43,45 @@ export class Registration {
 }
 ```
 
-In this example, the template checks `registrationForm.email().invalid()` to determine whether to display an error message.
+在这个例子中，模板（Template）通过检查 `registrationForm.email().invalid()` 来决定是否显示错误消息。
 
-### Field state signals
+### 字段状态信号 {#field-state-signals}
 
-The most commonly used signal is `value()`, a `WritableSignal` that provides access to the field's current value:
+最常用的信号是 `value()`，它是一个 `WritableSignal`，用于访问字段的当前值：
 
 ```ts
 const emailValue = registrationForm.email().value();
-console.log(emailValue); // Current email string
+console.log(emailValue); // 当前的 email 字符串
 ```
 
-Beyond `value()`, field state includes signals for validation, interaction tracking, and availability control:
+除了 `value()`，字段状态还包含用于验证、交互跟踪和可用性控制的信号：
 
-| Category                                | Signal       | Description                                                                       |
+| 类别                                | 信号       | 说明                                                                       |
 | --------------------------------------- | ------------ | --------------------------------------------------------------------------------- |
-| **[Validation](#validation-state)**     | `valid()`    | Field passes all validation rules and has no pending validators                   |
-|                                         | `invalid()`  | Field has validation errors                                                       |
-|                                         | `errors()`   | Array of validation error objects                                                 |
-|                                         | `pending()`  | Async validation in progress                                                      |
-| **[Interaction](#interaction-state)**   | `touched()`  | User has focused and blurred the field (if interactive)                           |
-|                                         | `dirty()`    | User has modified the field (if interactive), even if value matches initial state |
-| **[Availability](#availability-state)** | `disabled()` | Field is disabled and doesn't affect parent form state                            |
-|                                         | `hidden()`   | Indicates field should be hidden; visibility in template is controlled with `@if` |
-|                                         | `readonly()` | Field is readonly and doesn't affect parent form state                            |
+| **[验证](#validation-state)**     | `valid()`    | 字段通过了所有验证规则，且没有处于等待中的验证器                   |
+|                                         | `invalid()`  | 字段存在验证错误                                                       |
+|                                         | `errors()`   | 验证错误对象的数组                                                 |
+|                                         | `pending()`  | 异步验证正在进行中                                                      |
+| **[交互](#interaction-state)**   | `touched()`  | 用户曾聚焦并移出该字段（仅限可交互字段）                           |
+|                                         | `dirty()`    | 用户修改过该字段（仅限可交互字段），即使当前值与初始值相同 |
+| **[可用性](#availability-state)** | `disabled()` | 字段已禁用，且不影响父表单的状态                            |
+|                                         | `hidden()`   | 表示字段应被隐藏；它在模板中是否可见由 `@if` 控制 |
+|                                         | `readonly()` | 字段为只读，且不影响父表单的状态                            |
 
-These signals enable you to build responsive form user experiences that react to user behavior. The sections below explore each category in detail.
+借助这些信号，你可以构建能对用户行为做出响应的表单交互体验。下面各节会逐一详细介绍每个类别。
 
-## Validation state
+## 验证状态 {#validation-state}
 
-Validation state signals tell you whether a field is valid and what errors it contains.
+验证状态信号会告诉你字段是否有效，以及它包含哪些错误。
 
-::: info NOTE
-This guide focuses on **using** validation state in your templates and logic (such as reading `valid()`, `invalid()`, `errors()` to display feedback). For information on **defining** validation rules and creating custom validators, see the [Validation guide](/guide/forms/signals/validation).
+::: info 注意
+本指南侧重于在模板和逻辑中**使用**验证状态（例如读取 `valid()`、`invalid()`、`errors()` 来显示反馈）。关于如何**定义**验证规则和创建自定义验证器（validator），请参阅[验证指南](/guide/forms/signals/validation)。
 
 :::
 
-### Checking validity
+### 检查有效性 {#checking-validity}
 
-Use `valid()` and `invalid()` to check validation status:
+使用 `valid()` 和 `invalid()` 检查验证状态：
 
 ```ts
 @Component({
@@ -106,29 +102,29 @@ export class Login {
 }
 ```
 
-| Signal      | Returns `true` when                                             |
+| 信号      | 何时返回 `true`                                             |
 | ----------- | --------------------------------------------------------------- |
-| `valid()`   | Field passes all validation rules and has no pending validators |
-| `invalid()` | Field has validation errors                                     |
+| `valid()`   | 字段通过了所有验证规则，且没有处于等待中的验证器 |
+| `invalid()` | 字段存在验证错误                                     |
 
-When checking validity in code, use `invalid()` instead of `!valid()` if you want to distinguish between "has errors" and "validation pending." The reason for this is that both `valid()` and `invalid()` can be `false` simultaneously when async validation is pending because the field isn't valid yet since validation not complete and is also isn't invalid since no errors have been found yet.
+在代码中检查有效性时，如果你想区分「存在错误」和「验证等待中」，请使用 `invalid()` 而不是 `!valid()`。原因在于：当异步验证处于等待状态时，`valid()` 和 `invalid()` 可能同时为 `false`——字段还不是有效的，因为验证尚未完成；同时它也不是无效的，因为目前还没有发现任何错误。
 
-### Reading validation errors
+### 读取验证错误 {#reading-validation-errors}
 
-Access the array of validation errors with `errors()`, or an individual error with `getError()`. Each error object contains:
+使用 `errors()` 访问验证错误数组，或使用 `getError()` 获取单个错误。每个错误对象包含：
 
-| Property    | Description                                                     |
+| 属性    | 说明                                                     |
 | ----------- | --------------------------------------------------------------- |
-| `kind`      | The validation rule that failed (such as "required" or "email") |
-| `message`   | Optional human-readable error message                           |
-| `fieldTree` | Reference to the `FieldTree` where the error occurred           |
+| `kind`      | 未通过的验证规则（例如 "required" 或 "email"） |
+| `message`   | 可选的、便于人阅读的错误消息                           |
+| `fieldTree` | 指向发生错误的 `FieldTree` 的引用           |
 
-::: info NOTE
-The `message` property is optional. Validators can provide custom error messages, but if not specified, you may need to map error `kind` values to your own messages.
+::: info 注意
+`message` 属性是可选的。验证器可以提供自定义错误消息；如果没有指定，你可能需要自行把错误的 `kind` 值映射为对应的消息。
 
 :::
 
-Here's an example of how to display errors in your template by an array of validation errors:
+下面的例子演示了如何在模板中通过验证错误数组来显示错误：
 
 ```ts
 @Component({
@@ -146,9 +142,9 @@ Here's an example of how to display errors in your template by an array of valid
 })
 ```
 
-This approach loops through all errors for a field, displaying each error message to the user.
+这种方式会遍历字段的所有错误，并把每条错误消息显示给用户。
 
-Here's an example of how to display an error in your template with `getError()`:
+下面的例子演示了如何在模板中使用 `getError()` 显示单个错误：
 
 ```ts
 @Component({
@@ -164,11 +160,11 @@ Here's an example of how to display an error in your template with `getError()`:
 })
 ```
 
-`getError()` accepts any string for an error's `kind`, and recognizes build-in validation error kinds (e.g., "required", "email", "minLength").
+`getError()` 接受任意字符串作为错误的 `kind`，并能识别内置的验证错误类型（例如 "required"、"email"、"minLength"）。
 
-### Pending validation
+### 等待中的验证 {#pending-validation}
 
-The `pending()` signal indicates async validation is in progress:
+`pending()` 信号表示异步验证正在进行中：
 
 ```ts
 @Component({
@@ -186,19 +182,19 @@ The `pending()` signal indicates async validation is in progress:
 })
 ```
 
-This signal enables you to show loading states while async validation executes.
+借助这个信号，你可以在异步验证执行期间显示加载状态。
 
-## Interaction state
+## 交互状态 {#interaction-state}
 
-Interaction state tracks whether users have interacted with fields, enabling patterns like "show errors only after the user has touched a field."
+交互状态跟踪用户是否与字段发生过交互，从而支持「仅在用户触碰过字段之后才显示错误」之类的模式。
 
-### Touched state
+### 已触碰状态 {#touched-state}
 
-The `touched()` signal tracks whether a user has focused and then blurred a field, or whether the field has been marked as touched programmatically. Only interactive fields can become touched; hidden, disabled, and readonly fields don't become touched from user interactions or `markAsTouched()`.
+`touched()` 信号跟踪用户是否曾聚焦并随后移出某个字段，或者该字段是否已通过编程方式被标记为已触碰（touched）。只有可交互的字段才会变为已触碰；隐藏、禁用和只读字段不会因用户交互或 `markAsTouched()` 而变为已触碰。
 
-When you need a section-level action to reveal validation errors within that section, call `markAsTouched()` on the section field. The default value of `skipDescendants` is `false`, so the call marks the section field and each descendant field as touched.
+如果你需要通过一个区块级的操作来显示该区块内的验证错误，可以在该区块字段上调用 `markAsTouched()`。`skipDescendants` 的默认值为 `false`，因此这个调用会把区块字段及其每个后代字段都标记为已触碰。
 
-For example, a checkout flow can validate the shipping section before allowing the user to continue to the next step:
+例如，结账流程可以在允许用户进入下一步之前，先验证收货信息区块：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -258,18 +254,18 @@ export class CheckoutShipping {
 }
 ```
 
-When `continueToPayment()` calls `markAsTouched()` on `checkoutForm.shipping()`, it uses the default `skipDescendants: false` behavior. Angular marks `shipping`, `shipping.name`, and `shipping.address` as touched, so the child `touched() && invalid()` error messages become visible before the whole form is submitted.
+当 `continueToPayment()` 在 `checkoutForm.shipping()` 上调用 `markAsTouched()` 时，使用的是默认的 `skipDescendants: false` 行为。Angular 会把 `shipping`、`shipping.name` 和 `shipping.address` 都标记为已触碰，因此子字段中基于 `touched() && invalid()` 的错误消息会在整个表单提交之前就显示出来。
 
-::: info NOTE
-Pass `{skipDescendants: true}` only when the field receiving the call should become touched without changing the touched state of its descendants.
+::: info 注意
+只有当你希望接收调用的字段变为已触碰、而不改变其后代字段的已触碰状态时，才传入 `{skipDescendants: true}`。
 
 :::
 
-### Dirty state
+### 已修改状态 {#dirty-state}
 
-Forms often need to detect whether data has actually changed - for example, to warn users about unsaved changes or to enable a save button only when necessary. The `dirty()` signal tracks whether the user has modified the field.
+表单经常需要检测数据是否真的发生了变化——例如，提醒用户有未保存的更改，或者只在必要时才启用保存按钮。`dirty()` 信号跟踪用户是否修改过该字段。
 
-The `dirty()` signal becomes `true` when the user modifies an interactive field's value, and remains `true` even if the value is changed back to match the initial value:
+当用户修改了某个可交互字段的值时，`dirty()` 信号会变为 `true`，并且即使之后把值改回与初始值相同，它仍然保持为 `true`：
 
 ```ts
 @Component({
@@ -290,36 +286,36 @@ export class Profile {
 }
 ```
 
-Use `dirty()` for "unsaved changes" warnings or to enable save buttons only when data has changed.
+`dirty()` 可用于「未保存的更改」提醒，或者只在数据发生变化时才启用保存按钮。
 
-### Touched vs dirty
+### 已触碰与已修改的区别 {#touched-vs-dirty}
 
-These signals track different kinds of interaction state:
+这两个信号跟踪的是不同类型的交互状态：
 
-| Signal      | When it becomes true                                                                                                            |
+| 信号      | 何时变为 true                                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `touched()` | User has focused and blurred an interactive field, or the field was marked as touched programmatically                          |
-| `dirty()`   | User has modified an interactive field (even if they never blurred it, and even if the current value matches the initial value) |
+| `touched()` | 用户曾聚焦并移出某个可交互字段，或者该字段已通过编程方式被标记为已触碰                          |
+| `dirty()`   | 用户修改过某个可交互字段（即使从未移出该字段，即使当前值与初始值相同） |
 
-A field can be in different combinations:
+字段可能处于以下不同的组合状态：
 
-| State                  | Scenario                                                  |
+| 状态                  | 场景                                                  |
 | ---------------------- | --------------------------------------------------------- |
-| Touched but not dirty  | User focused and blurred the field but made no changes    |
-| Both touched and dirty | User focused the field, changed the value, and blurred it |
+| 已触碰但未修改  | 用户聚焦并移出了字段，但没有做任何更改    |
+| 已触碰且已修改 | 用户聚焦了字段、修改了值，然后移出 |
 
-::: info NOTE
-Hidden, disabled, and readonly fields are non-interactive - they don't become touched or dirty from user interactions.
+::: info 注意
+隐藏、禁用和只读字段都是不可交互的——它们不会因用户交互而变为已触碰或已修改。
 
 :::
 
-## Availability state
+## 可用性状态 {#availability-state}
 
-Availability state signals control whether fields are interactive, editable, or visible. Disabled, hidden, and readonly fields are non-interactive. They don't affect whether their parent form is valid, touched, or dirty.
+可用性状态信号控制字段是否可交互、可编辑或可见。禁用、隐藏和只读字段都是不可交互的，它们不会影响父表单是否有效、是否已触碰或是否已修改。
 
-### Disabled fields
+### 禁用字段 {#disabled-fields}
 
-The `disabled()` signal indicates whether a field accepts user input. Disabled fields appear in the UI but users cannot interact with them.
+`disabled()` 信号表示字段是否接受用户输入。禁用字段会显示在 UI 中，但用户无法与之交互。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -328,8 +324,8 @@ import {form, FormField, disabled} from '@angular/forms/signals';
 @Component({
   selector: 'app-order',
   imports: [FormField],
-  // TIP: The `[formField]` directive automatically binds the `disabled` attribute based
-  // on the field's `disabled()` state, so you don't need to manually add `[disabled]="field().disabled()"`
+  // 提示：`[formField]` 指令会根据字段的 `disabled()` 状态自动绑定 `disabled` attribute，
+  // 因此你无需手动添加 `[disabled]="field().disabled()"`
   template: `
     <input [formField]="orderForm.couponCode" />
 
@@ -350,23 +346,23 @@ export class Order {
 }
 ```
 
-In this example, we use `valueOf(schemaPath.total)` to check the value of the `total` field to determine whether `couponCode` should be disabled.
+在这个例子中，我们使用 `valueOf(schemaPath.total)` 检查 `total` 字段的值，以决定 `couponCode` 是否应被禁用。
 
-::: info NOTE
-The schema callback parameter (`schemaPath` in these examples) is a `SchemaPathTree` object that provides paths to all fields in your form. You can name this parameter anything you like.
+::: info 注意
+schema 回调参数（这些例子中的 `schemaPath`）是一个 `SchemaPathTree` 对象，它提供了指向表单中所有字段的路径。你可以随意给这个参数命名。
 
 :::
 
-When defining rules like `disabled()`, `hidden()`, or `readonly()`, the `when` function receives a `FieldContext` object that is typically destructured (such as `({valueOf})`). Two methods commonly used in validation rules are:
+在定义 `disabled()`、`hidden()` 或 `readonly()` 等规则时，`when` 函数会接收一个 `FieldContext` 对象，通常会对它进行解构（例如 `({valueOf})`）。验证规则中常用的两个方法是：
 
-- `valueOf(schemaPath.otherField)` - Read the value of another field in the form
-- `value()` - A signal containing the value of the field the rule is applied to
+- `valueOf(schemaPath.otherField)` - 读取表单中另一个字段的值
+- `value()` - 一个信号，包含当前规则所作用字段的值
 
-Disabled fields don't contribute to the parent form's validation state. Even if a disabled field would be invalid, the parent form can still be valid. The `disabled()` state affects interactivity and validation, but does not change the field's value.
+禁用字段不会参与父表单的验证状态。即使某个禁用字段本应是无效的，父表单仍然可以是有效的。`disabled()` 状态会影响交互性和验证，但不会改变字段的值。
 
-### Hidden fields
+### 隐藏字段 {#hidden-fields}
 
-The `hidden()` signal indicates whether a field is conditionally hidden. Use `hidden()` with `@if` to show or hide fields based on conditions:
+`hidden()` 信号表示字段是否被有条件地隐藏。将 `hidden()` 与 `@if` 结合使用，可以根据条件显示或隐藏字段：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -401,11 +397,11 @@ export class Profile {
 }
 ```
 
-Hidden fields don't participate in validation. If a required field is hidden, it won't prevent form submission. The `hidden()` state affects availability and validation, but does not change the field's value.
+隐藏字段不参与验证。如果某个必填字段被隐藏了，它不会阻止表单提交。`hidden()` 状态会影响可用性和验证，但不会改变字段的值。
 
-### Readonly fields
+### 只读字段 {#readonly-fields}
 
-The `readonly()` signal indicates whether a field is readonly. Readonly fields display their value but users cannot edit them:
+`readonly()` 信号表示字段是否为只读。只读字段会显示其值，但用户无法编辑：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -438,26 +434,26 @@ export class Account {
 }
 ```
 
-::: info NOTE
-The `[formField]` directive automatically binds the `readonly` attribute based on the field's `readonly()` state, so you don't need to manually add `[readonly]="field().readonly()"`.
+::: info 注意
+`[formField]` 指令会根据字段的 `readonly()` 状态自动绑定 `readonly` attribute，因此你无需手动添加 `[readonly]="field().readonly()"`。
 
 :::
 
-Like disabled and hidden fields, readonly fields are non-interactive and don't affect parent form state. The `readonly()` state affects editability and validation, but does not change the field's value.
+与禁用字段和隐藏字段一样，只读字段也是不可交互的，不会影响父表单的状态。`readonly()` 状态会影响可编辑性和验证，但不会改变字段的值。
 
-### When to use each
+### 何时使用哪一种 {#when-to-use-each}
 
-| State        | Use when                                                            | User can see it | User can interact | Contributes to validation |
+| 状态        | 适用场景                                                            | 用户能否看到 | 用户能否交互 | 是否参与验证 |
 | ------------ | ------------------------------------------------------------------- | --------------- | ----------------- | ------------------------- |
-| `disabled()` | Field temporarily unavailable (such as based on other field values) | Yes             | No                | No                        |
-| `hidden()`   | Field not relevant in current context                               | No (with @if)   | No                | No                        |
-| `readonly()` | Value should be visible but not editable                            | Yes             | No                | No                        |
+| `disabled()` | 字段暂时不可用（例如取决于其他字段的值） | 能             | 否                | 否                        |
+| `hidden()`   | 字段与当前上下文无关                               | 否（配合 @if）   | 否                | 否                        |
+| `readonly()` | 值应当可见但不可编辑                            | 能             | 否                | 否                        |
 
-## Form-level state
+## 表单级状态 {#form-level-state}
 
-The root form is also a field in the field tree. When you call it as a function, it also returns a `FieldState` object that aggregates the state of all child fields.
+根表单本身也是字段树中的一个字段。把它当作函数调用时，同样会返回一个 `FieldState` 对象，该对象汇总了所有子字段的状态。
 
-### Accessing form state
+### 访问表单状态 {#accessing-form-state}
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -483,43 +479,43 @@ export class Login {
 }
 ```
 
-In this example, the form is valid only when all child fields are valid. This allows you to enable/disable submit buttons based on overall form validity.
+在这个例子中，只有当所有子字段都有效时，表单才是有效的。这样你就可以根据表单的整体有效性来启用或禁用提交按钮。
 
-### Form-level signals
+### 表单级信号 {#form-level-signals}
 
-Because the root form is a field, it has the same signals (such as `valid()`, `invalid()`, `touched()`, `dirty()`, etc.).
+由于根表单也是一个字段，它拥有相同的信号（例如 `valid()`、`invalid()`、`touched()`、`dirty()` 等）。
 
-| Signal      | Form-level behavior                                            |
+| 信号      | 表单级行为                                            |
 | ----------- | -------------------------------------------------------------- |
-| `valid()`   | All interactive fields are valid and no validators are pending |
-| `invalid()` | At least one interactive field has validation errors           |
-| `pending()` | At least one interactive field has pending async validation    |
-| `touched()` | The form, or at least one interactive descendant, is touched   |
-| `dirty()`   | User has modified at least one interactive field               |
+| `valid()`   | 所有可交互字段都有效，且没有处于等待中的验证器 |
+| `invalid()` | 至少有一个可交互字段存在验证错误           |
+| `pending()` | 至少有一个可交互字段的异步验证处于等待中    |
+| `touched()` | 表单本身或至少一个可交互的后代字段已被触碰   |
+| `dirty()`   | 用户修改过至少一个可交互字段               |
 
-### When to use form-level vs field-level
+### 何时使用表单级状态与字段级状态 {#when-to-use-form-level-vs-field-level}
 
-**Use form-level state for:**
+**以下情况使用表单级状态：**
 
-- Submit button enabled/disabled state
-- "Save" button state
-- Overall form validity checks
-- Unsaved changes warnings
+- 提交按钮的启用 / 禁用状态
+- 「保存」按钮的状态
+- 表单整体有效性检查
+- 未保存更改的提醒
 
-**Use field-level state for:**
+**以下情况使用字段级状态：**
 
-- Individual field error messages
-- Field-specific styling
-- Per-field validation feedback
-- Conditional field availability
+- 单个字段的错误消息
+- 针对特定字段的样式
+- 逐字段的验证反馈
+- 字段的条件可用性
 
-## State propagation
+## 状态传播 {#state-propagation}
 
-Field state propagates from child fields up through parent field groups to the root form.
+字段状态会从子字段开始，经由父级字段组，一路向上传播到根表单。
 
-### How child state affects parent forms
+### 子字段状态如何影响父表单 {#how-child-state-affects-parent-forms}
 
-When a child field becomes invalid, its parent field group becomes invalid, and so does the root form. When a child becomes touched or dirty, the parent field group and root form reflect that change. This aggregation allows you to check validity at any level - field or entire form.
+当某个子字段变为无效时，它的父级字段组也会变为无效，根表单同样如此。当某个子字段变为已触碰或已修改时，父级字段组和根表单也会反映这一变化。这种汇总机制让你可以在任意层级检查有效性——无论是单个字段还是整个表单。
 
 ```ts
 const userModel = signal({
@@ -535,15 +531,15 @@ const userModel = signal({
 
 const userForm = form(userModel);
 
-// If firstName is invalid, profile is invalid
+// 如果 firstName 无效，则 profile 无效
 userForm.profile.firstName().invalid() === true;
 // → userForm.profile().invalid() === true
 // → userForm().invalid() === true
 ```
 
-### Hidden, disabled, and readonly fields
+### 隐藏、禁用和只读字段 {#hidden-disabled-and-readonly-fields}
 
-Hidden, disabled, and readonly fields are non-interactive and don't affect parent form state:
+隐藏、禁用和只读字段都是不可交互的，不会影响父表单的状态：
 
 ```ts
 const orderModel = signal({
@@ -557,17 +553,17 @@ const orderForm = form(orderModel, (schemaPath) => {
 });
 ```
 
-In this example, when `shippingAddress` is hidden, it doesn't affect form validity. As a result, even if `shippingAddress` is empty and required, the form can be valid.
+在这个例子中，当 `shippingAddress` 被隐藏时，它不会影响表单的有效性。因此，即使 `shippingAddress` 为空且是必填的，表单仍然可以是有效的。
 
-This behavior prevents hidden, disabled, or readonly fields from blocking form submission or affecting validation, touched, and dirty state.
+这种行为可以防止隐藏、禁用或只读字段阻碍表单提交，或影响验证、已触碰和已修改状态。
 
-## Using state in templates
+## 在模板中使用状态 {#using-state-in-templates}
 
-Field state signals integrate seamlessly with Angular templates, enabling reactive form user experiences without manual event handling.
+字段状态信号与 Angular 模板无缝集成，无需手动处理事件即可实现响应式的表单交互体验。
 
-### Conditional error display
+### 有条件地显示错误 {#conditional-error-display}
 
-Show errors only after a user has interacted with a field:
+仅在用户与字段交互之后才显示错误：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -596,11 +592,11 @@ export class Signup {
 }
 ```
 
-This pattern prevents showing errors before users have had a chance to interact with the field. Errors appear only after the user has focused and then left the field.
+这种模式可以避免在用户还没来得及与字段交互时就显示错误。只有当用户聚焦并离开该字段之后，错误才会出现。
 
-### Conditional field availability
+### 字段的条件可用性 {#conditional-field-availability}
 
-Use the `hidden()` signal with `@if` to show or hide fields conditionally:
+将 `hidden()` 信号与 `@if` 结合使用，可以有条件地显示或隐藏字段：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -637,11 +633,11 @@ export class Order {
 }
 ```
 
-Hidden fields don't participate in validation, allowing the form to be submitted even if the hidden field would otherwise be invalid.
+隐藏字段不参与验证，因此即使隐藏字段本应是无效的，表单仍然可以提交。
 
-### Tracking values for array fields
+### 跟踪数组字段的值 {#tracking-values-for-array-fields}
 
-In signal forms, a `@for` block over a set of fields should be tracked by field identity.
+在信号表单中，遍历一组字段的 `@for` 块应按字段的身份进行跟踪。
 
 ```ts
 @Component({
@@ -658,17 +654,17 @@ export class App {
 }
 ```
 
-The forms system is already tracking the model values within the array and maintaining a stable identity of the fields it creates automatically.
+表单系统本身已经在跟踪数组中的模型值，并会为它自动创建的字段维护稳定的身份。
 
-When an item changes, it may represent a new logical entity even if some of its properties look the same. Tracking by identity ensures the framework treats it as a distinct item rather than reusing existing UI elements. This prevents stateful elements, like form inputs, from being incorrectly shared and keeps bindings aligned with the correct part of the model.
+当某一项发生变化时，即使它的某些属性看起来相同，它也可能代表一个新的逻辑实体。按身份跟踪可以确保框架把它当作一个独立的条目，而不是复用已有的 UI 元素。这样可以防止表单输入框之类的有状态元素被错误地共享，并让绑定（Binding）始终与模型中正确的部分保持对应。
 
-## Using field state in component logic
+## 在组件逻辑中使用字段状态 {#using-field-state-in-component-logic}
 
-Field state signals work with Angular's reactive primitives like `computed()` and `effect()` for advanced form logic.
+字段状态信号可以与 Angular 的 `computed()`、`effect()` 等响应式原语配合使用，实现更高级的表单逻辑。
 
-### Validation checks before submission
+### 提交前的验证检查 {#validation-checks-before-submission}
 
-Check form validity in component methods:
+在组件（Component）方法中检查表单的有效性：
 
 ```ts
 export class Registration {
@@ -681,13 +677,13 @@ export class Registration {
   registrationForm = form(this.registrationModel);
 
   async onSubmit() {
-    // Wait for any pending async validation
+    // 等待所有处于等待中的异步验证
     if (this.registrationForm().pending()) {
       console.log('Waiting for validation...');
       return;
     }
 
-    // Guard against invalid submissions
+    // 防止提交无效数据
     if (this.registrationForm().invalid()) {
       console.error('Form is invalid');
       return;
@@ -699,18 +695,18 @@ export class Registration {
 }
 ```
 
-This ensures only valid, fully-validated data reaches your API.
+这样可以确保只有有效且已完成全部验证的数据才会到达你的 API。
 
-### Derived state with computed
+### 使用 computed 派生状态 {#derived-state-with-computed}
 
-Create computed signals based on field state to automatically update when the underlying field state changes:
+基于字段状态创建计算信号（Computed），使其在底层字段状态变化时自动更新：
 
 ```ts
 export class Password {
   passwordModel = signal({password: '', confirmPassword: ''});
   passwordForm = form(this.passwordModel);
 
-  // Compute password strength indicator
+  // 计算密码强度指示
   passwordStrength = computed(() => {
     const password = this.passwordForm.password().value();
     if (password.length < 8) return 'weak';
@@ -718,7 +714,7 @@ export class Password {
     return 'strong';
   });
 
-  // Check if all required fields are filled
+  // 检查所有必填字段是否都已填写
   allFieldsFilled = computed(() => {
     return (
       this.passwordForm.password().value().length > 0 &&
@@ -728,13 +724,13 @@ export class Password {
 }
 ```
 
-### Programmatic state changes
+### 以编程方式更改状态 {#programmatic-state-changes}
 
-While field state typically updates through user interactions (typing, focusing, blurring), you sometimes need to control it programmatically. Common scenarios include form submission and resetting forms.
+虽然字段状态通常会随用户交互（输入、聚焦、失焦）而更新，但有时你需要以编程方式控制它。常见场景包括表单提交和重置表单。
 
-#### Form submission
+#### 表单提交 {#form-submission}
 
-Signal Forms provides a `FormRoot` directive that simplifies form submission. It automatically prevents the default browser form submission behavior and sets the `novalidate` attribute on the `<form>` element.
+信号表单提供了一个 `FormRoot` 指令（Directive），用于简化表单提交。它会自动阻止浏览器默认的表单提交行为，并在 `<form>` 元素上设置 `novalidate` attribute。
 
 ```ts
 import {FormField, FormRoot, form, required, email} from '@angular/forms/signals';
@@ -770,18 +766,18 @@ export class Registration {
   );
 
   private submitToServer() {
-    // Send data to server
+    // 把数据发送到服务器
   }
 }
 ```
 
-When you use `FormRoot` with a form that has a `submission` option, submitting the form automatically calls the `submit()` function, which marks all fields as touched (revealing validation errors) and executes your `action` callback if the form is valid.
+当你把 `FormRoot` 用于带有 `submission` 选项的表单时，提交表单会自动调用 `submit()` 函数。该函数会把所有字段标记为已触碰（从而显示验证错误），并在表单有效时执行你的 `action` 回调。
 
-You can also submit a form manually, without using the directive, by calling `submit(this.registrationForm)`. When explicitly calling the `submit` function like this, you can pass a `FormSubmitOptions` to override the default `submission` logic for the form: `submit(this.registrationForm, {action: () => /* ... */ })`.
+你也可以不使用该指令，而是调用 `submit(this.registrationForm)` 来手动提交表单。像这样显式调用 `submit` 函数时，你可以传入一个 `FormSubmitOptions` 来覆盖表单默认的 `submission` 逻辑：`submit(this.registrationForm, {action: () => /* ... */ })`。
 
-#### Resetting forms after submission
+#### 提交后重置表单 {#resetting-forms-after-submission}
 
-After successfully submitting a form, you may want to return it to its initial state - clearing both user interaction history and field values. The `reset()` method clears the touched and dirty flags. You can also pass an optional value to `reset()` to update the model data:
+成功提交表单后，你可能希望让它回到初始状态——同时清除用户交互记录和字段值。`reset()` 方法会清除已触碰和已修改标志。你还可以向 `reset()` 传入一个可选的值来更新模型数据：
 
 ```ts
 export class Contact {
@@ -791,7 +787,7 @@ export class Contact {
     submission: {
       action: async (f) => {
         await this.api.sendMessage(this.contactModel());
-        // Clear interaction state (touched, dirty) and reset to initial values
+        // 清除交互状态（touched、dirty）并重置为初始值
         f().reset({...this.INITIAL_MODEL});
       },
     },
@@ -799,11 +795,11 @@ export class Contact {
 }
 ```
 
-This ensures the form is ready for new input without showing stale error messages or dirty state indicators.
+这样可以确保表单为新的输入做好准备，而不会显示过时的错误消息或已修改状态的标识。
 
-## Styling based on validation state
+## 根据验证状态设置样式 {#styling-based-on-validation-state}
 
-You can apply custom styles to your form by binding CSS classes based on the validation state:
+你可以根据验证状态绑定 CSS 类，为表单应用自定义样式：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -839,17 +835,17 @@ export class StyleExample {
 }
 ```
 
-Checking both `touched()` and validation state ensures styles only appear after the user has interacted with the field.
+同时检查 `touched()` 和验证状态，可以确保样式只在用户与字段交互之后才会出现。
 
-## Focus a form control bound to a form field
+## 聚焦绑定到表单字段的表单控件 {#focus-a-form-control-bound-to-a-form-field}
 
-Angular Signal Forms provide a `focusBoundControl()` method on field state that lets you programmatically move [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus) to the form control associated with a given form field.
+Angular 信号表单在字段状态上提供了 `focusBoundControl()` 方法，让你可以通过编程方式把[焦点](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)移到与指定表单字段关联的表单控件（form control）上。
 
-A common use case is improving accessibility on form submission: when a form is invalid, display error messages and automatically move focus to the first invalid field, guiding the user to correct it.
+一个常见的用例是改善表单提交时的无障碍性：当表单无效时，显示错误消息，并自动把焦点移到第一个无效字段上，引导用户进行修正。
 
-### Basic usage
+### 基本用法 {#basic-usage}
 
-Given a registration form:
+假设有一个注册表单：
 
 ```ts
 @Component({/* ... */})
@@ -863,23 +859,23 @@ export class Registration {
 }
 ```
 
-To move focus to the control bound to the `email` field:
+要把焦点移到绑定到 `email` 字段的控件上：
 
 ```ts
 registrationForm.email().focusBoundControl();
 ```
 
-### Preventing scroll
+### 防止滚动 {#preventing-scroll}
 
-If the target control is outside the viewport and you want to focus it without triggering a scroll, you can set the [preventScroll](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#preventscroll) option to `true` when calling the `focusBoundControl()` method.
+如果目标控件位于视口之外，而你希望在聚焦时不触发滚动，可以在调用 `focusBoundControl()` 方法时把 [preventScroll](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#preventscroll) 选项设为 `true`。
 
 ```ts
 registrationForm.email().focusBoundControl({preventScroll: true});
 ```
 
-### Focusing the first invalid field on submission
+### 提交时聚焦第一个无效字段 {#focusing-the-first-invalid-field-on-submission}
 
-Use `errorSummary()` to locate the first invalid field and focus it when the user submits the form with errors:
+当用户提交带有错误的表单时，使用 `errorSummary()` 找到第一个无效字段并聚焦它：
 
 ```ts
 onSubmit() {
@@ -887,18 +883,18 @@ onSubmit() {
   if (firstError?.fieldTree) {
     firstError.fieldTree().focusBoundControl();
   } else {
-    // proceed with submission
+    // 继续提交
   }
 }
 ```
 
-### Custom controls
+### 自定义控件 {#custom-controls}
 
-By default, calling `focusBoundControl()` on a custom control focuses the control's host element, which usually cannot receive focus. A custom control can contain multiple native inputs. For example, a date picker can contain separate day, month, and year fields. As a result, Angular cannot determine which element should receive focus or what action to perform.
+默认情况下，在自定义控件上调用 `focusBoundControl()` 会聚焦该控件的宿主元素（host element），而宿主元素通常无法获得焦点。一个自定义控件可能包含多个原生输入框，例如日期选择器可能包含独立的日、月、年字段。因此，Angular 无法确定应该由哪个元素获得焦点，也无法确定应执行什么操作。
 
-To support programmatic focus in a custom control, implement a `focus()` method. When `focusBoundControl()` is called on the field state associated with a custom control, Angular calls the control's `focus()` method if one is present.
+要在自定义控件中支持编程式聚焦，请实现一个 `focus()` 方法。当在与自定义控件关联的字段状态上调用 `focusBoundControl()` 时，如果该控件存在 `focus()` 方法，Angular 就会调用它。
 
-Consider a custom password input:
+来看一个自定义密码输入控件：
 
 ```html
 <div class="password-block">
@@ -912,20 +908,20 @@ export class PasswordInput implements FormValueControl<string> {
   readonly value = model<string>('');
   readonly passwordCtrl = viewChild.required<ElementRef<HTMLInputElement>>('passwordCtrl');
 
-  // Called automatically when focusBoundControl() is invoked
-  // on the field state associated with this custom control
+  // 调用 focusBoundControl() 时会自动调用此方法，
+  // 前提是在与该自定义控件关联的字段状态上调用
   focus(): void {
     this.passwordCtrl().nativeElement.focus();
   }
 }
 ```
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-This guide covered validation and availability status handling, interaction tracking and field state propagation. Related guides explore other aspects of Signal Forms:
+本指南介绍了验证状态与可用性状态的处理、交互跟踪以及字段状态的传播。以下相关指南探讨了信号表单的其他方面：
 
-- [Form models](/guide/forms/signals/models)
-- [Validation](/guide/forms/signals/validation)
-- [Custom controls](/guide/forms/signals/custom-controls)
-- [Working with Arrays](https://angular.dev/guide/forms/signals/arrays)
+- [表单模型](/guide/forms/signals/models)
+- [验证](/guide/forms/signals/validation)
+- [自定义控件](/guide/forms/signals/custom-controls)
+- [使用数组](https://angular.dev/guide/forms/signals/arrays)
 

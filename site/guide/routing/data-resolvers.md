@@ -1,38 +1,34 @@
----
-untranslated: true
----
+# 数据解析器 {#data-resolvers}
 
-# Data resolvers
+数据解析器（data resolver）让你可以在导航（navigation）到某个路由（route）之前获取数据，确保组件（component）在渲染之前就拿到所需的数据。通过预先加载关键数据，可以避免使用加载状态，并改善用户体验。
 
-Data resolvers allow you to fetch data before navigating to a route, ensuring that your components receive the data they need before rendering. This can help prevent the need for loading states and improve the user experience by pre-loading essential data.
-
-::: tip TIP
-If your application uses Angular Signals, consider using [route resources](/guide/routing/data-fetching-with-resources) for reactive data fetching with `Resource` APIs and built-in support for non-blocking data loading.
+::: tip 提示
+如果你的应用使用了 Angular 信号（signal），可以考虑使用[路由资源](/guide/routing/data-fetching-with-resources)，借助 `Resource` API 以响应式方式获取数据，并内置支持非阻塞的数据加载。
 
 :::
 
-## What are data resolvers?
+## 什么是数据解析器？ {#what-are-data-resolvers}
 
-A data resolver is a service that implements the `ResolveFn` function. It runs before a route activates and can fetch data from APIs, databases, or other sources. The resolved data becomes available to the component through the `ActivatedRoute`.
+数据解析器是一个实现了 `ResolveFn` 函数的服务（service）。它在路由激活之前运行，可以从 API、数据库或其他来源获取数据。解析出的数据会通过 `ActivatedRoute` 提供给组件。
 
-Data resolvers have access to [services provided at the route level](/guide/di/defining-dependency-providers#route-providers) as well as route-specific information via the `route` argument.
+数据解析器可以访问[在路由级别提供的服务](/guide/di/defining-dependency-providers#route-providers)，还可以通过 `route` 参数访问路由特有的信息。
 
-## Why use data resolvers?
+## 为什么要使用数据解析器？ {#why-use-data-resolvers}
 
-Data resolvers solve common routing challenges:
+数据解析器能解决常见的路由难题：
 
-- **Prevent empty states**: Components receive data immediately upon loading
-- **Better user experience**: No loading spinners for critical data
-- **Error handling**: Handle data fetching errors before navigation
-- **Data consistency**: Ensure required data is available before rendering which is important for SSR
+- **避免空状态**：组件在加载时立即拿到数据
+- **更好的用户体验**：关键数据无需显示加载转圈
+- **错误处理**：在导航之前处理数据获取错误
+- **数据一致性**：确保渲染前所需数据已经可用，这对 SSR 很重要
 
-## Creating a resolver
+## 创建解析器 {#creating-a-resolver}
 
-You create a resolver by writing a function with the `ResolveFn` type.
+你可以编写一个 `ResolveFn` 类型的函数来创建解析器。
 
-It receives the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as parameters.
+它接收 `ActivatedRouteSnapshot` 和 `RouterStateSnapshot` 作为参数。
 
-Here is a resolver that gets the user information before rendering a route using the [`inject`](https://angular.dev/api/core/inject) function:
+下面是一个使用 [`inject`](https://angular.dev/api/core/inject) 函数、在渲染路由之前获取用户信息的解析器：
 
 ```ts
 import {inject} from '@angular/core';
@@ -59,9 +55,9 @@ export const settingsResolver: ResolveFn<Settings> = (
 };
 ```
 
-## Configuring routes with resolvers
+## 为路由配置解析器 {#configuring-routes-with-resolvers}
 
-When you want to add one or more data resolvers to a route, you can add it under the `resolve` key in the route configuration. The `Routes` type defines the structure for route configurations:
+如果想为某个路由添加一个或多个数据解析器，可以把它们添加到路由配置的 `resolve` 键下。`Routes` 类型定义了路由配置的结构：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -78,13 +74,13 @@ export const routes: Routes = [
 ];
 ```
 
-You can learn more about the [`resolve` configuration in the API docs](https://angular.dev/api/router/Route#resolve).
+你可以在 [API 文档中进一步了解 `resolve` 配置](https://angular.dev/api/router/Route#resolve)。
 
-## Accessing resolved data in components
+## 在组件中访问解析出的数据 {#accessing-resolved-data-in-components}
 
-### Using ActivatedRoute
+### 使用 ActivatedRoute {#using-activatedroute}
 
-You can access the resolved data in a component by converting the `data` observable from the `ActivatedRoute` into a signal using the `toSignal` function:
+你可以使用 `toSignal` 函数把 `ActivatedRoute` 中的 `data` 可观察对象转换为信号，从而在组件中访问解析出的数据：
 
 ```ts
 import {Component, inject, computed} from '@angular/core';
@@ -107,9 +103,9 @@ export class UserDetail {
 }
 ```
 
-### Using withComponentInputBinding
+### 使用 withComponentInputBinding {#using-withcomponentinputbinding}
 
-A different approach to accessing the resolved data is to use `withComponentInputBinding()` when configuring your router with `provideRouter`. This allows resolved data to be passed directly as component inputs:
+访问解析出的数据的另一种方式，是在用 `provideRouter` 配置路由器（router）时使用 `withComponentInputBinding()`。这样，解析出的数据就可以直接作为组件输入（input）传入：
 
 ```ts
 import {bootstrapApplication} from '@angular/platform-browser';
@@ -121,7 +117,7 @@ bootstrapApplication(App, {
 });
 ```
 
-With this configuration, you can define inputs in your component that match the resolver keys using the `input` function and `input.required` for required inputs:
+有了这个配置，你就可以在组件中使用 `input` 函数（必需输入使用 `input.required`）定义与解析器键名匹配的输入：
 
 ```ts
 import {Component, input} from '@angular/core';
@@ -140,21 +136,21 @@ export class UserDetail {
 }
 ```
 
-This approach provides better type safety and eliminates the need to inject `ActivatedRoute` just to access resolved data.
+这种方式提供了更好的类型安全，而且不必为了访问解析出的数据而注入 `ActivatedRoute`。
 
-## Error handling in resolvers
+## 解析器中的错误处理 {#error-handling-in-resolvers}
 
-In the event of navigation failures, it is important to handle errors gracefully in your data resolvers. Otherwise, a `NavigationError` will occur and the navigation to the current route will fail which will lead to a poor experience for your users.
+当导航失败时，在数据解析器中妥善处理错误非常重要。否则会产生 `NavigationError`，导致导航到当前路由失败，给用户带来糟糕的体验。
 
-There are three primary ways to handle errors with data resolvers:
+在数据解析器中处理错误主要有三种方式：
 
-1. Centralize error handling in `withNavigationErrorHandler`
-2. Manage errors through a subscription to router events
-3. Handle errors directly in the resolver
+1. 在 `withNavigationErrorHandler` 中集中处理错误
+2. 通过订阅路由器事件来管理错误
+3. 直接在解析器中处理错误
 
-### Centralize error handling in `withNavigationErrorHandler`
+### 在 `withNavigationErrorHandler` 中集中处理错误 {#centralize-error-handling-in-withnavigationerrorhandler}
 
-The [`withNavigationErrorHandler`](https://angular.dev/api/router/withNavigationErrorHandler) feature provides a centralized way to handle all navigation errors, including those from failed data resolvers. This approach keeps error handling logic in one place and prevents duplicate error handling code across resolvers.
+[`withNavigationErrorHandler`](https://angular.dev/api/router/withNavigationErrorHandler) 特性提供了一种集中处理所有导航错误的方式，包括数据解析器失败所引发的错误。这种方式把错误处理逻辑集中在一处，避免在各个解析器中重复编写错误处理代码。
 
 ```ts
 import {bootstrapApplication} from '@angular/platform-browser';
@@ -180,20 +176,20 @@ bootstrapApplication(App, {
 });
 ```
 
-With this configuration, your resolvers can focus on data fetching while letting the centralized handler manage error scenarios:
+有了这个配置，解析器可以专注于获取数据，错误场景则交给集中的处理器来管理：
 
 ```ts
 export const userResolver: ResolveFn<User> = (route) => {
   const userStore = inject(UserStore);
   const userId = route.paramMap.get('id')!;
-  // No need for explicit error handling - let it bubble up
+  // 无需显式处理错误——让它向上冒泡即可
   return userStore.getUser(userId);
 };
 ```
 
-### Managing errors through a subscription to router events
+### 通过订阅路由器事件来管理错误 {#managing-errors-through-a-subscription-to-router-events}
 
-You can also handle resolver errors by subscribing to router events and listening for `NavigationError` events. This approach gives you more granular control over error handling and allows you to implement custom error recovery logic.
+你也可以订阅路由器事件并监听 `NavigationError` 事件来处理解析器错误。这种方式让你能更细粒度地控制错误处理，并实现自定义的错误恢复逻辑。
 
 ```ts
 import {Component, inject, signal} from '@angular/core';
@@ -246,15 +242,15 @@ export class App {
 }
 ```
 
-This approach is particularly useful when you need to:
+这种方式在以下情况下特别有用：
 
-- Implement custom retry logic for failed navigation
-- Show specific error messages based on the type of failure
-- Track navigation failures for analytics purposes
+- 为失败的导航实现自定义重试逻辑
+- 根据失败类型显示特定的错误消息
+- 出于分析目的跟踪导航失败
 
-### Handling errors directly in the resolver
+### 直接在解析器中处理错误 {#handling-errors-directly-in-the-resolver}
 
-Here's an updated example of the `userResolver` that logs the error and navigates back to the generic `/users` page using the `Router` service:
+下面是 `userResolver` 的更新版示例，它会记录错误，并使用 `Router` 服务导航回通用的 `/users` 页面：
 
 ```ts
 import {inject} from '@angular/core';
@@ -277,18 +273,18 @@ export const userResolver: ResolveFn<User | RedirectCommand> = (route) => {
 };
 ```
 
-## Navigation loading considerations
+## 导航加载方面的考量 {#navigation-loading-considerations}
 
-While data resolvers prevent loading states within components, they introduce a different UX consideration: navigation is blocked while resolvers execute. Users may experience delays between clicking a link and seeing the new route, especially with slow network requests.
+虽然数据解析器避免了组件内部的加载状态，但它也带来了另一种用户体验方面的考量：解析器执行期间导航会被阻塞。用户从点击链接到看到新路由之间可能会感到延迟，在网络请求较慢时尤其如此。
 
-::: tip TIP
-To avoid blocking navigation and render components immediately with skeleton or loading indicators, use [non-blocking route resources](/guide/routing/data-fetching-with-resources#blocking-and-non-blocking-resources).
+::: tip 提示
+如果想避免阻塞导航，并立即渲染带有骨架屏或加载指示器的组件，请使用[非阻塞的路由资源](/guide/routing/data-fetching-with-resources#blocking-and-non-blocking-resources)。
 
 :::
 
-### Providing navigation feedback
+### 提供导航反馈 {#providing-navigation-feedback}
 
-To improve user experience during resolver execution, you can listen to router events and show loading indicators:
+为了在解析器执行期间改善用户体验，你可以监听路由器事件并显示加载指示器：
 
 ```ts
 import {Component, computed, inject} from '@angular/core';
@@ -310,23 +306,23 @@ export class App {
 }
 ```
 
-This approach ensures users receive visual feedback that navigation is in progress while resolvers fetch data.
+这种方式可以确保在解析器获取数据时，用户能看到导航正在进行的视觉反馈。
 
-## Best practices
+## 最佳实践 {#best-practices}
 
-- **Keep resolvers lightweight**: Resolvers should fetch essential data only and not everything the page could possibly need
-- **Handle errors**: Always remember to handle errors gracefully to provide the best experience possible to users
-- **Use caching**: Consider caching resolved data to improve performance
-- **Consider navigation UX**: Implement loading indicators for resolver execution since navigation is blocked during data fetching
-- **Set reasonable timeouts**: Avoid resolvers that could hang indefinitely and block navigation
-- **Type safety**: Use TypeScript interfaces for resolved data
+- **保持解析器轻量**：解析器应该只获取关键数据，而不是页面可能需要的所有数据
+- **处理错误**：始终记得妥善处理错误，为用户提供尽可能好的体验
+- **使用缓存**：考虑缓存解析出的数据以提升性能
+- **考虑导航体验**：由于获取数据期间导航会被阻塞，请为解析器的执行实现加载指示器
+- **设置合理的超时**：避免解析器无限期挂起并阻塞导航
+- **类型安全**：为解析出的数据使用 TypeScript 接口
 
-## Reading parent resolved data in child resolvers
+## 在子解析器中读取父级解析出的数据 {#reading-parent-resolved-data-in-child-resolvers}
 
-Resolvers execute sequentially from parent to child. When a parent route defines a resolver, its resolved data is available to child resolvers that run afterward.
+解析器按从父到子的顺序依次执行。当父路由定义了解析器时，它解析出的数据可供随后运行的子解析器使用。
 
-::: info NOTE
-Because resolvers execute sequentially from parent to child, each nested level adds to the total navigation wait time (a network waterfall). If your child routes do not depend on parent data, consider [route resources](/guide/routing/data-fetching-with-resources), which execute concurrently across all routes.
+::: info 注意
+由于解析器按从父到子的顺序依次执行，每多一层嵌套都会增加总的导航等待时间（形成网络瀑布）。如果子路由不依赖父级数据，可以考虑使用[路由资源](/guide/routing/data-fetching-with-resources)，它会在所有路由之间并发执行。
 
 :::
 
@@ -341,16 +337,16 @@ import type {User} from './types';
 provideRouter([
   {
     path: 'users/:id',
-    resolve: {user: userResolver}, // user resolver in the parent route
+    resolve: {user: userResolver}, // 父路由中的 user 解析器
     children: [
       {
         path: 'posts',
         component: UserPosts,
-        // route.data.user is available here while this resolver runs
+        // 运行此解析器时，route.data.user 已经可用
         resolve: {
           posts: (route: ActivatedRouteSnapshot) => {
             const postService = inject(PostService);
-            const user = route.parent?.data['user'] as User; // parent data
+            const user = route.parent?.data['user'] as User; // 父级数据
             const userId = user.id;
             return postService.getPostByUser(userId);
           },
@@ -361,8 +357,8 @@ provideRouter([
 ]);
 ```
 
-## Next steps
+## 下一步 {#next-steps}
 
-- [Data fetching with resources](/guide/routing/data-fetching-with-resources)
-- [Control route access with guards](/guide/routing/route-guards)
+- [使用资源获取数据](/guide/routing/data-fetching-with-resources)
+- [使用守卫控制路由访问](/guide/routing/route-guards)
 

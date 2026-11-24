@@ -1,35 +1,31 @@
----
-untranslated: true
----
+# 组件测试工具概览 {#component-harnesses-overview}
 
-# Component harnesses overview
+<strong>组件测试工具（component harness）</strong>是一个类，它让测试能够通过一套受支持的 API，像最终用户那样与组件（component）交互。你可以为任何组件创建测试工具，从小型可复用部件到完整页面都可以。
 
-A <strong>component harness</strong> is a class that allows tests to interact with components the way an end user does via a supported API. You can create test harnesses for any component, ranging from small reusable widgets to full pages.
+测试工具有以下几个好处：
 
-Harnesses offer several benefits:
-
-- They make tests less brittle by insulating themselves against implementation details of a component, such as its DOM structure
-- They make tests become more readable and easier to maintain
-- They can be used across multiple testing environments
+- 它们把测试与组件的实现细节（例如 DOM 结构）隔离开，使测试不那么脆弱
+- 它们让测试更易读、更易维护
+- 它们可以在多种测试环境中使用
 
 ```ts
-// Example of test with a harness for a component called MyButtonComponent
+// 为名为 MyButtonComponent 的组件使用测试工具的测试示例
 it('should load button with exact text', async () => {
   const button = await loader.getHarness(MyButtonComponentHarness);
   expect(await button.getText()).toBe('Confirm');
 });
 ```
 
-Component harnesses are especially useful for shared UI widgets. Developers often write tests that depend on private implementation details of widgets, such as DOM structure and CSS classes. Those dependencies make tests brittle and hard to maintain. Harnesses offer an alternative— a supported API that interacts with the widget the same way an end-user does. Widget implementation changes now become less likely to break user tests. For example, [Angular Material](https://material.angular.dev/components/categories) provides a test harness for each component in the library.
+组件测试工具对共享的 UI 部件尤其有用。开发者编写的测试常常依赖部件的私有实现细节，例如 DOM 结构和 CSS 类。这些依赖让测试变得脆弱、难以维护。测试工具提供了另一种选择——一套受支持的 API，以与最终用户相同的方式和部件交互。这样，部件实现的改动就不太容易破坏使用者的测试了。例如，[Angular Material](https://material.angular.dev/components/categories) 为库中的每个组件都提供了测试工具。
 
-Component harnesses support multiple testing environments. You can use the same harness implementation in both unit and end-to-end tests. Test authors only need to learn one API and component authors don't have to maintain separate unit and end-to-end test implementations.
+组件测试工具支持多种测试环境。同一个测试工具实现既可以用于单元测试，也可以用于端到端测试。测试编写者只需学习一套 API，组件作者也不必分别维护单元测试和端到端测试的实现。
 
-Many developers can be categorized by one of the following developer type categories: test authors, component harness authors, and harness environment authors. Use the table below to find the most relevant section in this guide based on these categories:
+许多开发者可以归入以下几类之一：测试编写者、组件测试工具编写者，以及测试工具环境编写者。请根据下表，找到本指南中与你最相关的章节：
 
-| Developer Type              | Description                                                                                                                                                                                                                                                                                            | Relevant Section                                                                                             |
+| 开发者类型              | 描述                                                                                                                                                                                                                                                                                            | 相关章节                                                                                             |
 | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| Test Authors                | Developers that use component harnesses written by someone else to test their application. For example, this could be an app developer who uses a third-party menu component and needs to interact with the menu in a unit test.                                                                       | [Using component harnesses in tests](/guide/testing/using-component-harnesses)                                |
-| Component harness authors   | Developers who maintain some reusable Angular components and want to create a test harness for its users to use in their tests. For example, an author of a third party Angular component library or a developer who maintains a set of common components for a large Angular application.             | [Creating component harnesses for your components](/guide/testing/creating-component-harnesses)               |
-| Harness environment authors | Developers who want to add support for using component harnesses in additional testing environments. For information on supported testing environments out-of-the-box, see the [test harness environments and loaders](/guide/testing/using-component-harnesses#test-harness-environments-and-loaders). | [Adding support for additional testing environments](/guide/testing/component-harnesses-testing-environments) |
+| 测试编写者                | 使用他人编写的组件测试工具来测试自己应用的开发者。例如，某个应用开发者使用了第三方菜单组件，需要在单元测试中与该菜单交互。                                                                       | [在测试中使用组件测试工具](/guide/testing/using-component-harnesses)                                |
+| 组件测试工具编写者   | 维护一些可复用 Angular 组件，并希望为其使用者创建测试工具、供他们在测试中使用的开发者。例如，第三方 Angular 组件库的作者，或者为大型 Angular 应用维护一组通用组件的开发者。             | [为你的组件创建组件测试工具](/guide/testing/creating-component-harnesses)               |
+| 测试工具环境编写者 | 希望在更多测试环境中支持组件测试工具的开发者。关于开箱即用支持的测试环境，请参阅[测试工具环境与加载器](/guide/testing/using-component-harnesses#test-harness-environments-and-loaders)。 | [为其他测试环境添加支持](/guide/testing/component-harnesses-testing-environments) |
 
-For the full API reference, please see the [Angular CDK's component harness API reference page](/api#angular_cdk_testing).
+完整的 API 参考，请参阅 [Angular CDK 组件测试工具 API 参考页](/api#angular_cdk_testing)。

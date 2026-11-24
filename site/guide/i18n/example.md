@@ -1,8 +1,4 @@
----
-untranslated: true
----
-
-# Example Angular Internationalization application
+# Angular 国际化（i18n）示例应用 {#example-angular-internationalization-application}
 
 <!-- ## Explore the translated example application -->
 
@@ -10,9 +6,9 @@ untranslated: true
 <!-- TODO: link to GitHub -->
 <!-- <docs-code live path="adev/src/content/examples/i18n" title="live example"/> -->
 
-## `fr-CA` and `en-US` example
+## `fr-CA` 和 `en-US` 示例 {#fr-ca-and-en-us-example}
 
-The following tabs display the example application and the associated translation files.
+下面的选项卡展示了示例应用及其相关的翻译文件。
 
 ::: code-group
 
@@ -95,7 +91,7 @@ bootstrapApplication(AppComponent);
 ```
 
 ```txt [src/locale/messages.fr.xlf]
-<!-- The `messages.fr.xlf` after translation for documentation purposes -->
+<!-- 翻译后的 `messages.fr.xlf`，仅用于文档演示 -->
 <?xml version="1.0" encoding="UTF-8" ?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">

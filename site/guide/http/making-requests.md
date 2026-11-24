@@ -1,54 +1,50 @@
----
-untranslated: true
----
+# 发起 HTTP 请求 {#making-http-requests}
 
-# Making HTTP requests
+`HttpClient` 提供了与各种 HTTP 动词相对应的方法，用于发起请求，既可以加载数据，也可以在服务器上执行变更。每个方法都会返回一个 [RxJS `Observable`](https://rxjs.dev/guide/observable)，订阅它时会发送请求，并在服务器响应时发出结果。
 
-`HttpClient` has methods corresponding to the different HTTP verbs used to make requests, both to load data and to apply mutations on the server. Each method returns an [RxJS `Observable`](https://rxjs.dev/guide/observable) which, when subscribed, sends the request and then emits the results when the server responds.
-
-::: info NOTE
-`Observable`s created by `HttpClient` may be subscribed any number of times and will make a new backend request for each subscription.
+::: info 注意
+`HttpClient` 创建的 `Observable` 可以被订阅任意多次，每次订阅都会发起一个新的后端请求。
 
 :::
 
-Through an options object passed to the request method, various properties of the request and the returned response type can be adjusted.
+通过传给请求方法的选项对象，可以调整请求的各种属性以及返回的响应类型。
 
-## Fetching JSON data
+## 获取 JSON 数据 {#fetching-json-data}
 
-Fetching data from a backend often requires making a GET request using the [`HttpClient.get()`](https://angular.dev/api/common/http/HttpClient#get) method. This method takes two arguments: the string endpoint URL from which to fetch, and an _optional options_ object to configure the request.
+从后端获取数据通常需要使用 [`HttpClient.get()`](https://angular.dev/api/common/http/HttpClient#get) 方法发起 GET 请求。这个方法接受两个参数：要从中获取数据的端点 URL 字符串，以及一个用于配置请求的*可选的选项*对象。
 
-For example, to fetch configuration data from a hypothetical API using the `HttpClient.get()` method:
+例如，使用 `HttpClient.get()` 方法从一个假想的 API 获取配置数据：
 
 ```ts
 http.get<Config>('/api/config').subscribe((config) => {
-  // process the configuration.
+  // 处理配置。
 });
 ```
 
-Note the generic type argument which specifies that the data returned by the server will be of type `Config`. This argument is optional, and if you omit it, the returned data will have type `Object`.
+注意这里的泛型类型参数，它指定服务器返回的数据是 `Config` 类型。这个参数是可选的，如果省略它，返回的数据将是 `Object` 类型。
 
-::: tip TIP
-When dealing with data of uncertain structure and potential `undefined` or `null` values, consider using the `unknown` type instead of `Object` as the response type.
-
-:::
-
-::: danger CRITICAL
-The generic type of request methods is a type **assertion** about the data returned by the server. `HttpClient` does not verify that the actual return data matches this type.
+::: tip 提示
+在处理结构不确定、可能包含 `undefined` 或 `null` 值的数据时，可以考虑使用 `unknown` 类型而不是 `Object` 作为响应类型。
 
 :::
 
-## Fetching other types of data
+::: danger 严重
+请求方法的泛型类型是对服务器返回数据的一种类型**断言**。`HttpClient` 不会验证实际返回的数据是否与这个类型匹配。
 
-By default, `HttpClient` assumes that servers will return JSON data. When interacting with a non-JSON API, you can tell `HttpClient` what response type to expect when making the request. This is done with the `responseType` option.
+:::
 
-| **`responseType` value** | **Returned response type**                                                                                                                |
+## 获取其他类型的数据 {#fetching-other-types-of-data}
+
+默认情况下，`HttpClient` 假定服务器会返回 JSON 数据。与非 JSON 的 API 交互时，你可以在发起请求时告诉 `HttpClient` 预期的响应类型。这是通过 `responseType` 选项实现的。
+
+| **`responseType` 值** | **返回的响应类型**                                                                                                                |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `'json'` (default)       | JSON data of the given generic type                                                                                                       |
-| `'text'`                 | string data                                                                                                                               |
-| `'arraybuffer'`          | [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) containing the raw response bytes |
-| `'blob'`                 | [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob) instance                                                                        |
+| `'json'`（默认）       | 给定泛型类型的 JSON 数据                                                                                                       |
+| `'text'`                 | 字符串数据                                                                                                                               |
+| `'arraybuffer'`          | 包含原始响应字节的 [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) |
+| `'blob'`                 | [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob) 实例                                                                        |
 
-For example, you can ask `HttpClient` to download the raw bytes of a `.jpeg` image into an `ArrayBuffer`:
+例如，你可以让 `HttpClient` 把一张 `.jpeg` 图片的原始字节下载到一个 `ArrayBuffer` 中：
 
 ```ts
 http.get('/images/dog.jpg', {responseType: 'arraybuffer'}).subscribe((buffer) => {
@@ -56,17 +52,17 @@ http.get('/images/dog.jpg', {responseType: 'arraybuffer'}).subscribe((buffer) =>
 });
 ```
 
-::: warning Literal value for `responseType`
-Because the value of `responseType` affects the type returned by `HttpClient`, it must have a literal type and not a `string` type.
+::: warning `responseType` 必须是字面量值
+由于 `responseType` 的值会影响 `HttpClient` 返回的类型，它必须是字面量类型，而不能是 `string` 类型。
 
-This happens automatically if the options object passed to the request method is a literal object, but if you're extracting the request options out into a variable or helper method you might need to explicitly specify it as a literal, such as `responseType: 'text' as const`.
+如果传给请求方法的选项对象是一个对象字面量，这一点会自动满足；但如果你把请求选项提取到某个变量或辅助方法中，可能就需要显式地把它指定为字面量，例如 `responseType: 'text' as const`。
 :::
 
-## Mutating server state
+## 变更服务器状态 {#mutating-server-state}
 
-Server APIs that perform mutations often require making POST requests with a request body specifying the new state or the change to be made.
+执行变更的服务器 API 通常需要发起 POST 请求，并在请求体中指定新的状态或要进行的更改。
 
-The [`HttpClient.post()`](https://angular.dev/api/common/http/HttpClient#post) method behaves similarly to `get()`, and accepts an additional `body` argument before its options:
+[`HttpClient.post()`](https://angular.dev/api/common/http/HttpClient#post) 方法的行为与 `get()` 类似，只是在选项之前还接受一个额外的 `body` 参数：
 
 ```ts
 http.post<Config>('/api/config', newConfig).subscribe((config) => {
@@ -74,27 +70,27 @@ http.post<Config>('/api/config', newConfig).subscribe((config) => {
 });
 ```
 
-Many different types of values can be provided as the request's `body`, and `HttpClient` will serialize them accordingly:
+可以把许多不同类型的值作为请求的 `body` 提供，`HttpClient` 会相应地对它们进行序列化：
 
-| **`body` type**                                                                                                               | **Serialized as**                                    |
+| **`body` 类型**                                                                                                               | **序列化为**                                    |
 | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| string                                                                                                                        | Plain text                                           |
-| number, boolean, array, or plain object                                                                                       | JSON                                                 |
-| [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)                       | raw data from the buffer                             |
-| [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob)                                                                     | raw data with the `Blob`'s content type              |
-| [`FormData`](https://developer.mozilla.org/docs/Web/API/FormData)                                                             | `multipart/form-data` encoded data                   |
-| [`HttpParams`](https://angular.dev/api/common/http/HttpParams) or [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | `application/x-www-form-urlencoded` formatted string |
+| 字符串                                                                                                                        | 纯文本                                           |
+| 数字、布尔值、数组或普通对象                                                                                       | JSON                                                 |
+| [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)                       | 缓冲区中的原始数据                             |
+| [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob)                                                                     | 带有 `Blob` 内容类型的原始数据              |
+| [`FormData`](https://developer.mozilla.org/docs/Web/API/FormData)                                                             | `multipart/form-data` 编码的数据                   |
+| [`HttpParams`](https://angular.dev/api/common/http/HttpParams) 或 [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | `application/x-www-form-urlencoded` 格式的字符串 |
 
-::: warning IMPORTANT
-Remember to `.subscribe()` to mutation request `Observable`s in order to actually fire the request.
+::: warning 重要
+记得对变更请求的 `Observable` 调用 `.subscribe()`，这样才会真正发出请求。
 
 :::
 
-## Setting URL parameters
+## 设置 URL 参数 {#setting-url-parameters}
 
-Specify request parameters that should be included in the request URL using the `params` option.
+使用 `params` 选项指定应包含在请求 URL 中的请求参数。
 
-Passing an object literal is the simplest way of configuring URL parameters:
+传入一个对象字面量是配置 URL 参数最简单的方式：
 
 ```ts
 http
@@ -106,10 +102,10 @@ http
   });
 ```
 
-Alternatively, pass an instance of `HttpParams` if you need more control over the construction or serialization of the parameters.
+另外，如果你需要对参数的构造或序列化进行更多控制，可以传入一个 `HttpParams` 实例。
 
-::: warning IMPORTANT
-Instances of `HttpParams` are _immutable_ and cannot be directly changed. Instead, mutation methods such as `append()` return a new instance of `HttpParams` with the mutation applied.
+::: warning 重要
+`HttpParams` 的实例是*不可变的*，不能直接修改。相反，`append()` 等修改方法会返回一个应用了修改的新 `HttpParams` 实例。
 
 :::
 
@@ -125,13 +121,13 @@ http
   });
 ```
 
-You can instantiate `HttpParams` with a custom `HttpParameterCodec` that determines how `HttpClient` will encode the parameters into the URL.
+你可以使用自定义的 `HttpParameterCodec` 来实例化 `HttpParams`，由它决定 `HttpClient` 如何把参数编码到 URL 中。
 
-### Custom parameter encoding
+### 自定义参数编码 {#custom-parameter-encoding}
 
-By default, `HttpParams` uses the built-in [`HttpUrlEncodingCodec`](https://angular.dev/api/common/http/HttpUrlEncodingCodec) to encode and decode parameter keys and values.
+默认情况下，`HttpParams` 使用内置的 [`HttpUrlEncodingCodec`](https://angular.dev/api/common/http/HttpUrlEncodingCodec) 来编码和解码参数的键和值。
 
-You can provide your own implementation of [`HttpParameterCodec`](https://angular.dev/api/common/http/HttpParameterCodec) to customize how encoding and decoding are applied.
+你可以提供自己的 [`HttpParameterCodec`](https://angular.dev/api/common/http/HttpParameterCodec) 实现，以自定义编码和解码的方式。
 
 ```ts
 import {HttpClient, HttpParams, HttpParameterCodec} from '@angular/common/http';
@@ -170,11 +166,11 @@ export class ApiService {
 }
 ```
 
-## Setting request headers
+## 设置请求头 {#setting-request-headers}
 
-Specify request headers that should be included in the request using the `headers` option.
+使用 `headers` 选项指定应包含在请求中的请求头。
 
-Passing an object literal is the simplest way of configuring request headers:
+传入一个对象字面量是配置请求头最简单的方式：
 
 ```ts
 http
@@ -188,10 +184,10 @@ http
   });
 ```
 
-Alternatively, pass an instance of `HttpHeaders` if you need more control over the construction of headers.
+另外，如果你需要对请求头的构造进行更多控制，可以传入一个 `HttpHeaders` 实例。
 
-::: warning IMPORTANT
-Instances of `HttpHeaders` are _immutable_ and cannot be directly changed. Instead, mutation methods such as `append()` return a new instance of `HttpHeaders` with the mutation applied.
+::: warning 重要
+`HttpHeaders` 的实例是*不可变的*，不能直接修改。相反，`append()` 等修改方法会返回一个应用了修改的新 `HttpHeaders` 实例。
 
 :::
 
@@ -207,11 +203,11 @@ http
   });
 ```
 
-## Interacting with the server response events
+## 与服务器响应事件交互 {#interacting-with-the-server-response-events}
 
-For convenience, `HttpClient` by default returns an `Observable` of the data returned by the server (the response body). Occasionally it's desirable to examine the actual response, for example to retrieve specific response headers.
+为方便起见，`HttpClient` 默认返回一个由服务器所返回数据（即响应体）组成的 `Observable`。有时你需要检查实际的响应，例如获取特定的响应头。
 
-To access the entire response, set the `observe` option to `'response'`:
+要访问完整的响应，请把 `observe` 选项设置为 `'response'`：
 
 ```ts
 http.get<Config>('/api/config', {observe: 'response'}).subscribe((res) => {
@@ -220,24 +216,24 @@ http.get<Config>('/api/config', {observe: 'response'}).subscribe((res) => {
 });
 ```
 
-::: warning Literal value for `observe`
-Because the value of `observe` affects the type returned by `HttpClient`, it must have a literal type and not a `string` type.
+::: warning `observe` 必须是字面量值
+由于 `observe` 的值会影响 `HttpClient` 返回的类型，它必须是字面量类型，而不能是 `string` 类型。
 
-This happens automatically if the options object passed to the request method is a literal object, but if you're extracting the request options out into a variable or helper method you might need to explicitly specify it as a literal, such as `observe: 'response' as const`.
+如果传给请求方法的选项对象是一个对象字面量，这一点会自动满足；但如果你把请求选项提取到某个变量或辅助方法中，可能就需要显式地把它指定为字面量，例如 `observe: 'response' as const`。
 :::
 
-## Receiving raw progress events
+## 接收原始进度事件 {#receiving-raw-progress-events}
 
-In addition to the response body or response object, `HttpClient` can also return a stream of raw _events_ corresponding to specific moments in the request lifecycle. These events include when the request is sent, when the response header is returned, and when the body is complete. These events can also include _progress events_ that report upload and download status for large request or response bodies.
+除了响应体或响应对象之外，`HttpClient` 还可以返回一个原始*事件*流，这些事件对应于请求生命周期中的特定时刻。这些事件包括请求发送时、响应头返回时，以及响应体完成时。这些事件还可以包括*进度事件*，用于报告大型请求体或响应体的上传和下载状态。
 
-Progress events are disabled by default (as they have a performance cost) but can be enabled with the `reportUploadProgress` and `reportDownloadProgress` options.
+进度事件默认是禁用的（因为它们会带来性能开销），但可以通过 `reportUploadProgress` 和 `reportDownloadProgress` 选项启用。
 
-::: info NOTE
-The default fetch backend of `HttpClient` does not support _upload_ progress events and throws an error if you set `reportUploadProgress`. If your app needs upload progress events, configure `HttpClient` with `withXhr()` in `provideHttpClient(...)`.
+::: info 注意
+`HttpClient` 默认的 fetch 后端不支持*上传*进度事件，如果你设置了 `reportUploadProgress`，就会抛出错误。如果你的应用需要上传进度事件，请在 `provideHttpClient(...)` 中使用 `withXhr()` 来配置 `HttpClient`。
 
 :::
 
-To observe the event stream, set the `observe` option to `'events'`:
+要观察事件流，请把 `observe` 选项设置为 `'events'`：
 
 ```ts
 http
@@ -257,45 +253,45 @@ http
   });
 ```
 
-::: warning Literal value for `observe`
-Because the value of `observe` affects the type returned by `HttpClient`, it must have a literal type and not a `string` type.
+::: warning `observe` 必须是字面量值
+由于 `observe` 的值会影响 `HttpClient` 返回的类型，它必须是字面量类型，而不能是 `string` 类型。
 
-This happens automatically if the options object passed to the request method is a literal object, but if you're extracting the request options out into a variable or helper method you might need to explicitly specify it as a literal, such as `observe: 'events' as const`.
+如果传给请求方法的选项对象是一个对象字面量，这一点会自动满足；但如果你把请求选项提取到某个变量或辅助方法中，可能就需要显式地把它指定为字面量，例如 `observe: 'events' as const`。
 :::
 
-Each `HttpEvent` reported in the event stream has a `type` which distinguishes what the event represents:
+事件流中报告的每个 `HttpEvent` 都有一个 `type`，用于区分该事件所代表的含义：
 
-| **`type` value**                 | **Event meaning**                                                                  |
+| **`type` 值**                 | **事件含义**                                                                  |
 | -------------------------------- | ---------------------------------------------------------------------------------- |
-| `HttpEventType.Sent`             | The request has been dispatched to the server                                      |
-| `HttpEventType.UploadProgress`   | An `HttpUploadProgressEvent` reporting progress on uploading the request body      |
-| `HttpEventType.ResponseHeader`   | The head of the response has been received, including status and headers           |
-| `HttpEventType.DownloadProgress` | An `HttpDownloadProgressEvent` reporting progress on downloading the response body |
-| `HttpEventType.Response`         | The entire response has been received, including the response body                 |
-| `HttpEventType.User`             | A custom event from an HTTP interceptor.                                           |
+| `HttpEventType.Sent`             | 请求已发送到服务器                                      |
+| `HttpEventType.UploadProgress`   | 一个 `HttpUploadProgressEvent`，报告上传请求体的进度      |
+| `HttpEventType.ResponseHeader`   | 已收到响应头部，包括状态和响应头           |
+| `HttpEventType.DownloadProgress` | 一个 `HttpDownloadProgressEvent`，报告下载响应体的进度 |
+| `HttpEventType.Response`         | 已收到完整的响应，包括响应体                 |
+| `HttpEventType.User`             | 来自 HTTP 拦截器的自定义事件。                                           |
 
-## Handling request failure
+## 处理请求失败 {#handling-request-failure}
 
-There are three ways an HTTP request can fail:
+HTTP 请求可能以三种方式失败：
 
-- A network or connection error can prevent the request from reaching the backend server.
-- A request didn't respond in time when the timeout option was set.
-- The backend can receive the request but fail to process it, and return an error response.
+- 网络或连接错误可能导致请求无法到达后端服务器。
+- 设置了超时选项时，请求没有及时响应。
+- 后端收到了请求，但处理失败，并返回了一个错误响应。
 
-`HttpClient` captures all of the above kinds of errors in an `HttpErrorResponse` which it returns through the `Observable`'s error channel. Network and timeout errors have a `status` code of `0`. For timeouts, the `error` is a `DOMException` named `TimeoutError`; for network errors, it is the error thrown by `fetch` (or a [`ProgressEvent`](https://developer.mozilla.org/docs/Web/API/ProgressEvent) when using `withXhr()`). Backend errors have the failing `status` code returned by the backend, and the error response as the `error`. Inspect the response to identify the error's cause and the appropriate action to handle the error.
+`HttpClient` 会把上述所有类型的错误都捕获到一个 `HttpErrorResponse` 中，并通过 `Observable` 的错误通道返回。网络错误和超时错误的 `status` 码为 `0`。对于超时，`error` 是一个名为 `TimeoutError` 的 `DOMException`；对于网络错误，它是 `fetch` 抛出的错误（使用 `withXhr()` 时则是一个 [`ProgressEvent`](https://developer.mozilla.org/docs/Web/API/ProgressEvent)）。后端错误的 `status` 码是后端返回的失败状态码，`error` 则是错误响应。检查响应，以确定错误的原因以及处理该错误的适当方式。
 
-The [RxJS library](https://rxjs.dev/) offers several operators which can be useful for error handling.
+[RxJS 库](https://rxjs.dev/)提供了一些对错误处理很有用的操作符。
 
-You can use the `catchError` operator to transform an error response into a value for the UI. This value can tell the UI to display an error page or value, and capture the error's cause if necessary.
+你可以使用 `catchError` 操作符把错误响应转换为供 UI 使用的值。这个值可以告诉 UI 显示错误页面或错误值，并在必要时记录错误的原因。
 
-Sometimes transient errors such as network interruptions can cause a request to fail unexpectedly, and simply retrying the request will allow it to succeed. RxJS provides several _retry_ operators which automatically re-subscribe to a failed `Observable` under certain conditions. For example, the `retry()` operator will automatically attempt to re-subscribe a specified number of times.
+有时，网络中断之类的瞬时错误可能会导致请求意外失败，而只需重试请求就能成功。RxJS 提供了几个*重试*操作符，它们会在特定条件下自动重新订阅失败的 `Observable`。例如，`retry()` 操作符会自动尝试重新订阅指定的次数。
 
-### Timeouts
+### 超时 {#timeouts}
 
-To set a timeout for a request, you can set the `timeout` option to a number of milliseconds along with other request options. If the backend request does not complete within the specified time, the request will be aborted and an error will be emitted.
+要为请求设置超时，可以在其他请求选项之外，把 `timeout` 选项设置为一个毫秒数。如果后端请求没有在指定时间内完成，请求就会被中止，并发出一个错误。
 
-::: info NOTE
-The timeout will only apply to the backend HTTP request itself. It is not a timeout for the entire request handling chain. Therefore, this option is not affected by any delay introduced by interceptors.
+::: info 注意
+超时只作用于后端 HTTP 请求本身，而不是整个请求处理链的超时。因此，这个选项不受拦截器所引入的任何延迟影响。
 
 :::
 
@@ -309,22 +305,22 @@ http
       console.log('Config fetched successfully:', config);
     },
     error: (err) => {
-      // If the request times out, an error will have been emitted.
+      // 如果请求超时，就会发出一个错误。
     },
   });
 ```
 
-## Advanced fetch options
+## 高级 fetch 选项 {#advanced-fetch-options}
 
-Angular's `HttpClient` supports advanced fetch API options that can improve performance and user experience. These options are available when using the fetch backend, which is the default.
+Angular 的 `HttpClient` 支持一些高级的 fetch API 选项，它们可以提升性能和用户体验。这些选项在使用 fetch 后端（即默认后端）时可用。
 
-### Fetch options
+### Fetch 选项 {#fetch-options}
 
-The following options provide fine-grained control over request behavior when using the fetch backend.
+以下选项可以在使用 fetch 后端时对请求行为进行细粒度控制。
 
-#### Keep-alive connections
+#### Keep-alive 连接 {#keep-alive-connections}
 
-The `keepalive` option allows a request to outlive the page that initiated it. This is particularly useful for analytics or logging requests that need to complete even if the user navigates away from the page.
+`keepalive` 选项允许请求在发起它的页面关闭后继续存在。这对于分析或日志请求特别有用，即使用户离开了页面，这些请求也需要完成。
 
 ```ts
 http
@@ -334,12 +330,12 @@ http
   .subscribe();
 ```
 
-#### HTTP caching control
+#### HTTP 缓存控制 {#http-caching-control}
 
-The `cache` option controls how the request interacts with the browser's HTTP cache, which can significantly improve performance for repeated requests.
+`cache` 选项控制请求如何与浏览器的 HTTP 缓存交互，这可以显著提升重复请求的性能。
 
 ```ts
-//  Use cached response regardless of freshness
+//  无论是否新鲜，都使用缓存的响应
 http
   .get('/api/config', {
     cache: 'force-cache',
@@ -348,7 +344,7 @@ http
     // ...
   });
 
-// Always fetch from network, bypass cache
+// 总是从网络获取，绕过缓存
 http
   .get('/api/live-data', {
     cache: 'no-cache',
@@ -357,7 +353,7 @@ http
     // ...
   });
 
-// Use cached response only, fail if not in cache
+// 只使用缓存的响应，如果不在缓存中则失败
 http
   .get('/api/static-data', {
     cache: 'only-if-cached',
@@ -367,12 +363,12 @@ http
   });
 ```
 
-#### Request priority for Core Web Vitals
+#### 针对 Core Web Vitals 的请求优先级 {#request-priority-for-core-web-vitals}
 
-The `priority` option allows you to indicate the relative importance of a request, helping browsers optimize resource loading for better Core Web Vitals scores.
+`priority` 选项允许你指明请求的相对重要性，帮助浏览器优化资源加载，以获得更好的 Core Web Vitals 分数。
 
 ```ts
-// High priority for critical resources
+// 关键资源使用高优先级
 http
   .get('/api/user-profile', {
     priority: 'high',
@@ -381,7 +377,7 @@ http
     // ...
   });
 
-// Low priority for non-critical resources
+// 非关键资源使用低优先级
 http
   .get('/api/recommendations', {
     priority: 'low',
@@ -390,7 +386,7 @@ http
     // ...
   });
 
-// Auto priority (default) lets the browser decide
+// 自动优先级（默认）由浏览器决定
 http
   .get('/api/settings', {
     priority: 'auto',
@@ -400,23 +396,23 @@ http
   });
 ```
 
-Available `priority` values:
+可用的 `priority` 值：
 
-- `'high'`: High priority, loaded early (e.g., critical user data, above-the-fold content)
-- `'low'`: Low priority, loaded when resources are available (e.g., analytics, prefetch data)
-- `'auto'`: Browser determines priority based on request context (default)
+- `'high'`：高优先级，尽早加载（例如关键的用户数据、首屏内容）
+- `'low'`：低优先级，在资源空闲时加载（例如分析数据、预取数据）
+- `'auto'`：由浏览器根据请求上下文决定优先级（默认）
 
-::: tip TIP
-Use `priority: 'high'` for requests that affect Largest Contentful Paint (LCP) and `priority: 'low'` for requests that don't impact initial user experience.
+::: tip 提示
+对影响最大内容绘制（LCP）的请求使用 `priority: 'high'`，对不影响初始用户体验的请求使用 `priority: 'low'`。
 
 :::
 
-#### Request mode
+#### 请求模式 {#request-mode}
 
-The `mode` option controls how the request handles cross-origin requests and determines the response type.
+`mode` 选项控制请求如何处理跨源请求，并决定响应类型。
 
 ```ts
-// Same-origin requests only
+// 仅限同源请求
 http
   .get('/api/local-data', {
     mode: 'same-origin',
@@ -425,7 +421,7 @@ http
     // ...
   });
 
-// CORS-enabled cross-origin requests
+// 启用 CORS 的跨源请求
 http
   .get('https://api.external.com/data', {
     mode: 'cors',
@@ -434,7 +430,7 @@ http
     // ...
   });
 
-// No-CORS mode for simple cross-origin requests
+// 用于简单跨源请求的 No-CORS 模式
 http
   .get('https://external-api.com/public-data', {
     mode: 'no-cors',
@@ -444,28 +440,28 @@ http
   });
 ```
 
-Available `mode` values:
+可用的 `mode` 值：
 
-- `'same-origin'`: Only allow same-origin requests, fail for cross-origin requests
-- `'cors'`: Allow cross-origin requests with CORS (default)
-- `'no-cors'`: Allow simple cross-origin requests without CORS, response is opaque
+- `'same-origin'`：只允许同源请求，跨源请求会失败
+- `'cors'`：允许使用 CORS 的跨源请求（默认）
+- `'no-cors'`：允许不使用 CORS 的简单跨源请求，响应是不透明的
 
-::: tip TIP
-In the browser, use `mode: 'same-origin'` for sensitive requests that should never go cross-origin.
-
-:::
-
-::: warning IMPORTANT
-During SSR on Node.js, `HttpClient` uses Node.js's [Undici-based Fetch implementation](https://nodejs.org/api/globals.html#fetch). [Undici does not enforce browser CORS checks](https://undici.nodejs.org/#cors), so `mode: 'same-origin'` does not restrict server-side requests. Validate user-influenced URLs against an allowlist.
+::: tip 提示
+在浏览器中，对于绝不应跨源的敏感请求，请使用 `mode: 'same-origin'`。
 
 :::
 
-#### Redirect handling
+::: warning 重要
+在 Node.js 上进行 SSR 时，`HttpClient` 使用 Node.js [基于 Undici 的 Fetch 实现](https://nodejs.org/api/globals.html#fetch)。[Undici 不会执行浏览器的 CORS 检查](https://undici.nodejs.org/#cors)，因此 `mode: 'same-origin'` 不会限制服务端请求。请根据允许列表来验证受用户影响的 URL。
 
-The `redirect` option specifies how to handle redirect responses from the server.
+:::
+
+#### 重定向处理 {#redirect-handling}
+
+`redirect` 选项指定如何处理来自服务器的重定向响应。
 
 ```ts
-// Follow redirects automatically (default behavior)
+// 自动跟随重定向（默认行为）
 http
   .get('/api/resource', {
     redirect: 'follow',
@@ -474,47 +470,47 @@ http
     // ...
   });
 
-// Prevent automatic redirects
+// 阻止自动重定向
 http
   .get('/api/resource', {
     redirect: 'manual',
   })
   .subscribe((response) => {
-    // Handle redirect manually
+    // 手动处理重定向
   });
 
-// Treat redirects as errors
+// 把重定向视为错误
 http
   .get('/api/resource', {
     redirect: 'error',
   })
   .subscribe({
     next: (data) => {
-      // Success response
+      // 成功的响应
     },
     error: (err) => {
-      // Redirect responses will trigger this error handler
+      // 重定向响应会触发这个错误处理器
     },
   });
 ```
 
-Available `redirect` values:
+可用的 `redirect` 值：
 
-- `'follow'`: Automatically follow redirects (default)
-- `'error'`: Treat redirects as errors
-- `'manual'`: Don't follow redirects automatically, return redirect response
+- `'follow'`：自动跟随重定向（默认）
+- `'error'`：把重定向视为错误
+- `'manual'`：不自动跟随重定向，而是返回重定向响应
 
-::: tip TIP
-Use `redirect: 'manual'` when you need to handle redirects with custom logic.
+::: tip 提示
+当你需要用自定义逻辑处理重定向时，请使用 `redirect: 'manual'`。
 
 :::
 
-#### Credentials handling
+#### 凭据处理 {#credentials-handling}
 
-The `credentials` option controls whether cookies, authorization headers, and other credentials are sent with cross-origin requests. This is particularly important for authentication scenarios.
+`credentials` 选项控制是否随跨源请求发送 cookie、授权请求头以及其他凭据。这对于身份验证场景尤其重要。
 
 ```ts
-// Include credentials for cross-origin requests
+// 为跨源请求包含凭据
 http
   .get('https://api.example.com/protected-data', {
     credentials: 'include',
@@ -523,7 +519,7 @@ http
     // ...
   });
 
-// Never send credentials (default for cross-origin)
+// 从不发送凭据（跨源请求的默认行为）
 http
   .get('https://api.example.com/public-data', {
     credentials: 'omit',
@@ -532,7 +528,7 @@ http
     // ...
   });
 
-// Send credentials only for same-origin requests
+// 仅为同源请求发送凭据
 http
   .get('/api/user-data', {
     credentials: 'same-origin',
@@ -541,53 +537,53 @@ http
     // ...
   });
 
-// withCredentials overrides credentials setting
+// withCredentials 会覆盖 credentials 设置
 http
   .get('https://api.example.com/data', {
-    credentials: 'omit', // This will be ignored
-    withCredentials: true, // This forces credentials: 'include'
+    credentials: 'omit', // 这一项会被忽略
+    withCredentials: true, // 这一项会强制使用 credentials: 'include'
   })
   .subscribe((data) => {
-    // Request will include credentials despite credentials: 'omit'
+    // 尽管设置了 credentials: 'omit'，请求仍会包含凭据
   });
 
-// Legacy approach (still supported)
+// 旧式写法（仍受支持）
 http
   .get('https://api.example.com/data', {
     withCredentials: true,
   })
   .subscribe((data) => {
-    // Equivalent to credentials: 'include'
+    // 等同于 credentials: 'include'
   });
 ```
 
-::: warning IMPORTANT
-The `withCredentials` option takes precedence over the `credentials` option. If both are specified, `withCredentials: true` will always result in `credentials: 'include'`, regardless of the explicit `credentials` value.
+::: warning 重要
+`withCredentials` 选项的优先级高于 `credentials` 选项。如果两者都指定了，无论显式设置的 `credentials` 值是什么，`withCredentials: true` 总会导致 `credentials: 'include'`。
 
 :::
 
-Available `credentials` values:
+可用的 `credentials` 值：
 
-- `'omit'`: Never send credentials
-- `'same-origin'`: Send credentials only for same-origin requests (default)
-- `'include'`: Always send credentials, even for cross-origin requests
+- `'omit'`：从不发送凭据
+- `'same-origin'`：仅为同源请求发送凭据（默认）
+- `'include'`：总是发送凭据，即使是跨源请求
 
-::: tip TIP
-Use `credentials: 'include'` when you need to send authentication cookies or headers to a different domain that supports CORS. Avoid mixing `credentials` and `withCredentials` options to prevent confusion.
-
-:::
-
-::: warning IMPORTANT
-During SSR on Node.js, `credentials: 'include'` does not automatically forward cookies from the incoming browser request. The `credentials` option does not remove `Cookie` or `Authorization` headers that you add explicitly. [Undici permits some headers that browsers forbid](https://undici.nodejs.org/#forbidden-and-safelisted-header-names), so only forward credential headers to trusted origins.
+::: tip 提示
+当你需要向另一个支持 CORS 的域发送身份验证 cookie 或请求头时，请使用 `credentials: 'include'`。避免混用 `credentials` 和 `withCredentials` 选项，以免造成混淆。
 
 :::
 
-#### Referrer
+::: warning 重要
+在 Node.js 上进行 SSR 时，`credentials: 'include'` 不会自动转发来自浏览器传入请求的 cookie。`credentials` 选项也不会移除你显式添加的 `Cookie` 或 `Authorization` 请求头。[Undici 允许一些浏览器所禁止的请求头](https://undici.nodejs.org/#forbidden-and-safelisted-header-names)，因此只应把凭据相关的请求头转发给受信任的源。
 
-The `referrer` option allows you to control what referrer information is sent with the request. This is important for privacy and security considerations.
+:::
+
+#### Referrer {#referrer}
+
+`referrer` 选项允许你控制随请求发送的来源（referrer）信息。这对隐私和安全方面的考量很重要。
 
 ```ts
-// Send a specific referrer URL
+// 发送一个特定的 referrer URL
 http
   .get('/api/data', {
     referrer: 'https://example.com/page',
@@ -596,7 +592,7 @@ http
     // ...
   });
 
-// Use the current page as referrer (default behavior)
+// 使用当前页面作为 referrer（默认行为）
 http
   .get('/api/analytics', {
     referrer: 'about:client',
@@ -606,30 +602,30 @@ http
   });
 ```
 
-The `referrer` option accepts:
+`referrer` 选项接受：
 
-- A valid URL string: Sets the specific referrer URL to send
-- An empty string `''`: Sends no referrer information
-- `'about:client'`: Uses the default referrer (current page URL)
+- 一个有效的 URL 字符串：设置要发送的具体 referrer URL
+- 空字符串 `''`：不发送任何 referrer 信息
+- `'about:client'`：使用默认的 referrer（当前页面的 URL）
 
-::: tip TIP
-Use `referrer: ''` for sensitive requests where you don't want to leak the referring page URL.
+::: tip 提示
+对于不希望泄露来源页面 URL 的敏感请求，请使用 `referrer: ''`。
 
 :::
 
-#### Referrer policy
+#### Referrer 策略 {#referrer-policy}
 
-The `referrerPolicy` option controls how much referrer information—the URL of the page making the request—is sent along with an HTTP request. This setting affects both privacy and analytics, allowing you to balance data visibility with security considerations.
+`referrerPolicy` 选项控制随 HTTP 请求一起发送多少 referrer 信息（即发起请求的页面的 URL）。这个设置同时影响隐私和分析，让你可以在数据可见性与安全考量之间取得平衡。
 
 ```ts
-// Send no referrer information regardless of the current page
+// 无论当前页面是什么，都不发送 referrer 信息
 http
   .get('/api/data', {
     referrerPolicy: 'no-referrer',
   })
   .subscribe();
 
-// Send origin only (e.g. https://example.com)
+// 只发送源（例如 https://example.com）
 http
   .get('/api/analytics', {
     referrerPolicy: 'origin',
@@ -637,78 +633,78 @@ http
   .subscribe();
 ```
 
-The `referrerPolicy` option accepts:
+`referrerPolicy` 选项接受：
 
-- `'no-referrer'` Never send the `Referer` header.
-- `'no-referrer-when-downgrade'` Sends the referrer for same-origin and secure (HTTPS→HTTPS) requests, but omits it when navigating from a secure to a less secure origin (HTTPS→HTTP).
-- `'origin'` Sends only the origin (scheme, host, port) of the referrer, omitting path and query information.
-- `'origin-when-cross-origin'` Sends the full URL for same-origin requests, but only the origin for cross-origin requests.
-- `'same-origin'` Sends the full URL for same-origin requests and no referrer for cross-origin requests.
-- `'strict-origin'` Sends only the origin, and only if the protocol security level is not downgraded (e.g., HTTPS→HTTPS). Omits the referrer on downgrade.
-- `'strict-origin-when-cross-origin'` Default browser behavior. Sends the full URL for same-origin requests, the origin for cross-origin requests when not downgraded, and omits the referrer on downgrade.
-- `'unsafe-url'` Always sends the full URL (including path and query). This can expose sensitive data and should be used with caution.
+- `'no-referrer'` 从不发送 `Referer` 请求头。
+- `'no-referrer-when-downgrade'` 对同源请求和安全的（HTTPS→HTTPS）请求发送 referrer，但从安全的源跳转到安全性较低的源（HTTPS→HTTP）时省略它。
+- `'origin'` 只发送 referrer 的源（协议、主机、端口），省略路径和查询信息。
+- `'origin-when-cross-origin'` 对同源请求发送完整 URL，对跨源请求只发送源。
+- `'same-origin'` 对同源请求发送完整 URL，对跨源请求不发送 referrer。
+- `'strict-origin'` 只发送源，并且仅在协议安全级别没有降级（例如 HTTPS→HTTPS）时才发送。降级时省略 referrer。
+- `'strict-origin-when-cross-origin'` 浏览器的默认行为。对同源请求发送完整 URL；对跨源请求，在没有降级时发送源；降级时省略 referrer。
+- `'unsafe-url'` 总是发送完整 URL（包括路径和查询）。这可能会暴露敏感数据，应谨慎使用。
 
-::: tip TIP
-Prefer conservative values such as `'no-referrer'`, `'origin'`, or `'strict-origin-when-cross-origin'` for privacy-sensitive requests.
+::: tip 提示
+对于涉及隐私的敏感请求，优先使用 `'no-referrer'`、`'origin'` 或 `'strict-origin-when-cross-origin'` 这类保守的值。
 
 :::
 
-#### Integrity
+#### 完整性 {#integrity}
 
-The `integrity` option allows you to verify that the response hasn't been tampered with by providing a cryptographic hash of the expected content. This is particularly useful for loading scripts or other resources from CDNs.
+`integrity` 选项允许你通过提供预期内容的加密哈希，来验证响应没有被篡改。这在从 CDN 加载脚本或其他资源时特别有用。
 
 ```ts
-// Verify response integrity with SHA-256 hash
+// 使用 SHA-256 哈希验证响应的完整性
 http
   .get('/api/script.js', {
     integrity: 'sha256-ABC123...',
     responseType: 'text',
   })
   .subscribe((script) => {
-    // Script content is verified against the hash
+    // 脚本内容已根据哈希进行了验证
   });
 ```
 
-::: warning IMPORTANT
-The `integrity` option requires an exact match between the response content and the provided hash. If the content doesn't match, the request will fail with a network error.
+::: warning 重要
+`integrity` 选项要求响应内容与所提供的哈希完全匹配。如果内容不匹配，请求将以网络错误失败。
 
 :::
 
-::: danger CRITICAL
-During SSR, the Fetch implementation reads the entire response body to verify `integrity` before returning a response, as required by the [Fetch Standard](https://fetch.spec.whatwg.org/#concept-main-fetch). Angular enforces [`maxResponseBodySize`](/guide/ssr#configuring-the-response-body-size-limit) only after Fetch returns a response, so this limit does not constrain the data buffered during integrity verification.
+::: danger 严重
+在 SSR 期间，按照 [Fetch 标准](https://fetch.spec.whatwg.org/#concept-main-fetch)的要求，Fetch 实现会在返回响应之前读取整个响应体以验证 `integrity`。Angular 只会在 Fetch 返回响应之后才执行 [`maxResponseBodySize`](/guide/ssr#configuring-the-response-body-size-limit) 限制，因此这个限制无法约束完整性验证期间缓冲的数据。
 
 :::
 
-::: tip TIP
-Use subresource integrity when loading critical resources from external sources to ensure they haven't been modified. Generate hashes using tools like `openssl`.
+::: tip 提示
+从外部来源加载关键资源时，请使用子资源完整性来确保它们没有被修改。可以使用 `openssl` 等工具生成哈希。
 
 :::
 
-## HTTP `Observable`s
+## HTTP `Observable` {#http-observables}
 
-Each request method on `HttpClient` constructs and returns an `Observable` of the requested response type. Understanding how these `Observable`s work is important when using `HttpClient`.
+`HttpClient` 上的每个请求方法都会构造并返回一个所请求响应类型的 `Observable`。在使用 `HttpClient` 时，理解这些 `Observable` 的工作方式非常重要。
 
-`HttpClient` produces what RxJS calls "cold" `Observable`s, meaning that no actual request happens until the `Observable` is subscribed. Only then is the request actually dispatched to the server. Subscribing to the same `Observable` multiple times will trigger multiple backend requests. Each subscription is independent.
+`HttpClient` 产生的是 RxJS 所说的「冷」`Observable`，也就是说，在订阅 `Observable` 之前不会发生任何实际请求。只有到那时，请求才会真正发送到服务器。多次订阅同一个 `Observable` 会触发多个后端请求。每次订阅都是相互独立的。
 
-::: tip TIP
-You can think of `HttpClient` `Observable`s as _blueprints_ for actual server requests.
-
-:::
-
-Once subscribed, unsubscribing will abort the in-progress request. This is very useful if the `Observable` is subscribed via the `async` pipe, as it will automatically cancel the request if the user navigates away from the current page. Additionally, if you use the `Observable` with an RxJS combinator like `switchMap`, this cancellation will clean up any stale requests.
-
-Once the response returns, `Observable`s from `HttpClient` usually complete (although interceptors can influence this).
-
-Because of the automatic completion, there is usually no risk of memory leaks if `HttpClient` subscriptions are not cleaned up. However, as with any async operation, we strongly recommend that you clean up subscriptions when the component using them is destroyed, as the subscription callback may otherwise run and encounter errors when it attempts to interact with the destroyed component.
-
-::: tip TIP
-Using the `async` pipe or the `toSignal` operation to subscribe to `Observable`s ensures that subscriptions are disposed properly.
+::: tip 提示
+你可以把 `HttpClient` 的 `Observable` 看作实际服务器请求的*蓝图*。
 
 :::
 
-## Best practices
+订阅之后，取消订阅会中止正在进行的请求。如果 `Observable` 是通过 `async` 管道（Pipe）订阅的，这一点非常有用，因为当用户离开当前页面时，它会自动取消请求。此外，如果你把 `Observable` 与 `switchMap` 之类的 RxJS 组合操作符一起使用，这种取消机制会清理掉任何过时的请求。
 
-While `HttpClient` can be injected and used directly from components, generally we recommend you create reusable, injectable services which isolate and encapsulate data access logic. For example, this `UserService` encapsulates the logic to request data for a user by their id:
+一旦响应返回，来自 `HttpClient` 的 `Observable` 通常就会完成（尽管拦截器可能会影响这一点）。
+
+由于会自动完成，即使没有清理 `HttpClient` 的订阅，通常也不存在内存泄漏的风险。不过，与任何异步操作一样，我们强烈建议你在使用这些订阅的组件（Component）销毁时清理它们，否则订阅回调仍可能运行，并在尝试与已销毁的组件交互时遇到错误。
+
+::: tip 提示
+使用 `async` 管道或 `toSignal` 操作来订阅 `Observable`，可以确保订阅被正确地释放。
+
+:::
+
+## 最佳实践 {#best-practices}
+
+虽然可以在组件中直接注入并使用 `HttpClient`，但我们通常建议你创建可复用、可注入的服务（Service），用来隔离和封装数据访问逻辑。例如，下面这个 `UserService` 封装了按 id 请求用户数据的逻辑：
 
 ```ts
 @Service()
@@ -721,7 +717,7 @@ export class UserService {
 }
 ```
 
-Within a component, you can combine `@if` with the `async` pipe to render the UI for the data only after it's finished loading:
+在组件中，你可以把 `@if` 与 `async` 管道结合起来，只在数据加载完成后才渲染相应的 UI：
 
 ```ts
 import {AsyncPipe} from '@angular/common';

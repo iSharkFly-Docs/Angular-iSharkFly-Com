@@ -1,137 +1,133 @@
----
-untranslated: true
----
+# 列表框 {#listbox}
 
-# Listbox
-
-- [Listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
-- [Listbox API Reference](/api?query=listbox#angular_aria_listbox)
+- [列表框模式](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+- [Listbox API 参考](/api?query=listbox#angular_aria_listbox)
 
 
-## Overview
+## 概览 {#overview}
 
-A directive that displays a list of options for users to select from, supporting keyboard navigation, single or multiple selection, and screen reader support.
+列表框（listbox）是一个指令（directive），用于显示一组供用户选择的选项，支持键盘导航（keyboard navigation）、单选或多选，以及屏幕阅读器（screen reader）。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-## Usage
+## 用法 {#usage}
 
-Listbox is a foundational directive used by the [Select](/guide/aria/select), [Multiselect](/guide/aria/multiselect), and [Autocomplete](/guide/aria/autocomplete) patterns. For most dropdown needs, use those documented patterns instead.
+列表框是一个基础指令，[选择框](/guide/aria/select)、[多选](/guide/aria/multiselect)和[自动完成](/guide/aria/autocomplete)模式都基于它构建。对于大多数下拉需求，请改用这些已有文档的模式。
 
-Consider using listbox directly when:
+以下情况可以考虑直接使用列表框：
 
-- **Building custom selection components** - Creating specialized interfaces with specific behavior
-- **Visible selection lists** - Displaying selectable items directly on the page (not in dropdowns)
-- **Custom integration patterns** - Integrating with unique popup or layout requirements
+- **构建自定义选择组件** - 创建具有特定行为的专用界面
+- **可见的选择列表** - 直接在页面上（而不是在下拉框中）显示可选条目
+- **自定义集成模式** - 需要与特殊的弹出层或布局要求相集成
 
-Avoid listbox when:
+以下情况应避免使用列表框：
 
-- **Navigation menus are needed** - Use the [Menu](/guide/aria/menu) directive for actions and commands
+- **需要导航菜单时** - 对于操作和命令，请使用[菜单](/guide/aria/menu)指令
 
-## Features
+## 特性 {#features}
 
-Angular's listbox provides a fully accessible list implementation with:
+Angular 的列表框提供了完全无障碍的列表实现，具有以下特性：
 
-- **Keyboard Navigation** - Navigate options with arrow keys, select with Enter or Space
-- **Screen Reader Support** - Built-in ARIA attributes including role="listbox"
-- **Single or Multiple Selection** - `multi` attribute controls selection mode
-- **Horizontal or Vertical** - `orientation` attribute for layout direction
-- **Type-ahead Search** - Type characters to jump to matching options
-- **Signal-Based Reactivity** - Reactive state management using Angular signals
+- **键盘导航** - 用方向键浏览选项，用 Enter 或 Space 选择
+- **屏幕阅读器支持** - 内置 ARIA 属性，包括 role="listbox"
+- **单选或多选** - 由 `multi` 属性控制选择模式
+- **水平或垂直** - 由 `orientation` 属性控制布局方向
+- **预输入搜索** - 输入字符即可跳转到匹配的选项
+- **基于信号的响应式** - 使用 Angular 信号（signal）进行响应式状态管理
 
-## Examples
+## 示例 {#examples}
 
-### Basic listbox
+### 基本列表框 {#basic-listbox}
 
-Applications sometimes need selectable lists visible directly on the page rather than hidden in a dropdown. A standalone listbox provides keyboard navigation and selection for these visible list interfaces.
+应用有时需要直接在页面上显示可选列表，而不是将其隐藏在下拉框中。独立（standalone）的列表框可以为这类可见的列表界面提供键盘导航和选择功能。
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.html)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/basic/app/app.html)
 
-The `value` model signal provides two-way binding to the selected items. With `selectionMode="explicit"`, users press Space or Enter to select options. For dropdown patterns that combine listbox with combobox and overlay positioning, see the [Select](/guide/aria/select) pattern.
+`value` 模型信号为选中的条目提供双向绑定（two-way binding）。设置 `selectionMode="explicit"` 后，用户需要按 Space 或 Enter 来选择选项。对于将列表框与组合框（combobox）和浮层定位相结合的下拉模式，请参阅[选择框](/guide/aria/select)模式。
 
-### Horizontal listbox
+### 水平列表框 {#horizontal-listbox}
 
-Lists sometimes work better horizontally, such as toolbar-like interfaces or tab-style selections. The `orientation` attribute changes both the layout and keyboard navigation direction.
+有些列表更适合水平排列，例如类似工具栏的界面或标签页风格的选择。`orientation` 属性会同时改变布局方向和键盘导航方向。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/horizontal/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-With `orientation="horizontal"`, left and right arrow keys navigate between options instead of up and down. The listbox automatically handles right-to-left (RTL) languages by reversing navigation direction.
+设置 `orientation="horizontal"` 后，使用左右方向键（而不是上下方向键）在选项之间导航。对于从右到左（RTL）书写的语言，列表框会自动反转导航方向。
 
-### Selection modes
+### 选择模式 {#selection-modes}
 
-Listbox supports two selection modes that control when items become selected.
+列表框支持两种选择模式，用于控制条目何时被选中。
 
-The `'follow'` mode automatically selects the focused item, providing faster interaction when selection changes frequently. The `'explicit'` mode requires Space or Enter to confirm selection, preventing accidental changes while navigating. Dropdown patterns typically use `'follow'` mode for single selection.
+`'follow'` 模式会自动选中获得焦点的条目，在选择频繁变化时能提供更快捷的交互。`'explicit'` 模式需要按 Space 或 Enter 来确认选择，可以防止导航过程中的误操作。下拉模式通常在单选时使用 `'follow'` 模式。
 
-#### Explicit
+#### 显式 {#explicit}
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/explicit/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/explicit/app.html)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/explicit/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/explicit/app.html)
 
-#### Follow
+#### 跟随 {#follow}
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/follow/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/follow/app.html)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/follow/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/listbox/src/modes/app/follow/app.html)
 
-| Mode         | Description                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------ |
-| `'follow'`   | Automatically selects the focused item, providing faster interaction when selection changes frequently |
-| `'explicit'` | Requires Space or Enter to confirm selection, preventing accidental changes while navigating           |
+| 模式         | 说明                                                   |
+| ------------ | ------------------------------------------------------ |
+| `'follow'`   | 自动选中获得焦点的条目，在选择频繁变化时提供更快捷的交互 |
+| `'explicit'` | 需要按 Space 或 Enter 确认选择，防止导航过程中的误操作  |
 
-::: tip TIP
-Dropdown patterns typically use `'follow'` mode for single selection.
+::: tip 提示
+下拉模式通常在单选时使用 `'follow'` 模式。
 
 :::
 
-## Testing
+## 测试 {#testing}
 
-Angular Aria provides component harnesses for testing listbox components.
-Here is an example of how to use the harnesses in a component test:
+Angular Aria 提供了组件测试工具（harness），用于测试列表框组件（component）。
+下面是在组件测试中使用这些测试工具的示例：
 
 ```ts
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ListboxHarness} from '@angular/aria/listbox/testing';
-import {MyListboxComponent} from './my-listbox'; // Your component
+import {MyListboxComponent} from './my-listbox'; // 你的组件
 
 describe('MyListboxComponent', () => {
   let fixture: ComponentFixture<MyListboxComponent>;
@@ -150,39 +146,39 @@ describe('MyListboxComponent', () => {
   it('should allow selecting options', async () => {
     const listbox = await loader.getHarness(ListboxHarness);
 
-    // Verify listbox properties
+    // 验证列表框的属性
     expect(await listbox.isMulti()).toBe(true);
 
-    // Get all options
+    // 获取所有选项
     const options = await listbox.getOptions();
     expect(options.length).toBe(2);
 
-    // Click an option
+    // 点击一个选项
     await options[0].click();
 
-    // Verify option is selected
+    // 验证该选项已被选中
     expect(await options[0].isSelected()).toBe(true);
 
-    // Filter options by text
+    // 按文本过滤选项
     const bananaOption = await listbox.getOptions({text: 'Banana'});
     expect(bananaOption.length).toBe(1);
   });
 });
 ```
 
-## API reference
+## API 参考 {#api-reference}
 
-For detailed API documentation, inspect the following API references:
+详细的 API 文档请参阅以下 API 参考：
 
 - [`Listbox`](https://angular.dev/api/aria/listbox/Listbox)
 - [`Option`](https://angular.dev/api/aria/listbox/Option)
 
-### Related patterns
+### 相关模式 {#related-patterns}
 
-Listbox is used by these documented dropdown patterns:
+以下有文档的下拉模式使用了列表框：
 
-- [Select](/guide/aria/select) - Single-selection dropdown pattern using readonly combobox + listbox
-- [Multiselect](/guide/aria/multiselect) - Multiple-selection dropdown pattern using readonly combobox + listbox with `multi`
-- [Autocomplete](/guide/aria/autocomplete) - Filterable dropdown pattern using combobox + listbox
+- [选择框](/guide/aria/select) - 单选下拉模式，使用只读组合框 + 列表框
+- [多选](/guide/aria/multiselect) - 多选下拉模式，使用只读组合框 + 带 `multi` 的列表框
+- [自动完成](/guide/aria/autocomplete) - 可过滤的下拉模式，使用组合框 + 列表框
 
-For complete dropdown patterns with trigger, popup, and overlay positioning, see those pattern guides instead of using listbox alone.
+如果需要包含触发器、弹出层和浮层定位的完整下拉模式，请参阅这些模式的指南，而不要单独使用列表框。

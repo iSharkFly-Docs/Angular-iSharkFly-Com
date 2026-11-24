@@ -278,7 +278,7 @@ providers: [
 
 ### 控制图片解码 {#controlling-image-decoding}
 
-默认情况下，`NgOptimizedImage` 会为所有图片设置 `decoding="auto"`。这让浏览器可以在获取图片之后自行决定解码的最佳时机。当图片被标记为 `priority` 时，Angular 会自动设置 `decoding="sync"`，确保图片尽早被解码和绘制，有助于提升**最大内容绘制（LCP）**性能。
+默认情况下，`NgOptimizedImage` 会为所有图片设置 `decoding="auto"`。这让浏览器可以在获取图片之后自行决定解码的最佳时机。当图片被标记为 `priority` 时，Angular 会自动设置 `decoding="sync"`，确保图片尽早被解码和绘制，有助于提升**最大内容绘制**（LCP）性能。
 
 对于非优先图片，你可以显式设置 `decoding` 属性来覆盖默认的 `auto`。优先图片始终使用 `decoding="sync"`。  
 [详细信息请参阅标准图片 `decoding` 属性的文档](https://developer.mozilla.org/docs/Web/HTML/Element/img#decoding)。

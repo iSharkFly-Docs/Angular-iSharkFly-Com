@@ -1,27 +1,23 @@
----
-untranslated: true
----
+# 使用 JSON 构建动态表单 {#dynamic-forms-with-json}
 
-# Dynamic Forms with JSON
+有些表单无法在编译期确定结构。服务端驱动的表单、管理后台、多租户应用以及由 CMS 管理的内容，都需要根据运行时下发的配置来渲染字段（field），这些配置通常是来自后端、管理工具或租户设置的 JSON。
 
-Some forms can't define their structure at compile time. Server-driven forms, admin panels, multi-tenant applications, and CMS-managed content all need to render fields from configuration delivered at runtime, typically as JSON from a backend, an admin tool, or per-tenant settings.
+本指南介绍如何构建这样的表单：它的模型、schema、验证和渲染全部派生自同一份运行时配置。
 
-This guide shows how to build forms whose model, schema, validation, and rendering are all derived from a single runtime configuration.
+## 何时使用 JSON 驱动的表单 {#when-to-use-json-driven-forms}
 
-## When to use JSON-driven forms
+以下情况适合采用这种模式：
 
-This pattern is a good choice when:
+- 后端根据用户角色、功能开关或业务规则决定显示哪些字段
+- 非开发人员通过管理后台或 CMS 配置表单结构
+- 多租户应用中的每个租户都有自己的表单结构，并以配置形式存储
+- 表单需要在不重新部署前端的情况下持续演进
 
-- A backend defines which fields appear based on user role, feature flags, or business rules
-- Non-developers configure form structure through an admin panel or CMS
-- Each tenant in a multi-tenant application has its own form structure stored as configuration
-- Forms need to evolve without redeploying the frontend
+如果表单结构在构建时就已确定，请使用静态表单（直接在组件（Component）中定义字段）。静态表单的每个字段都能获得完整的 TypeScript 类型检查，测试和工具支持也更简单直接。
 
-Use a static form (with fields defined directly in your component) when the structure is known at build time. Static forms get full TypeScript checking on every field, plus straightforward testing and tooling support.
+## 定义带类型的字段配置 {#defining-a-typed-field-config}
 
-## Defining a typed field config
-
-When you want to render fields from runtime configuration, start with a TypeScript type that captures the shape of each field. A discriminated union by `kind` lets each variant declare its own validation options:
+当你想根据运行时配置渲染字段时，先定义一个 TypeScript 类型来描述每个字段的形状。以 `kind` 作为判别字段的可辨识联合类型，可以让每个变体声明各自的验证选项：
 
 ```ts
 type FieldConfig =
@@ -29,9 +25,9 @@ type FieldConfig =
   | {kind: 'number'; name: string; label: string; required?: boolean; min?: number; max?: number};
 ```
 
-Every variant has a name, label, and optional `required` flag. Number fields additionally accept `min` and `max` bounds. Add new variants by adding new `kind` branches.
+每个变体都有 name、label 和可选的 `required` 标志。数字字段还额外接受 `min` 和 `max` 边界。要添加新的变体，只需添加新的 `kind` 分支。
 
-A concrete config might look like this:
+一份具体的配置可能如下所示：
 
 ```ts
 const profileConfig: FieldConfig[] = [
@@ -40,11 +36,11 @@ const profileConfig: FieldConfig[] = [
 ];
 ```
 
-In practice this `FieldConfig[]` typically arrives from your backend, an admin panel, or a CMS. For brevity, the examples below use an in-component literal.
+在实践中，这个 `FieldConfig[]` 通常来自你的后端、管理后台或 CMS。为简洁起见，下面的示例直接在组件中使用字面量。
 
-## Building the model from config
+## 根据配置构建模型 {#building-the-model-from-config}
 
-The form's model needs one entry per field with a default value matching the field's kind. A small helper handles this:
+表单的模型需要为每个字段提供一个条目，其默认值要与字段的 kind 相匹配。一个小的辅助函数就能处理这件事：
 
 ```ts
 function buildModel(configs: FieldConfig[]): Record<string, string | number | null> {
@@ -56,13 +52,13 @@ function buildModel(configs: FieldConfig[]): Record<string, string | number | nu
 }
 ```
 
-The model uses `Record<string, string | number | null>` because the keys are not known ahead of time.
+模型使用 `Record<string, string | number | null>`，因为键无法事先确定。
 
-In addition, numeric fields initialize to `null` rather than `0` so an empty field reads as empty. With `0`, [`required()`](https://angular.dev/api/forms/signals/required) would treat the field as already filled, and any [`min()`](https://angular.dev/api/forms/signals/min) constraint above zero would flag the field invalid before the user enters anything.
+此外，数字字段初始化为 `null` 而不是 `0`，这样空字段读起来就是空的。如果使用 `0`，[`required()`](https://angular.dev/api/forms/signals/required) 会认为该字段已经填写，而任何大于零的 [`min()`](https://angular.dev/api/forms/signals/min) 约束都会在用户输入任何内容之前就把该字段标记为无效。
 
-## Building the schema from config
+## 根据配置构建 schema {#building-the-schema-from-config}
 
-The schema is also derived from the config. You can loop through each entry and apply the validators that match its kind:
+schema 同样派生自配置。你可以遍历每个条目，并应用与其 kind 相匹配的验证器：
 
 ```ts
 import {required, min, max, SchemaFn, SchemaPath} from '@angular/forms/signals';
@@ -86,11 +82,11 @@ function buildSchema(configs: FieldConfig[]): SchemaFn<Record<string, string | n
 }
 ```
 
-The discriminated union narrows `config` inside each branch, so `config.min` and `config.max` are typed correctly when `config.kind === 'number'`.
+可辨识联合类型会在每个分支内收窄 `config` 的类型，因此当 `config.kind === 'number'` 时，`config.min` 和 `config.max` 的类型是正确的。
 
-## Expressing conditional rules in config
+## 在配置中表达条件规则 {#expressing-conditional-rules-in-config}
 
-Some validation rules only make sense under certain conditions. For example, US state codes need validating only when the country is the US. Express these dependencies in the config by adding a `when` discriminator that names another field and the value it must equal:
+有些验证规则只在特定条件下才有意义。例如，只有当国家是美国时，才需要验证美国的州代码。可以在配置中添加一个 `when` 判别字段来表达这类依赖关系，它指明另一个字段以及该字段必须等于的值：
 
 ```ts
 type WhenCondition = {field: string; equals: string | number};
@@ -108,7 +104,7 @@ type FieldConfig =
     };
 ```
 
-Update `buildSchema()` to translate `when` into an [`applyWhen()`](https://angular.dev/api/forms/signals/applyWhen) call. Shared rule application logic moves into a small closure so the conditional and unconditional branches both call the same function:
+更新 `buildSchema()`，把 `when` 转换成 [`applyWhen()`](https://angular.dev/api/forms/signals/applyWhen) 调用。共用的规则应用逻辑被移到一个小闭包中，这样条件分支和无条件分支都调用同一个函数：
 
 ```ts
 import {applyWhen, required, min, max, SchemaFn, SchemaPath} from '@angular/forms/signals';
@@ -137,9 +133,9 @@ function buildSchema(configs: FieldConfig[]): SchemaFn<Record<string, string | n
 }
 ```
 
-When `applyWhen()`'s condition is true, the rules inside activate. When the condition becomes false, the rules deactivate and the field's validation state clears. Because the condition function reads through `valueOf(rootPath[field])`, the form re-evaluates the gate every time the referenced field changes.
+当 `applyWhen()` 的条件为 true 时，其中的规则会被激活。当条件变为 false 时，这些规则会被停用，字段的验证状态也会被清除。由于条件函数通过 `valueOf(rootPath[field])` 读取值，每当被引用的字段发生变化时，表单都会重新评估这个条件。
 
-A config that uses `when` looks like this:
+使用 `when` 的配置如下所示：
 
 ```ts
 const addressConfig: FieldConfig[] = [
@@ -154,17 +150,17 @@ const addressConfig: FieldConfig[] = [
 ];
 ```
 
-The `stateCode` field only requires a value when `country` is `'US'`. Users entering any other country can leave `stateCode` blank without blocking submission.
+只有当 `country` 为 `'US'` 时，`stateCode` 字段才要求填写。输入其他国家的用户可以把 `stateCode` 留空，不会妨碍提交。
 
-For more complex conditions (multiple fields, ranges, or non-equality checks), extend `WhenCondition` with additional discriminators (such as `in: string[]` or `notEquals: string | number`) and translate each variant inside `buildSchema()`. The principle is the same: the config carries the data, `buildSchema()` translates it to `applyWhen()` calls.
+对于更复杂的条件（多个字段、范围或非相等判断），可以为 `WhenCondition` 扩展更多判别字段（例如 `in: string[]` 或 `notEquals: string | number`），并在 `buildSchema()` 中分别转换每种变体。原理是一样的：配置承载数据，`buildSchema()` 把它转换成 `applyWhen()` 调用。
 
-To gate visibility instead of validation, follow the same pattern using [`hidden()`](https://angular.dev/api/forms/signals/hidden) on the field path. See [Configuring `hidden()` state on fields](/guide/forms/signals/form-logic#configuring-hidden-state-on-fields) for details.
+如果要控制的是可见性而不是验证，可以按同样的模式在字段路径上使用 [`hidden()`](https://angular.dev/api/forms/signals/hidden)。详情参见[在字段上配置 `hidden()` 状态](/guide/forms/signals/form-logic#configuring-hidden-state-on-fields)。
 
-## Expressing repeating fields in config
+## 在配置中表达重复字段 {#expressing-repeating-fields-in-config}
 
-Some configurations need fields that grow and shrink at runtime, like a list of phone numbers, tags, or invoice line items. Add an `array` kind to the config and translate it to [`applyEach()`](https://angular.dev/api/forms/signals/applyEach) so per-item rules apply uniformly as items come and go.
+有些配置需要在运行时增减的字段，比如电话号码列表、标签或发票明细行。可以在配置中添加一个 `array` kind，并把它转换成 [`applyEach()`](https://angular.dev/api/forms/signals/applyEach)，这样无论条目如何增减，每个条目的规则都能统一应用。
 
-Extend `FieldConfig` with an `array` variant. This example uses arrays of strings; the same approach scales to arrays of objects by replacing the item shape with a record:
+为 `FieldConfig` 扩展一个 `array` 变体。这个示例使用字符串数组；把条目的形状换成一个 record，同样的方法也可以扩展到对象数组：
 
 ```ts
 type FieldConfig =
@@ -181,7 +177,7 @@ type FieldConfig =
   | {kind: 'array'; name: string; label: string; itemRequired?: boolean; when?: WhenCondition};
 ```
 
-Update `buildModel()` to initialize array fields with an empty array. The model widens to include `string[]`:
+更新 `buildModel()`，用空数组初始化数组字段。模型的类型随之放宽，包含了 `string[]`：
 
 ```ts
 function buildModel(configs: FieldConfig[]): Record<string, string | number | null | string[]> {
@@ -195,7 +191,7 @@ function buildModel(configs: FieldConfig[]): Record<string, string | number | nu
 }
 ```
 
-Update `buildSchema()` to apply per-item rules with `applyEach()`. The path coming from a `Record<string, string | number | null | string[]>` model is too broad for `applyEach()` (and for `min()` / `max()`) to type-check directly, so cast `fieldPath` to the appropriate shape inside each `kind` branch:
+更新 `buildSchema()`，用 `applyEach()` 应用每个条目的规则。来自 `Record<string, string | number | null | string[]>` 模型的路径类型过于宽泛，`applyEach()`（以及 `min()` / `max()`）无法直接对它进行类型检查，因此要在每个 `kind` 分支内把 `fieldPath` 转换成合适的形状：
 
 ```ts
 import {
@@ -244,9 +240,9 @@ function buildSchema(
 }
 ```
 
-The casts inside each branch are deliberate escape hatches: you're trading the compiler's structural guarantee for a runtime invariant the surrounding `kind` check enforces. Each cast is scoped to a `kind` block, so the assumption stays local and straightforward to audit.
+每个分支内的类型转换是有意为之的「逃生舱」：你是在用编译器的结构化保证，换取一个由外围 `kind` 检查来保证的运行时不变式。每次转换都限定在一个 `kind` 块内，因此这个假设只在局部生效，也便于审查。
 
-A config that uses the `array` kind looks like this:
+使用 `array` kind 的配置如下所示：
 
 ```ts
 const contactConfig: FieldConfig[] = [
@@ -255,12 +251,12 @@ const contactConfig: FieldConfig[] = [
 ];
 ```
 
-To render an array field, iterate it with `@for` and let users add or remove items by updating the model signal. Add a typed accessor that returns a [`FieldTree`](https://angular.dev/api/forms/signals/FieldTree) so the iteration sees the array structure, and define methods to grow and shrink the model:
+要渲染数组字段，请用 `@for` 遍历它，并通过更新模型信号（Signal）让用户添加或移除条目。添加一个返回 [`FieldTree`](https://angular.dev/api/forms/signals/FieldTree) 的带类型访问器，让遍历能看到数组结构，并定义用于增减模型的方法：
 
 ```ts
 import {FieldTree} from '@angular/forms/signals';
 
-// inside the component class
+// 在组件类内部
 asArrayField(name: string): FieldTree<string[]> {
   return this.dynamicForm[name] as unknown as FieldTree<string[]>;
 }
@@ -280,9 +276,9 @@ removeItem(name: string, index: number) {
 }
 ```
 
-`FieldTree<string[]>` is iterable, so `@for` can walk it; each item is a `FieldTree<string>` that satisfies `[formField]` directly. Leaf fields can use `Field<T>` accessors instead, since `Field<T>` is the callable signature without iteration.
+`FieldTree<string[]>` 是可迭代的，因此 `@for` 可以遍历它；每个条目都是一个 `FieldTree<string>`，可以直接满足 `[formField]` 的要求。叶子字段则可以改用 `Field<T>` 访问器，因为 `Field<T>` 是不带迭代能力的可调用签名。
 
-In the template, render an array case like this:
+在模板（Template）中，像这样渲染数组分支：
 
 ```html
 @case ('array') {
@@ -297,11 +293,11 @@ In the template, render an array case like this:
 }
 ```
 
-The `addItem()` method extends the model; the form re-derives the array's fields automatically. New items start with fresh validation state. The `removeItem()` method filters the model. Because arrays of primitives are [tracked by position](#tracking-item-identity), field state is tied to the index rather than the value: when an item is removed, subsequent values shift into earlier positions and inherit their existing field state, while the trailing field is dropped.
+`addItem()` 方法扩展模型，表单会自动重新派生数组的字段。新条目以全新的验证状态开始。`removeItem()` 方法则对模型进行过滤。由于原始值数组是[按位置跟踪](#tracking-item-identity)的，字段状态绑定的是索引而不是值：当某个条目被移除时，后面的值会移到前面的位置并继承那些位置已有的字段状态，而最后一个字段会被丢弃。
 
-### Tracking item identity
+### 跟踪条目标识 {#tracking-item-identity}
 
-Signal Forms tracks each item in an array of objects by its identity. When you store a reference to a field at a specific position, that reference follows the underlying data, not the position. Reading state through the held reference returns the data even if it has moved:
+信号表单（Signal Forms）会按标识跟踪对象数组中的每个条目。当你保存某个位置上字段的引用时，这个引用跟随的是底层数据，而不是位置。即使数据移动了位置，通过所保存的引用读取状态，返回的仍是原来的数据：
 
 ```ts
 const contactModel = signal([
@@ -311,33 +307,33 @@ const contactModel = signal([
 
 const contactForm = form(contactModel);
 
-// Hold a reference to the field that's currently at index 0 (Alice).
+// 保存当前位于索引 0 的字段（Alice）的引用。
 const aliceField = contactForm[0];
 
-// Swap the array items so Bob is at index 0, Alice at index 1.
+// 交换数组条目，让 Bob 位于索引 0，Alice 位于索引 1。
 contactModel.update(([alice, bob]) => [bob, alice]);
 
-// The held reference still points to Alice's field, even after the swap.
-console.log(aliceField().value().phone); // '555-0001' (Alice's number)
-console.log(contactForm[0]().value().phone); // '555-0002' (Bob, now at index 0)
+// 交换之后，所保存的引用仍然指向 Alice 的字段。
+console.log(aliceField().value().phone); // '555-0001'（Alice 的号码）
+console.log(contactForm[0]().value().phone); // '555-0002'（Bob，现在位于索引 0）
 ```
 
-This identity tracking prevents bugs when sorting, reordering, or filtering, as long as the referenced item remains in the array. Stored field references remain valid even when array order changes; removing the referenced item itself orphans the held reference.
+只要被引用的条目仍在数组中，这种标识跟踪就能防止排序、重新排列或过滤时出现 bug。即使数组顺序发生变化，所保存的字段引用仍然有效；但如果移除了被引用的条目本身，所保存的引用就会失去归属。
 
-For arrays of primitives (the `phoneNumbers` example above), Signal Forms tracks items positionally instead: index 0 always refers to whatever value is currently at position 0.
+对于原始值数组（上面的 `phoneNumbers` 示例），信号表单改为按位置跟踪条目：索引 0 始终指向当前位于位置 0 的值。
 
-Identity here is by JavaScript object reference, not by a logical id like a database key. If you replace the array with freshly-deserialized objects (for example, after a server reload), field state doesn't follow the logical item even when each item's `id` is unchanged. The guarantee covers in-memory operations like sorting, reordering, and filtering, not data refresh.
+这里的标识指的是 JavaScript 对象引用，而不是数据库主键之类的逻辑 id。如果你用新反序列化的对象替换数组（例如在从服务器重新加载之后），即使每个条目的 `id` 没变，字段状态也不会跟随逻辑上的条目。这一保证只涵盖排序、重新排列和过滤这类内存中的操作，不包括数据刷新。
 
-## Validating the config
+## 验证配置 {#validating-the-config}
 
-Configs from external sources need validation before the form is built. Several failure modes can hide in untrusted JSON:
+来自外部的配置在构建表单之前需要先进行验证。不受信任的 JSON 中可能隐藏着以下几种失败情形：
 
-- Duplicate `name` values overwrite earlier model entries and break the `track config.name` expression in the template.
-- A `when` clause that names a non-existent field fails at runtime when the condition first evaluates.
-- A `when` clause that compares against an `array` field has no defined equality semantics.
-- A `when.equals` value whose type doesn't match the referenced field's kind silently never matches, hiding the conditional behavior as if the rule were never active.
+- 重复的 `name` 值会覆盖先前的模型条目，并破坏模板中的 `track config.name` 表达式。
+- `when` 子句如果引用了不存在的字段，会在条件首次求值时于运行时失败。
+- `when` 子句如果与 `array` 字段进行比较，则没有定义好的相等语义。
+- `when.equals` 的值类型如果与被引用字段的 kind 不匹配，就永远不会匹配，而且不会有任何提示，条件行为被隐藏起来，就好像这条规则从未生效过。
 
-Catch all four at the boundary:
+在边界处把这四种情况全部拦截下来：
 
 ```ts
 function validateConfigs(configs: FieldConfig[]): FieldConfig[] {
@@ -375,11 +371,11 @@ function validateConfigs(configs: FieldConfig[]): FieldConfig[] {
 }
 ```
 
-The first pass enforces uniqueness; the second pass walks each `when` clause to confirm the referenced field exists, isn't an array, and is being compared against a value of the right type. The function returns the configs unchanged on success, so it composes cleanly with the field initializer that holds the configs in the component. Failures surface at the boundary between your application and the upstream source rather than as opaque form misbehavior later.
+第一遍检查确保名称唯一；第二遍检查遍历每个 `when` 子句，确认被引用的字段存在、不是数组，并且比较值的类型正确。验证成功时，函数原样返回这些配置，因此它可以很自然地与组件中保存配置的字段初始化器组合使用。失败会在应用与上游数据源之间的边界处暴露出来，而不是在之后表现为难以排查的表单异常行为。
 
-## Rendering the form dynamically
+## 动态渲染表单 {#rendering-the-form-dynamically}
 
-In the component, use `@for` to iterate the configs and `@switch` on `kind` to pick the right input control:
+在组件中，使用 `@for` 遍历配置，并对 `kind` 使用 `@switch` 来选择合适的输入控件：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -431,17 +427,17 @@ export class DynamicForm {
   dynamicForm = form(this.model, buildSchema(this.configs));
 
   asTextField(name: string): Field<string> {
-    // <input type="text"> requires Field<string>.
+    // <input type="text"> 需要 Field<string>。
     return this.dynamicForm[name] as unknown as Field<string>;
   }
 
   asNumberField(name: string): Field<number | null> {
-    // <input type="number"> requires Field<number | null>.
+    // <input type="number"> 需要 Field<number | null>。
     return this.dynamicForm[name] as unknown as Field<number | null>;
   }
 
   asArrayField(name: string): FieldTree<string[]> {
-    // FieldTree (not Field) so @for can iterate the array.
+    // 使用 FieldTree（而不是 Field），这样 @for 才能遍历数组。
     return this.dynamicForm[name] as unknown as FieldTree<string[]>;
   }
 
@@ -461,26 +457,26 @@ export class DynamicForm {
 }
 ```
 
-Template type-checking treats `dynamicForm[name]` as an independent expression, so the `@switch` narrowing on `config.kind` doesn't reach the indexed access. The accessors restate that narrowing as a cast at the binding site, and the matching `kind` branch guarantees the narrowed type is correct at runtime.
+模板类型检查会把 `dynamicForm[name]` 视为一个独立的表达式，因此 `@switch` 对 `config.kind` 的类型收窄不会作用到这个索引访问上。这些访问器在绑定处以类型转换的形式重新表达了这种收窄，而相匹配的 `kind` 分支保证了收窄后的类型在运行时是正确的。
 
-Because the model and schema are both derived from the same `FieldConfig[]` at component construction, they can't drift apart for a given config. The example above assumes the config is available synchronously when the component is created.
+由于模型和 schema 都是在组件构造时从同一个 `FieldConfig[]` 派生出来的，对于给定的配置，它们不会彼此脱节。上面的示例假设在创建组件时，配置已经可以同步获取。
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-JSON-driven forms keep their model and schema aligned by deriving both from the same `FieldConfig[]`. Each extension in this guide (conditional rules, repeating fields) widens the type and adds a translation step inside `buildSchema()` while preserving that alignment. The model and schema stay locked together, regardless of where the config comes from or how it grows.
+JSON 驱动的表单通过从同一个 `FieldConfig[]` 派生模型和 schema，让两者保持一致。本指南中的每一项扩展（条件规则、重复字段）都会放宽类型，并在 `buildSchema()` 中增加一个转换步骤，同时保持这种一致性。无论配置来自哪里、如何增长，模型和 schema 始终紧密绑定在一起。
 
-For related guides cover other aspects of Signal Forms, check out:
+关于信号表单其他方面的相关指南，请参阅：
 
-- [Schemas and schema composability](/guide/forms/signals/schemas)
-- [Validation](/guide/forms/signals/validation)
-- [Adding form logic](/guide/forms/signals/form-logic)
-- [Field state management](/guide/forms/signals/field-state-management)
+- [schema 与 schema 的可组合性](/guide/forms/signals/schemas)
+- [验证](/guide/forms/signals/validation)
+- [添加表单逻辑](/guide/forms/signals/form-logic)
+- [字段状态管理](/guide/forms/signals/field-state-management)
 
 
-For detailed API documentation, see:
+详细的 API 文档，请参阅：
 
-- [`form()`](https://angular.dev/api/forms/signals/form) - Create a form from a model signal
-- [`applyWhen()`](https://angular.dev/api/forms/signals/applyWhen) - Apply a schema conditionally based on reactive state
-- [`applyEach()`](https://angular.dev/api/forms/signals/applyEach) - Apply a schema to each item in an array field
-- [`FieldTree`](https://angular.dev/api/forms/signals/FieldTree) - Navigable tree of fields exposed by `form()`
-- [`SchemaFn`](https://angular.dev/api/forms/signals/SchemaFn) - Type signature for schema functions
+- [`form()`](https://angular.dev/api/forms/signals/form) - 根据模型信号创建表单
+- [`applyWhen()`](https://angular.dev/api/forms/signals/applyWhen) - 根据响应式状态有条件地应用 schema
+- [`applyEach()`](https://angular.dev/api/forms/signals/applyEach) - 对数组字段中的每个条目应用 schema
+- [`FieldTree`](https://angular.dev/api/forms/signals/FieldTree) - 由 `form()` 暴露的可导航字段树
+- [`SchemaFn`](https://angular.dev/api/forms/signals/SchemaFn) - schema 函数的类型签名

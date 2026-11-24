@@ -1,28 +1,24 @@
----
-untranslated: true
----
+# 使用 Karma 和 Jasmine 进行测试 {#testing-with-karma-and-jasmine}
 
-# Testing with Karma and Jasmine
+虽然 [Vitest](https://vitest.dev) 是新 Angular 项目的默认测试运行器，但 [Karma](https://karma-runner.github.io) 仍然是一个受支持且被广泛使用的测试运行器。本指南介绍如何使用 Karma 测试运行器和 [Jasmine](https://jasmine.github.io) 测试框架来测试 Angular 应用。
 
-While [Vitest](https://vitest.dev) is the default test runner for new Angular projects, [Karma](https://karma-runner.github.io) is still a supported and widely used test runner. This guide provides instructions for testing your Angular application using the Karma test runner with the [Jasmine](https://jasmine.github.io) testing framework.
+## 设置 Karma 和 Jasmine {#setting-up-karma-and-jasmine}
 
-## Setting Up Karma and Jasmine
+你可以为新项目设置 Karma 和 Jasmine，也可以把它们添加到现有项目中。
 
-You can set up Karma and Jasmine for a new project or add it to an existing one.
+### 新项目 {#for-new-projects}
 
-### For New Projects
-
-To create a new project with Karma and Jasmine pre-configured, run the `ng new` command with the `--test-runner=karma` option:
+要创建一个预先配置好 Karma 和 Jasmine 的新项目，请带上 `--test-runner=karma` 选项运行 `ng new` 命令：
 
 ```shell
 ng new my-karma-app --test-runner=karma
 ```
 
-### For Existing Projects
+### 现有项目 {#for-existing-projects}
 
-To add Karma and Jasmine to an existing project, follow these steps:
+要把 Karma 和 Jasmine 添加到现有项目中，请按以下步骤操作：
 
-1.  **Install the necessary packages:**
+1.  **安装必要的包：**
 
     ::: code-group
 
@@ -44,9 +40,9 @@ To add Karma and Jasmine to an existing project, follow these steps:
 
     :::
 
-2.  **Configure the test runner in `angular.json`:**
+2.  **在 `angular.json` 中配置测试运行器：**
 
-    In your `angular.json` file, find the `test` target and set the `runner` option to `karma`:
+    在 `angular.json` 文件中找到 `test` 目标，并把 `runner` 选项设置为 `karma`：
 
     ```json
     {
@@ -59,7 +55,7 @@ To add Karma and Jasmine to an existing project, follow these steps:
               "builder": "@angular/build:unit-test",
               "options": {
                 "runner": "karma"
-                // ... other options
+                // ... 其他选项
               }
             }
           }
@@ -68,9 +64,9 @@ To add Karma and Jasmine to an existing project, follow these steps:
     }
     ```
 
-3.  **Update `tsconfig.spec.json` for Jasmine types:**
+3.  **更新 `tsconfig.spec.json` 以使用 Jasmine 类型：**
 
-    To ensure TypeScript recognizes global testing functions like `describe` and `it`, add `"jasmine"` to the `types` array in your `tsconfig.spec.json`:
+    为了让 TypeScript 能识别 `describe`、`it` 等全局测试函数，请在 `tsconfig.spec.json` 的 `types` 数组中添加 `"jasmine"`：
 
     ```json
     {
@@ -83,17 +79,17 @@ To add Karma and Jasmine to an existing project, follow these steps:
     }
     ```
 
-## Running Tests
+## 运行测试 {#running-tests}
 
-Once your project is configured, run the tests using the [`ng test`](https://angular.dev/cli/test) command:
+项目配置完成后，使用 [`ng test`](https://angular.dev/cli/test) 命令运行测试：
 
 ```shell
 ng test
 ```
 
-The `ng test` command builds the application in _watch mode_ and launches the [Karma test runner](https://karma-runner.github.io).
+`ng test` 命令会以*监视模式*（watch mode）构建应用，并启动 [Karma 测试运行器](https://karma-runner.github.io)。
 
-The console output looks like below:
+控制台输出如下所示：
 
 ```shell
 
@@ -106,34 +102,34 @@ TOTAL: 3 SUCCESS
 
 ```
 
-The test output is displayed in the browser using [Karma Jasmine HTML Reporter](https://github.com/dfederm/karma-jasmine-html-reporter).
+测试结果会通过 [Karma Jasmine HTML Reporter](https://github.com/dfederm/karma-jasmine-html-reporter) 显示在浏览器中。
 
 <img alt="Jasmine HTML Reporter in the browser" src="/assets/images/guide/testing/initial-jasmine-html-reporter.png">
 
-Click on a test row to re-run just that test or click on a description to re-run the tests in the selected test group ("test suite").
+点击某个测试行可以只重新运行该测试，点击某个描述则会重新运行所选测试组（"test suite"，测试套件）中的测试。
 
-Meanwhile, the `ng test` command is watching for changes. To see this in action, make a small change to a source file and save. The tests run again, the browser refreshes, and the new test results appear.
+与此同时，`ng test` 命令会持续监视变更。要看到它的效果，可以对某个源文件做一点小改动并保存。测试会再次运行，浏览器会刷新，并显示新的测试结果。
 
-## Configuration
+## 配置 {#configuration}
 
-The Angular CLI takes care of Jasmine and Karma configuration for you. It constructs the full configuration in memory, based on options specified in the `angular.json` file.
+Angular CLI 会替你处理 Jasmine 和 Karma 的配置。它会根据 `angular.json` 文件中指定的选项，在内存中构建完整的配置。
 
-### Customizing Karma Configuration
+### 自定义 Karma 配置 {#customizing-karma-configuration}
 
-If you want to customize Karma, you can create a `karma.conf.js` by running the following command:
+如果想自定义 Karma，可以运行以下命令来创建 `karma.conf.js`：
 
 ```shell
 ng generate config karma
 ```
 
-::: tip HELPFUL
-Read more about Karma configuration in the [Karma configuration guide](https://karma-runner.github.io/6.4/config/configuration-file.html).
+::: tip 提示
+关于 Karma 配置的更多信息，请参阅 [Karma 配置指南](https://karma-runner.github.io/6.4/config/configuration-file.html)。
 
 :::
 
-### Setting the Test Runner in `angular.json`
+### 在 `angular.json` 中设置测试运行器 {#setting-the-test-runner-in-angular-json}
 
-To explicitly set Karma as the test runner for your project, locate the `test` target in your `angular.json` file and set the `runner` option to `karma`:
+要显式地把 Karma 设置为项目的测试运行器，请在 `angular.json` 文件中找到 `test` 目标，并把 `runner` 选项设置为 `karma`：
 
 ```json
 {
@@ -146,7 +142,7 @@ To explicitly set Karma as the test runner for your project, locate the `test` t
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "karma"
-            // ... other options
+            // ... 其他选项
           }
         }
       }
@@ -155,11 +151,11 @@ To explicitly set Karma as the test runner for your project, locate the `test` t
 }
 ```
 
-## Code coverage enforcement
+## 强制执行代码覆盖率 {#code-coverage-enforcement}
 
-To enforce a minimum code coverage level, you can use the `check` property in the `coverageReporter` section of your `karma.conf.js` file.
+要强制要求最低的代码覆盖率（code coverage），可以使用 `karma.conf.js` 文件中 `coverageReporter` 部分的 `check` 属性。
 
-For example, to require a minimum of 80% coverage:
+例如，要求覆盖率至少达到 80%：
 
 ```javascript
 coverageReporter: {
@@ -180,33 +176,33 @@ coverageReporter: {
 }
 ```
 
-This will cause the test run to fail if the specified coverage thresholds are not met.
+这样，如果没有达到指定的覆盖率阈值，测试运行就会失败。
 
-## Testing in continuous integration
+## 在持续集成中测试 {#testing-in-continuous-integration}
 
-To run your Karma tests in a CI environment, use the following command:
+要在 CI 环境中运行 Karma 测试，请使用以下命令：
 
 ```shell
 ng test --no-watch --no-progress --browsers=ChromeHeadless
 ```
 
-::: info NOTE
-The `--no-watch` and `--no-progress` flags are crucial for Karma in CI environments to ensure tests run once and exit cleanly. The `--browsers=ChromeHeadless` flag is also essential for running tests in a browser environment without a graphical interface.
+::: info 注意
+在 CI 环境中，`--no-watch` 和 `--no-progress` 标志对 Karma 至关重要，它们能确保测试只运行一次并干净地退出。`--browsers=ChromeHeadless` 标志同样必不可少，它让测试可以在没有图形界面的浏览器环境中运行。
 
 :::
 
-## Debugging tests
+## 调试测试 {#debugging-tests}
 
-If your tests aren't working as you expect, you can inspect and debug them in the browser.
+如果测试的运行结果不符合预期，你可以在浏览器中检查并调试它们。
 
-To debug an application with the Karma test runner:
+要使用 Karma 测试运行器调试应用：
 
-1.  Reveal the Karma browser window. See [Set up for testing](/guide/testing#set-up-for-testing) if you need help with this step.
-2.  Click the **DEBUG** button to open a new browser tab and re-run the tests.
-3.  Open the browser's **Developer Tools**. On Windows, press `Ctrl-Shift-I`. On macOS, press `Command-Option-I`.
-4.  Pick the **Sources** section.
-5.  Press `Control/Command-P`, and then start typing the name of your test file to open it.
-6.  Set a breakpoint in the test.
-7.  Refresh the browser, and notice how it stops at the breakpoint.
+1.  显示 Karma 浏览器窗口。如果这一步需要帮助，请参阅[为测试做准备](/guide/testing#set-up-for-testing)。
+2.  点击 **DEBUG** 按钮，打开一个新的浏览器标签页并重新运行测试。
+3.  打开浏览器的**开发者工具**（Developer Tools）。在 Windows 上按 `Ctrl-Shift-I`，在 macOS 上按 `Command-Option-I`。
+4.  选择 **Sources** 面板。
+5.  按 `Control/Command-P`，然后开始输入测试文件的名称来打开它。
+6.  在测试中设置一个断点。
+7.  刷新浏览器，你会发现它停在了断点处。
 
 <img alt="Karma debugging" src="/assets/images/guide/testing/karma-1st-spec-debug.png">

@@ -1,89 +1,85 @@
----
-untranslated: true
----
+# 使用自定义 ID 管理已标记的文本 {#manage-marked-text-with-custom-ids}
 
-# Manage marked text with custom IDs
+Angular 提取器会生成一个文件，并为以下每个实例生成一个翻译单元条目。
 
-The Angular extractor generates a file with a translation unit entry each of the following instances.
+- 组件（component）模板（template）中的每个 `i18n` attribute
+- 组件代码中的每个 [`$localize`][ApiLocalizeInitLocalize] 标记消息字符串
 
-- Each `i18n` attribute in a component template
-- Each [`$localize`][ApiLocalizeInitLocalize] tagged message string in component code
+如[含义如何控制文本的提取与合并][GuideI18nCommonPrepareHowMeaningsControlTextExtractionAndMerges]中所述，Angular 会为每个翻译单元分配一个唯一 ID。
 
-As described in [How meanings control text extraction and merges][GuideI18nCommonPrepareHowMeaningsControlTextExtractionAndMerges], Angular assigns each translation unit a unique ID.
-
-The following example displays translation units with unique IDs.
+下面的示例展示了带有唯一 ID 的翻译单元。
 
 ```txt [messages.fr.xlf]
 <trans-unit id="ba0cc104d3d69bf669f97b8d96a4c5d8d9559aa3" datatype="html">
 ```
 
-When you change the translatable text, the extractor generates a new ID for that translation unit.
-In most cases, changes in the source text also require a change to the translation.
-Therefore, using a new ID keeps the text change in sync with translations.
+当你修改可翻译的文本时，提取器会为该翻译单元生成一个新的 ID。
+在大多数情况下，源文本的变化也需要相应地修改翻译。
+因此，使用新的 ID 可以让文本的变化与翻译保持同步。
 
-However, some translation systems require a specific form or syntax for the ID.
-To address the requirement, use a custom ID to mark text.
-Most developers don't need to use a custom ID.
-If you want to use a unique syntax to convey additional metadata, use a custom ID.
-Additional metadata may include the library, component, or area of the application in which the text appears.
+不过，有些翻译系统要求 ID 采用特定的形式或语法。
+为了满足这一要求，请使用自定义 ID 来标记文本。
+大多数开发者不需要使用自定义 ID。
+如果你想用一种独特的语法来传达额外的元数据，请使用自定义 ID。
+额外的元数据可以包括文本所在的库、组件或应用区域。
 
-To specify a custom ID in the `i18n` attribute or [`$localize`][ApiLocalizeInitLocalize] tagged message string, use the `@@` prefix.
-The following example defines the `introductionHeader` custom ID in a heading element.
+要在 `i18n` attribute 或 [`$localize`][ApiLocalizeInitLocalize] 标记消息字符串中指定自定义 ID，请使用 `@@` 前缀。
+下面的示例在一个标题元素中定义了自定义 ID `introductionHeader`。
 
 ```html [app.component.html]
 <h1 i18n="@@introductionHeader">Hello i18n!</h1>
 ```
 
-The following example defines the `introductionHeader` custom ID for a variable.
+下面的示例为一个变量定义了自定义 ID `introductionHeader`。
 
 ```ts
 variableText1 = $localize`:@@introductionHeader:Hello i18n!`;
 ```
 
-When you specify a custom ID, the extractor generates a translation unit with the custom ID.
+当你指定了自定义 ID 时，提取器会生成一个带有该自定义 ID 的翻译单元。
 
 ```txt [messages.fr.xlf]
 <trans-unit id="introductionHeader" datatype="html">
 ```
 
-If you change the text, the extractor does not change the ID.
-As a result, you don't have to take the extra step to update the translation.
-The drawback of using custom IDs is that if you change the text, your translation may be out-of-sync with the newly changed source text.
+如果你修改了文本，提取器不会改变这个 ID。
+因此，你无需额外执行更新翻译的步骤。
+使用自定义 ID 的缺点是，如果你修改了文本，翻译可能会与新修改的源文本不同步。
 
-## Use a custom ID with a description
+## 将自定义 ID 与描述一起使用 {#use-a-custom-id-with-a-description}
 
-Use a custom ID in combination with a description and a meaning to further help the translator.
+把自定义 ID 与描述和含义结合使用，可以进一步帮助译者。
 
-The following example includes a description, followed by the custom ID.
+下面的示例包含一个描述，后面跟着自定义 ID。
 
 ```html [app.component.html]
 <h1 i18n="An introduction header for this sample@@introductionHeader">Hello i18n!</h1>
 ```
 
-The following example defines the `introductionHeader` custom ID and description for a variable.
+下面的示例为一个变量定义了自定义 ID `introductionHeader` 和描述。
 
 ```ts
 variableText2 = $localize`:An introduction header for this sample@@introductionHeader:Hello i18n!`;
 ```
 
-The following example adds a meaning.
+下面的示例添加了一个含义。
 
 ```html [app.component.html]
 <h1 i18n="site header|An introduction header for this sample@@introductionHeader">Hello i18n!</h1>
 ```
 
-The following example defines the `introductionHeader` custom ID for a variable.
+下面的示例为一个变量定义了自定义 ID `introductionHeader`。
 
 ```ts
 variableText3 = $localize`:site header|An introduction header for this sample@@introductionHeader:Hello i18n!`;
 ```
 
-### Define unique custom IDs
+### 定义唯一的自定义 ID {#define-unique-custom-ids}
 
-Be sure to define custom IDs that are unique.
-If you use the same ID for two different text elements, the extraction tool extracts only the first one, and Angular uses the translation in place of both original text elements.
+请务必定义唯一的自定义 ID。
+如果你为两个不同的文本元素使用了相同的 ID，提取工具只会提取第一个，而 Angular 会用这条翻译同时替换这两个原始文本元素。
 
-For example, in the following code snippet the same `myId` custom ID is defined for two different text elements.
+例如，在下面的代码片段中，为两个不同的文本元素定义了同一个自定义 ID `myId`。
 
 ```html [app.component.html]
 <h3 i18n="@@myId">Hello</h3>
@@ -91,7 +87,7 @@ For example, in the following code snippet the same `myId` custom ID is defined 
 <p i18n="@@myId">Good bye</p>
 ```
 
-The following displays the translation in French.
+下面展示了法语翻译。
 
 ```txt [src/locale/messages.fr.xlf]
 <trans-unit id="myId" datatype="html">
@@ -100,7 +96,7 @@ The following displays the translation in French.
 </trans-unit>
 ```
 
-Both elements now use the same translation \(`Bonjour`\), because both were defined with the same custom ID.
+由于这两个元素是用同一个自定义 ID 定义的，它们现在都使用相同的翻译 \(`Bonjour`\)。
 
 ```html [rendered-output.html]
 <h3>Bonjour</h3>

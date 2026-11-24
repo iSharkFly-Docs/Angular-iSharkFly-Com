@@ -55,7 +55,7 @@
 
 Angular 需要 Node 的活跃 LTS 版本或维护期 LTS 版本。我们先来确认你的 `node.js` 版本。关于具体的版本要求，请参阅 [package.json 文件](https://unpkg.com/browse/@angular/core@15.1.5/package.json)中的 engines 属性。
 
-在**终端（Terminal）**窗口中：
+在**终端**（Terminal）窗口中：
 
 1. 运行以下命令：`node --version`
 1. 确认显示的版本号满足要求。

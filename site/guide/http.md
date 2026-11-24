@@ -1,22 +1,18 @@
----
-untranslated: true
----
+# 了解如何使用 HTTP 与后端服务通信 {#understanding-communication-with-backend-services-using-http}
 
-# Understanding communication with backend services using HTTP
+大多数前端应用都需要通过 HTTP 协议与服务器通信，以下载或上传数据，以及访问其他后端服务。Angular 为 Angular 应用提供了一套客户端 HTTP API，也就是 `@angular/common/http` 中的 `HttpClient` 服务（Service）类。
 
-Most front-end applications need to communicate with a server over the HTTP protocol to download or upload data and access other back-end services. Angular provides a client HTTP API for Angular applications, the `HttpClient` service class in `@angular/common/http`.
+## HTTP 客户端服务的功能 {#http-client-service-features}
 
-## HTTP client service features
+HTTP 客户端（HTTP client）服务提供以下主要功能：
 
-The HTTP client service offers the following major features:
+- 请求[带类型的响应值](/guide/http/making-requests#fetching-json-data)
+- 精简的[错误处理](/guide/http/making-requests#handling-request-failure)
+- 请求和响应的[拦截](/guide/http/interceptors)
+- 强大的[测试工具](/guide/http/testing)
 
-- The ability to request [typed response values](/guide/http/making-requests#fetching-json-data)
-- Streamlined [error handling](/guide/http/making-requests#handling-request-failure)
-- Request and response [interception](/guide/http/interceptors)
-- Robust [testing utilities](/guide/http/testing)
+## 下一步 {#what-s-next}
 
-## What's next
-
-- [Setting up HttpClient](/guide/http/setup)
-- [Making HTTP requests](/guide/http/making-requests)
+- [设置 HttpClient](/guide/http/setup)
+- [发起 HTTP 请求](/guide/http/making-requests)
 

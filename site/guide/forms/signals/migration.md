@@ -1,58 +1,54 @@
----
-untranslated: true
----
+# 将现有表单迁移到信号表单 {#migrating-existing-forms-to-signal-forms}
 
-# Migrating existing forms to Signal Forms
+本指南介绍将现有代码库迁移到信号表单（Signal Forms）的策略，重点关注与
+现有响应式表单（Reactive Forms）的互操作性。
 
-This guide provides strategies for migrating existing codebases to Signal Forms, focusing on interoperability with
-existing Reactive Forms.
+## 使用 `compatForm` 自上而下迁移 {#top-down-migration-using-compatform}
 
-## Top-down migration using `compatForm`
+有时你可能希望在信号表单中使用现有的响应式 `FormControl` 实例。对于
+涉及以下情况的控件，这种做法很有用：
 
-Sometimes you may want to use existing reactive `FormControl` instances within a Signal Form. This is useful for
-controls that involve:
+- 复杂的异步逻辑。
+- 尚未移植的复杂 RxJS 操作符。
+- 与现有第三方库的集成。
 
-- Complex asynchronous logic.
-- Intricate RxJS operators that are not yet ported.
-- Integration with existing third-party libraries.
+### 将 `FormControl` 集成到信号表单中 {#integrating-a-formcontrol-into-a-signal-form}
 
-### Integrating a `FormControl` into a signal form
+假设现有一个 `passwordControl`，它使用了一个专门的 `enterprisePasswordValidator`。你无需重写这个
+验证器（validator），而是可以把该控件桥接到你的信号（Signal）状态中。
 
-Consider an existing `passwordControl` that uses a specialized `enterprisePasswordValidator`. Instead of rewriting the
-validator, you can bridge the control into your signal state.
-
-We can do it using `compatForm`:
+我们可以使用 `compatForm` 来实现：
 
 ```ts
 import {signal} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {compatForm} from '@angular/forms/signals/compat';
 
-// 1. Existing control with a specialized validator
+// 1. 带有专门验证器的现有控件
 const passwordControl = new FormControl('', {
   validators: [Validators.required, enterprisePasswordValidator()],
   nonNullable: true,
 });
 
-// 2. Wrap it inside your form state signal
+// 2. 把它包装进你的表单状态信号中
 const user = signal({
   email: '',
-  password: passwordControl, // Nest the existing control directly
+  password: passwordControl, // 直接嵌套现有控件
 });
 
-// 3. Create the form
+// 3. 创建表单
 const f = compatForm(user);
 
-// Access values via the signal tree
-console.log(f.email().value()); // Current email value
-console.log(f.password().value()); // Current value of passwordControl
+// 通过信号树访问值
+console.log(f.email().value()); // 当前的 email 值
+console.log(f.password().value()); // passwordControl 的当前值
 
-// Reactive state is proxied automatically
+// 响应式状态会被自动代理
 const isPasswordValid = f.password().valid();
-const passwordErrors = f.password().errors(); // Returns CompatValidationError if the existing validator fails
+const passwordErrors = f.password().errors(); // 如果现有验证器未通过，则返回 CompatValidationError
 ```
 
-In the template, use standard reactive syntax by binding the underlying control:
+在模板（Template）中，通过绑定底层控件来使用标准的响应式语法：
 
 ```html
 <form novalidate>
@@ -80,7 +76,7 @@ In the template, use standard reactive syntax by binding the underlying control:
 </form>
 ```
 
-Errors from the existing validators are `CompatValidationError`s. They don't set `message`; the error object returned by the validator is available as `context` instead:
+来自现有验证器的错误是 `CompatValidationError`。它们不会设置 `message`；验证器返回的错误对象可以通过 `context` 获取：
 
 ```ts
 import {ValidationError} from '@angular/forms/signals';
@@ -103,7 +99,7 @@ import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {FormField, ValidationError} from '@angular/forms/signals';
 import {compatForm, CompatValidationError} from '@angular/forms/signals/compat';
 
-// Dummy enterprisePasswordValidator for the example
+// 本示例使用的模拟 enterprisePasswordValidator
 function enterprisePasswordValidator() {
   return (control: AbstractControl) => {
     if (control.value && control.value.length < 8) {
@@ -120,29 +116,29 @@ function enterprisePasswordValidator() {
   styleUrl: './app.css',
 })
 export class App {
-  // 1. Existing legacy control with a specialized validator
+  // 1. 带有专门验证器的现有旧版控件
   readonly passwordControl = new FormControl('', {
     validators: [Validators.required, enterprisePasswordValidator()],
     nonNullable: true,
   });
 
-  // 2. Wrap it inside your form state signal
+  // 2. 把它包装进你的表单状态信号中
   readonly user = signal({
     email: '',
-    password: this.passwordControl, // Nest the legacy control directly
+    password: this.passwordControl, // 直接嵌套旧版控件
   });
 
-  // 3. Create the form
+  // 3. 创建表单
   readonly f = compatForm(this.user);
 
-  // We have to manually extract values, because JSON pipe can't serialize FormControl
+  // 我们必须手动提取值，因为 JSON 管道无法序列化 FormControl
   readonly formValue = computed(() => ({
     email: this.f.email().value(),
     password: this.f.password().value(),
   }));
 
   errorMessage(error: ValidationError) {
-    // Errors from reactive validators keep the validator's error object in `context`.
+    // 来自响应式验证器的错误会把验证器的错误对象保存在 `context` 中。
     if (error instanceof CompatValidationError) {
       return (error.context as {message?: string} | null)?.message ?? error.kind;
     }
@@ -151,7 +147,7 @@ export class App {
 
   constructor() {
     console.log(this.f.email().value()); // ""
-    console.log(this.f.password().value()); // Current value of passwordControl
+    console.log(this.f.password().value()); // passwordControl 的当前值
   }
 }
 ```
@@ -186,10 +182,10 @@ export class App {
 
 :::
 
-### Integrating a `FormGroup` into a signal form
+### 将 `FormGroup` 集成到信号表单中 {#integrating-a-formgroup-into-a-signal-form}
 
-You can also wrap an entire `FormGroup`. This is common when a reusable sub-section of a form—such as an
-**Address Block**—is still managed by existing Reactive Forms.
+你也可以包装整个 `FormGroup`。当表单中某个可复用的子区块（例如
+**地址区块**）仍由现有的响应式表单管理时，这种做法很常见。
 
 ```ts
 import {signal} from '@angular/core';
@@ -197,14 +193,14 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {compatForm} from '@angular/forms/signals/compat';
 import {required} from '@angular/forms/signals';
 
-// 1. An existing address group with its own validation logic
+// 1. 一个带有自身验证逻辑的现有地址组
 const addressGroup = new FormGroup({
   street: new FormControl('123 Angular Way', Validators.required),
   city: new FormControl('Mountain View', Validators.required),
   zip: new FormControl('94043', Validators.required),
 });
 
-// 2. Include it in the state like it's a value
+// 2. 像普通值一样把它放进状态中
 const checkoutModel = signal({
   customerName: 'Pirojok the Cat',
   shippingAddress: addressGroup,
@@ -215,8 +211,8 @@ const f = compatForm(checkoutModel, (p) => {
 });
 ```
 
-The `shippingAddress` field acts as a branch in your Signal Form tree. You can bind these nested controls in your
-template by accessing the underlying existing controls via `.control()`:
+`shippingAddress` 字段在信号表单树中充当一个分支。你可以通过 `.control()` 访问底层的现有控件，
+从而在模板中绑定这些嵌套控件：
 
 ```html
 <form novalidate>
@@ -296,25 +292,25 @@ import {compatForm} from '@angular/forms/signals/compat';
   styleUrl: './app.css',
 })
 export class App {
-  // 1. A legacy address group with its own validation logic
+  // 1. 一个带有自身验证逻辑的旧版地址组
   readonly addressGroup = new FormGroup({
     street: new FormControl('123 Angular Way', Validators.required),
     city: new FormControl('Mountain View', Validators.required),
     zip: new FormControl('94043', Validators.required),
   });
 
-  // 2. Include it in the state like it's a value
+  // 2. 像普通值一样把它放进状态中
   readonly checkoutModel = signal({
     customerName: '',
     shippingAddress: this.addressGroup,
   });
 
-  // 3. Create the form
+  // 3. 创建表单
   readonly f = compatForm(this.checkoutModel, (p) => {
     required(p.customerName);
   });
 
-  // We have to manually extract values, because JSON pipe can't serialize FormControl
+  // 我们必须手动提取值，因为 JSON 管道无法序列化 FormControl
   readonly formValue = computed(() => ({
     customerName: this.f.customerName().value(),
     shippingAddress: this.f.shippingAddress().value(),
@@ -393,16 +389,16 @@ export class App {
 
 :::
 
-### Accessing values
+### 访问值 {#accessing-values}
 
-While `compatForm` proxies value access on the `FormControl` level, the full form value preserves the control:
+虽然 `compatForm` 会在 `FormControl` 层级上代理值的访问，但完整的表单值仍会保留控件本身：
 
 ```ts
 const passwordControl = new FormControl('password' /** ... */);
 
 const user = signal({
   email: '',
-  password: passwordControl, // Nest the existing control directly
+  password: passwordControl, // 直接嵌套现有控件
 });
 
 const form = compatForm(user);
@@ -410,7 +406,7 @@ form.password().value(); // 'password'
 form().value(); // { email: '', password: FormControl}
 ```
 
-If you need the whole form value with the controls unwrapped, use `extractValue` from `@angular/forms/signals/compat`:
+如果你需要获取把控件解包后的完整表单值，请使用 `@angular/forms/signals/compat` 中的 `extractValue`：
 
 ```ts
 import {extractValue} from '@angular/forms/signals/compat';
@@ -418,12 +414,12 @@ import {extractValue} from '@angular/forms/signals/compat';
 const formValue = computed(() => extractValue(form)); // {email: '', password: 'password'}
 ```
 
-## Bottom-up migration
+## 自下而上迁移 {#bottom-up-migration}
 
-### Integrating a Signal Form into a `FormGroup`
+### 将信号表单集成到 `FormGroup` 中 {#integrating-a-signal-form-into-a-formgroup}
 
-You can use `SignalFormControl` to expose a signal-based form as a standard `FormControl`. This is useful when you want
-to migrate leaf nodes of a form to Signals while keeping the parent `FormGroup` structure.
+你可以使用 `SignalFormControl` 把基于信号的表单暴露为一个标准的 `FormControl`。当你想把表单的叶子节点
+迁移到信号，同时保留父级 `FormGroup` 结构时，这种做法很有用。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -436,43 +432,43 @@ import {required} from '@angular/forms/signals';
   imports: [ReactiveFormsModule],
 })
 export class UserProfile {
-  // 1. Create a SignalFormControl, use signal form rules.
+  // 1. 创建一个 SignalFormControl，并使用信号表单规则。
   emailControl = new SignalFormControl('', (p) => {
     required(p, {message: 'Email is required'});
   });
 
-  // 2. Use it in an existing FormGroup
+  // 2. 在现有的 FormGroup 中使用它
   form = new FormGroup({
     email: this.emailControl,
   });
 }
 ```
 
-The `SignalFormControl` synchronizes values bi-directionally between the **Signal Forms** system and the **Reactive Forms** system:
+`SignalFormControl` 会在**信号表单**系统和**响应式表单**系统之间双向同步值：
 
-- **Signal -> Reactive**: Updating the value via Signal Forms updates the Reactive Form control immediately.
+- **信号 -> 响应式**：通过信号表单更新值，会立即更新响应式表单控件。
 
 ```ts
-// Signal Forms update
+// 信号表单更新
 this.emailControl.fieldTree().value.set('new@example.com');
 
-// Reactive Forms reflects the change
+// 响应式表单反映了这一变化
 console.log(this.form.value); // {email: 'new@example.com'}
 ```
 
-- **Reactive -> Signal**: Updating the value via the parent `FormGroup` updates the Signal Forms state.
+- **响应式 -> 信号**：通过父级 `FormGroup` 更新值，会更新信号表单的状态。
 
 ```ts
-// Reactive Forms update
+// 响应式表单更新
 this.form.patchValue({email: 'other@example.com'});
 
-// Signal Forms reflects the change
+// 信号表单反映了这一变化
 console.log(this.emailControl.fieldTree().value()); // 'other@example.com'
 ```
 
-### Binding `SignalFormControl`
+### 绑定 `SignalFormControl` {#binding-signalformcontrol}
 
-To use `SignalFormControl` in a `FormGroup`, pass it as a control and bind it in the template using `.fieldTree`:
+要在 `FormGroup` 中使用 `SignalFormControl`，请把它作为控件传入，并在模板中通过 `.fieldTree` 进行绑定：
 
 ```ts
 readonly emailControl = new SignalFormControl('', (p) => { required(p); });
@@ -485,47 +481,47 @@ readonly form = new FormGroup({
 
 ```html
 <form [formGroup]="form">
-  <!-- Standard control -->
+  <!-- 标准控件 -->
   <input formControlName="name" />
 
-  <!-- Signal control -->
+  <!-- 信号控件 -->
   <input [formField]="emailControl.fieldTree" />
 </form>
 ```
 
 ```html
-<!-- Avoid: Using formControlName or [formControl] for SignalFormControl -->
+<!-- 避免：对 SignalFormControl 使用 formControlName 或 [formControl] -->
 <input formControlName="email" />
 <input [formControl]="emailControl" />
 ```
 
-### Why `SignalFormControl` takes a value instead of a signal
+### 为什么 `SignalFormControl` 接收的是值而不是信号 {#why-signalformcontrol-takes-a-value-instead-of-a-signal}
 
-In standard Signal Forms, you create a form by passing a signal: `form(mySignal)`.
+在标准的信号表单中，你通过传入一个信号来创建表单：`form(mySignal)`。
 
-However, `SignalFormControl` takes a **raw value** (like a string or object) as its first argument:
+然而，`SignalFormControl` 的第一个参数接收的是一个**原始值**（例如字符串或对象）：
 
 ```ts
-// Takes a raw value, not a signal
+// 接收原始值，而不是信号
 const userControl = new SignalFormControl({
   email: 'pirojok@example.com',
 });
 ```
 
-`SignalFormControl` creates the signal internally to intercept writes and trigger the **synchronous updates** expected by Reactive Forms.
+`SignalFormControl` 会在内部创建信号，以便拦截写入操作，并触发响应式表单所期望的**同步更新**。
 
-You can still access the internal signal via `.sourceValue`:
+你仍然可以通过 `.sourceValue` 访问这个内部信号：
 
 ```ts
 const value = userControl.sourceValue();
 ```
 
-### Disabling/Enabling control
+### 禁用 / 启用控件 {#disabling-enabling-control}
 
-Imperative APIs for changing the enabled/disabled state (like `enable()`, `disable()`) are intentionally not supported
-in `SignalFormControl`. This is because the state of the control should be derived from the signal state and rules.
+`SignalFormControl` 有意不支持用于更改启用 / 禁用状态的命令式 API（例如 `enable()`、`disable()`）。
+这是因为控件的状态应当从信号状态和规则中派生出来。
 
-Attempting to call disable/enable would throw an error.
+尝试调用 disable/enable 会抛出错误。
 
 ```ts
 import {signal, effect} from '@angular/core';
@@ -537,7 +533,7 @@ export class UserProfile {
   readonly isLoading = signal(false);
 
   constructor() {
-    // This will throw an error
+    // 这里会抛出错误
     effect(() => {
       if (this.isLoading()) {
         this.emailControl.disable();
@@ -549,7 +545,7 @@ export class UserProfile {
 }
 ```
 
-Instead, use disabled rule:
+应改用 disabled 规则：
 
 ```ts
 import {signal} from '@angular/core';
@@ -560,24 +556,24 @@ export class UserProfile {
   readonly isLoading = signal(false);
 
   readonly emailControl = new SignalFormControl('', (p) => {
-    // The control becomes disabled whenever isLoading is true
+    // 只要 isLoading 为 true，控件就会被禁用
     disabled(p, {when: () => this.isLoading()});
   });
 
   async saveData() {
     this.isLoading.set(true);
-    // ... perform save ...
+    // ... 执行保存 ...
     this.isLoading.set(false);
   }
 }
 ```
 
-### Dynamic manipulation
+### 动态操作 {#dynamic-manipulation}
 
-Imperative APIs for adding or removing validators (like `addValidators()`, `removeValidators()`, `setValidators()`) are
-intentionally not supported in `SignalFormControl`.
+用于添加或移除验证器的命令式 API（例如 `addValidators()`、`removeValidators()`、`setValidators()`）
+在 `SignalFormControl` 中是有意不支持的。
 
-Attempting to call these methods will throw an error.
+尝试调用这些方法会抛出错误。
 
 ```ts
 export class UserProfile {
@@ -586,7 +582,7 @@ export class UserProfile {
 
   toggleRequired() {
     this.isRequired.update((v) => !v);
-    // This will throw an error
+    // 这里会抛出错误
     if (this.isRequired()) {
       this.emailControl.addValidators(Validators.required);
     } else {
@@ -596,7 +592,7 @@ export class UserProfile {
 }
 ```
 
-Instead, use `applyWhen` rule to conditionally apply validators:
+应改用 `applyWhen` 规则来有条件地应用验证器：
 
 ```ts
 import {signal} from '@angular/core';
@@ -607,7 +603,7 @@ export class UserProfile {
   readonly isRequired = signal(false);
 
   readonly emailControl = new SignalFormControl('', (p) => {
-    // The control becomes required whenever isRequired is true
+    // 只要 isRequired 为 true，控件就会变为必填
     applyWhen(
       p,
       () => this.isRequired(),
@@ -619,18 +615,18 @@ export class UserProfile {
 }
 ```
 
-### Manual Error Selection
+### 手动设置错误 {#manual-error-selection}
 
-The `setErrors()` and `markAsPending()` methods are not supported. In Signal Forms, errors are derived from validation
-rules and async validation status. If you need to report an error, it should be done declaratively via a validation rule
-in the schema.
+不支持 `setErrors()` 和 `markAsPending()` 方法。在信号表单中，错误是从验证规则和
+异步验证状态中派生出来的。如果你需要报告某个错误，应当在 schema 中
+通过验证规则以声明式的方式来实现。
 
-## Automatic status classes
+## 自动状态类 {#automatic-status-classes}
 
-Reactive/Template Forms automatically adds [class attributes](/guide/forms/template-driven-forms#track-control-states) (
-such as `.ng-valid` or `.ng-dirty`) to facilitate styling control states. Signal Forms does not do that.
+响应式表单 / 模板驱动表单会自动添加 [class attribute](/guide/forms/template-driven-forms#track-control-states)（
+例如 `.ng-valid` 或 `.ng-dirty`），以便为控件状态设置样式。信号表单不会这样做。
 
-If you want to preserve this behavior, you can provide the `NG_STATUS_CLASSES` preset:
+如果你希望保留这种行为，可以提供 `NG_STATUS_CLASSES` 预设：
 
 ```ts
 import {provideSignalFormsConfig} from '@angular/forms/signals';
@@ -646,7 +642,7 @@ bootstrapApplication(App, {
 });
 ```
 
-You can also provide your own custom configuration to apply whatever classes you wish based on you custom logic:
+你也可以提供自己的自定义配置，根据自定义逻辑应用任意你想要的类：
 
 ```ts
 import {provideSignalFormsConfig} from '@angular/forms/signals';
@@ -666,21 +662,21 @@ bootstrapApplication(App, {
 });
 ```
 
-## Custom Controls
+## 自定义控件 {#custom-controls}
 
-Any [custom Signal Form Control](/guide/forms/signals/custom-controls) can be
-used with Reactive (and Template-Driven) Forms as-is. This allows you to
-migrate existing `ControlValueAccessor` implementations to
-`FormValueControl`/`FormCheckboxControl` without breaking existing usages.
+任何[自定义信号表单控件](/guide/forms/signals/custom-controls)都可以
+直接与响应式表单（以及模板驱动表单（Template-driven Forms））配合使用。这样你就可以把
+现有的 `ControlValueAccessor` 实现迁移为
+`FormValueControl`/`FormCheckboxControl`，而不会破坏现有的用法。
 
-::: warning IMPORTANT
-Do **not** implement both `ControlValueAccessor` and
-`FormValueControl`/`FormCheckboxControl` on the same component. Implement one or
-the other.
+::: warning 重要
+**不要**在同一个组件（Component）上同时实现 `ControlValueAccessor` 和
+`FormValueControl`/`FormCheckboxControl`。只实现其中
+之一即可。
 
 :::
 
-Given the following custom control:
+假设有如下自定义控件：
 
 ```ts
 import {Component, model} from '@angular/core';
@@ -700,14 +696,14 @@ import {FormValueControl} from '@angular/forms/signals';
   `,
 })
 export class BasicInput implements FormValueControl<string> {
-  /** The current input value */
+  /** 当前的输入值 */
   value = model('');
 }
 ```
 
-You can use this custom control with reactive forms as you would a native input
-or a custom control based on `ControlValueAccessor`. For example, consider this
-simple component with a Reactive Form.
+你可以像使用原生输入框或基于 `ControlValueAccessor` 的自定义控件一样，
+把这个自定义控件用于响应式表单。例如，来看下面这个
+使用响应式表单的简单组件。
 
 ```ts
 import {Component} from '@angular/core';
@@ -731,5 +727,5 @@ export class ExampleComponent {
 }
 ```
 
-Any change to the custom `app-basic-input` control will be reflected in the
-reactive `FormControl`.
+对自定义控件 `app-basic-input` 的任何更改都会反映到
+响应式 `FormControl` 中。

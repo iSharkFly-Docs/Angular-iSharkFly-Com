@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 使用 `animate.enter` 和 `animate.leave` 为应用添加动画 {#animating-your-applications-with-animate-enter-and-animate-leave}
 
-# Animating your applications with `animate.enter` and `animate.leave`
+精心设计的动画（animation）可以让你的应用更直观、更有吸引力，但它们不只是装饰。
+动画可以从多个方面改进你的应用和用户体验：
 
-Well-designed animations can make your application more intuitive and engaging, but they aren't just cosmetic.
-Animations can improve your application and the user experience in a number of ways:
+- 没有动画时，网页之间的切换可能显得突兀、生硬
+- 动效能极大地提升用户体验，动画让用户有机会察觉应用对其操作的响应
+- 好的动画可以在整个工作流中流畅地引导用户的注意力
 
-- Without animations, web page transitions can seem abrupt and jarring
-- Motion greatly enhances the user experience, so animations give users a chance to detect the application's response to their actions
-- Good animations can smoothly direct the user's attention throughout a workflow
+Angular 提供了 `animate.enter` 和 `animate.leave` 来为应用中的元素添加动画。这两个特性会在适当的时机应用进入和离开的 CSS 类，或者调用函数来应用第三方库的动画。`animate.enter` 和 `animate.leave` 不是指令（directive），而是由 Angular 编译器直接支持的特殊 API。它们既可以直接用在元素上，也可以用作宿主绑定。
 
-Angular provides `animate.enter` and `animate.leave` to animate your application's elements. These two features apply enter and leave CSS classes at the appropriate times or call functions to apply animations from third party libraries. `animate.enter` and `animate.leave` are not directives. They are special API supported directly by the Angular compiler. They can be used directly on elements and also as a host binding.
+## `animate.enter` {#animate-enter}
 
-## `animate.enter`
-
-You can use `animate.enter` to animate elements as they _enter_ the DOM. You can define enter animations using CSS classes with either transitions or keyframe animations.
+你可以使用 `animate.enter` 为*进入* DOM 的元素添加动画。你可以使用带有过渡（transition）或关键帧动画的 CSS 类来定义进入动画。
 
 ::: code-group
 
@@ -96,16 +92,16 @@ export class Enter {
 
 :::
 
-When the animation completes, Angular removes the class or classes that you specified in `animate.enter` from the DOM. Animation classes are only present while the animation is active.
+动画完成后，Angular 会从 DOM 中移除你在 `animate.enter` 中指定的一个或多个类。动画类只会在动画进行期间存在。
 
-::: info NOTE
-When using multiple keyframe animations or transition properties on an element, Angular removes all classes only _after_ the longest animation has completed.
+::: info 注意
+当在一个元素上使用多个关键帧动画或过渡属性时，Angular 只会在耗时最长的动画完成*之后*才移除所有类。
 
 :::
 
-You can use `animate.enter` with any other Angular features, such as control flow or dynamic expressions. `animate.enter` accepts both a single class string (with multiple classes separated by spaces), or an array of class strings.
+你可以把 `animate.enter` 与任何其他 Angular 特性一起使用，例如控制流（control flow）或动态表达式。`animate.enter` 既接受单个类字符串（多个类之间用空格分隔），也接受类字符串数组。
 
-A quick note about using CSS transitions: If you choose to use transitions instead of keyframe animations, the classes added to the element with `animate.enter` represent the state that the transition will animate _to_. Your base element CSS is what the element will look like when no animations run, which is likely similar to the end state of the CSS transition. So you would still need to pair it with `@starting-style` to have an appropriate _from_ state for your transition to work.
+关于使用 CSS 过渡的简要说明：如果你选择使用过渡而不是关键帧动画，那么通过 `animate.enter` 添加到元素上的类表示过渡*最终要达到*的状态。元素的基础 CSS 决定了没有动画运行时元素的外观，这很可能与 CSS 过渡的结束状态相似。因此，你仍然需要搭配 `@starting-style`，为过渡提供合适的*起始*状态，过渡才能生效。
 
 ::: code-group
 
@@ -188,9 +184,9 @@ export class EnterBinding {
 
 :::
 
-## `animate.leave`
+## `animate.leave` {#animate-leave}
 
-You can use `animate.leave` to animate elements as they _leave_ the DOM. You can define leave animations using CSS classes with either transforms or keyframe animations.
+你可以使用 `animate.leave` 为*离开* DOM 的元素添加动画。你可以使用带有变换（transform）或关键帧动画的 CSS 类来定义离开动画。
 
 ::: code-group
 
@@ -269,14 +265,14 @@ export class Leave {
 
 :::
 
-When the animation completes, Angular automatically removes the animated element from the DOM.
+动画完成后，Angular 会自动从 DOM 中移除执行动画的元素。
 
-::: info NOTE
-When using multiple keyframe animations or transition properties on an element, Angular waits to remove the element only _after_ the longest of those animations has completed.
+::: info 注意
+当在一个元素上使用多个关键帧动画或过渡属性时，Angular 会等到其中耗时最长的动画完成*之后*才移除该元素。
 
 :::
 
-`animate.leave` can also be used with signals, and other bindings. You can use `animate.leave` with a single class or multiple classes. Either specify it as a simple string with spaces or a string array.
+`animate.leave` 也可以与信号（signal）和其他绑定（binding）一起使用。你可以为 `animate.leave` 指定单个类或多个类，既可以写成用空格分隔的简单字符串，也可以写成字符串数组。
 
 ::: code-group
 
@@ -357,9 +353,9 @@ export class LeaveBinding {
 
 :::
 
-### Element removal order
+### 元素移除顺序 {#element-removal-order}
 
-There is some nuance to how `animate.leave` animations are run and when an animation will occur. `animate.leave` works if it is placed on the element that is being removed, and if `animate.leave` is placed on an element that is a _descendant_ of the element being removed _within the same component template_, those child `animate.leave` animations will happen _before_ the parent node is removed from the DOM. This ensures that you can confidently animate away child elements without the parent node disappearing prematurely.
+`animate.leave` 动画如何运行以及何时发生，存在一些细微差别。`animate.leave` 放在被移除的元素上时会生效；如果 `animate.leave` 放在*同一个组件模板内*被移除元素的某个*后代*元素上，那么这些子元素的 `animate.leave` 动画会在父节点从 DOM 中移除*之前*执行。这样你就可以放心地为子元素添加离开动画，而不必担心父节点过早消失。
 
 ::: code-group
 
@@ -389,8 +385,8 @@ export class LeaveParent {
 
 @if (isShown()) {
   <div class="leave-parent">
-    <!-- the child node with `animate.leave` will animate first
-         before the parent node is removed from the DOM. -->
+    <!-- 带有 `animate.leave` 的子节点会先执行动画，
+         然后父节点才会从 DOM 中移除。 -->
     <div class="leave-container" animate.leave="leaving">
       <p>Goodbye</p>
     </div>
@@ -442,14 +438,14 @@ export class LeaveParent {
 
 :::
 
-::: warning IMPORTANT
-Child animations fire only for elements within the same component template. If an element being removed contains child components, any `animate.leave` animations defined inside those child component templates will **not** run before the parent is removed. To animate a child component on removal, apply `animate.leave` to the child component's host element directly within the parent template instead, or programmatically handle triggering the animation in the child component and delaying the removal of the parent until that animation completes.
+::: warning 重要
+子动画只会对同一个组件模板（template）内的元素触发。如果被移除的元素包含子组件（component），那么在这些子组件模板内部定义的任何 `animate.leave` 动画都**不会**在父元素被移除之前运行。要在子组件被移除时为其添加动画，请改为在父模板中直接把 `animate.leave` 应用到子组件的宿主元素（host element）上，或者在子组件中以编程方式触发动画，并把父元素的移除推迟到该动画完成之后。
 
 :::
 
-## Event Bindings, Functions, and Third-party Libraries
+## 事件绑定、函数和第三方库 {#event-bindings-functions-and-third-party-libraries}
 
-Both `animate.enter` and `animate.leave` support event binding syntax that allows for function calls. You can use this syntax to call a function in your component code or utilize third-party animation libraries, like [GSAP](https://gsap.com/), [anime.js](https://animejs.com/), or any other JavaScript animation library.
+`animate.enter` 和 `animate.leave` 都支持事件绑定（event binding）语法，允许进行函数调用。你可以用这种语法调用组件代码中的函数，或者使用第三方动画库，例如 [GSAP](https://gsap.com/)、[anime.js](https://animejs.com/) 或其他任何 JavaScript 动画库。
 
 ::: code-group
 
@@ -470,11 +466,11 @@ export class LeaveEvent {
   }
 
   leavingFn(event: AnimationCallbackEvent) {
-    // Example of calling GSAP
+    // 调用 GSAP 的示例
     // gsap.to(event.target, {
     //   duration: 1,
     //   x: 100,
-    //   // arrow functions are handy for concise callbacks
+    //   // 箭头函数便于编写简洁的回调
     //   onComplete: () => event.animationComplete()
     // });
     event.animationComplete();
@@ -539,44 +535,44 @@ export class LeaveEvent {
 
 :::
 
-The `$event` object has the type `AnimationCallbackEvent`. It includes the element as the `target` and provides an `animationComplete()` function to notify the framework when the animation finishes.
+`$event` 对象的类型是 `AnimationCallbackEvent`。它把元素作为 `target` 包含在内，并提供一个 `animationComplete()` 函数，用于在动画结束时通知框架。
 
-::: warning IMPORTANT
-You **must** call the `animationComplete()` function when using `animate.leave` for Angular to remove the element.
+::: warning 重要
+使用 `animate.leave` 时，你**必须**调用 `animationComplete()` 函数，Angular 才会移除该元素。
 
 :::
 
-If you don't call `animationComplete()` when using `animate.leave`, Angular calls the function automatically after a four-second delay. You can configure the duration of the delay by providing the token `MAX_ANIMATION_TIMEOUT` in milliseconds.
+如果你在使用 `animate.leave` 时没有调用 `animationComplete()`，Angular 会在延迟四秒后自动调用该函数。你可以通过提供令牌 `MAX_ANIMATION_TIMEOUT`（以毫秒为单位）来配置延迟时长。
 
 ```ts
   { provide: MAX_ANIMATION_TIMEOUT, useValue: 6000 }
 ```
 
-## Compatibility with Legacy Angular Animations
+## 与旧版 Angular 动画的兼容性 {#compatibility-with-legacy-angular-animations}
 
-You cannot use legacy animations alongside `animate.enter` and `animate.leave` within the same component. Doing so would result in enter classes remaining on the element or leaving nodes not being removed. It is otherwise fine to use both legacy animations and the new `animate.enter` and `animate.leave` animations within the same _application_. The only caveat is content projection. If you are projecting content from one component with legacy animations into another component with `animate.enter` or `animate.leave`, or vice versa, this will result in the same behavior as if they are used together in the same component. This is not supported.
+你不能在同一个组件中同时使用旧版动画和 `animate.enter`、`animate.leave`。这样做会导致进入类残留在元素上，或者离开的节点不会被移除。除此之外，在同一个*应用*中同时使用旧版动画和新的 `animate.enter`、`animate.leave` 动画是没有问题的。唯一需要注意的是内容投影（content projection）。如果你把内容从一个使用旧版动画的组件投影到另一个使用 `animate.enter` 或 `animate.leave` 的组件中（或者反过来），其行为就和在同一个组件中同时使用它们一样。这是不受支持的。
 
-## Testing
+## 测试 {#testing}
 
-TestBed provides built-in support for enabling or disabling animations in your test environment. CSS animations require a browser to run, and many of the APIs are not available in a test environment. By default, TestBed disables animations for you in your test environments.
+TestBed 内置支持在测试环境中启用或禁用动画。CSS 动画需要在浏览器中运行，而很多 API 在测试环境中不可用。默认情况下，TestBed 会在测试环境中为你禁用动画。
 
-If you want to test that the animations are animating in a browser test, for example an end-to-end test, you can configure TestBed to enable animations by specifying `animationsEnabled: true` in your test configuration.
+如果你想在浏览器测试（例如端到端测试）中测试动画是否正常执行，可以在测试配置中指定 `animationsEnabled: true`，让 TestBed 启用动画。
 
 ```ts
 TestBed.configureTestingModule({animationsEnabled: true});
 ```
 
-This will configure animations in your test environment to behave normally.
+这样，测试环境中的动画就会正常运行。
 
-::: info NOTE
-Some test environments do not emit animation events like `animationstart`, `animationend` and their transition event equivalents.
+::: info 注意
+某些测试环境不会发出 `animationstart`、`animationend` 之类的动画事件，以及与之对应的过渡事件。
 
 :::
 
-## More on Angular animations
+## 关于 Angular 动画的更多内容 {#more-on-angular-animations}
 
-You might also be interested in the following:
+你可能还会对以下内容感兴趣：
 
-- [Complex Animations with CSS](/guide/animations/css)
-- [Route transition animations](/guide/routing/route-transition-animations)
+- [使用 CSS 实现复杂动画](/guide/animations/css)
+- [路由过渡动画](/guide/routing/route-transition-animations)
 

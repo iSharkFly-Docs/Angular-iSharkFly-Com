@@ -1,16 +1,12 @@
----
-untranslated: true
----
+# 定义路由 {#define-routes}
 
-# Define routes
+路由（route）是 Angular 应用中导航（navigation）的基本构建块。
 
-Routes serve as the fundamental building blocks for navigation within an Angular app.
+## 什么是路由？ {#what-are-routes}
 
-## What are routes?
+在 Angular 中，**路由**是一个对象，它定义了针对特定 URL 路径或模式应该渲染哪个组件（component），以及用户导航到该 URL 时会发生什么的其他配置选项。
 
-In Angular, a **route** is an object that defines which component should render for a specific URL path or pattern, as well as additional configuration options about what happens when a user navigates to that URL.
-
-Here is a basic example of a route:
+下面是一个基本的路由示例：
 
 ```ts
 import {AdminPage} from './app-admin';
@@ -21,13 +17,13 @@ const adminPage = {
 };
 ```
 
-For this route, when a user visits the `/admin` path, the app will display the `AdminPage` component.
+对于这个路由，当用户访问 `/admin` 路径时，应用会显示 `AdminPage` 组件。
 
-### Managing routes in your application
+### 在应用中管理路由 {#managing-routes-in-your-application}
 
-Most projects define routes in a separate file that contains `routes` in the filename.
+大多数项目会在一个单独的文件中定义路由，这个文件的文件名中包含 `routes`。
 
-A collection of routes looks like this:
+一组路由看起来像这样：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -46,16 +42,16 @@ export const routes: Routes = [
 ];
 ```
 
-::: tip TIP
-If you generated a project with Angular CLI, your routes are defined in `src/app/app.routes.ts`.
+::: tip 提示
+如果你是用 Angular CLI 生成的项目，路由定义在 `src/app/app.routes.ts` 中。
 
 :::
 
-### Adding the router to your application
+### 将路由器添加到应用中 {#adding-the-router-to-your-application}
 
-When bootstrapping an Angular application without the Angular CLI, you can pass a configuration object that includes a `providers` array.
+在不使用 Angular CLI 引导 Angular 应用时，你可以传入一个包含 `providers` 数组的配置对象。
 
-Inside of the `providers` array, you can add the Angular router to your application by adding a `provideRouter` function call with your routes.
+在 `providers` 数组中，添加一个以路由为参数的 `provideRouter` 函数调用，即可将 Angular 路由器（router）添加到应用中。
 
 ```ts
 import {ApplicationConfig} from '@angular/core';
@@ -71,31 +67,31 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-## Route URL Paths
+## 路由 URL 路径 {#route-url-paths}
 
-### Static URL Paths
+### 静态 URL 路径 {#static-url-paths}
 
-Static URL Paths refer to routes with predefined paths that don't change based on dynamic parameters. These are routes that match a `path` string exactly and have a fixed outcome.
+静态 URL 路径指的是路径预先定义好、不会随动态参数而变化的路由。这类路由与 `path` 字符串完全匹配，结果是固定的。
 
-Examples of this include:
+例如：
 
 - "/admin"
 - "/blog"
 - "/settings/account"
 
-### Define URL Paths with Route Parameters
+### 使用路由参数定义 URL 路径 {#define-url-paths-with-route-parameters}
 
-Parameterized URLs allow you to define dynamic paths that allow multiple URLs to the same component while dynamically displaying data based on parameters in the URL.
+参数化 URL 让你可以定义动态路径，使多个 URL 指向同一个组件，同时根据 URL 中的参数动态显示数据。
 
-You can define this type of pattern by adding parameters to your route’s `path` string and prefixing each parameter with the colon (`:`) character.
+你可以在路由的 `path` 字符串中添加参数，并在每个参数前加上冒号（`:`）字符，来定义这种模式。
 
-::: warning IMPORTANT
-Parameters are distinct from information in the URL's [query string](https://en.wikipedia.org/wiki/Query_string).
-Learn more about [query parameters in Angular in this guide](/guide/routing/read-route-state#query-parameters).
+::: warning 重要
+参数与 URL 中[查询字符串](https://en.wikipedia.org/wiki/Query_string)里的信息是不同的。
+请在[本指南中进一步了解 Angular 中的查询参数](/guide/routing/read-route-state#query-parameters)。
 
 :::
 
-The following example displays a user profile component based on the user id passed in through the URL.
+下面的示例会根据通过 URL 传入的用户 id 显示用户资料组件。
 
 ```ts
 import {Routes} from '@angular/router';
@@ -104,16 +100,16 @@ import {UserProfile} from './user-profile/user-profile';
 const routes: Routes = [{path: 'user/:id', component: UserProfile}];
 ```
 
-In this example, URLs such as `/user/leeroy` and `/user/jenkins` render the `UserProfile` component. This component can then read the `id` parameter and use it to perform additional work, such as fetching data. See [reading route state guide](/guide/routing/read-route-state) for details on reading route parameters.
+在这个示例中，像 `/user/leeroy` 和 `/user/jenkins` 这样的 URL 都会渲染 `UserProfile` 组件。该组件随后可以读取 `id` 参数，并用它执行其他工作，例如获取数据。关于读取路由参数的详细信息，请参阅[读取路由状态指南](/guide/routing/read-route-state)。
 
-Valid route parameter names must start with a letter (a-z, A-Z) and can only contain:
+有效的路由参数名必须以字母（a-z、A-Z）开头，并且只能包含：
 
-- Letters (a-z, A-Z)
-- Numbers (0-9)
-- Underscore (\_)
-- Hyphen (-)
+- 字母（a-z、A-Z）
+- 数字（0-9）
+- 下划线（\_）
+- 连字符（-）
 
-You can also define paths with multiple parameters:
+你也可以定义带有多个参数的路径：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -126,15 +122,15 @@ const routes: Routes = [
 ];
 ```
 
-With this new path, users can visit `/user/leeroy/youtube` and `/user/leeroy/bluesky` and see respective social media feeds based on the parameter for the user leeroy.
+有了这个新路径，用户可以访问 `/user/leeroy/youtube` 和 `/user/leeroy/bluesky`，并根据参数看到用户 leeroy 对应的社交媒体动态。
 
-See [Reading route state](/guide/routing/read-route-state) for details on reading route parameters.
+关于读取路由参数的详细信息，请参阅[读取路由状态](/guide/routing/read-route-state)。
 
-### Wildcards
+### 通配符 {#wildcards}
 
-When you need to catch all routes for a specific path, the solution is a wildcard route which is defined with the double asterisk (`**`).
+当你需要捕获某个路径下的所有路由时，解决方案是使用通配符路由，它用双星号（`**`）定义。
 
-A common example is defining a Page Not Found component.
+一个常见的例子是定义一个“页面未找到”组件。
 
 ```ts
 import {Routes} from '@angular/router';
@@ -149,40 +145,40 @@ const routes: Routes = [
 ];
 ```
 
-In this routes array, the app displays the `NotFound` component when the user visits any path outside of `home` and `user/:id`.
+在这个路由数组中，当用户访问 `home` 和 `user/:id` 之外的任何路径时，应用都会显示 `NotFound` 组件。
 
-::: tip TIP
-Wildcard routes are typically placed at the end of a routes array.
+::: tip 提示
+通配符路由通常放在路由数组的末尾。
 
 :::
 
-## How Angular matches URLs
+## Angular 如何匹配 URL {#how-angular-matches-urls}
 
-When you define routes, the order is important because Angular uses a first-match wins strategy. This means that once Angular matches a URL with a route `path`, it stops checking any further routes. As a result, always put more specific routes before less specific routes.
+定义路由时，顺序很重要，因为 Angular 采用“首次匹配优先”的策略。也就是说，一旦 Angular 将 URL 与某个路由的 `path` 匹配上，就会停止检查后续的路由。因此，务必把更具体的路由放在不那么具体的路由之前。
 
-The following example shows routes defined from most-specific to least specific:
+下面的示例展示了按从最具体到最不具体的顺序定义的路由：
 
 ```ts
 const routes: Routes = [
-  {path: '', component: Home}, // Empty path
-  {path: 'users/new', component: NewUser}, // Static, most specific
-  {path: 'users/:id', component: UserDetail}, // Dynamic
-  {path: 'users', component: Users}, // Static, less specific
-  {path: '**', component: NotFound}, // Wildcard - always last
+  {path: '', component: Home}, // 空路径
+  {path: 'users/new', component: NewUser}, // 静态路径，最具体
+  {path: 'users/:id', component: UserDetail}, // 动态路径
+  {path: 'users', component: Users}, // 静态路径，不那么具体
+  {path: '**', component: NotFound}, // 通配符——始终放在最后
 ];
 ```
 
-If a user visits `/users/new`, Angular router would go through the following steps:
+如果用户访问 `/users/new`，Angular 路由器会依次执行以下步骤：
 
-1. Checks `''` - doesn't match
-1. Checks `users/new` - matches! Stops here
-1. Never reaches `users/:id` even though it could match
-1. Never reaches `users`
-1. Never reaches `**`
+1. 检查 `''`——不匹配
+1. 检查 `users/new`——匹配！在此停止
+1. 永远不会检查到 `users/:id`，尽管它也可能匹配
+1. 永远不会检查到 `users`
+1. 永远不会检查到 `**`
 
-## Redirects
+## 重定向 {#redirects}
 
-You can define a route that redirects to another route instead of rendering a component:
+你可以定义一个重定向（redirect）到另一个路由的路由，而不是渲染某个组件：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -200,11 +196,11 @@ const routes: Routes = [
 ];
 ```
 
-If you modify or remove a route, some users may still click on out-of-date links or bookmarks to that route. You can add a redirect to direct those users to an appropriate alternative route instead of a "not found" page.
+如果你修改或删除了某个路由，有些用户可能仍会点击指向该路由的过时链接或书签。你可以添加一个重定向，把这些用户引导到合适的替代路由，而不是显示“未找到”页面。
 
-## Page titles
+## 页面标题 {#page-titles}
 
-You can associate a **title** with each route. Angular automatically updates the [page title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) when a route activates. Always define appropriate page titles for your application, as these titles are necessary to create an accessible experience.
+你可以为每个路由关联一个**标题**（title）。路由激活时，Angular 会自动更新[页面标题](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title)。请始终为应用定义合适的页面标题，因为这些标题是打造无障碍体验所必需的。
 
 ```ts
 import {Routes} from '@angular/router';
@@ -226,7 +222,7 @@ const routes: Routes = [
 ];
 ```
 
-The page `title` property can be set dynamically to a resolver function using [`ResolveFn`](https://angular.dev/api/router/ResolveFn).
+页面的 `title` 属性可以通过 [`ResolveFn`](https://angular.dev/api/router/ResolveFn) 动态设置为一个解析器（resolver）函数。
 
 ```ts
 const titleResolver: ResolveFn<string> = (route) => route.queryParams['id'];
@@ -240,13 +236,13 @@ const routes: Routes = [
 ];
 ```
 
-Route titles can also be set via a service extending the [`TitleStrategy`](https://angular.dev/api/router/TitleStrategy) abstract class. By default, Angular uses the [`DefaultTitleStrategy`](https://angular.dev/api/router/DefaultTitleStrategy).
+路由标题也可以通过一个继承了 [`TitleStrategy`](https://angular.dev/api/router/TitleStrategy) 抽象类的服务（service）来设置。默认情况下，Angular 使用 [`DefaultTitleStrategy`](https://angular.dev/api/router/DefaultTitleStrategy)。
 
-### Using TitleStrategy for page titles
+### 使用 TitleStrategy 设置页面标题 {#using-titlestrategy-for-page-titles}
 
-For advanced scenarios where you need centralized control over how the document title is composed, implement a `TitleStrategy`.
+在需要集中控制文档标题组成方式的高级场景中，可以实现一个 `TitleStrategy`。
 
-`TitleStrategy` is a token you can provide to override the default title strategy used by Angular. You can supply a custom `TitleStrategy` to implement conventions such as adding an application suffix, formatting titles from breadcrumbs, or generating titles dynamically from route data.
+`TitleStrategy` 是一个令牌，你可以提供它来覆盖 Angular 使用的默认标题策略。你可以提供自定义的 `TitleStrategy` 来实现各种约定，例如添加应用后缀、根据面包屑格式化标题，或者根据路由数据动态生成标题。
 
 ```ts
 import {inject, Injectable} from '@angular/core';
@@ -256,19 +252,19 @@ import {TitleStrategy, RouterStateSnapshot} from '@angular/router';
 @Injectable()
 export class AppTitleStrategy extends TitleStrategy {
   private readonly title = inject(Title);
-  // Read once: getTitle() returns the prefixed title after the first update
+  // 只读取一次：首次更新后 getTitle() 会返回带前缀的标题
   private readonly defaultTitle = this.title.getTitle();
 
   updateTitle(snapshot: RouterStateSnapshot): void {
-    // PageTitle is equal to the "Title" of a route if it's set
-    // If it's not set, it uses the "title" given in index.html
+    // 如果路由设置了 "Title"，PageTitle 就等于它
+    // 如果没有设置，则使用 index.html 中给出的 "title"
     const pageTitle = this.buildTitle(snapshot) || this.defaultTitle;
     this.title.setTitle(`MyAwesomeApp - ${pageTitle}`);
   }
 }
 ```
 
-To use the custom strategy, provide it with the `TitleStrategy` token at the application level:
+要使用自定义策略，请在应用级别用 `TitleStrategy` 令牌提供它：
 
 ```ts
 import {provideRouter, TitleStrategy} from '@angular/router';
@@ -279,11 +275,11 @@ export const appConfig = {
 };
 ```
 
-## Route-level providers for dependency injection
+## 用于依赖注入的路由级提供者 {#route-level-providers-for-dependency-injection}
 
-Each route has a `providers` property that lets you provide dependencies to that route's content via [dependency injection](/guide/di).
+每个路由都有一个 `providers` 属性，让你可以通过[依赖注入](/guide/di)（dependency injection）为该路由的内容提供依赖。
 
-Common scenarios where this can be helpful include applications that have different services based on whether the user is an admin or not.
+这在一些常见场景中很有用，例如应用需要根据用户是否为管理员来使用不同的服务。
 
 ```ts
 export const ROUTES: Route[] = [
@@ -295,24 +291,24 @@ export const ROUTES: Route[] = [
       {path: 'teams', component: AdminTeams},
     ],
   },
-  // ... other application routes that don't
-  //     have access to ADMIN_API_KEY or AdminService.
+  // ... 其他应用路由，它们无法
+  //     访问 ADMIN_API_KEY 或 AdminService。
 ];
 ```
 
-In this code sample, the `admin` path contains a protected data property of `ADMIN_API_KEY` that is only available to children within its section. As a result, no other paths will be able to access the data provided via `ADMIN_API_KEY`.
+在这段代码示例中，`admin` 路径包含一个受保护的数据属性 `ADMIN_API_KEY`，它只对该部分内的子路由可用。因此，其他路径都无法访问通过 `ADMIN_API_KEY` 提供的数据。
 
-See the [Dependency injection guide](/guide/di) for more information about providers and injection in Angular.
+关于 Angular 中提供者（provider）和注入的更多信息，请参阅[依赖注入指南](/guide/di)。
 
-## Associating data with routes
+## 将数据与路由关联 {#associating-data-with-routes}
 
-Route data enables you to attach additional information to routes. You are able to configure how components behave based on this data.
+路由数据让你可以为路由附加额外的信息，并根据这些数据配置组件的行为。
 
-There are two ways to work with route data: static data that remains constant, and dynamic data that can change based on runtime conditions.
+处理路由数据有两种方式：保持不变的静态数据，以及可以根据运行时条件变化的动态数据。
 
-### Static data
+### 静态数据 {#static-data}
 
-You can associate arbitrary static data with a route via the `data` property in order to centralize things like route-specific metadata (e.g., analytics tracking, permissions, etc.):
+你可以通过 `data` 属性将任意静态数据与路由关联起来，以便集中管理路由特有的元数据（例如分析跟踪、权限等）：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -334,20 +330,20 @@ const routes: Routes = [
 ];
 ```
 
-In this code sample, the home and about page are configured with specific `analyticsId` which would then be used in their respective components for page tracking analytics.
+在这段代码示例中，首页和关于页面都配置了特定的 `analyticsId`，随后会在各自的组件中用于页面跟踪分析。
 
-You can read this static data by injecting the `ActivatedRoute`. See [Reading route state](/guide/routing/read-route-state) for details.
+你可以通过注入 `ActivatedRoute` 来读取这些静态数据。详情请参阅[读取路由状态](/guide/routing/read-route-state)。
 
-### Dynamic data with resources and resolvers
+### 使用资源和解析器获取动态数据 {#dynamic-data-with-resources-and-resolvers}
 
-When you need to fetch data for a route, Angular Router supports reactive route resources as well as data resolvers:
+当你需要为某个路由获取数据时，Angular 路由器既支持响应式的路由资源（resource），也支持数据解析器：
 
-- [Data fetching with resources](/guide/routing/data-fetching-with-resources): Fetch data reactively using Angular Signals `Resource` APIs.
-- [Route data resolvers](/guide/routing/data-resolvers): Fetch data before route activation using resolver functions.
+- [使用资源获取数据](/guide/routing/data-fetching-with-resources)：使用 Angular 信号（signal）的 `Resource` API 以响应式方式获取数据。
+- [路由数据解析器](/guide/routing/data-resolvers)：使用解析器函数在路由激活之前获取数据。
 
-### Error fallback components
+### 错误回退组件 {#error-fallback-components}
 
-You can specify an `errorComponent` on a route to render a dedicated fallback component if the route component throws an error during initialization or rendering:
+你可以在路由上指定一个 `errorComponent`，当路由组件在初始化或渲染期间抛出错误时，渲染一个专门的回退组件：
 
 ```ts
 import {Routes} from '@angular/router';
@@ -363,15 +359,15 @@ export const routes: Routes = [
 ];
 ```
 
-To learn more about configuring error fallbacks and retrying failed routes, see the [Error boundaries guide](/guide/routing/error-boundaries).
+要进一步了解如何配置错误回退以及重试失败的路由，请参阅[错误边界指南](/guide/routing/error-boundaries)。
 
-## Nested Routes
+## 嵌套路由 {#nested-routes}
 
-Nested routes, also known as child routes, are a common technique for managing more complex navigation routes where a component has a sub-view that changes based on the URL.
+嵌套路由（也称为子路由）是一种管理更复杂导航路由的常用技术，适用于组件包含一个会随 URL 变化的子视图的情况。
 
 <img alt="Diagram to illustrate nested routes" src="/assets/images/guide/router/nested-routing-diagram.svg">
 
-You can add child routes to any route definition with the `children` property:
+你可以通过 `children` 属性为任何路由定义添加子路由：
 
 ```ts
 const routes: Routes = [
@@ -392,11 +388,11 @@ const routes: Routes = [
 ];
 ```
 
-The above example defines a route for a product page that allows a user to change whether the product info or reviews are displayed based on the url.
+上面的示例为产品页定义了一个路由，让用户可以根据 URL 切换显示产品信息还是评论。
 
-The `children` property accepts an array of `Route` objects.
+`children` 属性接受一个 `Route` 对象数组。
 
-To display child routes, the parent component (`Product` in the example above) includes its own `<router-outlet>`.
+要显示子路由，父组件（上例中的 `Product`）需要包含自己的 `<router-outlet>`。
 
 ```html
 <!-- Product -->
@@ -406,10 +402,10 @@ To display child routes, the parent component (`Product` in the example above) i
 </article>
 ```
 
-After adding child routes to the configuration and adding a `<router-outlet>` to the component, navigation between URLs that match the child routes updates only the nested outlet.
+在配置中添加子路由并在组件中添加 `<router-outlet>` 之后，在与子路由匹配的 URL 之间导航时，只会更新嵌套的出口（outlet）。
 
-## Next steps
+## 下一步 {#next-steps}
 
-- [Route Loading Strategies](/guide/routing/loading-strategies)
-- [Display the contents of your routes with Outlets](/guide/routing/show-routes-with-outlets)
+- [路由加载策略](/guide/routing/loading-strategies)
+- [使用出口显示路由内容](/guide/routing/show-routes-with-outlets)
 

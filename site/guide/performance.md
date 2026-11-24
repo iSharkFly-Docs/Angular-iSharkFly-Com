@@ -1,16 +1,12 @@
----
-untranslated: true
----
+# 服务端渲染与混合渲染 {#server-side-hybrid-rendering}
 
-# Server-side & hybrid rendering
-
-Learn about different ways you can optimize the performance of your application with different rendering strategies.
+了解如何借助不同的渲染策略，以多种方式优化应用的性能。
 
 
-One of the top priorities of any developer is ensuring that their application is as performant as possible. These guides are here to help you follow best practices for building performant applications by taking advantage of different rendering strategies.
+每位开发者最关心的事情之一，就是让自己的应用尽可能地高性能。这些指南将帮助你遵循最佳实践，利用不同的渲染策略来构建高性能的应用。
 
-| Guides Types                                          | Description                                                                                                                                                                             |
+| 指南类型                                              | 说明                                                                                                                                                                                    |
 | :---------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Server and hybrid rendering](/guide/ssr)             | Learn how to leverage rendering pages on the server to improve load times.                                                                                                              |
-| [Hydration](/guide/hydration)                         | A process to improve application performance by restoring its state after server-side rendering and reusing existing DOM structure as much as possible.                                 |
-| [Incremental Hydration](/guide/incremental-hydration) | Incremental hydration is an advanced type of hydration that can leave sections of your application dehydrated and incrementally trigger hydration of those sections as they are needed. |
+| [服务端渲染与混合渲染](/guide/ssr)                    | 了解如何利用在服务器上渲染页面来缩短加载时间。                                                                                                                                          |
+| [水合](/guide/hydration)                              | 一种提升应用性能的过程：在服务端渲染之后恢复应用状态，并尽可能复用已有的 DOM 结构。                                                                                                     |
+| [增量水合](/guide/incremental-hydration)              | 增量水合是一种高级的水合方式，它可以让应用的某些部分保持未水合（dehydrated）状态，并在需要时逐步触发这些部分的水合。                                                                    |

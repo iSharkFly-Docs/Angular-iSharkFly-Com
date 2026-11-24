@@ -1,30 +1,26 @@
----
-untranslated: true
----
+# 路由中的错误边界 {#error-boundaries-in-routing}
 
-# Error boundaries in routing
-
-::: warning IMPORTANT
-Router error boundaries are in [developer preview](/reference/releases#developer-preview).
+::: warning 重要
+路由器错误边界目前处于[开发者预览](/reference/releases#developer-preview)阶段。
 
 :::
 
-When building web applications, runtime errors can occur during component initialization, data loading, or rendering. Angular Router allows you to isolate these failures to individual routes using **error boundaries**, preventing a single failing component from crashing the entire application shell.
+构建 Web 应用时，组件（component）初始化、数据加载或渲染期间都可能发生运行时错误。Angular 路由器（Router）允许你使用**错误边界**（error boundary）把这些故障隔离在单个路由（route）中，防止一个出错的组件导致整个应用外壳崩溃。
 
-::: info NOTE
-This guide covers error handling at the route level. For catching errors within specific sections of a component's template, refer to the [template `@boundary` block guide](/guide/templates/error-boundaries).
+::: info 注意
+本指南介绍的是路由级别的错误处理。如果要在组件模板（template）的特定部分中捕获错误，请参阅[模板 `@boundary` 块指南](/guide/templates/error-boundaries)。
 
 :::
 
-## What are router error boundaries?
+## 什么是路由器错误边界？ {#what-are-router-error-boundaries}
 
-Router error boundaries provide declarative error handling at the route outlet level. When a component within a route throws an error—such as a failed network resource, an unexpected null reference in a template, or an error during dependency injection—Angular Router catches the error and displays a dedicated fallback component (`errorComponent`) in place of the failing view.
+路由器错误边界在路由出口（outlet）级别提供声明式的错误处理。当路由中的某个组件抛出错误时（例如网络资源加载失败、模板中出现意外的 null 引用，或依赖注入（dependency injection）期间出错），Angular 路由器会捕获该错误，并在出错视图的位置显示一个专门的后备组件（`errorComponent`）。
 
-Sibling outlets, parent layout components, and global navigation headers remain fully interactive and intact.
+同级出口、父级布局组件和全局导航标题栏都会保持完整，并且仍可正常交互。
 
-## Configure an error component
+## 配置错误组件 {#configure-an-error-component}
 
-To display a custom fallback UI when a route fails, add the `errorComponent` property to your route definition:
+要在路由出错时显示自定义的后备 UI，请在路由定义中添加 `errorComponent` 属性：
 
 ```ts [app.routes.ts]
 import {Routes} from '@angular/router';
@@ -40,27 +36,27 @@ export const routes: Routes = [
 ];
 ```
 
-When you navigate to `/products/123`, if `ProductDetails` throws an error during creation or rendering, Angular Router instantiates `ProductErrorFallback` inside the `<router-outlet>` instead.
+当你导航到 `/products/123` 时，如果 `ProductDetails` 在创建或渲染期间抛出错误，Angular 路由器就会改为在 `<router-outlet>` 中实例化 `ProductErrorFallback`。
 
-::: info NOTE
-`errorComponent` only takes effect after you enable error boundaries. See [Global error boundary configuration](#global-error-boundary-configuration).
+::: info 注意
+只有在启用错误边界之后，`errorComponent` 才会生效。请参阅[全局错误边界配置](#global-error-boundary-configuration)。
 
 :::
 
-::: info NOTE
-Unlike route components which can be lazily loaded using `loadComponent`, the `errorComponent` must be eagerly loaded in your route configuration.
+::: info 注意
+路由组件可以使用 `loadComponent` 延迟加载（lazy loading），而 `errorComponent` 则不同，它必须在路由配置中立即加载（eagerly loaded）。
 
 :::
 
 ---
 
-## Create an error fallback component
+## 创建错误后备组件 {#create-an-error-fallback-component}
 
-An error fallback component is a standard Angular component that can receive the details of the caught error.
+错误后备组件就是一个标准的 Angular 组件，它可以接收所捕获错误的详细信息。
 
-### Access error details with an input
+### 通过输入访问错误详情 {#access-error-details-with-an-input}
 
-You can accept the caught error object by declaring an `error` input:
+你可以声明一个 `error` 输入（input）来接收捕获到的错误对象：
 
 ```ts [product-error-fallback.ts]
 import {Component, input} from '@angular/core';
@@ -79,19 +75,19 @@ export class ProductErrorFallback {
 }
 ```
 
-::: info NOTE
-If your route configuration includes parameters, query parameters, or route data named `error`, the caught runtime `Error` always takes precedence on the `error` input of an error component.
+::: info 注意
+如果路由配置中包含名为 `error` 的参数、查询参数或路由数据，那么对于错误组件的 `error` 输入，捕获到的运行时 `Error` 始终优先。
 
 :::
 
-::: warning IMPORTANT
-If the `errorComponent` itself throws an error during its creation or rendering, the `RouterOutlet` will not catch it again. The exception will bubble out of the outlet to the root `ErrorHandler` (or an enclosing [template `@boundary` block](/guide/templates/error-boundaries)) to prevent infinite error loops.
+::: warning 重要
+如果 `errorComponent` 本身在创建或渲染期间抛出错误，`RouterOutlet` 不会再次捕获它。该异常会从出口向外冒泡到根 `ErrorHandler`（或外层的[模板 `@boundary` 块](/guide/templates/error-boundaries)），以防止出现无限的错误循环。
 
 :::
 
-## Route parameter and data binding
+## 路由参数和数据绑定 {#route-parameter-and-data-binding}
 
-When using `withComponentInputBinding()`, Angular Router binds route parameters and static data to inputs on the `errorComponent` as well. This allows you to display contextual information in your error UI:
+使用 `withComponentInputBinding()` 时，Angular 路由器同样会把路由参数和静态数据绑定（binding）到 `errorComponent` 的输入上。这样你就可以在错误 UI 中显示上下文信息：
 
 ```ts [product-error-fallback.ts]
 import {Component, input} from '@angular/core';
@@ -111,9 +107,9 @@ export class ProductErrorFallback {
 }
 ```
 
-## Global error boundary configuration
+## 全局错误边界配置 {#global-error-boundary-configuration}
 
-Enable router error boundaries for your application with the `withErrorBoundaries` feature in `provideRouter`. Without it, a route's `errorComponent` is ignored:
+在 `provideRouter` 中使用 `withErrorBoundaries` 特性为应用启用路由器错误边界。如果不启用，路由的 `errorComponent` 会被忽略：
 
 ```ts [app.config.ts]
 import {ApplicationConfig, inject} from '@angular/core';
@@ -128,10 +124,10 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withErrorBoundaries({
-        // Default fallback component for routes that do not define their own errorComponent
+        // 用于未定义自身 errorComponent 的路由的默认后备组件
         defaultErrorComponent: GlobalErrorFallback,
 
-        // Global telemetry hook invoked whenever a route error is caught
+        // 每当捕获到路由错误时调用的全局遥测钩子
         onError: (error, details) => {
           inject(AnalyticsService).logException(error, details);
         },
@@ -141,18 +137,18 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-### Options
+### 选项 {#options}
 
-| Option                  | Type                                             | Description                                                                                                                          |
+| 选项                    | 类型                                             | 说明                                                                                                                                 |
 | ----------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `defaultErrorComponent` | `Type<unknown>`                                  | Default fallback component to render when a route without its own `errorComponent` throws an error.                                  |
-| `onError`               | `(error: Error, details?: ErrorDetails) => void` | Global callback invoked whenever any error is caught by a router error boundary. Ideal for sending telemetry to monitoring services. |
+| `defaultErrorComponent` | `Type<unknown>`                                  | 当未定义自身 `errorComponent` 的路由抛出错误时，要渲染的默认后备组件。                                                               |
+| `onError`               | `(error: Error, details?: ErrorDetails) => void` | 每当路由器错误边界捕获到任何错误时调用的全局回调，非常适合向监控服务发送遥测数据。                                                   |
 
 ---
 
-## Redirecting with `RedirectCommand`
+## 使用 `RedirectCommand` 进行重定向 {#redirecting-with-redirectcommand}
 
-When an authentication failure or data condition requires navigating to another page, components and route resources can throw a `RedirectCommand`:
+当身份验证失败或某种数据条件要求导航到另一个页面时，组件和路由资源可以抛出 `RedirectCommand`：
 
 ```ts [user-profile.ts]
 import {Component, inject, resource} from '@angular/core';
@@ -169,7 +165,7 @@ export class UserProfile {
     loader: async () => {
       const response = await fetch('/api/user');
       if (response.status === 401) {
-        // Automatically redirects to /login when unauthorized
+        // 未授权时自动重定向到 /login
         throw new RedirectCommand(this.router.parseUrl('/login'));
       }
       return response.json();
@@ -178,33 +174,33 @@ export class UserProfile {
 }
 ```
 
-When a `RedirectCommand` is thrown:
+当抛出 `RedirectCommand` 时：
 
-1. `RouterOutlet` catches the command and initiates navigation to the specified redirect destination.
-2. If nested outlets or template error boundaries exist, Angular deduplicates the command to ensure the navigation is only triggered once.
-3. The error component (if configured) renders during the transition.
+1. `RouterOutlet` 会捕获该命令，并发起到指定重定向（redirect）目标的导航。
+2. 如果存在嵌套出口或模板错误边界，Angular 会对该命令去重，确保导航只触发一次。
+3. 在过渡（transition）期间会渲染错误组件（如果已配置）。
 
-::: info NOTE
-If a `RedirectCommand` is thrown and no `errorComponent` is configured, the router initiates the navigation and intentionally swallows the error to prevent it from being logged as a crash by the global `ErrorHandler`.
-
-:::
-
-## Error boundary scope vs. navigation errors
-
-It is helpful to understand the distinction between **view-layer errors** and **navigation pipeline errors**:
-
-- **View-layer errors (Error boundaries)**: Occur inside component constructors, dependency injection, lifecycle hooks (`ngOnInit`), template expressions, and component `resource()` loaders. These are caught by `RouterOutlet` and display the `errorComponent`.
-- **Navigation pipeline errors (`NavigationError`)**: Occur before route activation, such as failing `canActivate` / `canMatch` guards or route `resolve` data functions. These halt the navigation transition before reaching the outlet and can be customized using `withNavigationErrorHandler`.
-
-::: info NOTE
-When an error boundary displays an `errorComponent`, `canDeactivate` guards configured for that route run when navigating away. The guard receives the active `errorComponent` instance as its `component` parameter. If your guard accesses component-specific properties or methods, verify the component type or safely handle the error component instance.
+::: info 注意
+如果抛出了 `RedirectCommand` 但没有配置 `errorComponent`，路由器会发起导航，并有意吞掉该错误，以免它被全局 `ErrorHandler` 记录为崩溃。
 
 :::
 
-## Next steps
+## 错误边界的作用范围与导航错误 {#error-boundary-scope-vs-navigation-errors}
 
-- [Template error boundaries](/guide/templates/error-boundaries)
-- [Show routes with outlets](/guide/routing/show-routes-with-outlets)
-- [Redirecting routes](/guide/routing/redirecting-routes)
-- [Data fetching with resources](/guide/routing/data-fetching-with-resources)
+理解**视图层错误**和**导航管道错误**之间的区别会很有帮助：
+
+- **视图层错误**（错误边界）：发生在组件构造函数、依赖注入、生命周期钩子（lifecycle hook，如 `ngOnInit`）、模板表达式以及组件的 `resource()` 加载器中。这些错误会被 `RouterOutlet` 捕获，并显示 `errorComponent`。
+- **导航管道错误**（`NavigationError`）：发生在路由激活之前，例如 `canActivate` / `canMatch` 守卫失败，或路由的 `resolve` 数据函数失败。这些错误会在到达出口之前中止导航过渡，可以使用 `withNavigationErrorHandler` 进行自定义处理。
+
+::: info 注意
+当错误边界显示 `errorComponent` 时，为该路由配置的 `canDeactivate` 守卫会在离开时运行。守卫的 `component` 参数接收的是当前激活的 `errorComponent` 实例。如果你的守卫会访问组件特有的属性或方法，请先检查组件类型，或者安全地处理错误组件实例。
+
+:::
+
+## 后续步骤 {#next-steps}
+
+- [模板错误边界](/guide/templates/error-boundaries)
+- [使用出口显示路由](/guide/routing/show-routes-with-outlets)
+- [重定向路由](/guide/routing/redirecting-routes)
+- [使用资源获取数据](/guide/routing/data-fetching-with-resources)
 

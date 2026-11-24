@@ -1,27 +1,23 @@
----
-untranslated: true
----
+# 与其他表单方案的比较 {#comparison-with-other-form-approaches}
 
-# Comparison with other form approaches
+Angular 提供了三种构建表单的方案：信号表单（Signal Forms）、响应式表单（Reactive Forms）和模板驱动表单（Template-driven Forms）。它们在管理状态、验证和数据流方面各有不同的模式。本指南帮助你理解它们之间的差异，并为项目选择合适的方案。
 
-Angular provides three approaches to building forms: Signal Forms, Reactive Forms, and Template-driven Forms. Each has distinct patterns for managing state, validation, and data flow. This guide helps you understand the differences and choose the right approach for your project.
+## 快速比较 {#quick-comparison}
 
-## Quick comparison
+| 特性         | 信号表单                         | 响应式表单                          | 模板驱动表单          |
+| ------------ | -------------------------------- | ----------------------------------- | --------------------- |
+| 数据源       | 用户定义的可写信号模型           | `FormControl`/`FormGroup`           | 组件中的用户模型      |
+| 类型安全     | 从模型推断                       | 使用类型化表单显式声明              | 很少                  |
+| 验证         | 带有基于路径的验证器的 schema    | 传给控件的验证器列表                | 基于指令              |
+| 状态管理     | 基于信号                         | 基于 Observable                     | 由 Angular 管理       |
+| 设置方式     | 信号 + schema 函数               | FormControl 树                      | 模板中的 NgModel      |
+| 最适合       | 基于信号的应用                   | 复杂表单                            | 简单表单              |
+| 学习曲线     | 中等                             | 中等偏高                            | 低                    |
+| 状态         | 稳定（v22+）                     | 稳定                                | 稳定                  |
 
-| Feature          | Signal Forms                       | Reactive Forms                        | Template-driven Forms   |
-| ---------------- | ---------------------------------- | ------------------------------------- | ----------------------- |
-| Source of truth  | User-defined writable signal model | `FormControl`/`FormGroup`             | User model in component |
-| Type safety      | Inferred from model                | Explicit with typed forms             | Minimal                 |
-| Validation       | Schema with path-based validators  | List of validators passed to Controls | Directive-based         |
-| State management | Signal-based                       | Observable-based                      | Angular-managed         |
-| Setup            | Signal + schema function           | FormControl tree                      | NgModel in template     |
-| Best for         | Signal-based apps                  | Complex forms                         | Simple forms            |
-| Learning curve   | Medium                             | Medium-High                           | Low                     |
-| Status           | Stable (v22+)                      | Stable                                | Stable                  |
+## 示例：登录表单 {#by-example-login-form}
 
-## By example: Login form
-
-The best way to understand the differences is to see the same form implemented in all three approaches.
+理解这些差异的最好方式，是看看用三种方案分别实现的同一个表单。
 
 ::: code-group
 
@@ -85,7 +81,7 @@ export class LoginComponent {
   });
 
   onSubmit() {
-    // Only runs the action when the form is valid.
+    // 仅在表单有效时才运行 action。
     submit(this.loginForm, async (field) => {
       console.log('Submitting:', field().value());
     });
@@ -232,43 +228,43 @@ export class LoginComponent {
 
 :::
 
-## Understanding the differences
+## 理解这些差异 {#understanding-the-differences}
 
-The three approaches make different design choices that affect how you write and maintain your forms. These differences stem from where each approach stores form state and how it manages validation.
+三种方案做出了不同的设计选择，这些选择会影响你编写和维护表单的方式。这些差异源于每种方案在哪里存储表单状态，以及如何管理验证。
 
-### Where your form data lives
+### 表单数据存放在哪里 {#where-your-form-data-lives}
 
-The most fundamental difference is where each approach considers the "source of truth" for form values.
+最根本的差异在于，每种方案把什么当作表单值的「数据源（source of truth）」。
 
-Signal Forms stores data in a writable signal. When you need the current form values, you call the signal:
+信号表单把数据存储在一个可写信号中。需要当前表单值时，调用这个信号即可：
 
 ```ts
 const credentials = this.loginModel(); // { email: '...', password: '...' }
 ```
 
-This keeps your form data in a single reactive container that automatically notifies Angular when values change. The form structure mirrors your data model exactly.
+这样表单数据就保存在单个响应式容器中，值发生变化时会自动通知 Angular。表单结构与你的数据模型完全对应。
 
-Reactive Forms stores data inside FormControl and FormGroup instances. You access values through the form hierarchy:
+响应式表单把数据存储在 FormControl 和 FormGroup 实例中。你需要通过表单层级结构访问值：
 
 ```ts
 const credentials = this.loginForm.value; // { email: '...', password: '...' }
 ```
 
-This separates form state management from your component's data model. The form structure is explicit but requires more setup code.
+这种方式把表单状态管理与组件的数据模型分离开来。表单结构是显式的，但需要更多的设置代码。
 
-Template-driven Forms stores data in component properties. You access values directly:
+模板驱动表单把数据存储在组件属性中。你可以直接访问这些值：
 
 ```ts
 const credentials = {email: this.email, password: this.password};
 ```
 
-This is the most direct approach but requires manually assembling values when you need them. Angular manages form state through directives in the template.
+这是最直接的方案，但需要值时得手动把它们组装起来。Angular 通过模板中的指令来管理表单状态。
 
-### How validation works
+### 验证如何工作 {#how-validation-works}
 
-Each approach defines validation rules differently, affecting where your validation logic lives and how you maintain it.
+每种方案定义验证规则的方式都不同，这会影响验证逻辑放在哪里以及如何维护。
 
-Signal Forms uses a schema function where you bind validators to field paths:
+信号表单使用一个 schema 函数，在其中把验证器绑定到字段路径上：
 
 ```ts
 loginForm = form(this.loginModel, (fieldPath) => {
@@ -277,9 +273,9 @@ loginForm = form(this.loginModel, (fieldPath) => {
 });
 ```
 
-All validation rules live together in one place. The schema function runs once during form creation, and validators execute automatically when field values change. Error messages are part of the validation definition.
+所有验证规则都集中在一处。schema 函数在创建表单时只运行一次，字段值变化时验证器会自动执行。错误消息是验证定义的一部分。
 
-Reactive Forms attaches validators when creating controls:
+响应式表单在创建控件时附加验证器：
 
 ```ts
 loginForm = new FormGroup({
@@ -287,81 +283,81 @@ loginForm = new FormGroup({
 });
 ```
 
-Validators are tied to individual controls in the form structure. This distributes validation across your form definition. Error messages typically live in your template.
+验证器与表单结构中的各个控件绑定在一起，因此验证分散在整个表单定义中。错误消息通常放在模板里。
 
-Template-driven Forms uses directive attributes in the template:
+模板驱动表单在模板中使用指令 attribute：
 
 ```html
 <input [(ngModel)]="email" required email />
 ```
 
-Validation rules live in your template alongside the HTML. This keeps validation close to the UI but spreads logic across template and component.
+验证规则与 HTML 一起放在模板中。这让验证贴近界面，但逻辑会分散在模板和组件之间。
 
-### Type safety and autocomplete
+### 类型安全与自动补全 {#type-safety-and-autocomplete}
 
-TypeScript integration differs significantly between approaches, affecting how much the compiler helps you avoid errors.
+不同方案对 TypeScript 的集成程度差别很大，这会影响编译器能在多大程度上帮你避免错误。
 
-Signal Forms infers types from your model structure:
+信号表单从模型结构推断类型：
 
 ```ts
 const loginModel = signal({email: '', password: ''});
 const loginForm = form(loginModel);
-// TypeScript knows: loginForm.email exists and returns FieldState<string>
+// TypeScript 知道：loginForm.email 存在，并返回 FieldState<string>
 ```
 
-You define your data shape once in the signal, and TypeScript automatically knows what fields exist and their types. Accessing `loginForm.username` (which doesn't exist) produces a type error.
+你只需在信号中定义一次数据结构，TypeScript 就会自动知道有哪些字段以及它们的类型。访问 `loginForm.username`（并不存在）会产生类型错误。
 
-Reactive Forms requires explicit type annotations with typed forms:
+响应式表单需要借助类型化表单显式添加类型注解：
 
 ```ts
 const loginForm = new FormGroup({
   email: new FormControl<string>(''),
   password: new FormControl<string>(''),
 });
-// TypeScript knows: loginForm.controls.email is FormControl<string>
+// TypeScript 知道：loginForm.controls.email 是 FormControl<string>
 ```
 
-You specify types for each control individually. TypeScript validates your form structure, but you maintain type information separately from your data model.
+你需要为每个控件单独指定类型。TypeScript 会检查表单结构，但类型信息需要与数据模型分开维护。
 
-Template-driven Forms offers minimal type safety:
+模板驱动表单只提供很少的类型安全：
 
 ```ts
 email = '';
 password = '';
-// TypeScript only knows these are strings, no form-level typing
+// TypeScript 只知道它们是字符串，没有表单级别的类型
 ```
 
-TypeScript understands your component properties but has no knowledge of form structure or validation. You lose compile-time checking for form operations.
+TypeScript 了解组件的属性，但对表单结构或验证一无所知。表单操作因此失去了编译期检查。
 
-## Choose your approach
+## 选择你的方案 {#choose-your-approach}
 
-### Use Signal Forms if:
+### 以下情况使用信号表单： {#use-signal-forms-if}
 
-- You're building new signal-based applications (Angular v22+)
-- You want type safety inferred from your model structure
-- Schema-based validation appeals to you
-- Your team is familiar with signals
+- 你在构建新的、基于信号的应用（Angular v22+）
+- 你希望从模型结构推断出类型安全
+- 你喜欢基于 schema 的验证
+- 你的团队熟悉信号
 
-### Use Reactive Forms if:
+### 以下情况使用响应式表单： {#use-reactive-forms-if}
 
-- You need production-ready stability
-- You're building complex, dynamic forms
-- You prefer observable-based patterns
-- You need fine-grained control over form state
-- You're working on an existing reactive forms codebase
+- 你需要生产就绪的稳定性
+- 你在构建复杂的动态表单
+- 你偏好基于 Observable 的模式
+- 你需要对表单状态进行细粒度控制
+- 你在维护一个已有的响应式表单代码库
 
-### Use Template-driven Forms if:
+### 以下情况使用模板驱动表单： {#use-template-driven-forms-if}
 
-- You're building simple forms (login, contact, search)
-- You're doing rapid prototyping
-- Your form logic is straightforward
-- You prefer keeping form logic in templates
-- You're working on an existing template-driven codebase
+- 你在构建简单的表单（登录、联系、搜索）
+- 你在做快速原型开发
+- 你的表单逻辑很简单
+- 你倾向于把表单逻辑放在模板中
+- 你在维护一个已有的模板驱动表单代码库
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-To learn more about each approach:
+进一步了解各个方案：
 
-- **Signal Forms**: See the [Overview guide](/guide/forms/signals/overview) to get started, or dive into [Form Models](/guide/forms/signals/models), [Validation](/guide/forms/signals/validation), and [Field State Management](/guide/forms/signals/field-state-management)
-- **Reactive Forms**: See the [Reactive Forms guide](/guide/forms/reactive-forms) in Angular documentation
-- **Template-driven Forms**: See the [Template-driven Forms guide](/guide/forms/template-driven-forms) in Angular documentation
+- **信号表单**：参阅[概览指南](/guide/forms/signals/overview)开始上手，或者深入了解[表单模型](/guide/forms/signals/models)、[验证](/guide/forms/signals/validation)和[字段状态管理](/guide/forms/signals/field-state-management)
+- **响应式表单**：参阅 Angular 文档中的[响应式表单指南](/guide/forms/reactive-forms)
+- **模板驱动表单**：参阅 Angular 文档中的[模板驱动表单指南](/guide/forms/template-driven-forms)

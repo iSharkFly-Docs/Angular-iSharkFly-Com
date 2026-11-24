@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 可复用动画 {#reusable-animations}
 
-# Reusable animations
-
-::: warning IMPORTANT
-The `@angular/animations` package is now deprecated. The Angular team recommends using native CSS with `animate.enter` and `animate.leave` for animations for all new code. Learn more at the new enter and leave [animation guide](/guide/animations). Also see [Migrating away from Angular's Animations package](/guide/animations/migration) to learn how you can start migrating to pure CSS animations in your apps.
+::: warning 重要
+`@angular/animations` 包现已弃用。Angular 团队建议所有新代码都使用原生 CSS 配合 `animate.enter` 和 `animate.leave` 来实现动画。请参阅新的进入与离开[动画指南](/guide/animations)了解更多信息。另请参阅[迁移出 Angular 的 Animations 包](/guide/animations/migration)，了解如何开始将应用迁移到纯 CSS 动画。
 
 :::
 
-This topic provides examples of how to create reusable animations.
+本主题通过示例介绍如何创建可复用的动画（animation）。
 
-## Create reusable animations
+## 创建可复用动画 {#create-reusable-animations}
 
-To create a reusable animation, use the [`animation()`](https://angular.dev/api/animations/animation) function to define an animation in a separate `.ts` file and declare this animation definition as a `const` export variable.
-You can then import and reuse this animation in your application components using the [`useAnimation()`](https://angular.dev/api/animations/useAnimation) function.
+要创建可复用动画，可以使用 [`animation()`](https://angular.dev/api/animations/animation) 函数在一个单独的 `.ts` 文件中定义动画，并把这个动画定义声明为 `const` 导出变量。
+然后，你就可以在应用的组件（component）中导入这个动画，并通过 [`useAnimation()`](https://angular.dev/api/animations/useAnimation) 函数复用它。
 
 ```ts [animations.ts]
 import {animation, style, animate, trigger, transition, useAnimation} from '@angular/animations';
@@ -29,15 +25,15 @@ export const transitionAnimation = animation([
 ]);
 ```
 
-In the preceding code snippet, `transitionAnimation` is made reusable by declaring it as an export variable.
+在上面的代码片段中，`transitionAnimation` 被声明为导出变量，因而可以复用。
 
-::: tip HELPFUL
-The `height`, `opacity`, `backgroundColor`, and `time` inputs are replaced during runtime.
+::: tip 提示
+`height`、`opacity`、`backgroundColor` 和 `time` 这些输入会在运行时被替换。
 
 :::
 
-You can also export a part of an animation.
-For example, the following snippet exports the animation `trigger`.
+你也可以只导出动画的一部分。
+例如，下面的代码片段导出了动画 `trigger`。
 
 ```ts [animations.ts]
 import {animation, style, animate, trigger, transition, useAnimation} from '@angular/animations';
@@ -55,8 +51,8 @@ export const triggerAnimation = trigger('openClose', [
 ]);
 ```
 
-From this point, you can import reusable animation variables into your component class.
-For example, the following code snippet imports the `transitionAnimation` variable and uses it via the `useAnimation()` function.
+此后，你就可以把这些可复用的动画变量导入组件类中。
+例如，下面的代码片段导入了 `transitionAnimation` 变量，并通过 `useAnimation()` 函数使用它。
 
 ```ts [open-close.ts]
 import {Component, input} from '@angular/core';
@@ -84,13 +80,13 @@ import {transitionAnimation} from './animations';
 })
 ```
 
-## More on Angular animations
+## 更多 Angular 动画相关内容 {#more-on-angular-animations}
 
-You might also be interested in the following:
+你可能还对以下内容感兴趣：
 
-- [Introduction to Angular animations](/guide/legacy-animations)
-- [Transition and triggers](/guide/legacy-animations/transition-and-triggers)
-- [Complex animation sequences](/guide/legacy-animations/complex-sequences)
-- [Route transition animations](/guide/routing/route-transition-animations)
-- [Migrating to Native CSS Animations](/guide/animations/migration)
+- [Angular 动画简介](/guide/legacy-animations)
+- [过渡与触发器](/guide/legacy-animations/transition-and-triggers)
+- [复杂动画序列](/guide/legacy-animations/complex-sequences)
+- [路由过渡动画](/guide/routing/route-transition-animations)
+- [迁移到原生 CSS 动画](/guide/animations/migration)
 

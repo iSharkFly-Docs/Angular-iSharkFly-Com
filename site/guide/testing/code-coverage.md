@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 代码覆盖率 {#code-coverage}
 
-# Code coverage
+代码覆盖率（code coverage）报告会展示代码库中哪些部分可能没有被单元测试充分覆盖。
 
-Code coverage reports show you any parts of your code base that might not be properly tested by your unit tests.
+## 前提条件 {#prerequisites}
 
-## Prerequisites
-
-To generate code coverage reports with Vitest, you must install the `@vitest/coverage-v8` package:
+要用 Vitest 生成代码覆盖率报告，必须先安装 `@vitest/coverage-v8` 包：
 
 ::: code-group
 
@@ -30,17 +26,17 @@ bun add --dev @vitest/coverage-v8
 
 :::
 
-## Generating a report
+## 生成报告 {#generating-a-report}
 
-To generate a coverage report, add the `--coverage` flag to the `ng test` command:
+要生成覆盖率报告，请给 `ng test` 命令加上 `--coverage` 标志：
 
 ```shell
 ng test --coverage
 ```
 
-After the tests run, the command creates a new `coverage/` directory in the project. Open the `index.html` file to see a report with your source code and code coverage values.
+测试运行完成后，该命令会在项目中创建一个新的 `coverage/` 目录。打开其中的 `index.html` 文件，即可查看包含源代码和代码覆盖率数值的报告。
 
-If you want to create code-coverage reports every time you test, you can set the `coverage` option to `true` in your `angular.json` file:
+如果希望每次测试时都生成代码覆盖率报告，可以在 `angular.json` 文件中把 `coverage` 选项设置为 `true`：
 
 ```json
 {
@@ -59,11 +55,11 @@ If you want to create code-coverage reports every time you test, you can set the
 }
 ```
 
-## Enforcing code coverage thresholds
+## 强制执行代码覆盖率阈值 {#enforcing-code-coverage-thresholds}
 
-The code coverage percentages let you estimate how much of your code is tested. If your team decides on a minimum amount to be unit tested, you can enforce this minimum in your configuration.
+代码覆盖率百分比可以让你估算代码有多少经过了测试。如果团队确定了单元测试的最低覆盖量，就可以在配置中强制执行这个下限。
 
-For example, suppose you want the code base to have a minimum of 80% code coverage. To enable this, add the `coverageThresholds` option to your `angular.json` file:
+例如，假设你希望代码库的代码覆盖率至少达到 80%。要启用这一点，请在 `angular.json` 文件中添加 `coverageThresholds` 选项：
 
 ```json
 {
@@ -88,16 +84,16 @@ For example, suppose you want the code base to have a minimum of 80% code covera
 }
 ```
 
-Now, if your coverage drops below 80% when you run your tests, the command will fail.
+现在，如果运行测试时覆盖率低于 80%，该命令就会失败。
 
-## Advanced configuration
+## 高级配置 {#advanced-configuration}
 
-You can configure several other coverage options in your `angular.json` file:
+你还可以在 `angular.json` 文件中配置其他几个覆盖率选项：
 
-- `coverageInclude`: Glob patterns of files to include in the coverage report.
-- `coverageExclude`: Glob patterns of files to exclude in the coverage report.
-- `coverageReporters`: An array of reporters to use (e.g., `html`, `lcov`, `json`).
-- `coverageWatermarks`: An object specifying `[low, high]` watermarks for the HTML reporter, which can affect the color-coding of the report.
+- `coverageInclude`：要纳入覆盖率报告的文件的 glob 模式。
+- `coverageExclude`：要从覆盖率报告中排除的文件的 glob 模式。
+- `coverageReporters`：要使用的报告器数组（例如 `html`、`lcov`、`json`）。
+- `coverageWatermarks`：一个为 HTML 报告器指定 `[low, high]` 水位线的对象，会影响报告的颜色标记。
 
 ```json
 {

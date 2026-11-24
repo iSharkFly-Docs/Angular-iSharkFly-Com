@@ -25,7 +25,7 @@ Angular 使用 TypeScript，以便充分利用强类型编程环境的优势。
 
 这一步会在应用中创建一个新接口。
 
-在 IDE 的**终端（Terminal）**窗格中：
+在 IDE 的**终端**（Terminal）窗格中：
 
 1. 在你的项目目录中，进入 `first-app` 目录。
 1. 在 `first-app` 目录中，运行此命令来创建新接口。
@@ -47,7 +47,7 @@ Angular 使用 TypeScript，以便充分利用强类型编程环境的优势。
 这一步会为接口添加应用表示房屋位置所需的属性。
 
 1.  如果 `ng serve` 命令尚未运行，请在 IDE 的**终端**窗格中启动它，以构建应用并在 `http://localhost:4200` 上启动。
-1.  在 IDE 的**编辑（Edit）**窗格中，打开 `src/app/housinglocation.ts` 文件。
+1.  在 IDE 的**编辑**（Edit）窗格中，打开 `src/app/housinglocation.ts` 文件。
 1.  在 `housinglocation.ts` 中，用以下代码替换默认内容，使新接口与此示例一致。
 
       ```ts [Update src/app/housinglocation.ts to match this code]

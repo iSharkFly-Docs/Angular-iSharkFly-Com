@@ -1,45 +1,41 @@
----
-untranslated: true
----
+# 根据语言环境格式化数据 {#format-data-based-on-locale}
 
-# Format data based on locale
+Angular 提供了下列内置的数据转换[管道（Pipe）](/guide/templates/pipes)。
+这些数据转换管道使用 [`LOCALE_ID`][ApiCoreLocaleId] 令牌，根据各个语言环境（locale）的规则来格式化数据。
 
-Angular provides the following built-in data transformation [pipes](/guide/templates/pipes).
-The data transformation pipes use the [`LOCALE_ID`][ApiCoreLocaleId] token to format data based on rules of each locale.
+| 数据转换管道                            | 详情                       |
+| :-------------------------------------- | :------------------------- |
+| [`DatePipe`][ApiCommonDatepipe]         | 格式化日期值。             |
+| [`CurrencyPipe`][ApiCommonCurrencypipe] | 把数字转换为货币字符串。   |
+| [`DecimalPipe`][ApiCommonDecimalpipe]   | 把数字转换为十进制数字符串。 |
+| [`PercentPipe`][ApiCommonPercentpipe]   | 把数字转换为百分比字符串。 |
 
-| Data transformation pipe                | Details                                           |
-| :-------------------------------------- | :------------------------------------------------ |
-| [`DatePipe`][ApiCommonDatepipe]         | Formats a date value.                             |
-| [`CurrencyPipe`][ApiCommonCurrencypipe] | Transforms a number into a currency string.       |
-| [`DecimalPipe`][ApiCommonDecimalpipe]   | Transforms a number into a decimal number string. |
-| [`PercentPipe`][ApiCommonPercentpipe]   | Transforms a number into a percentage string.     |
+## 使用 DatePipe 显示当前日期 {#use-datepipe-to-display-the-current-date}
 
-## Use DatePipe to display the current date
-
-To display the current date in the format for the current locale, use the following format for the `DatePipe`.
+要以当前语言环境的格式显示当前日期，请对 `DatePipe` 使用下面的格式。
 
 ```html
 {{ today | date }}
 ```
 
-## Override current locale for CurrencyPipe
+## 为 CurrencyPipe 覆盖当前语言环境 {#override-current-locale-for-currencypipe}
 
-Add the `locale` parameter to the pipe to override the current value of `LOCALE_ID` token.
+给管道添加 `locale` 参数，即可覆盖 `LOCALE_ID` 令牌的当前值。
 
-To force the currency to use American English \(`en-US`\), use the following format for the `CurrencyPipe`
+要强制货币使用美式英语（`en-US`），请对 `CurrencyPipe` 使用下面的格式
 
 ```html
 {{ amount | currency: 'USD' : 'symbol' : '1.2-2' : 'en-US' }}
 ```
 
-::: tip HELPFUL
-The locale specified for the `CurrencyPipe` overrides the global `LOCALE_ID` token of your application.
+::: tip 提示
+为 `CurrencyPipe` 指定的语言环境会覆盖应用全局的 `LOCALE_ID` 令牌。
 
 :::
 
-## What's next
+## 下一步 {#what-s-next}
 
-- [Prepare component for translation](/guide/i18n/prepare)
+- [准备要翻译的组件](/guide/i18n/prepare)
 
 
 [ApiCommonCurrencypipe]: api/common/CurrencyPipe 'CurrencyPipe | Common - API | Angular'

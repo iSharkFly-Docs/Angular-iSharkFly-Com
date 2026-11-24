@@ -66,7 +66,7 @@ Angular 编译器内置了「扩展诊断（Extended Diagnostics）」，它能�
 
 ## 语义化版本 {#semantic-versioning}
 
-Angular 团队计划在 Angular 的**次要（minor）**版本中添加或启用新的扩展诊断（参见 [semver](https://docs.npmjs.com/about-semantic-versioning)）。
+Angular 团队计划在 Angular 的**次要**（minor）版本中添加或启用新的扩展诊断（参见 [semver](https://docs.npmjs.com/about-semantic-versioning)）。
 这意味着升级 Angular 后，你现有的代码库中可能会出现新的警告。
 这使团队能够更快地交付功能，也让开发者更容易使用扩展诊断。
 

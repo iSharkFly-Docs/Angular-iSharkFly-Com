@@ -1,45 +1,41 @@
----
-untranslated: true
----
+# 响应式表单 {#reactive-forms}
 
-# Reactive forms
+响应式表单（Reactive Forms）提供了一种模型驱动的方式来处理值会随时间变化的表单输入。
+本指南将介绍如何创建和更新基本的表单控件（form control）、在一个组中使用多个控件、验证表单值，以及创建可以在运行时添加或移除控件的动态表单。
 
-Reactive forms provide a model-driven approach to handling form inputs whose values change over time.
-This guide shows you how to create and update a basic form control, use multiple controls in a group, validate form values, and create dynamic forms where you can add or remove controls at runtime.
+## 响应式表单概览 {#overview-of-reactive-forms}
 
-## Overview of reactive forms
+响应式表单使用显式且不可变的方式来管理表单在某个特定时间点的状态。
+对表单状态的每次修改都会返回一个新的状态，从而在两次变更之间保持模型的完整性。
+响应式表单围绕可观察流（observable stream）构建，表单输入和值都以流的形式提供，并且可以同步访问。
 
-Reactive forms use an explicit and immutable approach to managing the state of a form at a given point in time.
-Each change to the form state returns a new state, which maintains the integrity of the model between changes.
-Reactive forms are built around observable streams, where form inputs and values are provided as streams that can be accessed synchronously.
+响应式表单还让测试（testing）变得简单直接，因为你可以确信在请求数据时，数据是一致且可预测的。
+这些流的任何消费者都可以安全地操作这些数据。
 
-Reactive forms also provide a straightforward path to testing because you are assured that your data is consistent and predictable when requested.
-Any consumers of these streams can safely manipulate the data.
+响应式表单与[模板驱动表单](/guide/forms/template-driven-forms)（Template-driven Forms）有着明显的区别。
+响应式表单提供对数据模型的同步访问、借助可观察对象操作符实现的不可变性，以及通过可观察流进行的变更追踪。
 
-Reactive forms differ from [template-driven forms](/guide/forms/template-driven-forms) in distinct ways.
-Reactive forms provide synchronous access to the data model, immutability with observable operators, and change tracking through observable streams.
+模板驱动表单允许直接在模板（template）中修改数据，但不如响应式表单那样明确，因为它们依赖于嵌入在模板中的指令（directive），并借助可变数据来异步追踪变更。
+关于这两种范式的详细比较，请参阅[表单概览](/guide/forms)。
 
-Template-driven forms allow direct access to modify data in your template, but are less explicit than reactive forms because they rely on directives embedded in the template, along with mutable data to track changes asynchronously.
-See the [Forms Overview](/guide/forms) for detailed comparisons between the two paradigms.
+## 添加基本的表单控件 {#adding-a-basic-form-control}
 
-## Adding a basic form control
+使用表单控件需要三个步骤。
 
-There are three steps to using form controls.
+1. 生成一个新组件（component），并注册响应式表单模块。该模块声明了使用响应式表单所需的响应式表单指令。
+1. 实例化一个新的 `FormControl`。
+1. 在模板中注册这个 `FormControl`。
 
-1. Generate a new component and register the reactive forms module. This module declares the reactive-form directives required to use reactive forms.
-1. Instantiate a new `FormControl`.
-1. Register the `FormControl` in the template.
+然后，你就可以通过把该组件添加到模板中来显示这个表单。
 
-You can then display the form by adding the component to the template.
-
-The following examples show how to add a single form control.
-In the example, the user enters their name into an input field, captures that input value, and displays the current value of the form control element.
+下面的示例展示了如何添加单个表单控件。
+在这个示例中，用户在输入框中输入自己的名字，程序捕获这个输入值，并显示表单控件元素的当前值。
 
 
 
-### 1. Generate a new component and import the ReactiveFormsModule
+### 1. 生成一个新组件并导入 ReactiveFormsModule {#_1-generate-a-new-component-and-import-the-reactiveformsmodule}
 
-Use the CLI command `ng generate component` to generate a component in your project and import `ReactiveFormsModule` from the `@angular/forms` package and add it to your Component's `imports` array.
+使用 CLI 命令 `ng generate component` 在项目中生成一个组件，从 `@angular/forms` 包中导入 `ReactiveFormsModule`，并把它添加到组件的 `imports` 数组中。
 
 ```ts [name-editor.component.ts (excerpt)]
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
@@ -54,9 +50,9 @@ export class NameEditorComponent {
 ```
 
 
-### 2. Declare a FormControl instance
+### 2. 声明一个 FormControl 实例 {#_2-declare-a-formcontrol-instance}
 
-Use the constructor of `FormControl` to set its initial value, which in this case is an empty string. By creating these controls in your component class, you get immediate access to listen for, update, and validate the state of the form input.
+使用 `FormControl` 的构造函数来设置它的初始值，在本例中是一个空字符串。通过在组件类中创建这些控件，你可以立即监听、更新和验证表单输入的状态。
 
 ```ts [name-editor.component.ts]
 import {Component} from '@angular/core';
@@ -75,21 +71,21 @@ export class NameEditorComponent {
 ```
 
 
-### 3. Register the control in the template
+### 3. 在模板中注册控件 {#_3-register-the-control-in-the-template}
 
-After you create the control in the component class, you must associate it with a form control element in the template. Update the template with the form control using the `formControl` binding provided by `FormControlDirective`, which is also included in the `ReactiveFormsModule`.
+在组件类中创建控件之后，你必须把它与模板中的某个表单控件元素关联起来。使用 `FormControlDirective` 提供的 `formControl` 绑定（binding）在模板中更新这个表单控件，该指令同样包含在 `ReactiveFormsModule` 中。
 
 ```html [name-editor.component.html]
 <label for="name">Name: </label>
 <input id="name" type="text" [formControl]="name" />
 ```
 
-Using the template binding syntax, the form control is now registered to the `name` input element in the template. The form control and DOM element communicate with each other: the view reflects changes in the model, and the model reflects changes in the view.
+借助模板绑定语法，这个表单控件现在已经注册到模板中的 `name` 输入元素上了。表单控件和 DOM 元素会相互通信：视图会反映模型中的变化，模型也会反映视图中的变化。
 
 
-### 4. Display the component
+### 4. 显示组件 {#_4-display-the-component}
 
-The `FormControl` assigned to the `name` property is displayed when the `<app-name-editor>` component is added to a template.
+当把 `<app-name-editor>` 组件添加到模板中时，赋值给 `name` 属性的 `FormControl` 就会显示出来。
 
 ```html [app.component.html (name editor)]
 <app-name-editor />
@@ -97,33 +93,33 @@ The `FormControl` assigned to the `name` property is displayed when the `<app-na
 
 
 
-### Displaying a form control value
+### 显示表单控件的值 {#displaying-a-form-control-value}
 
-You can display the value in the following ways:
+你可以通过以下方式显示这个值：
 
-- Through the `valueChanges` observable where you can listen for changes in the form's value in the template using `AsyncPipe` or in the component class using the `subscribe()` method
-- With the `value` property, which gives you a snapshot of the current value
+- 通过可观察对象 `valueChanges`，你可以在模板中使用 `AsyncPipe`，或在组件类中使用 `subscribe()` 方法来监听表单值的变化
+- 通过 `value` 属性，它会给出当前值的快照
 
-The following example shows you how to display the current value using interpolation in the template.
+下面的示例展示了如何在模板中使用插值来显示当前值。
 
 ```html [name-editor.component.html (control value)]
 <p>Value: {{ name.value }}</p>
 ```
 
-The displayed value changes as you update the form control element.
+当你更新表单控件元素时，显示的值也会随之改变。
 
-Reactive forms provide access to information about a given control through properties and methods provided with each instance.
-These properties and methods of the underlying [AbstractControl](https://angular.dev/api/forms/AbstractControl 'API reference') class are used to control form state and determine when to display messages when handling [input validation](#validating-form-input 'Learn more about validating form input').
+响应式表单通过每个实例提供的属性和方法，让你可以访问某个控件的相关信息。
+底层 [AbstractControl](https://angular.dev/api/forms/AbstractControl 'API reference') 类的这些属性和方法，用于控制表单状态，并在处理[输入验证](#validating-form-input 'Learn more about validating form input')时决定何时显示消息。
 
-Read about other `FormControl` properties and methods in the [API Reference](https://angular.dev/api/forms/FormControl 'Detailed syntax reference').
+关于 `FormControl` 的其他属性和方法，请参阅 [API 参考](https://angular.dev/api/forms/FormControl 'Detailed syntax reference')。
 
-### Replacing a form control value
+### 替换表单控件的值 {#replacing-a-form-control-value}
 
-Reactive forms have methods to change a control's value programmatically, which gives you the flexibility to update the value without user interaction.
-A form control instance provides a `setValue()` method that updates the value of the form control and validates the structure of the value provided against the control's structure.
-For example, when retrieving form data from a backend API or service, use the `setValue()` method to update the control to its new value, replacing the old value entirely.
+响应式表单提供了以编程方式修改控件值的方法，让你可以灵活地在没有用户交互的情况下更新值。
+表单控件实例提供了一个 `setValue()` 方法，它会更新表单控件的值，并根据控件的结构来验证所提供值的结构。
+例如，当从后端 API 或服务（service）获取表单数据时，可以使用 `setValue()` 方法把控件更新为新值，从而完全替换旧值。
 
-The following example adds a method to the component class to update the value of the control to _Nancy_ using the `setValue()` method.
+下面的示例在组件类中添加了一个方法，使用 `setValue()` 方法把控件的值更新为 *Nancy*。
 
 ```ts [name-editor.component.ts (update value)]
 updateName() {
@@ -131,36 +127,36 @@ updateName() {
 }
 ```
 
-Update the template with a button to simulate a name update.
-When you click the **Update Name** button, the value entered in the form control element is reflected as its current value.
+在模板中添加一个按钮，用来模拟名字的更新。
+当你点击 **Update Name** 按钮时，表单控件元素中输入的值就会反映为它的当前值。
 
 ```html [name-editor.component.html (update value)]
 <button type="button" (click)="updateName()">Update Name</button>
 ```
 
-The form model is the source of truth for the control, so when you click the button, the value of the input is changed within the component class, overriding its current value.
+表单模型是控件的唯一事实来源（source of truth），因此当你点击按钮时，输入框的值会在组件类中被修改，覆盖其当前值。
 
-::: tip HELPFUL
-In this example, you're using a single control.
-When using the `setValue()` method with a [form group](#grouping-form-controls) or [form array](#creating-dynamic-forms) instance, the value needs to match the structure of the group or array.
+::: tip 提示
+在这个示例中，你使用的是单个控件。
+当对[表单组](#grouping-form-controls)或[表单数组](#creating-dynamic-forms)实例使用 `setValue()` 方法时，值需要与组或数组的结构相匹配。
 
 :::
 
-## Grouping form controls
+## 对表单控件进行分组 {#grouping-form-controls}
 
-Forms typically contain several related controls.
-Reactive forms provide two ways of grouping multiple related controls into a single input form.
+表单通常包含多个相关的控件。
+响应式表单提供了两种方式，可以把多个相关控件分组到同一个输入表单中。
 
-| Form groups | Details                                                                                                                                                                                                                                                |
+| 表单分组 | 详情                                                                                                                                                                                                                                                |
 | :---------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Form group  | Defines a form with a fixed set of controls that you can manage together. Form group basics are discussed in this section. You can also [nest form groups](#creating-nested-form-groups 'See more about nesting groups') to create more complex forms. |
-| Form array  | Defines a dynamic form, where you can add and remove controls at run time. You can also nest form arrays to create more complex forms. For more about this option, see [Creating dynamic forms](#creating-dynamic-forms).                              |
+| 表单组（form group）  | 定义一个包含固定控件集合的表单，你可以统一管理这些控件。本节将讨论表单组的基础知识。你还可以[嵌套表单组](#creating-nested-form-groups 'See more about nesting groups')来创建更复杂的表单。 |
+| 表单数组（form array）  | 定义一个动态表单，你可以在运行时添加和移除控件。你也可以嵌套表单数组来创建更复杂的表单。关于这种方式的更多信息，请参阅[创建动态表单](#creating-dynamic-forms)。                              |
 
-Just as a form control instance gives you control over a single input field, a form group instance tracks the form state of a group of form control instances \(for example, a form\).
-Each control in a form group instance is tracked by name when creating the form group.
-The following example shows how to manage multiple form control instances in a single group.
+就像表单控件实例让你可以控制单个输入字段一样，表单组实例会追踪一组表单控件实例（例如一个表单）的表单状态。
+创建表单组时，表单组实例中的每个控件都会按名称进行追踪。
+下面的示例展示了如何在一个组中管理多个表单控件实例。
 
-Generate a `ProfileEditor` component and import the `FormGroup` and `FormControl` classes from the `@angular/forms` package.
+生成一个 `ProfileEditor` 组件，并从 `@angular/forms` 包中导入 `FormGroup` 和 `FormControl` 类。
 
 ```shell
 ng generate component ProfileEditor
@@ -178,19 +174,19 @@ import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
 export class ProfileEditorComponent {
 ```
 
-To add a form group to this component, take the following steps.
+要为这个组件添加表单组，请执行以下步骤。
 
-1. Create a `FormGroup` instance.
-1. Associate the `FormGroup` model and view.
-1. Save the form data.
+1. 创建一个 `FormGroup` 实例。
+1. 关联 `FormGroup` 模型和视图。
+1. 保存表单数据。
 
 
 
-### 1. Create a FormGroup instance
+### 1. 创建一个 FormGroup 实例 {#_1-create-a-formgroup-instance}
 
-Create a property in the component class named `profileForm` and set the property to a new form group instance. To initialize the form group, provide the constructor with an object of named keys mapped to their control.
+在组件类中创建一个名为 `profileForm` 的属性，并把它设置为一个新的表单组实例。要初始化这个表单组，需要向构造函数提供一个对象，其中的各个命名键分别映射到对应的控件。
 
-For the profile form, add two form control instances with the names `firstName` and `lastName`
+对于这个个人资料表单，添加两个表单控件实例，名称分别为 `firstName` 和 `lastName`
 
 ```ts [profile-editor.component.ts (form group)]
 import {Component} from '@angular/core';
@@ -210,12 +206,12 @@ export class ProfileEditorComponent {
 }
 ```
 
-The individual form controls are now collected within a group. A `FormGroup` instance provides its model value as an object reduced from the values of each control in the group. A form group instance has the same properties (such as `value` and `untouched`) and methods (such as `setValue()`) as a form control instance.
+现在，各个表单控件都被收集到了一个组中。`FormGroup` 实例以一个对象的形式提供其模型值，该对象由组中每个控件的值汇总而成。表单组实例拥有与表单控件实例相同的属性（例如 `value` 和 `untouched`）和方法（例如 `setValue()`）。
 
 
-### 2. Associate the FormGroup model and view
+### 2. 关联 FormGroup 模型和视图 {#_2-associate-the-formgroup-model-and-view}
 
-A form group tracks the status and changes for each of its controls, so if one of the controls changes, the parent control also emits a new status or value change. The model for the group is maintained from its members. After you define the model, you must update the template to reflect the model in the view.
+表单组会追踪其中每个控件的状态和变化，因此只要其中一个控件发生变化，父控件也会发出新的状态或值变更。组的模型由其成员共同维护。定义好模型之后，你必须更新模板，以便在视图中反映这个模型。
 
 ```html [profile-editor.component.html (template form group)]
 <form [formGroup]="profileForm">
@@ -228,70 +224,70 @@ A form group tracks the status and changes for each of its controls, so if one o
 </form>
 ```
 
-Just as a form group contains a group of controls, the _profileForm_ `FormGroup` is bound to the `form` element with the `FormGroup` directive, creating a communication layer between the model and the form containing the inputs. The `formControlName` input provided by the `FormControlName` directive binds each individual input to the form control defined in `FormGroup`. The form controls communicate with their respective elements. They also communicate changes to the form group instance, which provides the source of truth for the model value.
+就像表单组包含一组控件一样，*profileForm* 这个 `FormGroup` 通过 `FormGroup` 指令绑定到 `form` 元素上，在模型和包含这些输入框的表单之间建立了一个通信层。`FormControlName` 指令提供的 `formControlName` 输入（input）会把每个单独的输入框绑定到 `FormGroup` 中定义的表单控件上。各个表单控件会与各自对应的元素通信。它们还会把变更通知给表单组实例，而表单组实例是模型值的唯一事实来源。
 
 
-### 3. Save form data
+### 3. 保存表单数据 {#_3-save-form-data}
 
-The `ProfileEditor` component accepts input from the user, but in a real scenario you want to capture the form value and make it available for further processing outside the component. The `FormGroup` directive listens for the `submit` event emitted by the `form` element and emits an `ngSubmit` event that you can bind to a callback function. Add an `ngSubmit` event listener to the `form` tag with the `onSubmit()` callback method.
+`ProfileEditor` 组件会接收用户的输入，但在实际场景中，你需要捕获表单值，并让它可以在组件外部做进一步处理。`FormGroup` 指令会监听 `form` 元素发出的 `submit` 事件，并发出一个 `ngSubmit` 事件，你可以把它绑定到一个回调函数上。在 `form` 标签上添加一个 `ngSubmit` 事件监听器（event listener），并使用 `onSubmit()` 回调方法。
 
 ```html [profile-editor.component.html (submit event)]
 <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
 ```
 
-The `onSubmit()` method in the `ProfileEditor` component captures the current value of `profileForm`. Use `output()` to keep the form encapsulated and to provide the form value outside the component. The following example uses `console.warn` to log a message to the browser console.
+`ProfileEditor` 组件中的 `onSubmit()` 方法会捕获 `profileForm` 的当前值。使用 `output()` 来保持表单的封装性，并把表单值提供给组件外部。下面的示例使用 `console.warn` 把一条消息输出到浏览器控制台。
 
 ```ts [profile-editor.component.ts (submit method)]
 onSubmit() {
-  // TODO: Use output() with form value
+  // TODO: 使用 output() 传出表单值
   console.warn(this.profileForm.value);
 }
 ```
 
-The `submit` event is emitted by the `form` tag using the built-in DOM event. You trigger the event by clicking a button with `submit` type. This lets the user press the **Enter** key to submit the completed form.
+`submit` 事件由 `form` 标签通过内置的 DOM 事件发出。你可以通过点击一个 `submit` 类型的按钮来触发这个事件。这样用户就可以按下 **Enter** 键来提交填写完成的表单。
 
-Use a `button` element to add a button to the bottom of the form to trigger the form submission.
+使用一个 `button` 元素在表单底部添加一个按钮，用于触发表单提交。
 
 ```html [profile-editor.component.html (submit button)]
 <p>Complete the form to enable button.</p>
 <button type="submit" [disabled]="!profileForm.valid">Submit</button>
 ```
 
-The button in the preceding snippet also has a `disabled` binding attached to it to disable the button when `profileForm` is invalid. You aren't performing any validation yet, so the button is always enabled. Basic form validation is covered in the [Validating form input](#validating-form-input) section.
+上面代码片段中的按钮还附加了一个 `disabled` 绑定，用于在 `profileForm` 无效时禁用按钮。由于你还没有进行任何验证，因此这个按钮始终是启用的。基本的表单验证会在[验证表单输入](#validating-form-input)一节中介绍。
 
 
-### 4. Display the component {#display-the-component-form-group}
+### 4. 显示组件 {#display-the-component-form-group}
 
-To display the `ProfileEditor` component that contains the form, add it to a component template.
+要显示包含该表单的 `ProfileEditor` 组件，请把它添加到某个组件模板中。
 
 ```html [app.component.html (profile editor)]
 <app-profile-editor />
 ```
 
-`ProfileEditor` lets you manage the form control instances for the `firstName` and `lastName` controls within the form group instance.
+`ProfileEditor` 让你可以在表单组实例中管理 `firstName` 和 `lastName` 这两个表单控件实例。
 
 
 
-### Creating nested form groups
+### 创建嵌套表单组 {#creating-nested-form-groups}
 
-Form groups can accept both individual form control instances and other form group instances as children.
-This makes composing complex form models easier to maintain and logically group together.
+表单组既可以接受单独的表单控件实例，也可以接受其他表单组实例作为子级。
+这让复杂表单模型的组合更容易维护，也更便于进行逻辑分组。
 
-When building complex forms, managing the different areas of information is easier in smaller sections.
-Using a nested form group instance lets you break large forms groups into smaller, more manageable ones.
+构建复杂表单时，把不同类别的信息拆分成更小的部分来管理会更容易。
+使用嵌套的表单组实例，可以把大型表单组拆分成更小、更易于管理的组。
 
-To make more complex forms, use the following steps.
+要创建更复杂的表单，请执行以下步骤。
 
-1. Create a nested group.
-1. Group the nested form in the template.
+1. 创建一个嵌套组。
+1. 在模板中对嵌套表单进行分组。
 
-Some types of information naturally fall into the same group.
-A name and address are typical examples of such nested groups, and are used in the following examples.
+某些类型的信息天然就属于同一组。
+姓名和地址就是这类嵌套组的典型例子，下面的示例中也会用到它们。
 
 
-### 1. Create a nested group
+### 1. 创建一个嵌套组 {#_1-create-a-nested-group}
 
-To create a nested group in `profileForm`, add a nested `address` element to the form group instance.
+要在 `profileForm` 中创建嵌套组，请向表单组实例中添加一个嵌套的 `address` 元素。
 
 ```ts [profile-editor.component.ts (nested form group)]
 import {Component} from '@angular/core';
@@ -317,12 +313,12 @@ export class ProfileEditorComponent {
 }
 ```
 
-In this example, `address group` combines the current `firstName` and `lastName` controls with the new `street`, `city`, `state`, and `zip` controls. Even though the `address` element in the form group is a child of the overall `profileForm` element in the form group, the same rules apply with value and status changes. Changes in status and value from the nested form group propagate to the parent form group, maintaining consistency with the overall model.
+在这个示例中，`address group` 把现有的 `firstName` 和 `lastName` 控件与新增的 `street`、`city`、`state` 和 `zip` 控件组合在一起。尽管表单组中的 `address` 元素是表单组中整个 `profileForm` 元素的子级，但值和状态变更同样遵循相同的规则。嵌套表单组中的状态和值变更会传播到父表单组，从而与整体模型保持一致。
 
 
-### 2. Group the nested form in the template
+### 2. 在模板中对嵌套表单进行分组 {#_2-group-the-nested-form-in-the-template}
 
-After you update the model in the component class, update the template to connect the form group instance and its input elements. Add the `address` form group containing the `street`, `city`, `state`, and `zip` fields to the `ProfileEditor` template.
+在组件类中更新模型之后，再更新模板，把表单组实例与其输入元素连接起来。把包含 `street`、`city`、`state` 和 `zip` 字段的 `address` 表单组添加到 `ProfileEditor` 模板中。
 
 ```html [profile-editor.component.html (template nested form group)]
 <div formGroupName="address">
@@ -342,27 +338,27 @@ After you update the model in the component class, update the template to connec
 </div>
 ```
 
-The `ProfileEditor` form is displayed as one group, but the model is broken down further to represent the logical grouping areas.
+`ProfileEditor` 表单显示为一个整体，但模型被进一步拆分，以表示各个逻辑分组区域。
 
-Display the value for the form group instance in the component template using the `value` property and `JsonPipe`.
+在组件模板中使用 `value` 属性和 `JsonPipe` 来显示这个表单组实例的值。
 
 
 
-### Updating parts of the data model
+### 更新部分数据模型 {#updating-parts-of-the-data-model}
 
-When updating the value for a form group instance that contains multiple controls, you might only want to update parts of the model.
-This section covers how to update specific parts of a form control data model.
+当更新包含多个控件的表单组实例的值时，你可能只想更新模型的一部分。
+本节介绍如何更新表单控件数据模型中的特定部分。
 
-There are two ways to update the model value:
+有两种方式可以更新模型值：
 
-| Methods        | Details                                                                                                                                                               |
+| 方法        | 详情                                                                                                                                                               |
 | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `setValue()`   | Set a new value for an individual control. The `setValue()` method strictly adheres to the structure of the form group and replaces the entire value for the control. |
-| `patchValue()` | Replace any properties defined in the object that have changed in the form model.                                                                                     |
+| `setValue()`   | 为单个控件设置新值。`setValue()` 方法会严格遵循表单组的结构，并替换控件的整个值。 |
+| `patchValue()` | 用对象中定义的属性替换表单模型中发生了变化的对应属性。                                                                                     |
 
-The strict checks of the `setValue()` method help catch nesting errors in complex forms, while `patchValue()` fails silently on those errors.
+`setValue()` 方法的严格检查有助于发现复杂表单中的嵌套错误，而 `patchValue()` 遇到这类错误时会静默失败。
 
-In `ProfileEditorComponent`, use the `updateProfile` method with the following example to update the first name and street address for the user.
+在 `ProfileEditorComponent` 中，参考下面的示例使用 `updateProfile` 方法来更新用户的名字和街道地址。
 
 ```ts [profile-editor.component.ts (patch value)]
 updateProfile() {
@@ -375,50 +371,50 @@ updateProfile() {
 }
 ```
 
-Simulate an update by adding a button to the template to update the user profile on demand.
+在模板中添加一个按钮来模拟更新，以便按需更新用户资料。
 
 ```html [profile-editor.component.html (update value)]
 <button type="button" (click)="updateProfile()">Update Profile</button>
 ```
 
-When a user clicks the button, the `profileForm` model is updated with new values for `firstName` and `street`. Notice that `street` is provided in an object inside the `address` property.
-This is necessary because the `patchValue()` method applies the update against the model structure.
-`patchValue()` only updates properties that the form model defines.
+当用户点击这个按钮时，`profileForm` 模型会用 `firstName` 和 `street` 的新值进行更新。注意，`street` 是在 `address` 属性内的一个对象中提供的。
+这是必需的，因为 `patchValue()` 方法会依据模型结构来应用更新。
+`patchValue()` 只会更新表单模型中定义了的属性。
 
-## Using the FormBuilder service to generate controls
+## 使用 FormBuilder 服务生成控件 {#using-the-formbuilder-service-to-generate-controls}
 
-Creating form control instances manually can become repetitive when dealing with multiple forms.
-The `FormBuilder` service provides convenient methods for generating controls.
+在处理多个表单时，手动创建表单控件实例会变得十分繁琐。
+`FormBuilder` 服务提供了一些用于生成控件的便捷方法。
 
-Use the following steps to take advantage of this service.
+按照以下步骤来使用这个服务。
 
-1. Import the `FormBuilder` class.
-1. Inject the `FormBuilder` service.
-1. Generate the form contents.
+1. 导入 `FormBuilder` 类。
+1. 注入 `FormBuilder` 服务。
+1. 生成表单内容。
 
-The following examples show how to refactor the `ProfileEditor` component to use the form builder service to create form control and form group instances.
+下面的示例展示了如何重构 `ProfileEditor` 组件，使用表单构建器服务来创建表单控件和表单组实例。
 
 
-### 1. Import the FormBuilder class
+### 1. 导入 FormBuilder 类 {#_1-import-the-formbuilder-class}
 
-Import the `FormBuilder` class from the `@angular/forms` package.
+从 `@angular/forms` 包中导入 `FormBuilder` 类。
 
 ```ts [profile-editor.component.ts (import)]
 import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
 ```
 
 
-### 2. Inject the FormBuilder service
+### 2. 注入 FormBuilder 服务 {#_2-inject-the-formbuilder-service}
 
-The `FormBuilder` service is an injectable provider from the reactive forms module. Use the `inject()` function to inject this dependency in your component.
+`FormBuilder` 服务是响应式表单模块中一个可注入的提供者（provider）。使用 `inject()` 函数在组件中注入这个依赖。
 
 ```ts [profile-editor.component.ts (property init)]
 private formBuilder = inject(FormBuilder);
 ```
 
-### 3. Generate form controls
+### 3. 生成表单控件 {#_3-generate-form-controls}
 
-The `FormBuilder` service has four methods: `control()`, `group()`, `record()`, and `array()`. These are factory methods for generating instances in your component classes including form controls, form groups, form records, and form arrays. Use the `group` method to create the `profileForm` controls.
+`FormBuilder` 服务有四个方法：`control()`、`group()`、`record()` 和 `array()`。它们都是工厂方法，用于在组件类中生成各种实例，包括表单控件、表单组、表单记录（form record）和表单数组。使用 `group` 方法来创建 `profileForm` 的控件。
 
 ```ts [profile-editor.component.ts (form builder)]
 profileForm = this.formBuilder.group({
@@ -433,10 +429,10 @@ profileForm = this.formBuilder.group({
 });
 ```
 
-In the preceding example, you use the `group()` method with the same object to define the properties in the model. The value for each control name is an array containing the initial value as the first item in the array.
+在上面的示例中，你使用 `group()` 方法和同样的对象来定义模型中的属性。每个控件名对应的值都是一个数组，数组的第一项是初始值。
 
-::: tip TIP
-You can define the control with just the initial value, but if your controls need sync or async validation, add sync and async validators as the second and third items in the array. Compare using the form builder to creating the instances manually.
+::: tip 提示
+你可以只用初始值来定义控件，但如果控件需要同步或异步验证，请把同步验证器和异步验证器分别添加为数组的第二项和第三项。请比较一下使用表单构建器与手动创建实例这两种方式。
 
 :::
 
@@ -473,36 +469,36 @@ You can define the control with just the initial value, but if your controls nee
 
 
 
-## Validating form input
+## 验证表单输入 {#validating-form-input}
 
-_Form validation_ is used to ensure that user input is complete and correct.
-This section covers adding a single validator to a form control and displaying the overall form status.
-Form validation is covered more extensively in the [Form Validation](/guide/forms/form-validation) guide.
+*表单验证*用于确保用户的输入完整且正确。
+本节介绍如何为表单控件添加单个验证器，以及如何显示表单的整体状态。
+[表单验证](/guide/forms/form-validation)指南中会更全面地介绍表单验证。
 
-Use the following steps to add form validation.
+按照以下步骤添加表单验证。
 
-1. Import a validator function in your form component.
-1. Add the validator to the field in the form.
-1. Add logic to handle the validation status.
+1. 在表单组件中导入一个验证器函数。
+1. 把验证器添加到表单中的字段上。
+1. 添加处理验证状态的逻辑。
 
-The most common validation is making a field required.
-The following example shows how to add a required validation to the `firstName` control and display the result of validation.
+最常见的验证是把某个字段设为必填。
+下面的示例展示了如何为 `firstName` 控件添加必填验证，并显示验证结果。
 
 
-### 1. Import a validator function
+### 1. 导入验证器函数 {#_1-import-a-validator-function}
 
-Reactive forms include a set of validator functions for common use cases. These functions receive a control to validate against and return an error object or a null value based on the validation check.
+响应式表单为常见的使用场景提供了一组验证器函数。这些函数接收一个要验证的控件，并根据验证检查的结果返回一个错误对象或 null 值。
 
-Import the `Validators` class from the `@angular/forms` package.
+从 `@angular/forms` 包中导入 `Validators` 类。
 
 ```ts [profile-editor.component.ts (import)]
 import {Validators} from '@angular/forms';
 ```
 
 
-### 2. Make a field required
+### 2. 把字段设为必填 {#_2-make-a-field-required}
 
-In the `ProfileEditor` component, add the `Validators.required` static method as the second item in the array for the `firstName` control.
+在 `ProfileEditor` 组件中，把 `Validators.required` 静态方法添加为 `firstName` 控件数组中的第二项。
 
 ```ts [profile-editor.component.ts (required validator)]
 private formBuilder = inject(FormBuilder);
@@ -520,52 +516,52 @@ profileForm = this.formBuilder.group({
 ```
 
 
-### 3. Display form status
+### 3. 显示表单状态 {#_3-display-form-status}
 
-When you add a required field to the form control, its initial status is invalid. This invalid status propagates to the parent form group element, making its status invalid. Access the current status of the form group instance through its `status` property.
+为表单控件添加必填字段后，它的初始状态是无效的。这个无效状态会传播到父表单组元素，使其状态也变为无效。可以通过表单组实例的 `status` 属性访问其当前状态。
 
-Display the current status of `profileForm` using interpolation.
+使用插值显示 `profileForm` 的当前状态。
 
 ```html [profile-editor.component.html (display status)]
 <p>Form Status: {{ profileForm.status }}</p>
 ```
 
-The **Submit** button is disabled because `profileForm` is invalid due to the required `firstName` form control. After you fill out the `firstName` input, the form becomes valid and the **Submit** button is enabled.
+由于必填的 `firstName` 表单控件，`profileForm` 处于无效状态，因此 **Submit** 按钮被禁用。填写 `firstName` 输入框之后，表单就会变为有效**，Submit** 按钮也随之启用。
 
-For more on form validation, visit the [Form Validation](/guide/forms/form-validation) guide.
-
-
-
-## Creating dynamic forms
-
-`FormArray` is an alternative to `FormGroup` for managing any number of unnamed controls.
-As with form group instances, you can dynamically insert and remove controls from form array instances, and the form array instance value and validation status is calculated from its child controls.
-However, you don't need to define a key for each control by name, so this is a great option if you don't know the number of child values in advance.
-
-To define a dynamic form, take the following steps.
-
-1. Import the `FormArray` class.
-1. Define a `FormArray` control.
-1. Access the `FormArray` control with a getter method.
-1. Display the form array in a template.
-
-The following example shows you how to manage an array of _aliases_ in `ProfileEditor`.
+关于表单验证的更多信息，请参阅[表单验证](/guide/forms/form-validation)指南。
 
 
-### 1. Import the `FormArray` class
 
-Import the `FormArray` class from `@angular/forms` to use for type information. The `FormBuilder` service is ready to create a `FormArray` instance.
+## 创建动态表单 {#creating-dynamic-forms}
+
+`FormArray` 是 `FormGroup` 之外的另一种选择，用于管理任意数量的匿名控件。
+与表单组实例一样，你可以在表单数组实例中动态插入和移除控件，表单数组实例的值和验证状态都由其子控件计算得出。
+不过，你不需要为每个控件按名称定义一个键，所以当你事先不知道子值的数量时，这是一个很好的选择。
+
+要定义动态表单，请执行以下步骤。
+
+1. 导入 `FormArray` 类。
+1. 定义一个 `FormArray` 控件。
+1. 使用 getter 方法访问 `FormArray` 控件。
+1. 在模板中显示表单数组。
+
+下面的示例展示了如何在 `ProfileEditor` 中管理一个*别名*（aliases）数组。
+
+
+### 1. 导入 `FormArray` 类 {#_1-import-the-formarray-class}
+
+从 `@angular/forms` 中导入 `FormArray` 类，以便使用其类型信息。`FormBuilder` 服务已经可以用来创建 `FormArray` 实例了。
 
 ```ts [profile-editor.component.ts (import)]
 import {FormArray} from '@angular/forms';
 ```
 
 
-### 2. Define a `FormArray` control
+### 2. 定义一个 `FormArray` 控件 {#_2-define-a-formarray-control}
 
-You can initialize a form array with any number of controls, from zero to many, by defining them in an array. Add an `aliases` property to the form group instance for `profileForm` to define the form array.
+你可以通过在数组中定义控件，来用任意数量（从零个到多个）的控件初始化表单数组。为 `profileForm` 的表单组实例添加一个 `aliases` 属性来定义这个表单数组。
 
-Use the `FormBuilder.array()` method to define the array, and the `FormBuilder.control()` method to populate the array with an initial control.
+使用 `FormBuilder.array()` 方法定义该数组，并使用 `FormBuilder.control()` 方法用一个初始控件来填充该数组。
 
 ```ts [profile-editor.component.ts (aliases form array)]
 private formBuilder = inject(FormBuilder);
@@ -583,14 +579,14 @@ profileForm = this.formBuilder.group({
 });
 ```
 
-The aliases control in the form group instance is now populated with a single control until more controls are added dynamically.
+现在，表单组实例中的 aliases 控件里已经填充了一个控件，直到动态添加更多控件为止。
 
 
-### 3. Access the `FormArray` control
+### 3. 访问 `FormArray` 控件 {#_3-access-the-formarray-control}
 
-A getter provides access to the aliases in the form array instance compared to repeating the `profileForm.get()` method to get each instance. The form array instance represents an undefined number of controls in an array. It's convenient to access a control through a getter, and this approach is straightforward to repeat for additional controls. <br />
+与反复调用 `profileForm.get()` 方法来获取每个实例相比，getter 提供了一种访问表单数组实例中各个别名的方式。表单数组实例在一个数组中表示数量不定的控件。通过 getter 访问控件很方便，而且这种方式也很容易推广到其他控件上。 <br />
 
-Use the getter syntax to create an `aliases` class property to retrieve the alias's form array control from the parent form group.
+使用 getter 语法创建一个 `aliases` 类属性，从父表单组中获取别名的表单数组控件。
 
 ```ts [profile-editor.component.ts (aliases getter)]
 get aliases() {
@@ -598,7 +594,7 @@ get aliases() {
 }
 ```
 
-Because the returned control is of the type `AbstractControl`, you need to provide an explicit type to access the method syntax for the form array instance. Define a method to dynamically insert an alias control into the alias's form array. The `FormArray.push()` method inserts the control as a new item in the array, and you can also pass an array of controls to FormArray.push() to register multiple controls at once.
+由于返回的控件是 `AbstractControl` 类型，你需要提供一个明确的类型，才能使用表单数组实例的方法。定义一个方法，用于把别名控件动态插入到别名的表单数组中。`FormArray.push()` 方法会把控件作为新项插入到数组中，你也可以向 FormArray.push() 传入一个控件数组，一次性注册多个控件。
 
 ```ts [profile-editor.component.ts (add alias)]
 addAlias() {
@@ -606,14 +602,14 @@ addAlias() {
 }
 ```
 
-In the template, each control is displayed as a separate input field.
+在模板中，每个控件都显示为一个单独的输入字段。
 
 
-### 4. Display the form array in the template
+### 4. 在模板中显示表单数组 {#_4-display-the-form-array-in-the-template}
 
-To attach the aliases from your form model, you must add it to the template. Similar to the `formGroupName` input provided by `FormGroupName`, `formArrayName` binds communication from the form array instance to the template with `FormArrayName`.
+要关联表单模型中的别名，你必须把它添加到模板中。与 `FormGroupName` 提供的 `formGroupName` 输入类似，`formArrayName` 借助 `FormArrayName` 把表单数组实例与模板之间的通信绑定起来。
 
-Add the following template HTML after the `<div>` closing the `formGroupName` element.
+在闭合 `formGroupName` 元素的 `<div>` 之后添加以下模板 HTML。
 
 ```html [profile-editor.component.html (aliases form array template)]
 <div formArrayName="aliases">
@@ -622,7 +618,7 @@ Add the following template HTML after the `<div>` closing the `formGroupName` el
 
   @for (alias of aliases.controls; track $index; let i = $index) {
     <div>
-      <!-- The repeated alias template -->
+      <!-- 重复的别名模板 -->
       <label for="alias-{{ i }}">Alias:</label>
       <input id="alias-{{ i }}" type="text" [formControlName]="i" />
     </div>
@@ -630,12 +626,12 @@ Add the following template HTML after the `<div>` closing the `formGroupName` el
 </div>
 ```
 
-The `@for` block iterates over each form control instance provided by the aliases form array instance. Because form array elements are unnamed, you assign the index to the `i` variable and pass it to each control to bind it to the `formControlName` input.
+`@for` 块会遍历 aliases 表单数组实例提供的每个表单控件实例。由于表单数组中的元素是匿名的，因此你把索引赋值给变量 `i`，并把它传给每个控件，以绑定到 `formControlName` 输入上。
 
-Each time a new alias instance is added, the new form array instance is provided its control based on the index. This lets you track each individual control when calculating the status and value of the root control.
+每次添加新的别名实例时，新的表单数组实例都会根据索引获得其对应的控件。这样，在计算根控件的状态和值时，你就可以追踪每一个单独的控件。
 
-::: info NOTE
-In zoneless applications, mutating a reactive forms model (for example calling `FormArray.push()`) does not automatically schedule component change detection. If your template depends on structural model changes such as `aliases.controls`, make sure the component notifies Angular to run change detection, for example by bridging a forms observable to `ChangeDetectorRef.markForCheck()`:
+::: info 注意
+在无 Zone（zoneless）应用中，修改响应式表单模型（例如调用 `FormArray.push()`）不会自动调度组件的变更检测（change detection）。如果你的模板依赖于 `aliases.controls` 这类结构性的模型变化，请确保组件会通知 Angular 运行变更检测，例如把某个表单的可观察对象桥接到 `ChangeDetectorRef.markForCheck()`：
 
 :::
 
@@ -656,10 +652,10 @@ export class ProfileEditor {
 ```
 
 
-### Using `FormArrayDirective` for top-level form arrays
+### 使用 `FormArrayDirective` 处理顶层表单数组 {#using-formarraydirective-for-top-level-form-arrays}
 
-You can bind a `FormArray` directly to a `<form>` element by using the `FormArrayDirective`.  
-This is useful when the form does not use a top-level `FormGroup`, and the array itself represents the full form model.
+你可以使用 `FormArrayDirective` 把 `FormArray` 直接绑定到 `<form>` 元素上。  
+当表单没有使用顶层的 `FormGroup`，而是由数组本身表示完整的表单模型时，这种方式非常有用。
 
 ```ts
 import {Component} from '@angular/core';
@@ -683,30 +679,30 @@ export class FormArrayExampleComponent {
 }
 ```
 
-### 5. Add an alias
+### 5. 添加一个别名 {#_5-add-an-alias}
 
-Initially, the form contains one `Alias` field. To add another field, click the **Add Alias** button. You can also validate the array of aliases reported by the form model displayed by `Form Value` at the bottom of the template. Instead of a form control instance for each alias, you can compose another form group instance with additional fields. The process of defining a control for each item is the same.
-
-
+一开始，表单中只包含一个 `Alias` 字段。要添加另一个字段，请点击 **Add Alias** 按钮。你还可以验证由表单模型报告的别名数组，它显示在模板底部的 `Form Value` 中。除了为每个别名使用一个表单控件实例外，你还可以组合另一个包含更多字段的表单组实例。为每一项定义控件的过程是一样的。
 
 
-## Unified control state change events
 
-All form controls expose a single unified stream of **control state change events** through the `events` observable on `AbstractControl` (`FormControl`, `FormGroup`, `FormArray`, and `FormRecord`).
-This unified stream lets you react to **value**, **status**, **pristine**, **touched**, and **reset** state changes, as well as **form-level actions** such as **submit**, allowing you to handle all updates with a single subscription instead of wiring multiple observables.
 
-### Event types
+## 统一的控件状态变更事件 {#unified-control-state-change-events}
 
-Each item emitted by `events` is an instance of a specific event class:
+所有表单控件都通过 `AbstractControl`（`FormControl`、`FormGroup`、`FormArray` 和 `FormRecord`）上的可观察对象 `events`，暴露出一个统一的**控件状态变更事件**流。
+借助这个统一的事件流，你可以响应 **value**、**status**、**pristine**、**touched** 和 **reset** 等状态变更，以及**提交**（submit）这类**表单级操作**，从而只需一个订阅就能处理所有更新，而无需连接多个可观察对象。
 
-- **`ValueChangeEvent`** — when the control’s **value** changes.
-- **`StatusChangeEvent`** — when the control’s **validation status** updates to one of the `FormControlStatus` values (`VALID`, `INVALID`, `PENDING`, or `DISABLED`).
-- **`PristineChangeEvent`** — when the control’s **pristine/dirty** state changes.
-- **`TouchedChangeEvent`** — when the control’s **touched/untouched** state changes.
-- **`FormResetEvent`** — when a control or form is reset, either via the `reset()` API or a native action.
-- **`FormSubmittedEvent`** — when the form is submitted.
+### 事件类型 {#event-types}
 
-All event classes extend `ControlEvent` and include a `source` reference to the `AbstractControl` that originated the change, which is useful in large forms.
+`events` 发出的每一项都是某个特定事件类的实例：
+
+- **`ValueChangeEvent`**：当控件的**值**发生变化时发出。
+- **`StatusChangeEvent`**：当控件的**验证状态**更新为某个 `FormControlStatus` 值（`VALID`、`INVALID`、`PENDING` 或 `DISABLED`）时发出。
+- **`PristineChangeEvent`**：当控件的 **pristine/dirty** 状态发生变化时发出。
+- **`TouchedChangeEvent`**：当控件的 **touched/untouched** 状态发生变化时发出。
+- **`FormResetEvent`**：当通过 `reset()` API 或原生操作重置控件或表单时发出。
+- **`FormSubmittedEvent`**：当表单被提交时发出。
+
+所有事件类都继承自 `ControlEvent`，并包含一个 `source` 引用，指向发起此次变更的 `AbstractControl`，这在大型表单中非常有用。
 
 ```ts
 import {Component} from '@angular/core';
@@ -758,9 +754,9 @@ export class UnifiedEventsBasicComponent {
 }
 ```
 
-### Filtering specific events
+### 过滤特定事件 {#filtering-specific-events}
 
-Prefer RxJS operators when you only need a subset of event types.
+当你只需要部分事件类型时，优先使用 RxJS 操作符。
 
 ```ts
 import {filter} from 'rxjs/operators';
@@ -771,9 +767,9 @@ control.events
   .subscribe((e) => console.log('Status:', e.status));
 ```
 
-### Unifying from multiple subscriptions
+### 把多个订阅合而为一 {#unifying-from-multiple-subscriptions}
 
-**Before**
+**之前**
 
 ```ts
 import {combineLatest} from 'rxjs';
@@ -783,47 +779,47 @@ combineLatest([control.valueChanges, control.statusChanges]).subscribe(([value, 
 });
 ```
 
-**After**
+**之后**
 
 ```ts
 control.events.subscribe((e) => {
-  // Handle ValueChangeEvent, StatusChangeEvent, etc.
+  // 处理 ValueChangeEvent、StatusChangeEvent 等事件
 });
 ```
 
-::: info NOTE
-On value change, the emit happens right after a value of this control is updated. The value of a parent control (for example if this FormControl is a part of a FormGroup) is updated later, so accessing a value of a parent control (using the `value` property) from the callback of this event might result in getting a value that has not been updated yet. Subscribe to the `events` of the parent control instead.
+::: info 注意
+在值发生变化时，事件会在该控件的值更新后立即发出。父控件的值（例如当这个 FormControl 是某个 FormGroup 的一部分时）会在稍后才更新，因此在该事件的回调中访问父控件的值（使用 `value` 属性）可能会得到一个尚未更新的值。这种情况下，请改为订阅父控件的 `events`。
 
 :::
 
-## Managing form control state
+## 管理表单控件状态 {#managing-form-control-state}
 
-Reactive forms track control state through **touched/untouched** and **pristine/dirty**. Angular updates these automatically during DOM interactions, but you can also manage them programmatically.
+响应式表单通过 **touched/untouched** 和 **pristine/dirty** 来追踪控件状态。Angular 会在 DOM 交互过程中自动更新这些状态，但你也可以以编程方式管理它们。
 
-**[`markAsTouched`](https://angular.dev/api/forms/FormControl#markAsTouched)** — Marks a control or form as touched by focus and blur events that do not change the value. Propagates to parent controls by default.
+**[`markAsTouched`](https://angular.dev/api/forms/FormControl#markAsTouched)**：通过不改变值的聚焦和失焦事件，把控件或表单标记为 touched。默认会传播到父控件。
 
 ```ts
-// Show validation errors after user leaves a field
+// 在用户离开字段后显示验证错误
 onEmailBlur() {
   const email = this.form.get('email');
   email.markAsTouched();
 }
 ```
 
-**[`markAsUntouched`](https://angular.dev/api/forms/FormControl#markAsUntouched)** — Marks a control or form as untouched. Cascades to all child controls and recalculates the touched status of all parent controls.
+**[`markAsUntouched`](https://angular.dev/api/forms/FormControl#markAsUntouched)**：把控件或表单标记为 untouched。会级联到所有子控件，并重新计算所有父控件的 touched 状态。
 
 ```ts
-// Reset form state after successful submission
+// 成功提交后重置表单状态
 onSubmitSuccess() {
   this.form.markAsUntouched();
   this.form.markAsPristine();
 }
 ```
 
-**[`markAsDirty`](https://angular.dev/api/forms/FormControl#markAsDirty)** — Marks a control or form as dirty, meaning the value has been changed. Propagates to parent controls by default.
+**[`markAsDirty`](https://angular.dev/api/forms/FormControl#markAsDirty)**：把控件或表单标记为 dirty，表示其值已被修改。默认会传播到父控件。
 
 ```ts
-// Mark programmatically changed values as modified
+// 把以编程方式修改的值标记为已修改
 autofillAddress() {
   const previousAddress = getAddress();
   this.form.patchValue(previousAddress, { emitEvent: false });
@@ -831,10 +827,10 @@ autofillAddress() {
 }
 ```
 
-**[`markAsPristine`](https://angular.dev/api/forms/FormControl#markAsPristine)** — Marks a control or form as pristine. Marks all child controls as pristine and recalculates the pristine status of all parent controls.
+**[`markAsPristine`](https://angular.dev/api/forms/FormControl#markAsPristine)**：把控件或表单标记为 pristine。会把所有子控件标记为 pristine，并重新计算所有父控件的 pristine 状态。
 
 ```ts
-// Reset pristine state after saving to track new changes
+// 保存后重置 pristine 状态，以便追踪新的变更
 saveForm() {
   this.api.save(this.form.value).subscribe(() => {
     this.form.markAsPristine();
@@ -842,20 +838,20 @@ saveForm() {
 }
 ```
 
-**[`markAllAsDirty`](https://angular.dev/api/forms/FormControl#markAllAsDirty)** — Marks the control or form and all its descendant controls as dirty.
+**[`markAllAsDirty`](https://angular.dev/api/forms/FormControl#markAllAsDirty)**：把控件或表单及其所有后代控件标记为 dirty。
 
 ```ts
-// Mark imported data as dirty
+// 把导入的数据标记为 dirty
 loadData(data: FormData) {
   this.form.patchValue(data);
   this.form.markAllAsDirty();
 }
 ```
 
-**[`markAllAsTouched`](https://angular.dev/api/forms/FormControl#markAllAsTouched)** — Marks the control or form and all its descendant controls as touched. Useful for showing validation errors across the entire form.
+**[`markAllAsTouched`](https://angular.dev/api/forms/FormControl#markAllAsTouched)**：把控件或表单及其所有后代控件标记为 touched。适用于在整个表单范围内显示验证错误。
 
 ```ts
-// Show all validation errors before submission
+// 提交前显示所有验证错误
 onSubmit() {
   if (this.form.invalid) {
     this.form.markAllAsTouched();
@@ -865,13 +861,13 @@ onSubmit() {
 }
 ```
 
-## Controlling event emission and propagation
+## 控制事件的发出与传播 {#controlling-event-emission-and-propagation}
 
-When updating form controls programmatically, you have precise control over how changes propagate through the form hierarchy and whether events are emitted.
+以编程方式更新表单控件时，你可以精确控制变更如何在表单层级结构中传播，以及是否发出事件。
 
-### Understanding event emission
+### 理解事件的发出 {#understanding-event-emission}
 
-By default `emitEvent: true`, any change to a control emits events through the `valueChanges` and `statusChanges` observables. Setting `emitEvent: false` suppresses these emissions, which is useful when setting values programmatically without triggering reactive behavior like auto-save, avoiding circular updates between controls, or performing bulk updates where events should emit only once at the end.
+默认情况下 `emitEvent: true`，对控件的任何修改都会通过 `valueChanges` 和 `statusChanges` 可观察对象发出事件。设置 `emitEvent: false` 可以抑制这些事件的发出。这在以下场景中很有用：以编程方式设置值而不触发自动保存之类的响应式行为、避免控件之间的循环更新，或者执行批量更新并希望只在最后发出一次事件。
 
 ```ts
 @Component({/* ... */})
@@ -882,22 +878,22 @@ export class BlogPostEditor {
   });
 
   constructor() {
-    // Auto-save draft every time user types
+    // 用户每次输入时自动保存草稿
     this.postForm.valueChanges.subscribe((formValue) => {
       this.autosaveDraft(formValue);
     });
   }
 
   loadExistingDraft(savedDraft: {title: string; content: string}) {
-    // Restore draft without triggering auto-save
+    // 恢复草稿，但不触发自动保存
     this.postForm.setValue(savedDraft, {emitEvent: false});
   }
 }
 ```
 
-### Understanding propagation control
+### 理解传播控制 {#understanding-propagation-control}
 
-By default `onlySelf: false`, updates cascade to parent controls, recalculating their values and validation status. Setting `onlySelf: true` isolates the update to the current control, preventing parent notification. This is useful for batch operations where you want to manually trigger the parent update once.
+默认情况下 `onlySelf: false`，更新会级联到父控件，并重新计算它们的值和验证状态。设置 `onlySelf: true` 会把更新限制在当前控件内，不通知父控件。这在批量操作中很有用，你可以在最后手动触发一次父控件的更新。
 
 ```ts
 updatePostalCodeValidator(country: string) {
@@ -912,61 +908,61 @@ updatePostalCodeValidator(country: string) {
 }
 ```
 
-::: tip HELPFUL
-For dynamically managing validators at runtime, see the [Managing validators dynamically in reactive forms](/guide/forms/form-validation#managing-validators-dynamically-in-reactive-forms) section in the Form Validation guide.
+::: tip 提示
+关于在运行时动态管理验证器，请参阅表单验证指南中的[在响应式表单中动态管理验证器](/guide/forms/form-validation#managing-validators-dynamically-in-reactive-forms)一节。
 
 :::
 
-## Utility functions for narrowing form control types
+## 用于收窄表单控件类型的工具函数 {#utility-functions-for-narrowing-form-control-types}
 
-Angular provides four utility functions that help determine the concrete type of an `AbstractControl`. These functions act as **type guards** and narrow the control type when they return `true`, which lets you safely access subtype-specific properties inside the same block.
+Angular 提供了四个工具函数，用于判断 `AbstractControl` 的具体类型。这些函数充当**类型守卫**（type guard），在返回 `true` 时会收窄控件的类型，让你可以在同一个代码块中安全地访问特定子类型的属性。
 
-| Utility function | Details                                             |
+| 工具函数 | 详情                                             |
 | :--------------- | :-------------------------------------------------- |
-| `isFormControl`  | Returns `true` when the control is a `FormControl`. |
-| `isFormGroup`    | Returns `true` when the control is a `FormGroup`    |
-| `isFormRecord`   | Returns `true` when the control is a `FormRecord`   |
-| `isFormArray`    | Returns `true` when the control is a `FormArray`    |
+| `isFormControl`  | 当控件是 `FormControl` 时返回 `true`。 |
+| `isFormGroup`    | 当控件是 `FormGroup` 时返回 `true`    |
+| `isFormRecord`   | 当控件是 `FormRecord` 时返回 `true`   |
+| `isFormArray`    | 当控件是 `FormArray` 时返回 `true`    |
 
-These helpers are particularly useful in **custom validators**, where the function signature receives an `AbstractControl`, but the logic is intended for a specific control kind.
+这些辅助函数在**自定义验证器**中尤其有用：这类函数的签名接收的是 `AbstractControl`，但其逻辑只针对某种特定类型的控件。
 
 ```ts
 import {AbstractControl, isFormArray} from '@angular/forms';
 
 export function positiveValues(control: AbstractControl) {
   if (!isFormArray(control)) {
-    return null; // Not a FormArray: validator is not applicable.
+    return null; // 不是 FormArray：该验证器不适用。
   }
 
-  // Safe to access FormArray-specific API after narrowing.
+  // 收窄类型之后，就可以安全地访问 FormArray 特有的 API。
   const hasNegative = control.controls.some((c) => c.value < 0);
   return hasNegative ? {positiveValues: true} : null;
 }
 ```
 
-## Reactive forms API summary
+## 响应式表单 API 汇总 {#reactive-forms-api-summary}
 
-The following table lists the base classes and services used to create and manage reactive form controls.
-For complete syntax details, see the API reference documentation for the [Forms package](/api#angular_forms 'API reference').
+下表列出了用于创建和管理响应式表单控件的基础类和服务。
+关于完整的语法细节，请参阅 [Forms 包](/api#angular_forms 'API reference')的 API 参考文档。
 
-### Classes
+### 类 {#classes}
 
-| Class             | Details                                                                                                                                                                                 |
+| 类             | 详情                                                                                                                                                                                 |
 | :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AbstractControl` | The abstract base class for the concrete form control classes `FormControl`, `FormGroup`, and `FormArray`. It provides their common behaviors and properties.                           |
-| `FormControl`     | Manages the value and validity status of an individual form control. It corresponds to an HTML form control such as `<input>` or `<select>`.                                            |
-| `FormGroup`       | Manages the value and validity state of a group of `AbstractControl` instances. The group's properties include its child controls. The top-level form in your component is `FormGroup`. |
-| `FormArray`       | Manages the value and validity state of a numerically indexed array of `AbstractControl` instances.                                                                                     |
-| `FormBuilder`     | An injectable service that provides factory methods for creating control instances.                                                                                                     |
-| `FormRecord`      | Tracks the value and validity state of a collection of `FormControl` instances, each of which has the same value type.                                                                  |
+| `AbstractControl` | 具体表单控件类 `FormControl`、`FormGroup` 和 `FormArray` 的抽象基类。它提供了这些类的通用行为和属性。                           |
+| `FormControl`     | 管理单个表单控件的值和有效性状态。它对应于一个 HTML 表单控件，例如 `<input>` 或 `<select>`。                                            |
+| `FormGroup`       | 管理一组 `AbstractControl` 实例的值和有效性状态。组的属性包括它的子控件。组件中的顶层表单就是 `FormGroup`。 |
+| `FormArray`       | 管理一个按数字索引的 `AbstractControl` 实例数组的值和有效性状态。                                                                                     |
+| `FormBuilder`     | 一个可注入的服务，提供用于创建控件实例的工厂方法。                                                                                                     |
+| `FormRecord`      | 追踪一组 `FormControl` 实例的值和有效性状态，其中每个实例的值类型都相同。                                                                  |
 
-### Directives
+### 指令 {#directives}
 
-| Directive              | Details                                                                                    |
+| 指令              | 详情                                                                                    |
 | :--------------------- | :----------------------------------------------------------------------------------------- |
-| `FormControlDirective` | Syncs a standalone `FormControl` instance to a form control element.                       |
-| `FormControlName`      | Syncs `FormControl` in an existing `FormGroup` instance to a form control element by name. |
-| `FormGroupDirective`   | Syncs an existing `FormGroup` instance to a DOM element.                                   |
-| `FormGroupName`        | Syncs a nested `FormGroup` instance to a DOM element.                                      |
-| `FormArrayName`        | Syncs a nested `FormArray` instance to a DOM element.                                      |
-| `FormArrayDirective`   | Syncs a standalone `FormArray` instance to a DOM element.                                  |
+| `FormControlDirective` | 把一个独立的 `FormControl` 实例同步到表单控件元素上。                       |
+| `FormControlName`      | 按名称把现有 `FormGroup` 实例中的 `FormControl` 同步到表单控件元素上。 |
+| `FormGroupDirective`   | 把现有的 `FormGroup` 实例同步到 DOM 元素上。                                   |
+| `FormGroupName`        | 把嵌套的 `FormGroup` 实例同步到 DOM 元素上。                                      |
+| `FormArrayName`        | 把嵌套的 `FormArray` 实例同步到 DOM 元素上。                                      |
+| `FormArrayDirective`   | 把一个独立的 `FormArray` 实例同步到 DOM 元素上。                                  |

@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 从 Karma 迁移到 Vitest {#migrating-from-karma-to-vitest}
 
-# Migrating from Karma to Vitest
+Angular CLI 使用 [Vitest](https://vitest.dev/) 作为新项目的默认单元测试运行器。本指南介绍如何把现有项目从 Karma 和 Jasmine 迁移到 Vitest。
 
-The Angular CLI uses [Vitest](https://vitest.dev/) as the default unit test runner for new projects. This guide provides instructions for migrating an existing project from Karma and Jasmine to Vitest.
-
-::: warning IMPORTANT
-Migrating an existing project to Vitest is considered experimental. This process also requires the use of the `application` build system, which is the default for all newly created projects.
+::: warning 重要
+把现有项目迁移到 Vitest 目前仍属实验性功能。这个过程还要求使用 `application` 构建系统，它是所有新建项目的默认构建系统。
 
 :::
 
-## Manual migration steps
+## 手动迁移步骤 {#manual-migration-steps}
 
-Before using the automated refactoring schematic, you must manually update your project to use the Vitest test runner.
+在使用自动重构原理图（schematic）之前，你必须先手动更新项目，使其使用 Vitest 测试运行器。
 
-### 1. Install dependencies
+### 1. 安装依赖 {#_1-install-dependencies}
 
-Install `vitest` and a DOM emulation library. While browser testing is still possible (see [step 5](#5-configure-browser-mode-optional)), Vitest uses a DOM emulation library by default to simulate a browser environment within Node.js for faster test execution. The CLI automatically detects and uses `happy-dom` if it's installed; otherwise, it falls back to `jsdom`. You must have one of these packages installed.
+安装 `vitest` 和一个 DOM 模拟库。虽然仍然可以在浏览器中测试（参见[第 5 步](#5-configure-browser-mode-optional)），但 Vitest 默认使用 DOM 模拟库在 Node.js 中模拟浏览器环境，以加快测试执行速度。如果安装了 `happy-dom`，CLI 会自动检测并使用它；否则会回退到 `jsdom`。你必须安装这两个包中的一个。
 
 ::: code-group
 
@@ -39,9 +35,9 @@ bun add --dev vitest jsdom
 
 :::
 
-### 2. Update `angular.json`
+### 2. 更新 `angular.json` {#_2-update-angular-json}
 
-In your `angular.json` file, find the `test` target for your project and change the `builder` to `@angular/build:unit-test`.
+在 `angular.json` 文件中找到项目的 `test` 目标，并把 `builder` 改为 `@angular/build:unit-test`。
 
 ```json
 {
@@ -57,27 +53,27 @@ In your `angular.json` file, find the `test` target for your project and change 
 }
 ```
 
-The `unit-test` builder defaults to `"tsConfig": "tsconfig.spec.json"` and `"buildTarget": "::development"`. You can explicitly set these options if your project requires different values. For example, if the `development` build configuration is missing or you need different options for testing, you can create and use a `testing` or similarly named build configuration for `buildTarget`.
+`unit-test` 构建器默认使用 `"tsConfig": "tsconfig.spec.json"` 和 `"buildTarget": "::development"`。如果项目需要不同的值，可以显式设置这些选项。例如，如果缺少 `development` 构建配置，或者测试需要不同的选项，你可以创建一个名为 `testing`（或类似名称）的构建配置，并将其用作 `buildTarget`。
 
-The `@angular/build:karma` builder previously allowed build options (like `polyfills`, `assets`, or `styles`) to be configured directly within the `test` target. The new `@angular/build:unit-test` builder does not support this. If your test-specific build options differ from your existing `development` build configuration, you must move them to a dedicated build target configuration. If your test build options already match your `development` build configuration, no action is needed.
+以前的 `@angular/build:karma` 构建器允许直接在 `test` 目标中配置构建选项（例如 `polyfills`、`assets` 或 `styles`）。新的 `@angular/build:unit-test` 构建器不支持这种做法。如果测试专用的构建选项与现有的 `development` 构建配置不同，你必须把它们移到一个专门的构建目标配置中。如果测试构建选项已经与 `development` 构建配置一致，则无需任何操作。
 
-### 3. Handle custom `karma.conf.js` configurations
+### 3. 处理自定义的 `karma.conf.js` 配置 {#_3-handle-custom-karma-conf-js-configurations}
 
-Custom configurations in `karma.conf.js` are not automatically migrated. Before deleting your `karma.conf.js` file, review it for any custom settings that need to be migrated.
+`karma.conf.js` 中的自定义配置不会被自动迁移。在删除 `karma.conf.js` 文件之前，请检查其中是否有需要迁移的自定义设置。
 
-Many Karma options have equivalents in Vitest that can be set in a custom Vitest configuration file (e.g., `vitest.config.ts`) and linked to your `angular.json` via the `runnerConfig` option.
+许多 Karma 选项在 Vitest 中都有对应的设置，可以在自定义的 Vitest 配置文件（例如 `vitest.config.ts`）中设置，并通过 `runnerConfig` 选项关联到 `angular.json`。
 
-Common migration paths include:
+常见的迁移方式包括：
 
-- **Reporters**: Karma reporters must be replaced with Vitest-compatible reporters. These can often be configured directly in your `angular.json` under the `test.options.reporters` property. For more advanced configurations, use a custom `vitest.config.ts` file.
-- **Plugins**: Karma plugins may have Vitest equivalents that you will need to find and install. Note that code coverage is a first-class feature in the Angular CLI and can be enabled with `ng test --coverage`.
-- **Custom Browser Launchers**: These are replaced by the `browsers` option in `angular.json` and the installation of a browser provider like `@vitest/browser-playwright`.
+- **报告器（Reporters）**：Karma 报告器必须替换为与 Vitest 兼容的报告器。这些报告器通常可以直接在 `angular.json` 的 `test.options.reporters` 属性下配置。如需更高级的配置，请使用自定义的 `vitest.config.ts` 文件。
+- **插件（Plugins）**：Karma 插件可能有对应的 Vitest 插件，你需要自行查找并安装。注意，代码覆盖率是 Angular CLI 的一等功能，可以通过 `ng test --coverage` 启用。
+- **自定义浏览器启动器（Custom Browser Launchers）**：它们由 `angular.json` 中的 `browsers` 选项以及安装 `@vitest/browser-playwright` 之类的浏览器提供程序来替代。
 
-For other settings, consult the official [Vitest documentation](https://vitest.dev/config/).
+其他设置请查阅官方 [Vitest 文档](https://vitest.dev/config/)。
 
-### 4. Remove Karma and `test.ts` files
+### 4. 删除 Karma 和 `test.ts` 文件 {#_4-remove-karma-and-test-ts-files}
 
-You can now delete `karma.conf.js` and `src/test.ts` from your project and uninstall the Karma-related packages. The following commands are based on the packages installed in a new Angular CLI project; your project may have other Karma-related packages to remove.
+现在可以从项目中删除 `karma.conf.js` 和 `src/test.ts`，并卸载与 Karma 相关的包。以下命令基于新建 Angular CLI 项目中安装的包；你的项目可能还有其他需要移除的 Karma 相关包。
 
 ::: code-group
 
@@ -99,17 +95,17 @@ bun remove karma karma-chrome-launcher karma-coverage karma-jasmine karma-jasmin
 
 :::
 
-### 5. Configure browser mode (optional)
+### 5. 配置浏览器模式（可选） {#_5-configure-browser-mode-optional}
 
-If you need to run tests in a real browser, you must install a browser provider and configure your `angular.json`.
+如果需要在真实浏览器中运行测试，你必须安装一个浏览器提供程序并配置 `angular.json`。
 
-**Install a browser provider:**
+**安装浏览器提供程序：**
 
-Choose one of the following browser providers based on your needs:
+根据需要选择以下浏览器提供程序之一：
 
-- **Playwright**: `@vitest/browser-playwright` for Chromium, Firefox, and WebKit.
-- **WebdriverIO**: `@vitest/browser-webdriverio` for Chrome, Firefox, Safari, and Edge.
-- **Preview**: `@vitest/browser-preview` for WebContainer environments (like StackBlitz).
+- **Playwright**：`@vitest/browser-playwright`，适用于 Chromium、Firefox 和 WebKit。
+- **WebdriverIO**：`@vitest/browser-webdriverio`，适用于 Chrome、Firefox、Safari 和 Edge。
+- **Preview**：`@vitest/browser-preview`，适用于 WebContainer 环境（例如 StackBlitz）。
 
 ::: code-group
 
@@ -131,9 +127,9 @@ bun add --dev @vitest/browser-playwright
 
 :::
 
-**Update `angular.json` for browser mode:**
+**更新 `angular.json` 以启用浏览器模式：**
 
-Add the `browsers` option to your `test` target's options. The browser name depends on the provider you installed (e.g., `chromium` for Playwright, `chrome` for WebdriverIO).
+在 `test` 目标的选项中添加 `browsers` 选项。浏览器名称取决于你安装的提供程序（例如 Playwright 用 `chromium`，WebdriverIO 用 `chrome`）。
 
 ```json
 {
@@ -152,86 +148,86 @@ Add the `browsers` option to your `test` target's options. The browser name depe
 }
 ```
 
-Headless mode is enabled automatically if the `CI` environment variable is set or if a browser name includes "Headless" (e.g., `ChromeHeadless`). Otherwise, tests will run in a headed browser.
+如果设置了 `CI` 环境变量，或者浏览器名称中包含 "Headless"（例如 `ChromeHeadless`），就会自动启用无头模式。否则，测试会在有界面的浏览器中运行。
 
-## Automated test refactoring with schematics
+## 使用原理图自动重构测试 {#automated-test-refactoring-with-schematics}
 
-::: warning IMPORTANT
-The `refactor-jasmine-vitest` schematic is experimental and may not cover all possible test patterns. Always review the changes made by the schematic.
+::: warning 重要
+`refactor-jasmine-vitest` 原理图是实验性的，可能无法覆盖所有的测试模式。请务必审查原理图所做的更改。
 
 :::
 
-The Angular CLI provides the `refactor-jasmine-vitest` schematic to automatically refactor your Jasmine tests to use Vitest.
+Angular CLI 提供了 `refactor-jasmine-vitest` 原理图，可以自动把 Jasmine 测试重构为使用 Vitest。
 
-### Overview
+### 概览 {#overview}
 
-The schematic automates the following transformations in your test files (`.spec.ts`):
+该原理图会在测试文件（`.spec.ts`）中自动执行以下转换：
 
-- Converts `fit` and `fdescribe` to `it.only` and `describe.only`.
-- Converts `xit` and `xdescribe` to `it.skip` and `describe.skip`.
-- Converts `spyOn` calls to the equivalent `vi.spyOn`.
-- Replaces `jasmine.objectContaining` with `expect.objectContaining`.
-- Replaces `jasmine.any` with `expect.any`.
-- Replaces `jasmine.createSpy` with `vi.fn`.
-- Updates `beforeAll`, `beforeEach`, `afterAll`, and `afterEach` to their Vitest equivalents.
-- Converts `fail()` to Vitest's `expect.fail()`.
-- Adjusts expectations to match Vitest APIs
-- Adds TODO comments for code that cannot be automatically converted
+- 把 `fit` 和 `fdescribe` 转换为 `it.only` 和 `describe.only`。
+- 把 `xit` 和 `xdescribe` 转换为 `it.skip` 和 `describe.skip`。
+- 把 `spyOn` 调用转换为等效的 `vi.spyOn`。
+- 用 `expect.objectContaining` 替换 `jasmine.objectContaining`。
+- 用 `expect.any` 替换 `jasmine.any`。
+- 用 `vi.fn` 替换 `jasmine.createSpy`。
+- 把 `beforeAll`、`beforeEach`、`afterAll` 和 `afterEach` 更新为对应的 Vitest 写法。
+- 把 `fail()` 转换为 Vitest 的 `expect.fail()`。
+- 调整断言以匹配 Vitest API
+- 为无法自动转换的代码添加 TODO 注释
 
-The schematic **does not** perform the following actions:
+该原理图**不会**执行以下操作：
 
-- It does not install `vitest` or other related dependencies.
-- It does not change your `angular.json` to use the Vitest builder or migrate any build options (like `polyfills` or `styles`) from the `test` target.
-- It does not remove `karma.conf.js` or `test.ts` files.
-- It does not handle complex or nested spy scenarios, which may require manual refactoring.
+- 不会安装 `vitest` 或其他相关依赖。
+- 不会修改 `angular.json` 以使用 Vitest 构建器，也不会从 `test` 目标迁移任何构建选项（例如 `polyfills` 或 `styles`）。
+- 不会删除 `karma.conf.js` 或 `test.ts` 文件。
+- 不会处理复杂或嵌套的间谍（spy）场景，这些可能需要手动重构。
 
-### Running the schematic
+### 运行原理图 {#running-the-schematic}
 
-Once your project is configured for Vitest, you can run the schematic to refactor your test files.
+项目配置好 Vitest 之后，就可以运行该原理图来重构测试文件。
 
-To refactor **all** test files in your default project, run:
+要重构默认项目中的**所有**测试文件，请运行：
 
 ```bash
 ng g @schematics/angular:refactor-jasmine-vitest
 ```
 
-### Options
+### 选项 {#options}
 
-You can use the following options to customize the schematic's behavior:
+你可以使用以下选项来自定义原理图的行为：
 
-| Option                   | Description                                                                                         |
+| 选项                   | 描述                                                                                         |
 | :----------------------- | :-------------------------------------------------------------------------------------------------- |
-| `--project <name>`       | Specify the project to refactor in a multi-project workspace. <br> Example: `--project=my-lib`      |
-| `--include <path>`       | Refactor only a specific file or directory. <br> Example: `--include=src/app/app.component.spec.ts` |
-| `--file-suffix <suffix>` | Specify a different file suffix for test files. <br> Example: `--file-suffix=.test.ts`              |
-| `--add-imports`          | Add explicit `vitest` imports if you have disabled globals in your Vitest configuration.            |
-| `--verbose`              | See detailed logging of all transformations applied.                                                |
-| `--browser-mode`         | If you intend to run the tests in browser mode.                                                     |
+| `--project <name>`       | 在多项目工作区中指定要重构的项目。<br> 示例：`--project=my-lib`      |
+| `--include <path>`       | 只重构指定的文件或目录。<br> 示例：`--include=src/app/app.component.spec.ts` |
+| `--file-suffix <suffix>` | 为测试文件指定不同的文件后缀。<br> 示例：`--file-suffix=.test.ts`              |
+| `--add-imports`          | 如果在 Vitest 配置中禁用了全局变量，则添加显式的 `vitest` 导入。            |
+| `--verbose`              | 查看所有已应用转换的详细日志。                                                |
+| `--browser-mode`         | 如果你打算在浏览器模式下运行测试，请使用此选项。                                                     |
 
-### After migrating
+### 迁移之后 {#after-migrating}
 
-After the schematic completes, it's a good practice to:
+原理图执行完成后，最好做以下几件事：
 
-1.  **Run your tests**: Execute `ng test` to ensure that all tests still pass after the refactoring.
-2.  **Review the changes**: Look over the changes made by the schematic, paying close attention to any complex tests, especially those with intricate spies or mocks, as they may require further manual adjustments.
+1.  **运行测试**：执行 `ng test`，确保重构后所有测试仍然通过。
+2.  **审查更改**：仔细检查原理图所做的更改，特别留意那些复杂的测试，尤其是含有复杂间谍或模拟（mock）的测试，因为它们可能需要进一步手动调整。
 
-The `ng test` command builds the application in _watch mode_ and launches the configured runner. Watch mode is enabled by default when using an interactive terminal and not running on CI.
+`ng test` 命令会以*监视模式*（watch mode）构建应用，并启动所配置的运行器。在交互式终端中且不在 CI 上运行时，默认会启用监视模式。
 
-## Configuration
+## 配置 {#configuration}
 
-The Angular CLI takes care of the Vitest configuration for you, constructing the full configuration in memory based on options in `angular.json`.
+Angular CLI 会替你处理 Vitest 的配置，它会根据 `angular.json` 中的选项在内存中构建完整的配置。
 
-### Custom Vitest configuration
+### 自定义 Vitest 配置 {#custom-vitest-configuration}
 
-::: warning IMPORTANT
-While using a custom configuration enables advanced options, the Angular team does not provide direct support for the specific contents of the configuration file or for any third-party plugins used within it. The CLI will also override certain properties (`test.projects`, `test.include`) to ensure proper operation.
+::: warning 重要
+虽然使用自定义配置可以启用一些高级选项，但 Angular 团队不会为配置文件的具体内容或其中使用的任何第三方插件提供直接支持。CLI 还会覆盖某些属性（`test.projects`、`test.include`），以确保正常运行。
 
 :::
 
-You can provide a custom Vitest configuration file to override the default settings. For a full list of available options, see the official [Vitest documentation](https://vitest.dev/config/).
+你可以提供一个自定义的 Vitest 配置文件来覆盖默认设置。完整的可用选项列表，请参阅官方 [Vitest 文档](https://vitest.dev/config/)。
 
-**1. Direct path:**
-Provide a direct path to a Vitest configuration file in your `angular.json`:
+**1. 直接路径：**
+在 `angular.json` 中提供 Vitest 配置文件的直接路径：
 
 ```json
 {
@@ -248,19 +244,19 @@ Provide a direct path to a Vitest configuration file in your `angular.json`:
 }
 ```
 
-**2. Automatic search for base configuration:**
-If you set `runnerConfig` to `true`, the builder will automatically search for a shared `vitest-base.config.*` file in your project and workspace roots.
+**2. 自动搜索基础配置：**
+如果把 `runnerConfig` 设置为 `true`，构建器会自动在项目根目录和工作区根目录中搜索共享的 `vitest-base.config.*` 文件。
 
-## `zone.js` Vitest patch
+## `zone.js` Vitest 补丁 {#zone-js-vitest-patch}
 
-In order to use functions like `fakeAsync`, `flush` or `waitForAsync`, or to enable your existing tests to work with them, you can add `zone.js/plugins/vitest-patch` to your test target polyfills in `angular.json`.
+为了使用 `fakeAsync`、`flush` 或 `waitForAsync` 等函数，或者让现有测试能够配合这些函数工作，你可以把 `zone.js/plugins/vitest-patch` 添加到 `angular.json` 中测试目标的 polyfills 里。
 
-Regardless, we strongly recommend you start planning to convert your existing test suites to native `async` and Vitest fake timers, since this is the established approach.
+尽管如此，我们仍然强烈建议你开始计划把现有的测试套件转换为原生 `async` 和 Vitest 假定时器（fake timers），因为这已是公认的做法。
 
-See [an example here](/guide/testing/components-scenarios#async-test-with-a-vitest-fake-timers) for fake timers usage with Vitest.
+关于在 Vitest 中使用假定时器的示例，请参阅[这里的示例](/guide/testing/components-scenarios#async-test-with-a-vitest-fake-timers)。
 
-## Bug reports
+## 问题报告 {#bug-reports}
 
-Report issues and feature requests on [GitHub](https://github.com/angular/angular-cli/issues).
+请在 [GitHub](https://github.com/angular/angular-cli/issues) 上报告问题和功能请求。
 
-Please provide a minimal reproduction where possible to aid the team in addressing issues.
+请尽可能提供一个最小复现，以帮助团队解决问题。

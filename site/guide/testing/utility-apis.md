@@ -1,35 +1,31 @@
----
-untranslated: true
----
+# 测试工具 API {#testing-utility-apis}
 
-# Testing Utility APIs
-
-::: info NOTE
-While this guide is being updated for Vitest, some descriptions and examples of utility APIs are currently presented within the context of Karma/Jasmine. We are actively working to provide Vitest equivalents and updated guidance where applicable.
+::: info 注意
+本指南正在针对 Vitest 进行更新，目前部分工具 API 的说明和示例仍基于 Karma/Jasmine。我们正在积极补充 Vitest 的对应写法，并在适用之处提供更新后的指导。
 
 :::
 
-This page describes the most useful Angular testing features.
+本页介绍最有用的 Angular 测试特性。
 
-The Angular testing utilities include the `TestBed`, the `ComponentFixture`, and a handful of functions that control the test environment.
-The [`TestBed`](#testbed-class-summary) and [`ComponentFixture`](#the-componentfixture) classes are covered separately.
+Angular 测试工具包括 `TestBed`、`ComponentFixture`，以及少量用于控制测试环境的函数。
+[`TestBed`](#testbed-class-summary) 和 [`ComponentFixture`](#the-componentfixture) 这两个类会分别单独介绍。
 
-Here's a summary of the stand-alone functions, in order of likely utility:
+下面按可能的实用程度，汇总了这些独立函数：
 
-| Function     | Details                                                                                                                                                                                                                                                      |
+| 函数 | 详情 |
 | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`inject`]   | Injects one or more services from the current `TestBed` injector into a test function. It cannot inject a service provided by the component itself. See discussion of the [debugElement.injector](/guide/testing/components-scenarios#get-injected-services). |
-| `getTestBed` | Gets the current instance of the `TestBed`. Usually unnecessary because the static class methods of the `TestBed` class are typically sufficient. The `TestBed` instance exposes a few rarely used members that are not available as static methods.         |
+| [`inject`] | 从当前 `TestBed` 的注入器（Injector）中把一个或多个服务（Service）注入到测试函数中。它无法注入由组件（Component）自身提供的服务。参见关于 [debugElement.injector](/guide/testing/components-scenarios#get-injected-services) 的讨论。 |
+| `getTestBed` | 获取 `TestBed` 的当前实例。通常不需要它，因为 `TestBed` 类的静态方法一般就够用了。`TestBed` 实例还暴露了少数几个很少用到、且没有对应静态方法的成员。 |
 
-For handling complex asynchronous scenarios or testing legacy Zone.js-based applications, see the [Zone.js Testing Utilities](/guide/testing/zone-js-testing-utilities) guide.
+如需处理复杂的异步场景，或测试基于 Zone.js 的旧版应用，请参阅 [Zone.js 测试工具函数](/guide/testing/zone-js-testing-utilities)指南。
 
-## `TestBed` class summary
+## `TestBed` 类概览 {#testbed-class-summary}
 
-The `TestBed` class is one of the principal Angular testing utilities.
-Its API is quite large and can be overwhelming until you've explored it, a little at a time.
-Read the early part of this guide first to get the basics before trying to absorb the full API.
+`TestBed` 类是最主要的 Angular 测试工具之一。
+它的 API 相当庞大，在你一点点摸索熟悉之前，可能会让人有些应接不暇。
+建议先阅读本指南的前面部分，掌握基础知识，再尝试消化完整的 API。
 
-The module definition passed to `configureTestingModule` is a subset of the `@NgModule` metadata properties.
+传给 `configureTestingModule` 的模块定义是 `@NgModule` 元数据属性的一个子集。
 
 ```ts
 type TestModuleMetadata = {
@@ -40,7 +36,7 @@ type TestModuleMetadata = {
 };
 ```
 
-Each override method takes a `MetadataOverride<T>` where `T` is the kind of metadata appropriate to the method, that is, the parameter of an `@NgModule`, `@Component`, `@Directive`, or `@Pipe`.
+每个覆盖（override）方法都接受一个 `MetadataOverride<T>`，其中 `T` 是适用于该方法的元数据类型，也就是 `@NgModule`、`@Component`、`@Directive` 或 `@Pipe` 的参数。
 
 ```ts
 type MetadataOverride<T> = {
@@ -50,107 +46,107 @@ type MetadataOverride<T> = {
 };
 ```
 
-The `TestBed` API consists of static class methods that either update or reference a _global_ instance of the `TestBed`.
+`TestBed` 的 API 由一组静态类方法组成，它们会更新或引用 `TestBed` 的一个*全局*实例。
 
-Internally, all static methods cover methods of the current runtime `TestBed` instance, which is also returned by the `getTestBed()` function.
+在内部，所有静态方法都对应着当前运行时 `TestBed` 实例上的方法，这个实例也可以通过 `getTestBed()` 函数获取。
 
-Call `TestBed` methods _within_ a `beforeEach()` to ensure a fresh start before each individual test.
+请在 `beforeEach()` *内部*调用 `TestBed` 的方法，以确保每个测试开始前都是全新的状态。
 
-Here are the most important static methods, in order of likely utility.
+下面按可能的实用程度列出最重要的静态方法。
 
-| Methods                  | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| :----------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `configureTestingModule` | The testing shims establish the [initial test environment](/guide/testing) and a default testing module. The default testing module is configured with basic declaratives and some Angular service substitutes that every tester needs. <br /> Call `configureTestingModule` to refine the testing module configuration for a particular set of tests by adding and removing imports, declarations \(of components, directives, and pipes\), and providers.                                                                                               |
-| `compileComponents`      | Compile the testing module asynchronously after you've finished configuring it. You **must** call this method if _any_ of the testing module components have asynchronously loaded resources (like @defer blocks).                                                                                                                                                                                                                                                                                                                                       |
-| `createComponent<T>`     | Create an instance of a component of type `T` based on the current `TestBed` configuration. After calling `createComponent`, the `TestBed` configuration is frozen for the duration of the current spec.                                                                                                                                                                                                                                                                                                                                                 |
-| `overrideComponent`      | Replace metadata for the given component class, which could be nested deeply within an inner module.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `overrideDirective`      | Replace metadata for the given directive class, which could be nested deeply within an inner module.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `overridePipe`           | Replace metadata for the given pipe class, which could be nested deeply within an inner module.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `overrideModule`         | Replace metadata for the given `NgModule`. Recall that modules can import other modules. The `overrideModule` method can reach deeply into the current testing module to modify one of these inner modules.                                                                                                                                                                                                                                                                                                                                              |
-| `inject`                 | Retrieve a service from the current `TestBed` injector. The `inject` function is often adequate for this purpose. But `inject` throws an error if it can't provide the service. <br /> What if the service is optional? <br /> The `TestBed.inject()` method takes an optional second parameter, the object to return if Angular can't find the provider \(`null` in this example\): `expect(TestBed.inject(NotProvided, null)).toBeNull();` After calling `TestBed.inject`, the `TestBed` configuration is frozen for the duration of the current spec. |
-| `initTestEnvironment`    | Initialize the testing environment for the entire test run. <br /> The testing shims call it for you so there is rarely a reason for you to call it yourself. <br /> Call this method _exactly once_. To change this default in the middle of a test run, call `resetTestEnvironment` first. <br /> Specify a default Angular testing module and a `PlatformRef`. Alternatives for non-browser platforms are available in the general form `@angular/platform-<platform_name>/testing`.                                                                  |
-| `resetTestEnvironment`   | Reset the initial test environment, including the default testing module.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 方法 | 详情 |
+| :----------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `configureTestingModule` | 测试垫片（shim）会建立[初始测试环境](/guide/testing)和一个默认的测试模块。默认测试模块中配置了基本的可声明对象，以及每个测试者都需要的一些 Angular 服务替身。<br /> 调用 `configureTestingModule` 可以为特定的一组测试细化测试模块的配置，即添加或移除导入、声明（组件、指令和管道）以及提供者（Provider）。 |
+| `compileComponents` | 在完成测试模块的配置之后，异步编译该测试模块。如果测试模块中*任何*组件带有异步加载的资源（例如 @defer 块），你就**必须**调用这个方法。 |
+| `createComponent<T>` | 基于当前 `TestBed` 的配置，创建一个类型为 `T` 的组件实例。调用 `createComponent` 之后，`TestBed` 的配置在当前测试用例（spec）期间会被冻结。 |
+| `overrideComponent` | 替换指定组件类的元数据，该组件类可能深嵌在某个内部模块中。 |
+| `overrideDirective` | 替换指定指令（Directive）类的元数据，该指令类可能深嵌在某个内部模块中。 |
+| `overridePipe` | 替换指定管道（Pipe）类的元数据，该管道类可能深嵌在某个内部模块中。 |
+| `overrideModule` | 替换指定 `NgModule` 的元数据。别忘了模块可以导入其他模块。`overrideModule` 方法可以深入当前测试模块内部，修改其中某个内部模块。 |
+| `inject` | 从当前 `TestBed` 注入器中获取一个服务。`inject` 函数通常足以满足这个需求，但如果无法提供该服务，`inject` 会抛出错误。<br /> 如果这个服务是可选的呢？<br /> `TestBed.inject()` 方法接受一个可选的第二个参数，即 Angular 找不到提供者时要返回的对象（本例中为 `null`）：`expect(TestBed.inject(NotProvided, null)).toBeNull();`。调用 `TestBed.inject` 之后，`TestBed` 的配置在当前测试用例期间会被冻结。 |
+| `initTestEnvironment` | 为整个测试运行初始化测试环境。<br /> 测试垫片会替你调用它，所以你很少有理由自己调用。<br /> 这个方法*只能调用一次*。如果要在测试运行中途更改这个默认值，请先调用 `resetTestEnvironment`。<br /> 需要指定一个默认的 Angular 测试模块和一个 `PlatformRef`。非浏览器平台的替代方案以 `@angular/platform-<platform_name>/testing` 的通用形式提供。 |
+| `resetTestEnvironment` | 重置初始测试环境，包括默认的测试模块。 |
 
-A few of the `TestBed` instance methods are not covered by static `TestBed` _class_ methods.
-These are rarely needed.
+`TestBed` 有少数几个实例方法没有对应的 `TestBed` 静态*类*方法。
+这些方法很少用到。
 
-## The `ComponentFixture`
+## `ComponentFixture` {#the-componentfixture}
 
-The `TestBed.createComponent<T>` creates an instance of the component `T` and returns a strongly typed `ComponentFixture` for that component.
+`TestBed.createComponent<T>` 会创建组件 `T` 的一个实例，并为该组件返回一个强类型的 `ComponentFixture`。
 
-The `ComponentFixture` properties and methods provide access to the component, its DOM representation, and aspects of its Angular environment.
+通过 `ComponentFixture` 的属性和方法，可以访问组件本身、它的 DOM 表示，以及它所处 Angular 环境的各个方面。
 
-### `ComponentFixture` properties
+### `ComponentFixture` 的属性 {#componentfixture-properties}
 
-Here are the most important properties for testers, in order of likely utility.
+下面按可能的实用程度列出对测试者最重要的属性。
 
-| Properties          | Details                                                                                                                                                                                                                                                                                   |
+| 属性 | 详情 |
 | :------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `componentInstance` | The instance of the component class created by `TestBed.createComponent`.                                                                                                                                                                                                                 |
-| `debugElement`      | The `DebugElement` associated with the root element of the component. <br /> The `debugElement` provides insight into the component and its DOM element during test and debugging. It's a critical property for testers. The most interesting members are covered [below](#debugelement). |
-| `nativeElement`     | The native DOM element at the root of the component.                                                                                                                                                                                                                                      |
-| `changeDetectorRef` | The `ChangeDetectorRef` of the component's host view, not of the component itself. See [Using Zoneless in `TestBed`](/guide/zoneless#using-zoneless-in-testbed).                                                                                                                           |
+| `componentInstance` | 由 `TestBed.createComponent` 创建的组件类实例。 |
+| `debugElement` | 与组件根元素关联的 `DebugElement`。<br /> 在测试和调试过程中，`debugElement` 能让你深入了解组件及其 DOM 元素。它是对测试者至关重要的属性。其中最值得关注的成员会在[下文](#debugelement)介绍。 |
+| `nativeElement` | 组件根部的原生 DOM 元素。 |
+| `changeDetectorRef` | 组件宿主视图的 `ChangeDetectorRef`，而不是组件自身的。参见[在 `TestBed` 中使用无 Zone（zoneless）](/guide/zoneless#using-zoneless-in-testbed)。 |
 
-### `ComponentFixture` methods
+### `ComponentFixture` 的方法 {#componentfixture-methods}
 
-The _fixture_ methods cause Angular to perform certain tasks on the component tree.
-Call these methods to trigger Angular behavior in response to simulated user action.
+这些*测试夹具*（fixture）方法会让 Angular 在组件树上执行特定的任务。
+调用这些方法，可以触发 Angular 对模拟用户操作的响应行为。
 
-Here are the most useful methods for testers.
+下面是对测试者最有用的方法。
 
-| Methods             | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| :------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `detectChanges`     | Trigger a change detection cycle for the component. <br /> Call it to initialize the component \(it calls `ngOnInit`\) and after your test code, change the component's data bound property values. Angular can't see that you've changed `personComponent.name` and won't update the `name` binding until you call `detectChanges`. <br /> Runs `checkNoChanges` afterwards to confirm that there are no circular updates unless called as `detectChanges(false)`;                                                                                                           |
-| `autoDetectChanges` | Set this to `true` when you want the fixture to detect changes automatically. <br /> When autodetect is `true`, the test fixture calls `detectChanges` immediately after creating the component. Then it listens for pertinent zone events and calls `detectChanges` accordingly. When your test code modifies component property values directly, you probably still have to call `fixture.detectChanges` to trigger data binding updates. <br /> The default is `true` with zoneless change detection (the `TestBed` default) and `false` with Zone-based change detection. |
-| `checkNoChanges`    | Do a change detection run to make sure there are no pending changes. Throws an exceptions if there are.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `isStable`          | If the fixture is currently _stable_, returns `true`. If there are async tasks that have not completed, returns `false`.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `whenStable`        | Returns a promise that resolves when the fixture is stable. <br /> To resume testing after completion of asynchronous activity or asynchronous change detection, hook that promise. See [whenStable](/guide/testing/components-scenarios#whenstable).                                                                                                                                                                                                                                                                                                                          |
-| `destroy`           | Trigger component destruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 方法 | 详情 |
+| :------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `detectChanges` | 为组件触发一轮变更检测（Change Detection）。<br /> 调用它来初始化组件（它会调用 `ngOnInit`），以及在测试代码修改了组件的数据绑定属性值之后调用。Angular 察觉不到你修改了 `personComponent.name`，在你调用 `detectChanges` 之前，它不会更新 `name` 绑定。<br /> 之后它还会运行 `checkNoChanges` 来确认没有循环更新，除非以 `detectChanges(false)` 的方式调用。 |
+| `autoDetectChanges` | 如果希望测试夹具自动检测变更，请将它设为 `true`。<br /> 当自动检测为 `true` 时，测试夹具会在创建组件后立即调用 `detectChanges`，然后监听相关的 zone 事件并相应地调用 `detectChanges`。当测试代码直接修改组件的属性值时，你可能仍然需要调用 `fixture.detectChanges` 来触发数据绑定的更新。<br /> 在无 Zone 变更检测（`TestBed` 的默认方式）下默认值为 `true`，在基于 Zone 的变更检测下默认值为 `false`。 |
+| `checkNoChanges` | 执行一次变更检测，确保没有待处理的变更。如果有，就抛出异常。 |
+| `isStable` | 如果测试夹具当前处于*稳定*状态，则返回 `true`；如果还有未完成的异步任务，则返回 `false`。 |
+| `whenStable` | 返回一个在测试夹具稳定时解析的 Promise。<br /> 若要在异步活动或异步变更检测完成后继续测试，请挂接这个 Promise。参见 [whenStable](/guide/testing/components-scenarios#whenstable)。 |
+| `destroy` | 触发组件的销毁。 |
 
-#### `DebugElement`
+#### `DebugElement` {#debugelement}
 
-The `DebugElement` provides crucial insights into the component's DOM representation.
+`DebugElement` 能让你深入了解组件的 DOM 表示。
 
-From the test root component's `DebugElement` returned by `fixture.debugElement`, you can walk \(and query\) the fixture's entire element and component subtrees.
+从 `fixture.debugElement` 返回的测试根组件的 `DebugElement` 出发，你可以遍历（和查询）测试夹具的整个元素子树和组件子树。
 
-Here are the most useful `DebugElement` members for testers, in approximate order of utility:
+下面大致按实用程度列出对测试者最有用的 `DebugElement` 成员：
 
-| Members               | Details                                                                                                                                                                                                                                                                                                                                         |
+| 成员 | 详情 |
 | :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nativeElement`       | The corresponding DOM element in the browser                                                                                                                                                                                                                                                                                                    |
-| `query`               | Calling `query(predicate: Predicate<DebugElement>)` returns the first `DebugElement` that matches the predicate at any depth in the subtree.                                                                                                                                                                                                    |
-| `queryAll`            | Calling `queryAll(predicate: Predicate<DebugElement>)` returns all `DebugElements` that matches the predicate at any depth in subtree.                                                                                                                                                                                                          |
-| `injector`            | The host dependency injector. For example, the root element's component instance injector.                                                                                                                                                                                                                                                      |
-| `componentInstance`   | The element's own component instance, if it has one.                                                                                                                                                                                                                                                                                            |
-| `context`             | An object that provides parent context for this element. Often an ancestor component instance that governs this element. <br /> When an element is repeated within `@for` block, the context is an `RepeaterContext` whose `$implicit` property is the value of the row instance value. For example, the `hero` in `@for(hero of heroes; ...)`. |
-| `children`            | The immediate `DebugElement` children. Walk the tree by descending through `children`. `DebugElement` also has `childNodes`, a list of `DebugNode` objects. `DebugElement` derives from `DebugNode` objects and there are often more nodes than elements. Testers can usually ignore plain nodes.                                               |
-| `parent`              | The `DebugElement` parent. Null if this is the root element.                                                                                                                                                                                                                                                                                    |
-| `name`                | The element tag name, if it is an element.                                                                                                                                                                                                                                                                                                      |
-| `triggerEventHandler` | Triggers the event by its name if there is a corresponding listener in the element's `listeners` collection. The second parameter is the _event object_ expected by the handler. <br /> If the event lacks a listener or there's some other problem, consider calling `nativeElement.dispatchEvent(eventObject)`.                               |
-| `listeners`           | The callbacks attached to the component's `@Output` properties and/or the element's event properties.                                                                                                                                                                                                                                           |
-| `providerTokens`      | This component's injector lookup tokens. Includes the component itself plus the tokens that the component lists in its `providers` metadata.                                                                                                                                                                                                    |
-| `references`          | Dictionary of objects associated with template local variables \(for example, `#foo`\), keyed by the local variable name.                                                                                                                                                                                                                       |
+| `nativeElement` | 浏览器中对应的 DOM 元素 |
+| `query` | 调用 `query(predicate: Predicate<DebugElement>)` 会返回子树中任意深度上第一个与谓词匹配的 `DebugElement`。 |
+| `queryAll` | 调用 `queryAll(predicate: Predicate<DebugElement>)` 会返回子树中任意深度上所有与谓词匹配的 `DebugElements`。 |
+| `injector` | 宿主的依赖注入器。例如，根元素的组件实例注入器。 |
+| `componentInstance` | 该元素自身的组件实例（如果有的话）。 |
+| `context` | 一个为该元素提供父级上下文的对象，通常是管理该元素的某个祖先组件实例。<br /> 当元素在 `@for` 块中重复渲染时，上下文是一个 `RepeaterContext`，其 `$implicit` 属性就是当前行实例的值。例如 `@for(hero of heroes; ...)` 中的 `hero`。 |
+| `children` | 直接的 `DebugElement` 子元素。通过逐层向下遍历 `children` 来遍历整棵树。`DebugElement` 还有 `childNodes`，它是一个 `DebugNode` 对象列表。`DebugElement` 派生自 `DebugNode`，而且节点数通常比元素多。测试者一般可以忽略普通节点。 |
+| `parent` | 父级 `DebugElement`。如果这是根元素，则为 null。 |
+| `name` | 元素的标签名（如果它是元素的话）。 |
+| `triggerEventHandler` | 如果元素的 `listeners` 集合中有对应的监听器，就按名称触发该事件。第二个参数是处理器所期望的*事件对象*。<br /> 如果该事件没有监听器，或者存在其他问题，可以考虑调用 `nativeElement.dispatchEvent(eventObject)`。 |
+| `listeners` | 附加到组件的 `@Output` 属性和/或元素事件属性上的回调。 |
+| `providerTokens` | 该组件注入器的查找令牌。包括组件本身，以及组件在其 `providers` 元数据中列出的令牌。 |
+| `references` | 与模板（Template）局部变量（例如 `#foo`）关联的对象字典，以局部变量名为键。 |
 
-The `DebugElement.query(predicate)` and `DebugElement.queryAll(predicate)` methods take a predicate that filters the source element's subtree for matching `DebugElement`.
+`DebugElement.query(predicate)` 和 `DebugElement.queryAll(predicate)` 方法接受一个谓词，用于在源元素的子树中筛选匹配的 `DebugElement`。
 
-The predicate is any method that takes a `DebugElement` and returns a _truthy_ value.
-The following example finds all `DebugElements` with a reference to a template local variable named "content":
+谓词可以是任何接受一个 `DebugElement` 并返回*真值*的方法。
+下面的例子会找出所有引用了名为 "content" 的模板局部变量的 `DebugElements`：
 
 ```ts
-// Filter for DebugElements with a #content reference
+// 筛选带有 #content 引用的 DebugElements
 const contentRefs = el.queryAll((de) => de.references['content']);
 ```
 
-The Angular `By` class has three static methods for common predicates:
+Angular 的 `By` 类提供了三个用于常见谓词的静态方法：
 
-| Static method             | Details                                                                    |
+| 静态方法 | 详情 |
 | :------------------------ | :------------------------------------------------------------------------- |
-| `By.all`                  | Return all elements                                                        |
-| `By.css(selector)`        | Return elements with matching CSS selectors                                |
-| `By.directive(directive)` | Return elements that Angular matched to an instance of the directive class |
+| `By.all` | 返回所有元素 |
+| `By.css(selector)` | 返回与 CSS 选择器（Selector）匹配的元素 |
+| `By.directive(directive)` | 返回 Angular 匹配到该指令类实例的元素 |
 
 ```ts
-// Can find DebugElement either by css selector or by directive
+// 可以通过 CSS 选择器或指令来查找 DebugElement
 const h2 = fixture.debugElement.query(By.css('h2'));
 const directive = fixture.debugElement.query(By.directive(Highlight));
 ```

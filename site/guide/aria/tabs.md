@@ -1,157 +1,153 @@
----
-untranslated: true
----
+# 标签页 {#tabs}
 
-# Tabs
-
-- [Tabs ARIA pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
-- [Tabs API Reference](https://angular.dev/api/aria/tabs/Tabs)
+- [标签页 ARIA 模式](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
+- [Tabs API 参考](https://angular.dev/api/aria/tabs/Tabs)
 
 
-## Overview
+## 概览 {#overview}
 
-Tabs display layered content sections where only one panel is visible at a time. Users switch between panels by clicking tab buttons or using arrow keys to navigate the tab list.
+标签页（tabs）用于展示分层的内容区域，每次只显示一个面板。用户通过点击标签按钮，或用方向键在标签列表中导航来切换面板。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-## Usage
+## 用法 {#usage}
 
-Tabs work well for organizing related content into distinct sections where users switch between different views or categories.
+标签页适合把相关内容组织成若干独立的区域，让用户在不同的视图或类别之间切换。
 
-**Use tabs when:**
+**以下情况适合使用标签页：**
 
-- Organizing related content into distinct sections
-- Creating settings panels with multiple categories
-- Building documentation with multiple topics
-- Implementing dashboards with different views
-- Showing content where users need to switch contexts
+- 把相关内容组织成若干独立的区域
+- 创建包含多个类别的设置面板
+- 构建包含多个主题的文档
+- 实现具有不同视图的仪表盘
+- 展示需要用户切换上下文的内容
 
-**Avoid tabs when:**
+**以下情况应避免使用标签页：**
 
-- Building sequential forms or wizards (use a stepper pattern)
-- Navigating between pages (use router navigation)
-- Showing single content sections (no need for tabs)
-- Having more than 7-8 tabs (consider a different layout)
+- 构建按顺序填写的表单或向导（请使用步进器模式）
+- 在页面之间导航（请使用路由器导航）
+- 只展示单个内容区域（不需要标签页）
+- 标签超过 7-8 个（请考虑换一种布局）
 
-## Features
+## 特性 {#features}
 
-- **Selection modes** - Tabs activate automatically on focus or require manual activation
-- **Keyboard navigation** - Arrow keys, Home, and End for efficient tab navigation
-- **Orientation** - Horizontal or vertical tab list layouts
-- **Lazy content** - Tab panels render only when activated
-- **Disabled tabs** - Disable individual tabs with focus management
-- **Focus modes** - Roving tabindex or activedescendant focus strategies
-- **RTL support** - Right-to-left language navigation
+- **选择模式** - 标签可以在获得焦点（focus）时自动激活，也可以要求手动激活
+- **键盘导航（keyboard navigation）** - 使用方向键、Home 和 End 高效地在标签之间导航
+- **方向** - 标签列表可以水平或垂直布局
+- **延迟渲染内容** - 标签面板只在激活时才渲染
+- **禁用标签** - 禁用单个标签，并配合焦点管理
+- **焦点模式** - 支持 roving tabindex 或 activedescendant 两种焦点策略
+- **RTL 支持** - 支持从右到左书写语言的导航
 
-## Examples
+## 示例 {#examples}
 
-### Selection follows focus
+### 选择跟随焦点 {#selection-follows-focus}
 
-When selection follows focus, tabs activate immediately as you navigate with arrow keys. This provides instant feedback and works well for lightweight content.
+当选择跟随焦点时，用方向键导航到某个标签就会立即激活它。这种方式能提供即时反馈，适合轻量的内容。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/selection-follows-focus/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-Set `[selectionMode]="'follow'"` on the tab list to enable this behavior.
+在标签列表上设置 `[selectionMode]="'follow'"` 即可启用此行为。
 
-### Manual activation
+### 手动激活 {#manual-activation}
 
-With manual activation, arrow keys move focus between tabs without changing the selected tab. Users press Space or Enter to activate the focused tab.
+在手动激活模式下，方向键只在标签之间移动焦点，不会改变选中的标签。用户需要按 Space 或 Enter 来激活获得焦点的标签。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/explicit-selection/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-Use `[selectionMode]="'explicit'"` for heavy content panels to avoid unnecessary rendering.
+对于内容较重的面板，请使用 `[selectionMode]="'explicit'"`，以避免不必要的渲染。
 
-### Vertical tabs
+### 垂直标签页 {#vertical-tabs}
 
-Arrange tabs vertically for interfaces like settings panels or navigation sidebars.
+对于设置面板或导航侧边栏这类界面，可以把标签垂直排列。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/vertical/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-Set `[orientation]="'vertical'"` on the tab list. Navigation changes to Up/Down arrow keys.
+在标签列表上设置 `[orientation]="'vertical'"`，导航方式就会变为上下方向键。
 
-### Lazy content rendering
+### 延迟渲染内容 {#lazy-content-rendering}
 
-Use the `ngTabContent` directive on an `ng-template` to defer rendering tab panels until they're shown.
+在 `ng-template` 上使用 `ngTabContent` 指令（directive），可以把标签面板的渲染推迟到它们显示时。
 
 ```html
 <div ngTabs>
@@ -162,63 +158,63 @@ Use the `ngTabContent` directive on an `ng-template` to defer rendering tab pane
 
   <div ngTabPanel value="tab1">
     <ng-template ngTabContent>
-      <!-- This content only renders when Tab 1 is shown -->
+      <!-- 此内容只在显示 Tab 1 时渲染 -->
       <app-heavy-component />
     </ng-template>
   </div>
 
   <div ngTabPanel value="tab2">
     <ng-template ngTabContent>
-      <!-- This content only renders when Tab 2 is shown -->
+      <!-- 此内容只在显示 Tab 2 时渲染 -->
       <app-another-component />
     </ng-template>
   </div>
 </div>
 ```
 
-By default, content is removed from the DOM when the panel is hidden. Set `[preserveContent]="true"` to keep it, for example when the panel contains a video that shouldn't reset when switching tabs.
+默认情况下，面板隐藏时其内容会从 DOM 中移除。设置 `[preserveContent]="true"` 可以保留这些内容，例如当面板中包含一个不应在切换标签时被重置的视频时。
 
-### Disabled tabs
+### 禁用的标签 {#disabled-tabs}
 
-Disable specific tabs to prevent user interaction. Control whether disabled tabs can receive keyboard focus.
+可以禁用特定的标签以阻止用户交互，并控制禁用的标签能否获得键盘焦点。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/tabs/src/disabled/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-When `[softDisabled]="true"` on the tab list, disabled tabs can receive focus but cannot be activated. When `[softDisabled]="false"`, disabled tabs are skipped during keyboard navigation.
+在标签列表上设置 `[softDisabled]="true"` 时，禁用的标签可以获得焦点，但无法被激活。设置 `[softDisabled]="false"` 时，键盘导航会跳过禁用的标签。
 
-## Testing
+## 测试 {#testing}
 
-Angular Aria provides component harnesses for testing tabs components.
-Here is an example of how to use the harnesses in a component test:
+Angular Aria 提供了组件测试工具（harness），用于测试标签页组件（component）。
+下面是在组件测试中使用这些测试工具的示例：
 
 ```ts
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ComponentHarness, HarnessLoader} from '@angular/cdk/testing';
 import {TabsHarness} from '@angular/aria/tabs/testing';
-import {MyTabsComponent} from './my-tabs'; // Your component
+import {MyTabsComponent} from './my-tabs'; // 你的组件
 
-// A simple harness to help query content inside the tab panel
+// 一个简单的测试工具，用于帮助查询标签面板中的内容
 class TestContentHarness extends ComponentHarness {
   static hostSelector = '.test-content';
   async getText(): Promise<string> {
@@ -243,32 +239,32 @@ describe('MyTabsComponent', () => {
   it('should switch tabs and scope panel queries', async () => {
     const tabs = await loader.getHarness(TabsHarness);
 
-    // Get all tabs
+    // 获取所有标签
     const tabItems = await tabs.getTabs();
     expect(tabItems.length).toBe(3);
 
-    // Verify initial selection
+    // 验证初始选择
     expect(await tabItems[0].isSelected()).toBe(true);
     expect(await tabItems[1].isSelected()).toBe(false);
 
-    // Query content inside the active tab panel
-    // TabHarness automatically scopes queries to its associated panel
+    // 查询当前激活的标签面板中的内容
+    // TabHarness 会自动把查询范围限定在与之关联的面板内
     const content = await tabItems[0].getHarness(TestContentHarness);
     expect(await content.getText()).toBe('Content 1');
 
-    // Switch to the second tab
+    // 切换到第二个标签
     await tabItems[1].select();
 
-    // Verify selection updated
+    // 验证选择已更新
     expect(await tabItems[0].isSelected()).toBe(false);
     expect(await tabItems[1].isSelected()).toBe(true);
   });
 });
 ```
 
-## API reference
+## API 参考 {#api-reference}
 
-For detailed API documentation, inspect the following API references:
+详细的 API 文档请参阅以下 API 参考：
 
 - [`Tabs`](https://angular.dev/api/aria/tabs/Tabs)
 - [`TabList`](https://angular.dev/api/aria/tabs/TabList)

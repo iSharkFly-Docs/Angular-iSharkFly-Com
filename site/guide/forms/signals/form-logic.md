@@ -1,56 +1,52 @@
----
-untranslated: true
----
+# 添加表单逻辑 {#adding-form-logic}
 
-# Adding form logic
+信号表单（Signal Forms）允许你使用 schema 为表单添加逻辑。验证逻辑在[验证指南](/guide/forms/signals/validation)中介绍，本指南讨论 schema 中可用的其他规则。你可以有条件地禁用字段（field）、根据其他值隐藏字段、将字段设为只读、对用户输入进行防抖，以及为自定义控件附加元数据。
 
-Signal Forms allow you to add logic to your form using schemas. Validation logic is covered in the [Validation guide](/guide/forms/signals/validation), and this guide discusses other rules available in schemas. You can disable fields conditionally, hide them based on other values, make them readonly, debounce user input, and attach metadata for custom controls.
+本指南将展示如何使用 `disabled()`、`hidden()`、`readonly()`、`debounce()` 和 `metadata()` 等规则来控制字段的行为。
 
-This guide shows you how to use rules like `disabled()`, `hidden()`, `readonly()`, `debounce()`, and `metadata()` to control field behavior.
+## 何时添加表单逻辑 {#when-to-add-form-logic}
 
-## When to add form logic
+当字段的行为依赖于其他字段的值，或者需要响应式更新时，就可以使用规则。例如：
 
-Use rules when field behavior depends on other field values or needs to update reactively. For example:
+- 当订单总额过低时禁用的优惠码字段
+- 除非需要配送，否则隐藏的地址字段
+- 通过防抖来减少 API 调用的搜索字段
 
-- A coupon code field that's disabled when the order total is too low
-- An address field that's hidden unless shipping is required
-- A search field that debounces to reduce API calls
+## 规则的工作原理 {#how-rules-work}
 
-## How rules work
-
-Rules bind reactive logic to specific fields in your form. Most conditional rules accept an options object with a `when` function. The `when` function automatically recomputes whenever the signals it references change, just like a `computed`.
+规则会把响应式逻辑绑定（binding）到表单中的特定字段上。大多数条件规则都接受一个带有 `when` 函数的选项对象。每当 `when` 函数引用的信号（signal）发生变化时，它都会自动重新计算，就像 `computed` 一样。
 
 ```ts
 const orderForm = form(this.orderModel, (schemaPath) => {
   disabled(schemaPath.couponCode, {when: ({valueOf}) => valueOf(schemaPath.total) < 50});
   //~~~~~~ ~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //rule     path                   reactive logic function
+  //规则     路径                   响应式逻辑函数
 });
 ```
 
-Reactive logic functions receive a `FieldContext` object that provides access to field values and state through helper functions like `valueOf()` and `stateOf()`. It is often destructured to access these helpers directly.
+响应式逻辑函数会接收一个 `FieldContext` 对象，它通过 `valueOf()` 和 `stateOf()` 等辅助函数提供对字段值和状态的访问。通常会对它进行解构，以便直接使用这些辅助函数。
 
-::: info NOTE
-The schema callback parameter (`schemaPath` in these examples) is a `SchemaPathTree` object that provides paths to all fields in your form. You can name this parameter anything you like.
-
-:::
-
-For complete details on `FieldContext` properties and methods, see the [Validation guide](/guide/forms/signals/validation).
-
-## Prevent field updates with `disabled()`
-
-The `disabled()` rule configures a field's disabled state.
-
-It works with the `[formField]` directive to automatically bind the `disabled` attribute based on the field's state, so you don't need to manually add `[disabled]="yourForm.fieldName().disabled()"` to your template.
-
-::: info NOTE
-Disabled fields skip validation - they don't participate in form validation checks. The field's value is preserved but not validated. For details on validation behavior, see the [Validation guide](/guide/forms/signals/validation).
+::: info 注意
+schema 回调的参数（这些例子中的 `schemaPath`）是一个 `SchemaPathTree` 对象，它提供了表单中所有字段的路径。你可以随意为这个参数命名。
 
 :::
 
-### Always disabled
+关于 `FieldContext` 属性和方法的完整细节，请参阅[验证指南](/guide/forms/signals/validation)。
 
-To disable a field permanently, call `disabled()` with just the field path:
+## 使用 `disabled()` 阻止字段更新 {#prevent-field-updates-with-disabled}
+
+`disabled()` 规则用于配置字段的禁用状态。
+
+它与 `[formField]` 指令（Directive）配合使用，会根据字段的状态自动绑定 `disabled` attribute，因此你无需在模板（Template）中手动添加 `[disabled]="yourForm.fieldName().disabled()"`。
+
+::: info 注意
+禁用的字段会跳过验证，它们不参与表单的验证检查。字段的值会被保留，但不会被验证。关于验证行为的详细信息，请参阅[验证指南](/guide/forms/signals/validation)。
+
+:::
+
+### 始终禁用 {#always-disabled}
+
+要永久禁用某个字段，只需传入字段路径来调用 `disabled()`：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -78,9 +74,9 @@ export class Settings {
 }
 ```
 
-### Conditional disabling
+### 条件禁用 {#conditional-disabling}
 
-To disable a field based on conditions, provide a `when` function that returns `true` (disabled) or `false` (enabled):
+要根据条件禁用字段，可以提供一个返回 `true`（禁用）或 `false`（启用）的 `when` 函数：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -113,11 +109,11 @@ export class Order {
 }
 ```
 
-In this example, when the order total is less than $50, the coupon code field is disabled.
+在这个例子中，当订单总额低于 50 美元时，优惠码字段会被禁用。
 
-### Disabled reasons
+### 禁用原因 {#disabled-reasons}
 
-When you disable a field, provide user-facing explanations by returning a string instead of `true`:
+禁用字段时，可以返回一个字符串而不是 `true`，以便向用户提供说明：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -161,16 +157,16 @@ export class Order {
 }
 ```
 
-The `when` function returns:
+`when` 函数可以返回：
 
-- A **string** to disable the field with a reason
-- `false` to enable the field (not just any falsy value - use `false` explicitly)
+- 一个**字符串**，表示禁用该字段并附带原因
+- `false`，表示启用该字段（不是任意假值都可以，请显式使用 `false`）
 
-Access the reasons through the `disabledReasons()` signal on the field state. Each reason has a `message` property containing the string you returned.
+通过字段状态上的 `disabledReasons()` 信号来访问这些原因。每个原因都有一个 `message` 属性，其中包含你返回的字符串。
 
-#### Multiple disabled reasons
+#### 多个禁用原因 {#multiple-disabled-reasons}
 
-You can also call `disabled()` multiple times on the same field, and all of the returned reasons accumulate:
+你也可以对同一个字段多次调用 `disabled()`，所有返回的原因都会累积起来：
 
 ```ts
 orderForm = form(this.orderModel, (schemaPath) => {
@@ -184,25 +180,25 @@ orderForm = form(this.orderModel, (schemaPath) => {
 });
 ```
 
-If both conditions are true, the field shows both disabled reasons. This pattern is useful for complex availability rules that you want to keep separate.
+如果两个条件都为真，该字段会显示两个禁用原因。当你希望将复杂的可用性规则分开管理时，这种模式很有用。
 
-## Configuring `hidden()` state on fields
+## 为字段配置 `hidden()` 状态 {#configuring-hidden-state-on-fields}
 
-The `hidden()` rule configures a field's hidden state. However, this only sets a programmatic state. **You control whether the field appears in the UI**.
+`hidden()` 规则用于配置字段的隐藏状态。不过，它只设置一个程序层面的状态。**字段是否显示在 UI 中由你来控制**。
 
-::: warning IMPORTANT
-Unlike `disabled` and `readonly`, there is no native DOM property for `hidden` state. The `[formField]` directive does not apply a `hidden` attribute to elements. You must use `@if` or CSS in your template to conditionally render fields based on the `hidden()` state.
-
-:::
-
-::: info NOTE
-Like disabled fields, hidden fields also skip validation. See the [Validation guide](/guide/forms/signals/validation) for details.
+::: warning 重要
+与 `disabled` 和 `readonly` 不同，`hidden` 状态没有对应的原生 DOM 属性。`[formField]` 指令不会为元素应用 `hidden` attribute。你必须在模板中使用 `@if` 或 CSS，根据 `hidden()` 状态有条件地渲染字段。
 
 :::
 
-### Basic field hiding
+::: info 注意
+与禁用的字段一样，隐藏的字段也会跳过验证。详情请参阅[验证指南](/guide/forms/signals/validation)。
 
-Use `hidden()` with a `when` function that returns `true` (hidden) or `false` (visible):
+:::
+
+### 基本的字段隐藏 {#basic-field-hiding}
+
+将 `hidden()` 与一个返回 `true`（隐藏）或 `false`（可见）的 `when` 函数配合使用：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -237,9 +233,9 @@ export class Profile {
 }
 ```
 
-### Always hidden
+### 始终隐藏 {#always-hidden}
 
-To make a field permanently hidden, call `hidden()` with just the field path:
+要永久隐藏某个字段，只需传入字段路径来调用 `hidden()`：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -254,7 +250,7 @@ import {form, FormField, hidden} from '@angular/forms/signals';
       Make profile public
     </label>
 
-    <!-- The publicUrl is permanently hidden, so this block never renders -->
+    <!-- publicUrl 被永久隐藏，因此这个块永远不会渲染 -->
     @if (!profileForm.publicUrl().hidden()) {
       <label>
         Public URL
@@ -270,24 +266,24 @@ export class Profile {
   });
 
   profileForm = form(this.profileModel, (schemaPath) => {
-    // This field is now permanently hidden and excluded from active validation
+    // 该字段现在被永久隐藏，并且不参与验证
     hidden(schemaPath.publicUrl);
   });
 }
 ```
 
-## Display uneditable fields with `readonly()`
+## 使用 `readonly()` 显示不可编辑的字段 {#display-uneditable-fields-with-readonly}
 
-The `readonly()` rule prevents users from updating a field. The `FormField` directive automatically binds this state to the HTML `readonly` attribute, which prevents editing while still allowing users to focus and select text.
+`readonly()` 规则会阻止用户更新字段。`FormField` 指令会自动把这个状态绑定到 HTML 的 `readonly` attribute 上，它可以阻止编辑，同时仍允许用户聚焦和选择文本。
 
-::: info NOTE
-Readonly fields skip [validation](/guide/forms/signals/validation).
+::: info 注意
+只读字段会跳过[验证](/guide/forms/signals/validation)。
 
 :::
 
-### Always readonly
+### 始终只读 {#always-readonly}
 
-To make a field permanently readonly, call `readonly()` with just the field path:
+要让某个字段永久只读，只需传入字段路径来调用 `readonly()`：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -320,11 +316,11 @@ export class Account {
 }
 ```
 
-The `FormField` directive automatically binds the `readonly` attribute based on the field's state.
+`FormField` 指令会根据字段的状态自动绑定 `readonly` attribute。
 
-### Conditional readonly
+### 条件只读 {#conditional-readonly}
 
-To make a field readonly based on conditions, provide a `when` function:
+要根据条件让字段只读，可以提供一个 `when` 函数：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -357,57 +353,57 @@ export class Document {
 }
 ```
 
-When `isLocked` is true, the title field becomes readonly.
+当 `isLocked` 为 true 时，标题字段会变为只读。
 
-## Choose between hidden, disabled, and readonly
+## 在 hidden、disabled 和 readonly 之间做选择 {#choose-between-hidden-disabled-and-readonly}
 
-These three configuration functions control field availability in different ways:
+这三个配置函数以不同的方式控制字段的可用性：
 
-Choose `hidden()` when the field:
+在以下情况下选择 `hidden()`：
 
-- Should not appear in the UI at all
-- Is irrelevant to the current form state
-- Example: Shipping address fields when "same as billing" is checked
+- 字段根本不应出现在 UI 中
+- 字段与当前表单状态无关
+- 例如：勾选了 "same as billing"（与账单地址相同）时的配送地址字段
 
-Choose `disabled()` when the field:
+在以下情况下选择 `disabled()`：
 
-- Should be visible but not editable
-- Needs to show why it's unavailable (using disabled reasons)
-- Should be excluded from HTML form submission
-- Example: Submit button disabled until form is valid, approval fields disabled for non-admin users
+- 字段应该可见但不可编辑
+- 需要说明它为何不可用（使用禁用原因）
+- 应从 HTML 表单提交中排除
+- 例如：在表单有效之前禁用的提交按钮，对非管理员用户禁用的审批字段
 
-Choose `readonly()` when the field:
+在以下情况下选择 `readonly()`：
 
-- Should be visible but not editable
-- Contains data users need to see, select, or copy
-- Should be included in HTML form submission
-- Example: Order confirmation number, system-generated reference codes
+- 字段应该可见但不可编辑
+- 包含用户需要查看、选择或复制的数据
+- 应包含在 HTML 表单提交中
+- 例如：订单确认号、系统生成的参考编码
 
-All three skip validation and prevent user editing while active. The key differences:
+这三者在生效时都会跳过验证并阻止用户编辑。主要区别如下：
 
-| Feature                          | `hidden()` | `disabled()` | `readonly()` |
+| 特性                             | `hidden()` | `disabled()` | `readonly()` |
 | -------------------------------- | ---------- | ------------ | ------------ |
-| Visible in UI                    | No         | Yes          | Yes          |
-| Users can focus/select           | No         | No           | Yes          |
-| Included in HTML form submission | No         | No           | Yes          |
+| 在 UI 中可见                     | 否         | 是           | 是           |
+| 用户可以聚焦/选择                | 否         | 否           | 是           |
+| 包含在 HTML 表单提交中           | 否         | 否           | 是           |
 
-## Delay input operations with `debounce()`
+## 使用 `debounce()` 延迟输入操作 {#delay-input-operations-with-debounce}
 
-The `debounce()` rule delays updating the form model. This is useful for performance optimization and reducing unnecessary operations during rapid input.
+`debounce()` 规则会推迟表单模型的更新。这对于性能优化以及在快速输入时减少不必要的操作很有用。
 
-### What debouncing does
+### 防抖的作用 {#what-debouncing-does}
 
-Without debouncing, every keystroke immediately updates the form model. This can trigger:
+如果没有防抖，每次按键都会立即更新表单模型。这可能会触发：
 
-- Expensive computed signals that recalculate on every change
-- Validation checks after each character
-- API calls or other side effects tied to the model value
+- 每次变化都要重新计算的、开销较大的计算信号（computed）
+- 每输入一个字符后的验证检查
+- 与模型值相关联的 API 调用或其他副作用
 
-Debouncing delays these updates and reduces unnecessary work.
+防抖可以推迟这些更新，减少不必要的工作。
 
-### Basic debouncing
+### 基本防抖 {#basic-debouncing}
 
-You can debounce a field by specifying a delay in milliseconds:
+你可以通过指定以毫秒为单位的延迟来为字段设置防抖：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -436,25 +432,25 @@ export class Search {
 }
 ```
 
-With a 300ms debounce:
+设置 300 毫秒的防抖后：
 
-- User types in the input field
-- Form model updates only after 300ms of typing inactivity
-- If user keeps typing, the timer resets with each keystroke
-- Once user pauses for 300ms, the model updates with the final value
+- 用户在输入框中输入
+- 只有在停止输入 300 毫秒后，表单模型才会更新
+- 如果用户持续输入，每次按键都会重置计时器
+- 一旦用户停顿 300 毫秒，模型就会以最终值更新
 
-### Timing guarantees
+### 时机保证 {#timing-guarantees}
 
-The `debounce()` function ensures users don't lose data through these mechanisms:
+`debounce()` 函数通过以下机制确保用户不会丢失数据：
 
-- **When marked as touched:** The value syncs immediately, aborting any pending debounce delay. This happens when the field loses focus (blur) or when explicitly marked as touched.
-- **On form submission:** All fields are marked as touched before validation, which ensures all debounced values sync immediately.
+- **被标记为已触碰（touched）时**：值会立即同步，并中止所有挂起的防抖延迟。这会在字段失去焦点（blur）或被显式标记为已触碰时发生。
+- **表单提交时**：在验证之前，所有字段都会被标记为已触碰，从而确保所有防抖中的值都会立即同步。
 
-This means users can type quickly, tab away, or submit the form without waiting for debounce delays to expire.
+这意味着用户可以快速输入、按 Tab 键离开或提交表单，而无需等待防抖延迟到期。
 
-### Custom debounce logic
+### 自定义防抖逻辑 {#custom-debounce-logic}
 
-For advanced control, provide a debouncer function that controls when to synchronize the value. This function is called every time the control value is updated and can return either `undefined` to synchronize immediately, or a Promise that prevents synchronization until it resolves:
+如需更高级的控制，可以提供一个防抖函数来控制何时同步值。每次控件值更新时都会调用这个函数，它可以返回 `undefined` 来立即同步，也可以返回一个 Promise，在它 resolve 之前阻止同步：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -477,7 +473,7 @@ export class Search {
 
   searchForm = form(this.searchModel, (schemaPath) => {
     debounce(schemaPath.query, (context, abortSignal) => {
-      // Return a promise that resolves after 500ms, or right away when the debounce is aborted
+      // 返回一个 Promise，它在 500 毫秒后 resolve，或在防抖被中止时立即 resolve
       return new Promise<void>((resolve) => {
         const timeoutId = setTimeout(resolve, 500);
         abortSignal.addEventListener(
@@ -494,39 +490,39 @@ export class Search {
 }
 ```
 
-The debouncer function can return:
+防抖函数可以返回：
 
-- `undefined` to synchronize the value immediately
-- A `Promise<void>` that prevents synchronization until it resolves
+- `undefined`，表示立即同步值
+- 一个 `Promise<void>`，在它 resolve 之前阻止同步
 
-Use cases for custom debounce logic:
+自定义防抖逻辑的使用场景：
 
-- Implementing custom timing logic beyond simple delays
-- Coordinating synchronization with external events
-- Conditional debouncing based on application state
+- 实现超出简单延迟的自定义时机逻辑
+- 将同步与外部事件进行协调
+- 根据应用状态有条件地防抖
 
-### When to use debouncing
+### 何时使用防抖 {#when-to-use-debouncing}
 
-Debouncing is most useful when:
+防抖在以下情况下最有用：
 
-- You have expensive computed signals that depend on the field value
-- The field triggers API calls or other side effects
-- You want to reduce validation overhead during rapid typing
-- Performance profiling shows model updates are causing slowdowns
+- 有依赖于该字段值的、开销较大的计算信号
+- 该字段会触发 API 调用或其他副作用
+- 希望在快速输入时减少验证开销
+- 性能分析表明模型更新导致了性能下降
 
-Don't use debouncing if:
+在以下情况下不要使用防抖：
 
-- The field needs immediate updates for good UX (such as calculator inputs)
-- The performance benefit is negligible
-- Users expect real-time feedback
+- 字段需要立即更新才能获得良好的用户体验（例如计算器输入）
+- 性能收益微乎其微
+- 用户期望实时反馈
 
-## Associate data with a field using `metadata()`
+## 使用 `metadata()` 将数据与字段关联 {#associate-data-with-a-field-using-metadata}
 
-Metadata attaches reactive data to a field. Validation rules use this system internally, and you can publish your own keys for application-specific information like help text, configuration, or computed display values.
+元数据（metadata）会把响应式数据附加到字段上。验证规则在内部使用这个系统，你也可以发布自己的键，用于帮助文本、配置或计算出的显示值等应用特定的信息。
 
-Signal Forms provides pre-defined metadata keys that built-in validators populate automatically:
+信号表单提供了一些预定义的元数据键，内置验证器（validator）会自动填充它们：
 
-| Key          | Populated by         | Read via              |
+| 键           | 填充者               | 读取方式              |
 | ------------ | -------------------- | --------------------- |
 | `REQUIRED`   | `required()`         | `field().required()`  |
 | `MIN`        | `min()`, `minDate()` | `field().min()`       |
@@ -535,7 +531,7 @@ Signal Forms provides pre-defined metadata keys that built-in validators populat
 | `MAX_LENGTH` | `maxLength()`        | `field().maxLength()` |
 | `PATTERN`    | `pattern()`          | `field().pattern()`   |
 
-The `[formField]` directive automatically binds five of these (`REQUIRED`, `MIN`, `MAX`, `MIN_LENGTH`, and `MAX_LENGTH`) to the corresponding HTML attribute on a native form control. `PATTERN` is the exception, because Signal Forms supports multiple patterns per field but the HTML `pattern` attribute accepts only a single regular expression.
+`[formField]` 指令会自动把其中五个键（`REQUIRED`、`MIN`、`MAX`、`MIN_LENGTH` 和 `MAX_LENGTH`）绑定到原生表单控件上对应的 HTML attribute。`PATTERN` 是例外，因为信号表单支持每个字段有多个模式，而 HTML 的 `pattern` attribute 只接受一个正则表达式。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -566,9 +562,9 @@ export class Age {
 }
 ```
 
-### Reactive metadata
+### 响应式元数据 {#reactive-metadata}
 
-Validation rules can derive their constraints from other fields, making the published metadata reactive:
+验证规则可以从其他字段派生约束，从而使发布的元数据具有响应性：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -607,17 +603,17 @@ export class Inventory {
 }
 ```
 
-The `max()` validation rule sets the `MAX` metadata reactively based on the selected item, so any template or control reading `field().max()` updates whenever the item changes.
+`max()` 验证规则会根据所选的商品以响应式的方式设置 `MAX` 元数据，因此任何读取 `field().max()` 的模板或控件都会在商品变化时随之更新。
 
-For deeper coverage, including how to define custom keys, combine contributions with reducers, and use managed metadata for lifecycle-aware objects, see the [Field metadata guide](/guide/forms/signals/field-metadata).
+如需更深入的介绍，包括如何定义自定义键、如何用归约函数（reducer）合并多个贡献值，以及如何为具有生命周期的对象使用托管元数据，请参阅[字段元数据指南](/guide/forms/signals/field-metadata)。
 
-## Combining rules
+## 组合规则 {#combining-rules}
 
-You can apply multiple rules to the same field, and you can use conditional logic to apply entire groups of rules based on form state.
+你可以对同一个字段应用多个规则，也可以使用条件逻辑，根据表单状态应用整组规则。
 
-### Multiple rules on one field
+### 在一个字段上应用多个规则 {#multiple-rules-on-one-field}
 
-Apply multiple rules to configure all aspects of a field's behavior:
+应用多个规则来配置字段行为的各个方面：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -656,16 +652,16 @@ export class Promo {
 }
 ```
 
-These rules work together:
+这些规则会协同工作：
 
-- Hidden takes precedence - if the field is hidden, disabled state doesn't matter
-- Disabled prevents editing regardless of readonly state
-- Debouncing affects model updates regardless of other state
-- Metadata is independent and always available
+- 隐藏优先：如果字段被隐藏，禁用状态就无关紧要了
+- 无论只读状态如何，禁用都会阻止编辑
+- 无论其他状态如何，防抖都会影响模型更新
+- 元数据是独立的，始终可用
 
-### Conditional logic with applyWhen
+### 使用 applyWhen 实现条件逻辑 {#conditional-logic-with-applywhen}
 
-Use `applyWhen()` to conditionally apply entire groups of rules:
+使用 `applyWhen()` 有条件地应用整组规则：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -700,7 +696,7 @@ export class Address {
       schemaPath,
       ({valueOf}) => valueOf(schemaPath.country) === 'US',
       (schemaPath) => {
-        // Only applied when country is US
+        // 仅当国家为 US 时应用
         required(schemaPath.zipCode);
         pattern(schemaPath.zipCode, /^\d{5}(-\d{4})?$/);
       },
@@ -709,17 +705,17 @@ export class Address {
 }
 ```
 
-The `applyWhen()` function receives:
+`applyWhen()` 函数接收：
 
-1. A path to apply logic to (often the root form path)
-2. A reactive logic function that returns `true` (apply) or `false` (don't apply)
-3. A schema function that defines the conditional rules
+1. 要应用逻辑的路径（通常是表单的根路径）
+2. 一个返回 `true`（应用）或 `false`（不应用）的响应式逻辑函数
+3. 一个定义条件规则的 schema 函数
 
-The conditional rules only run when the condition is true. This is useful for complex forms where validation rules or behavior changes based on user choices.
+只有当条件为真时，这些条件规则才会运行。对于验证规则或行为会随用户选择而变化的复杂表单，这非常有用。
 
-### Reusable schema functions
+### 可复用的 schema 函数 {#reusable-schema-functions}
 
-Extract common rule configurations into reusable functions:
+将常用的规则配置提取到可复用的函数中：
 
 ```ts
 import {SchemaPath, debounce, metadata, maxLength, form} from '@angular/forms/signals';
@@ -731,7 +727,7 @@ function emailFieldConfig(path: SchemaPath<string>) {
   maxLength(path, 255);
 }
 
-// Use in multiple forms
+// 在多个表单中使用
 const contactForm = form(contactModel, (schemaPath) => {
   emailFieldConfig(schemaPath.email);
   emailFieldConfig(schemaPath.alternateEmail);
@@ -742,12 +738,12 @@ const registrationForm = form(registrationModel, (schemaPath) => {
 });
 ```
 
-This pattern is useful when you have standard field configurations that you use across multiple forms in your application.
+当你的应用中有多个表单都会用到的标准字段配置时，这种模式很有用。
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-To learn more about Signal Forms, check out these related guides:
+要进一步了解信号表单，请查看以下相关指南：
 
-- [Field State Management](/guide/forms/signals/field-state-management) - Learn how to use the state signals created by these functions in your templates and component logic
-- [Validation](/guide/forms/signals/validation) - Learn about validation rules and error handling
-- [Custom Controls](/guide/forms/signals/custom-controls) - Learn how custom controls can read metadata and state to configure themselves automatically
+- [字段状态管理](/guide/forms/signals/field-state-management)：了解如何在模板和组件（Component）逻辑中使用这些函数创建的状态信号
+- [验证](/guide/forms/signals/validation)：了解验证规则和错误处理
+- [自定义控件](/guide/forms/signals/custom-controls)：了解自定义控件如何读取元数据和状态来自动完成自身配置

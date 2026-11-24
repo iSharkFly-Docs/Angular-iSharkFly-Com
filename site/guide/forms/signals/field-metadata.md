@@ -1,16 +1,12 @@
----
-untranslated: true
----
+# 字段元数据 {#field-metadata}
 
-# Field metadata
+字段元数据（field metadata）是可以附加到单个字段（field）上的响应式数据。Angular 内置的约束类验证器（Validator），例如 `required()` 和 `min()`，内部就使用了这套机制。换句话说，每次调用验证器时，你都在为该字段的某个元数据键贡献一个值。
 
-Field metadata is reactive data you can attach to an individual field. Angular's built-in constraint validators like `required()` and `min()` use this system internally. In other words, every time you call a validator, you're contributing to a metadata key for that particular field.
+本指南将深入介绍元数据系统：归约器（reducer）如何合并多条 schema 规则的贡献、如何编写自定义归约器、读取操作如何与 `hasMetadata()` 配合，以及托管元数据如何把具备生命周期感知能力的对象绑定到单个字段上。
 
-This guide covers the metadata system in depth: how reducers combine contributions from multiple schema rules, how to write custom reducers, how reading composes with `hasMetadata()`, and how managed metadata ties lifecycle-aware objects to individual fields.
+## 你其实已经在使用元数据了 {#you-have-already-been-using-metadata}
 
-## You have already been using metadata
-
-When you call `required()` in a schema and read `.required()` on the resulting field in a template, you are using the metadata system. `state.required` is not a special-case property. It is a convenience getter that returns the current value of a built-in `REQUIRED` metadata key.
+当你在 schema 中调用 `required()`，并在模板（Template）中读取对应字段的 `.required()` 时，你就在使用元数据系统。`state.required` 并不是特殊处理的属性，它只是一个便捷的 getter，返回内置 `REQUIRED` 元数据键的当前值。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -40,38 +36,38 @@ export class Registration {
 }
 ```
 
-Calling `required(path.username)` contributes a value to the `REQUIRED` metadata key on that field. Reading `registrationForm.username().required()` returns the accumulated value. The metadata key is the bridge connecting the two.
+调用 `required(path.username)` 会向该字段的 `REQUIRED` 元数据键贡献一个值；读取 `registrationForm.username().required()` 则返回累积后的值。元数据键就是连接两者的桥梁。
 
-Several built-in constraint validators follow this pattern:
+以下几个内置约束类验证器都遵循这种模式：
 
-| Validator     | Metadata key               | Type                  | `FieldState` getter |
+| 验证器        | 元数据键                   | 类型                  | `FieldState` getter |
 | ------------- | -------------------------- | --------------------- | ------------------- |
 | `required()`  | `REQUIRED`                 | `boolean`             | `required`          |
-| `min()`       | `MIN` selects `MIN_NUMBER` | `number \| undefined` | `min`               |
-| `max()`       | `MAX` selects `MAX_NUMBER` | `number \| undefined` | `max`               |
-| `minDate()`   | `MIN` selects `MIN_DATE`   | `Date \| undefined`   | `min`               |
-| `maxDate()`   | `MAX` selects `MAX_DATE`   | `Date \| undefined`   | `max`               |
+| `min()`       | `MIN` 选择 `MIN_NUMBER`    | `number \| undefined` | `min`               |
+| `max()`       | `MAX` 选择 `MAX_NUMBER`    | `number \| undefined` | `max`               |
+| `minDate()`   | `MIN` 选择 `MIN_DATE`      | `Date \| undefined`   | `min`               |
+| `maxDate()`   | `MAX` 选择 `MAX_DATE`      | `Date \| undefined`   | `max`               |
 | `minLength()` | `MIN_LENGTH`               | `number \| undefined` | `minLength`         |
 | `maxLength()` | `MAX_LENGTH`               | `number \| undefined` | `maxLength`         |
 | `pattern()`   | `PATTERN`                  | `RegExp[]`            | `pattern`           |
 
-Non-constraint validators like `email()` and `validate()` do not contribute to metadata. They run their check and surface a validation error, but they do not publish a reactive value for templates to read.
+`email()` 和 `validate()` 这类非约束类验证器不会贡献元数据。它们只执行检查并给出验证错误，不会发布供模板读取的响应式值。
 
-## When to use custom metadata
+## 何时使用自定义元数据 {#when-to-use-custom-metadata}
 
-When you need reactive data attached to a specific field that built-in state signals like `valid()`, `disabled()`, and `touched()` do not cover, use **custom metadata**.
+如果你需要把某些响应式数据附加到特定字段上，而 `valid()`、`disabled()`、`touched()` 等内置状态信号（Signal）又无法满足需求，就可以使用**自定义元数据**。
 
-Some examples might include:
+一些示例：
 
-- **Configuration attached to reusable field schemas.** A currency symbol on a price field, so any template or custom control rendering the field can display it. Or `MIN_DATE` and `MAX_DATE` on a date field, read by a reusable range picker.
-- **Parsed values shared between rules on one field.** A phone number parsed once into E.164 format, so a format validator and a uniqueness check both read the same canonical form without reparsing.
-- **Display hints assembled from the field's state.** A severity level (`'info' | 'warning' | 'error'`) that the UI maps to badges and icons, or a context-aware help message that changes based on what the user has typed and which other fields are filled in.
+- **附加到可复用字段 schema 上的配置。** 比如价格字段上的货币符号，这样任何渲染该字段的模板或自定义控件都可以显示它。又比如日期字段上的 `MIN_DATE` 和 `MAX_DATE`，供可复用的日期范围选择器读取。
+- **同一字段多条规则之间共享的解析结果。** 比如把电话号码一次性解析为 E.164 格式，这样格式验证器和唯一性检查都能读取同一个规范形式，而无需重复解析。
+- **根据字段状态组装出的显示提示。** 比如由 UI 映射为徽章和图标的严重级别（`'info' | 'warning' | 'error'`），或者根据用户输入内容以及其他字段填写情况而变化的上下文帮助信息。
 
-If you find yourself keeping a parallel `Map<fieldKey, value>` alongside your form to track something per field, that is a sign metadata is the right tool. Metadata stays colocated with the schema, stays reactive, and participates in the field's lifecycle.
+如果你发现自己在表单之外另外维护了一个 `Map<fieldKey, value>`，用来按字段跟踪某些数据，这就说明元数据是更合适的工具。元数据与 schema 放在一起，保持响应式，并参与字段的生命周期。
 
-## Creating a metadata key
+## 创建元数据键 {#creating-a-metadata-key}
 
-When you want to create a custom key, call `createMetadataKey<TWrite>()`. The type parameter describes the value your schema rules will contribute.
+要创建自定义键，请调用 `createMetadataKey<TWrite>()`。类型参数描述了 schema 规则所贡献的值的类型。
 
 ```ts
 import {createMetadataKey} from '@angular/forms/signals';
@@ -79,16 +75,16 @@ import {createMetadataKey} from '@angular/forms/signals';
 export const USERNAME_HELP = createMetadataKey<string>();
 ```
 
-Every `createMetadataKey()` call creates a new unique key. Two calls with matching type parameters are still two distinct keys, so define each key once at module scope and import it wherever it's needed.
+每次调用 `createMetadataKey()` 都会创建一个新的唯一键。即使两次调用的类型参数相同，得到的也是两个不同的键，所以请在模块作用域中只定义一次每个键，并在需要的地方导入。
 
-::: info NOTE
-A key created without a reducer uses "override" semantics by default: the last contribution wins if multiple rules set the key.
+::: info 注意
+未指定归约器的键默认使用「覆盖」语义：如果多条规则都设置了该键，则最后一个贡献值生效。
 
 :::
 
-## Setting values from a schema
+## 在 schema 中设置值 {#setting-values-from-a-schema}
 
-When you need to register a value for the key on a specific field, use `metadata(path, key, logic)` inside a schema function.
+要为特定字段上的某个键注册值，请在 schema 函数中使用 `metadata(path, key, logic)`。
 
 ```ts
 import {Component, computed, signal} from '@angular/core';
@@ -131,19 +127,19 @@ export class Registration {
 }
 ```
 
-The logic function receives the field's context, which exposes `value` as a signal of the field's current value, `state` as the field's `FieldState`, and methods like `valueOf(path)` and `stateOf(path)` for reading other fields in the same form. Any signal the function reads becomes a reactive dependency: when `value()` changes, the metadata recomputes, and any template reading the key updates.
+逻辑函数会接收字段的上下文，其中 `value` 是表示字段当前值的信号，`state` 是字段的 `FieldState`，此外还有 `valueOf(path)` 和 `stateOf(path)` 等方法，用于读取同一表单中的其他字段。函数中读取的任何信号都会成为响应式依赖：当 `value()` 变化时，元数据会重新计算，所有读取该键的模板也会随之更新。
 
-## Reading metadata from a field
+## 从字段读取元数据 {#reading-metadata-from-a-field}
 
-`hasMetadata(key)` returns `true` if any schema rule registered the key on this field. `state.metadata(key)` returns `undefined` when no rule has registered the key, and a signal of the current reduced value otherwise.
+如果有任何 schema 规则在该字段上注册了这个键，`hasMetadata(key)` 就返回 `true`。没有规则注册该键时，`state.metadata(key)` 返回 `undefined`；否则返回一个信号，其值为当前归约后的结果。
 
 ```ts
-registrationForm.username().hasMetadata(USERNAME_HELP); // true if any metadata() rule registered this key
+registrationForm.username().hasMetadata(USERNAME_HELP); // 只要有 metadata() 规则注册了该键，就为 true
 ```
 
-The shape of that inner value (whether it can itself be `undefined`, what type it holds) depends on the key's reducer. Reducers are covered in the next section.
+内部值的形态（它本身是否可能为 `undefined`、持有什么类型）取决于键的归约器。归约器将在下一节介绍。
 
-When the key may not be registered, gate the read with `hasMetadata()`:
+当键可能未被注册时，先用 `hasMetadata()` 判断再读取：
 
 ```html
 @if (registrationForm.username().hasMetadata(USERNAME_HELP)) {
@@ -151,27 +147,27 @@ When the key may not be registered, gate the read with `hasMetadata()`:
 }
 ```
 
-When you know a rule always registers the key (because the schema in the same file does so), you can skip the `hasMetadata()` check and use optional chaining as a compact alternative:
+如果你确定某条规则总会注册该键（因为同一文件中的 schema 就是这么做的），可以省略 `hasMetadata()` 检查，改用可选链作为更简洁的写法：
 
 ```ts
 const message = registrationForm.username().metadata(USERNAME_HELP)?.();
 // message: string | undefined
 ```
 
-Or, when the rule is guaranteed to have registered, drop the optional chain and assert:
+或者，在规则一定已经注册的情况下，去掉可选链，直接使用非空断言：
 
 ```ts
 const message = registrationForm.username().metadata(USERNAME_HELP)!();
-// message: string | undefined (still, because the inner value may be undefined)
+// message: string | undefined（仍然如此，因为内部值可能是 undefined）
 ```
 
-The component example above uses optional chaining inside a `computed()` so the template binds to a plain `string`, with an empty fallback for the initial frame.
+上面的组件（Component）示例在 `computed()` 中使用了可选链，这样模板绑定的是普通的 `string`，并在初始帧时回退为空字符串。
 
-This is the whole API for a single contributor. The next section covers what happens when more than one schema rule contributes to the same key, and how to combine those contributions with reducers.
+以上就是单个贡献者时的全部 API。下一节将介绍当多条 schema 规则向同一个键贡献值时会发生什么，以及如何使用归约器合并这些贡献。
 
-## Combining contributions with reducers
+## 使用归约器合并贡献 {#combining-contributions-with-reducers}
 
-Override semantics work when only one rule contributes to a key on a given field. As soon as two rules contribute, the first value is silently discarded:
+当某个字段上只有一条规则向键贡献值时，覆盖语义没有问题。但一旦有两条规则贡献值，第一个值就会被悄无声息地丢弃：
 
 ```ts
 const HELP = createMetadataKey<string>();
@@ -182,9 +178,9 @@ form(model, (path) => {
 });
 ```
 
-After both rules run, `state.metadata(HELP)!()` returns only the second message. This is almost never what you want. Contributions often come from different sources: two schemas composed with `apply()` that each attach help text, or multiple validation rules that each contribute a hint.
+两条规则都运行后，`state.metadata(HELP)!()` 只返回第二条消息。这几乎从来都不是你想要的结果。贡献往往来自不同的来源：比如通过 `apply()` 组合的两个 schema 各自附加了帮助文本，或者多条验证规则各自贡献了一条提示。
 
-To combine contributions, pass a reducer to `createMetadataKey()`. A reducer describes how to fold individual values into an accumulated result:
+要合并这些贡献，请向 `createMetadataKey()` 传入一个归约器。归约器描述了如何把各个值折叠成一个累积结果：
 
 ```ts
 import {createMetadataKey, MetadataReducer, form, metadata} from '@angular/forms/signals';
@@ -203,48 +199,48 @@ form(model, (path) => {
 // ]
 ```
 
-Notice the two type parameters on `createMetadataKey<TWrite, TAcc>`: the first is the type each rule contributes, the second is the type the reducer produces. With `list()`, rules contribute a `string` and the field reads back a `string[]`.
+注意 `createMetadataKey<TWrite, TAcc>` 上的两个类型参数：第一个是每条规则所贡献的值的类型，第二个是归约器产出的类型。使用 `list()` 时，规则贡献的是 `string`，而字段读取到的是 `string[]`。
 
-### Built-in reducers
+### 内置归约器 {#built-in-reducers}
 
-Angular provides six built-in reducers on the [`MetadataReducer`](https://angular.dev/api/forms/signals/MetadataReducer) namespace. `override()` has two forms with slightly different semantics, listed separately in the table:
+Angular 在 [`MetadataReducer`](https://angular.dev/api/forms/signals/MetadataReducer) 命名空间中提供了六个内置归约器。其中 `override()` 有两种形式，语义略有不同，因此在表中分别列出：
 
-| Reducer        | Accumulator type      | What it does                                                           | Initial value |
+| 归约器         | 累加器类型            | 作用                                                                   | 初始值        |
 | -------------- | --------------------- | ---------------------------------------------------------------------- | ------------- |
-| `list<T>()`    | `T[]`                 | Accepts `T \| undefined` contributions; appends non-`undefined` values | `[]`          |
-| `or()`         | `boolean`             | `true` if any contribution is `true`                                   | `false`       |
-| `and()`        | `boolean`             | `true` only if every contribution is `true`                            | `true`        |
-| `min()`        | `number \| undefined` | Keeps the smallest contributed number                                  | `undefined`   |
-| `max()`        | `number \| undefined` | Keeps the largest contributed number                                   | `undefined`   |
-| `override()`   | `T \| undefined`      | Last contribution replaces previous (the default)                      | `undefined`   |
-| `override(fn)` | `T`                   | Same, but with a provided initial value                                | `fn()`        |
+| `list<T>()`    | `T[]`                 | 接受 `T \| undefined` 类型的贡献；追加所有非 `undefined` 的值          | `[]`          |
+| `or()`         | `boolean`             | 只要有任一贡献为 `true`，结果就为 `true`                               | `false`       |
+| `and()`        | `boolean`             | 只有所有贡献都为 `true`，结果才为 `true`                               | `true`        |
+| `min()`        | `number \| undefined` | 保留贡献中最小的数字                                                   | `undefined`   |
+| `max()`        | `number \| undefined` | 保留贡献中最大的数字                                                   | `undefined`   |
+| `override()`   | `T \| undefined`      | 后一个贡献替换前一个（默认行为）                                       | `undefined`   |
+| `override(fn)` | `T`                   | 同上，但使用提供的初始值                                               | `fn()`        |
 
-`list()` is the only built-in reducer whose item type is wider than its accumulator's element type. A rule may contribute `undefined` and the reducer will silently drop it. This is how the built-in `PATTERN` key handles dynamic `pattern()` rules whose logic function returns `undefined`: the `undefined` contribution is skipped rather than included in the final regex list.
+`list()` 是唯一一个元素类型比累加器元素类型更宽的内置归约器。规则可以贡献 `undefined`，归约器会悄悄丢弃它。内置的 `PATTERN` 键正是借此处理动态 `pattern()` 规则的：当逻辑函数返回 `undefined` 时，这个 `undefined` 贡献会被跳过，而不会被加入最终的正则表达式列表。
 
-### How built-in validator keys use reducers
+### 内置验证器键如何使用归约器 {#how-built-in-validator-keys-use-reducers}
 
-While `MetadataReducer.min()` and `MetadataReducer.max()` are reducers, you may be surprised to learn that they are not validators. `MetadataReducer.min()` picks the smallest contribution to a key, while the `min()` validator enforces a lower bound on a field's value. They share a name but solve different problems.
+虽然 `MetadataReducer.min()` 和 `MetadataReducer.max()` 是归约器，但你可能会惊讶地发现它们并不是验证器。`MetadataReducer.min()` 选取某个键的最小贡献值，而 `min()` 验证器则对字段的值施加下限约束。它们名字相同，解决的却是不同的问题。
 
-The built-in constraint keys pick their reducers based on what "strictest" means for the constraint, which is often the opposite of what the key's name suggests:
+内置约束键会根据该约束「最严格」的含义来选择归约器，而这往往与键名给人的直觉恰好相反：
 
-| Key          | Reducer          | Reasoning                                                                                                                              |
+| 键           | 归约器           | 理由                                                                                                                                   |
 | ------------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `REQUIRED`   | `or()`           | If any `required()` rule evaluates to `true`, the field is required.                                                                   |
-| `MIN_NUMBER` | `max()`          | A minimum-number constraint is strictest when largest. If one rule requires `>= 5` and another `>= 10`, the effective minimum is `10`. |
-| `MIN_DATE`   | `max()`          | Same logic as `MIN_NUMBER`: the latest required date wins.                                                                             |
-| `MAX_NUMBER` | `min()`          | A maximum-number constraint is strictest when smallest. If one rule caps at `100` and another at `50`, the effective maximum is `50`.  |
-| `MAX_DATE`   | `min()`          | Same logic as `MAX_NUMBER`: the earliest allowed date wins.                                                                            |
-| `MIN_LENGTH` | `max()`          | Same logic as `MIN_NUMBER`: the longest required length wins.                                                                          |
-| `MAX_LENGTH` | `min()`          | Same logic as `MAX_NUMBER`: the shortest allowed length wins.                                                                          |
-| `PATTERN`    | `list<RegExp>()` | Each `pattern()` call contributes a regex; the value must match all of them.                                                           |
+| `REQUIRED`   | `or()`           | 只要有任一 `required()` 规则求值为 `true`，该字段就是必填的。                                                                          |
+| `MIN_NUMBER` | `max()`          | 最小值约束越大就越严格。如果一条规则要求 `>= 5`，另一条要求 `>= 10`，那么实际生效的最小值是 `10`。                                     |
+| `MIN_DATE`   | `max()`          | 与 `MIN_NUMBER` 逻辑相同：要求的最晚日期胜出。                                                                                         |
+| `MAX_NUMBER` | `min()`          | 最大值约束越小就越严格。如果一条规则的上限是 `100`，另一条是 `50`，那么实际生效的最大值是 `50`。                                       |
+| `MAX_DATE`   | `min()`          | 与 `MAX_NUMBER` 逻辑相同：允许的最早日期胜出。                                                                                         |
+| `MIN_LENGTH` | `max()`          | 与 `MIN_NUMBER` 逻辑相同：要求的最长长度胜出。                                                                                         |
+| `MAX_LENGTH` | `min()`          | 与 `MAX_NUMBER` 逻辑相同：允许的最短长度胜出。                                                                                         |
+| `PATTERN`    | `list<RegExp>()` | 每次调用 `pattern()` 都会贡献一个正则表达式；值必须匹配其中所有的正则表达式。                                                          |
 
-`MIN` and `MAX` are selection keys. They point to the concrete key that matches the field's value type, such as `MIN_NUMBER` for `min()` and `MIN_DATE` for `minDate()`. This is why `field().min()` and `field().max()` work for both numeric and date fields.
+`MIN` 和 `MAX` 是选择键。它们指向与字段值类型匹配的具体键，例如 `min()` 对应 `MIN_NUMBER`，`minDate()` 对应 `MIN_DATE`。正因如此，`field().min()` 和 `field().max()` 对数字字段和日期字段都适用。
 
-This pairing of "strictest wins" is why calling `min(path.age, 18)` and `min(path.age, 21)` in two composed schemas works correctly. Each call registers its own validator that enforces its specific bound (so a value below either bound fails validation). Separately, each call contributes to the `MIN_NUMBER` key, and `state.min!()` reports the aggregate (`21`) so UI and custom controls can read the effective minimum.
+正是这种「最严格者胜出」的配对，使得在两个组合的 schema 中分别调用 `min(path.age, 18)` 和 `min(path.age, 21)` 能够正确工作。每次调用都会注册自己的验证器，强制执行各自的下限（因此低于任一下限的值都无法通过验证）。另外，每次调用还会向 `MIN_NUMBER` 键贡献值，而 `state.min!()` 会报告汇总结果（`21`），以便 UI 和自定义控件读取实际生效的最小值。
 
-### Writing a custom reducer
+### 编写自定义归约器 {#writing-a-custom-reducer}
 
-When you want to write your own reducer, implement an object matching the `MetadataReducer<TAcc, TItem>` interface:
+要编写自己的归约器，请实现一个符合 `MetadataReducer<TAcc, TItem>` 接口的对象：
 
 ```ts
 interface MetadataReducer<TAcc, TItem> {
@@ -253,7 +249,7 @@ interface MetadataReducer<TAcc, TItem> {
 }
 ```
 
-You can define a custom reducer when none of the built-ins match the semantics you need. For example, a `SEVERITY` key that keeps the most severe level contributed by any rule:
+当没有任何内置归约器符合你所需的语义时，就可以定义自定义归约器。例如，一个 `SEVERITY` 键，保留所有规则贡献中最严重的级别：
 
 ```ts
 import {createMetadataKey, type MetadataReducer} from '@angular/forms/signals';
@@ -273,7 +269,7 @@ const maxSeverity: MetadataReducer<Severity | undefined, Severity> = {
 export const SEVERITY = createMetadataKey<Severity, Severity | undefined>(maxSeverity);
 ```
 
-Any number of rules can now contribute a severity, and the field reports the highest:
+现在，任意数量的规则都可以贡献严重级别，而字段会报告其中最高的级别：
 
 ```ts
 form(model, (path) => {
@@ -285,20 +281,20 @@ form(model, (path) => {
 });
 ```
 
-The reducer runs whenever any contribution's signals change, so `state.metadata(SEVERITY)!()` stays in sync with the current worst case across all rules.
+只要任一贡献所依赖的信号发生变化，归约器就会重新运行，因此 `state.metadata(SEVERITY)!()` 始终与所有规则中当前最严重的情况保持同步。
 
-::: tip TIP
-Keep your reducers pure: `reduce()` should depend only on its two arguments, and `getInitial()` should return the same value every time it is called. Reducers run inside a reactive computation that re-executes when any contribution's signals change, so impure reducers produce inconsistent metadata.
+::: tip 提示
+保持归约器的纯粹性：`reduce()` 应该只依赖它的两个参数，`getInitial()` 每次调用都应返回相同的值。归约器运行在一个响应式计算中，任一贡献所依赖的信号发生变化时都会重新执行，因此不纯的归约器会产生不一致的元数据。
 
 :::
 
-## Attaching lifecycle-aware objects with managed metadata
+## 使用托管元数据附加具备生命周期感知的对象 {#attaching-lifecycle-aware-objects-with-managed-metadata}
 
-Managed metadata stores a lifecycle-aware object on a field instead of a reactive value. Use it for per-field objects like a `resource()` that fetches external data, an `effect()` that syncs to an outside system, or a service handle scoped to a single field.
+托管元数据（managed metadata）在字段上存储的是一个具备生命周期感知能力的对象，而不是响应式值。可以用它来存放按字段划分的对象，例如获取外部数据的 `resource()`、与外部系统同步的 `effect()`，或者作用域限定于单个字段的服务（Service）句柄。
 
-### Creating a managed key
+### 创建托管键 {#creating-a-managed-key}
 
-When you want to define a managed key, call `createManagedMetadataKey<TRead, TWrite>(create)`. The `create` function you pass produces the value the key holds.
+要定义托管键，请调用 `createManagedMetadataKey<TRead, TWrite>(create)`。你传入的 `create` 函数负责生成该键所持有的值。
 
 ```ts
 import {Signal} from '@angular/core';
@@ -319,15 +315,15 @@ export const URL_PREVIEW = createManagedMetadataKey((_state, url: Signal<string 
 });
 ```
 
-The `create` function receives the field's `FieldState` and a `Signal<TAcc>` of data contributed by `metadata()` rules for this key, and returns whatever object should live on the field. The return value is stored as-is: unlike non-managed keys, the framework does not wrap it in a `computed()`.
+`create` 函数会接收字段的 `FieldState`，以及一个 `Signal<TAcc>`（其中是 `metadata()` 规则为该键贡献的数据），并返回应当挂在该字段上的任意对象。返回值会被原样存储：与非托管键不同，框架不会把它包装在 `computed()` 中。
 
-`create` runs once when a field is constructed, inside the field's injection context. That lets you call `inject()`, `resource()`, and `effect()` inside `create`, and ties cleanup to the field's lifecycle: when the field is destroyed, Angular destroys the injection context, and any `resource()`, `effect()`, or `DestroyRef` callback you registered there cleans up automatically.
+`create` 会在字段构造时运行一次，并且运行在字段的注入上下文（Injection Context）中。因此你可以在 `create` 中调用 `inject()`、`resource()` 和 `effect()`，并把清理工作与字段的生命周期绑定：当字段被销毁时，Angular 会销毁该注入上下文，你在其中注册的所有 `resource()`、`effect()` 或 `DestroyRef` 回调都会自动清理。
 
-Because `create` itself is not reactive, any behavior that needs to respond to signal changes has to live inside an `effect()`, `resource()`, or `httpResource()` set up during that initial call. `URL_PREVIEW` demonstrates the pattern: the `httpResource()` reads the URL signal inside its request function, so the request re-runs whenever the signal changes. The schema rule (`metadata(path.url, URL_PREVIEW, ({value}) => value())`) decides what data to feed in; the managed key decides what to do with it.
+由于 `create` 本身不是响应式的，任何需要响应信号变化的行为，都必须放在这次初始调用中创建的 `effect()`、`resource()` 或 `httpResource()` 里。`URL_PREVIEW` 演示了这种模式：`httpResource()` 在其请求函数中读取 URL 信号，因此每当该信号变化时，请求都会重新执行。schema 规则（`metadata(path.url, URL_PREVIEW, ({value}) => value())`）决定输入什么数据，托管键则决定如何处理这些数据。
 
-### Using a managed key in a form
+### 在表单中使用托管键 {#using-a-managed-key-in-a-form}
 
-When you need to use a managed key in a form, register a `metadata()` rule for the key, and then read the returned object from the field state.
+要在表单中使用托管键，请为该键注册一条 `metadata()` 规则，然后从字段状态中读取返回的对象。
 
 ```ts
 import {Component, computed, signal} from '@angular/core';
@@ -345,7 +341,7 @@ import {URL_PREVIEW} from './url-preview';
             URL
             <input [formField]="link.url" />
           </label>
-          <!-- Read the URL_PREVIEW key for this link's url field; the result is the resource its create function produced -->
+          <!-- 读取该链接 url 字段上的 URL_PREVIEW 键；结果就是其 create 函数生成的 resource -->
           @let preview = link.url().metadata(URL_PREVIEW);
           @if (preview?.isLoading()) {
             <p>Loading preview...</p>
@@ -371,9 +367,9 @@ export class LinkEditor {
   linksModel = signal({links: [{url: ''}]});
 
   linksForm = form(this.linksModel, (path) => {
-    // Register the URL_PREVIEW key on each link's url field.
-    // applyEach runs the schema per item, so create() runs once per link
-    // and each link gets its own resource.
+    // 在每个链接的 url 字段上注册 URL_PREVIEW 键。
+    // applyEach 会为每一项分别运行 schema，因此 create() 对每个链接运行一次，
+    // 每个链接都会得到自己的 resource。
     applyEach(path.links, (itemPath) => {
       metadata(itemPath.url, URL_PREVIEW, ({value}) => value());
     });
@@ -385,23 +381,23 @@ export class LinkEditor {
 }
 ```
 
-Each array item gets its own `URL_PREVIEW` resource because `applyEach` registers the schema rules against each item independently. When the user adds a link, `create` runs for the new item's field. When a link is removed (not shown here, but a common pattern), the framework tears down that field's injector along with the resource.
+由于 `applyEach` 会针对每个数组项独立注册 schema 规则，因此每一项都会得到自己的 `URL_PREVIEW` 资源（Resource）。当用户添加链接时，`create` 会为新项的字段运行。当某个链接被移除时（这里没有演示，但这是很常见的模式），框架会销毁该字段的注入器（Injector）以及其中的资源。
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-Remember that metadata exists so reactive data can travel with the field through schema composition, accumulate across rules, and tear down with the field's lifecycle. It leverages the same system Angular's built-in validators use, and can be tailored to your own use cases.
+请记住，元数据存在的意义在于：让响应式数据随字段一起贯穿 schema 组合，在多条规则之间累积，并随字段的生命周期一起销毁。它利用的正是 Angular 内置验证器所使用的同一套系统，并且可以按你自己的使用场景进行定制。
 
-For detailed API documentation, see:
+详细的 API 文档请参阅：
 
-- [`createMetadataKey()`](https://angular.dev/api/forms/signals/createMetadataKey) - Define a metadata key with optional reducer
-- [`createManagedMetadataKey()`](https://angular.dev/api/forms/signals/createManagedMetadataKey) - Define a lifecycle-aware metadata key
-- [`metadata()`](https://angular.dev/api/forms/signals/metadata) - Contribute a value to a metadata key in a schema
-- [`MetadataReducer`](https://angular.dev/api/forms/signals/MetadataReducer) - Built-in reducers for combining contributions
+- [`createMetadataKey()`](https://angular.dev/api/forms/signals/createMetadataKey) - 定义元数据键，可选指定归约器
+- [`createManagedMetadataKey()`](https://angular.dev/api/forms/signals/createManagedMetadataKey) - 定义具备生命周期感知能力的元数据键
+- [`metadata()`](https://angular.dev/api/forms/signals/metadata) - 在 schema 中向元数据键贡献值
+- [`MetadataReducer`](https://angular.dev/api/forms/signals/MetadataReducer) - 用于合并贡献的内置归约器
 
-For additional related guides on Signal Forms, check out:
+更多有关信号表单（Signal Forms）的相关指南，请查看：
 
-- [Adding form logic](/guide/forms/signals/form-logic)
-- [Validation](/guide/forms/signals/validation)
-- [Field state management](/guide/forms/signals/field-state-management)
-- [Async operations](/guide/forms/signals/async-operations)
+- [添加表单逻辑](/guide/forms/signals/form-logic)
+- [验证](/guide/forms/signals/validation)
+- [字段状态管理](/guide/forms/signals/field-state-management)
+- [异步操作](/guide/forms/signals/async-operations)
 

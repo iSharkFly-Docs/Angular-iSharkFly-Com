@@ -1,85 +1,81 @@
----
-untranslated: true
----
+# Angular 中的表单 {#forms-in-angular}
 
-# Forms in Angular
-
-Handling user input with forms is the cornerstone of many common applications.
+用表单处理用户输入是许多常见应用的基石。
 
 
-Applications use forms to enable users to log in, to update a profile, to enter sensitive information, and to perform many other data-entry tasks.
+应用通过表单让用户登录、更新个人资料、输入敏感信息，以及完成许多其他数据录入任务。
 
-Angular provides two different approaches to handling user input through forms: reactive and template-driven.
+Angular 提供了两种通过表单处理用户输入的方式：响应式和模板驱动。
 
-Both capture user input events from the view, validate the input, create a form and data model, and provide a way to track changes.
+两者都会从视图中捕获用户输入事件、验证输入、创建表单和数据模型，并提供跟踪变化的方法。
 
-::: tip TIP
-If you're looking for the new Signal Forms, check out our [essential Signal Forms guide](/essentials/signal-forms)!
+::: tip 提示
+如果你在找新的信号表单（Signal Forms），请查看我们的[信号表单基础指南](/essentials/signal-forms)！
 
 :::
 
-This guide provides information to help you decide which type of form works best for your situation.
-It introduces the common building blocks used by both approaches.
-It also summarizes the key differences between the two approaches, and demonstrates those differences in the context of setup, data flow, and testing.
+本指南提供的信息可以帮助你判断哪种表单最适合你的场景。
+它介绍了两种方式共用的基础构建块。
+它还总结了两种方式之间的关键区别，并从设置、数据流和测试三个方面展示这些区别。
 
-## Choosing an approach
+## 选择一种方式 {#choosing-an-approach}
 
-Reactive forms and template-driven forms process and manage form data differently.
-Each approach offers different advantages.
+响应式表单（Reactive Forms）和模板驱动表单（Template-driven Forms）处理和管理表单数据的方式不同。
+每种方式各有优势。
 
-| Forms                 | Details                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 表单 | 详情 |
 | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Reactive forms        | Provide direct, explicit access to the underlying form's object model. Compared to template-driven forms, they are more robust: they're more scalable, reusable, and testable. If forms are a key part of your application, or you're already using reactive patterns for building your application, use reactive forms.                                                                                            |
-| Template-driven forms | Rely on directives in the template to create and manipulate the underlying object model. They are useful for adding a simple form to an app, such as an email list signup form. They're straightforward to add to an app, but they don't scale as well as reactive forms. If you have very basic form requirements and logic that can be managed solely in the template, template-driven forms could be a good fit. |
+| 响应式表单 | 提供对底层表单对象模型的直接、显式访问。与模板驱动表单相比，它们更健壮：可扩展性、可复用性和可测试性都更好。如果表单是应用的关键部分，或者你已经在使用响应式模式构建应用，请使用响应式表单。 |
+| 模板驱动表单 | 依靠模板（Template）中的指令（Directive）来创建和操作底层对象模型。它们适合为应用添加简单的表单，比如邮件列表注册表单。它们很容易添加到应用中，但可扩展性不如响应式表单。如果你的表单需求和逻辑非常简单，完全可以在模板中管理，那么模板驱动表单可能很合适。 |
 
-### Key differences
+### 关键区别 {#key-differences}
 
-The following table summarizes the key differences between reactive and template-driven forms.
+下表总结了响应式表单和模板驱动表单之间的关键区别。
 
-|                                                   | Reactive                             | Template-driven                 |
+|                                                   | 响应式 | 模板驱动 |
 | :------------------------------------------------ | :----------------------------------- | :------------------------------ |
-| [Setup of form model](#setting-up-the-form-model) | Explicit, created in component class | Implicit, created by directives |
-| [Data model](#mutability-of-the-data-model)       | Structured and immutable             | Unstructured and mutable        |
-| [Data flow](#data-flow-in-forms)                  | Synchronous                          | Asynchronous                    |
-| [Form validation](#form-validation)               | Functions                            | Directives                      |
+| [表单模型的设置](#setting-up-the-form-model) | 显式，在组件类中创建 | 隐式，由指令创建 |
+| [数据模型](#mutability-of-the-data-model)       | 结构化且不可变 | 非结构化且可变 |
+| [数据流](#data-flow-in-forms)                  | 同步 | 异步 |
+| [表单验证](#form-validation)               | 函数 | 指令 |
 
-### Scalability
+### 可扩展性 {#scalability}
 
-If forms are a central part of your application, scalability is very important.
-Being able to reuse form models across components is critical.
+如果表单是应用的核心部分，可扩展性就非常重要。
+能够在多个组件（Component）之间复用表单模型至关重要。
 
-Reactive forms are more scalable than template-driven forms.
-They provide direct access to the underlying form API, and use [synchronous data flow](#data-flow-in-reactive-forms) between the view and the data model, which makes creating large-scale forms easier.
-Reactive forms require less setup for testing, and testing does not require deep understanding of change detection to properly test form updates and validation.
+响应式表单比模板驱动表单更具可扩展性。
+它们提供对底层表单 API 的直接访问，并在视图和数据模型之间使用[同步数据流](#data-flow-in-reactive-forms)，这让创建大型表单更容易。
+响应式表单的测试所需的设置更少，而且测试时不需要深入理解变更检测（Change Detection），就能正确测试表单的更新和验证。
 
-Template-driven forms focus on simple scenarios and are not as reusable.
-They abstract away the underlying form API, and use [asynchronous data flow](#data-flow-in-template-driven-forms) between the view and the data model.
-The abstraction of template-driven forms also affects testing.
-Tests are deeply reliant on manual change detection execution to run properly, and require more setup.
+模板驱动表单侧重于简单场景，复用性较差。
+它们把底层表单 API 抽象掉了，并在视图和数据模型之间使用[异步数据流](#data-flow-in-template-driven-forms)。
+模板驱动表单的这层抽象也会影响测试。
+测试严重依赖手动执行变更检测才能正确运行，并且需要更多设置。
 
-## Setting up the form model
+## 设置表单模型 {#setting-up-the-form-model}
 
-Both reactive and template-driven forms track value changes between the form input elements that users interact with and the form data in your component model.
-The two approaches share underlying building blocks, but differ in how you create and manage the common form-control instances.
+响应式表单和模板驱动表单都会跟踪用户交互的表单输入元素与组件模型中的表单数据之间的值变化。
+两种方式共享底层构建块，但在创建和管理通用的表单控件（form control）实例的方式上有所不同。
 
-### Common form foundation classes
+### 通用的表单基础类 {#common-form-foundation-classes}
 
-Both reactive and template-driven forms are built on the following base classes.
+响应式表单和模板驱动表单都构建在以下基类之上。
 
-| Base classes           | Details                                                                             |
+| 基类 | 详情 |
 | :--------------------- | :---------------------------------------------------------------------------------- |
-| `FormControl`          | Tracks the value and validation status of an individual form control.               |
-| `FormGroup`            | Tracks the same values and status for a collection of form controls.                |
-| `FormArray`            | Tracks the same values and status for an array of form controls.                    |
-| `ControlValueAccessor` | Creates a bridge between Angular `FormControl` instances and built-in DOM elements. |
+| `FormControl`          | 跟踪单个表单控件的值和验证状态。 |
+| `FormGroup`            | 跟踪一组表单控件的值和状态。 |
+| `FormArray`            | 跟踪一个表单控件数组的值和状态。 |
+| `ControlValueAccessor` | 在 Angular 的 `FormControl` 实例和内置 DOM 元素之间建立桥梁。 |
 
-### Setup in reactive forms
+### 在响应式表单中设置 {#setup-in-reactive-forms}
 
-With reactive forms, you define the form model directly in the component class.
-The `[formControl]` directive links the explicitly created `FormControl` instance to a specific form element in the view, using an internal value accessor.
+使用响应式表单时，你直接在组件类中定义表单模型。
+`[formControl]` 指令通过内部的值访问器（value accessor），把显式创建的 `FormControl` 实例链接到视图中的特定表单元素。
 
-The following component implements an input field for a single control, using reactive forms.
-In this example, the form model is the `FormControl` instance.
+下面的组件使用响应式表单，为单个控件实现了一个输入框。
+在这个例子中，表单模型就是 `FormControl` 实例。
 
 ```ts [favorite-color.component.ts]
 import {Component} from '@angular/core';
@@ -95,17 +91,17 @@ export class FavoriteColorReactive {
 }
 ```
 
-::: warning IMPORTANT
-In reactive forms, the form model is the source of truth; it provides the value and status of the form element at any given point in time, through the `[formControl]` directive on the `<input>` element.
+::: warning 重要
+在响应式表单中，表单模型是唯一可信来源（source of truth）；它通过 `<input>` 元素上的 `[formControl]` 指令，提供表单元素在任一时刻的值和状态。
 
 :::
 
-### Setup in template-driven forms
+### 在模板驱动表单中设置 {#setup-in-template-driven-forms}
 
-In template-driven forms, the form model is implicit, rather than explicit.
-The directive `NgModel` creates and manages a `FormControl` instance for a given form element.
+在模板驱动表单中，表单模型是隐式的，而不是显式的。
+`NgModel` 指令会为给定的表单元素创建并管理一个 `FormControl` 实例。
 
-The following component implements the same input field for a single control, using template-driven forms.
+下面的组件使用模板驱动表单，为单个控件实现了同样的输入框。
 
 ```ts [favorite-color.component.ts]
 import {Component, signal} from '@angular/core';
@@ -121,32 +117,32 @@ export class FavoriteColorTemplate {
 }
 ```
 
-::: warning IMPORTANT
-In a template-driven form, the source of truth is the template. The `NgModel` directive automatically manages the `FormControl` instance for you.
+::: warning 重要
+在模板驱动表单中，唯一可信来源是模板。`NgModel` 指令会自动为你管理 `FormControl` 实例。
 
 :::
 
-## Data flow in forms
+## 表单中的数据流 {#data-flow-in-forms}
 
-When an application contains a form, Angular must keep the view in sync with the component model and the component model in sync with the view.
-As users change values and make selections through the view, the new values must be reflected in the data model.
-Similarly, when the program logic changes values in the data model, those values must be reflected in the view.
+当应用包含表单时，Angular 必须让视图与组件模型保持同步，同时也让组件模型与视图保持同步。
+当用户通过视图修改值和做出选择时，新值必须反映到数据模型中。
+同样，当程序逻辑修改数据模型中的值时，这些值也必须反映到视图中。
 
-Reactive and template-driven forms differ in how they handle data flowing from the user or from programmatic changes.
-The following diagrams illustrate both kinds of data flow for each type of form, using the favorite-color input field defined above.
+响应式表单和模板驱动表单处理来自用户或程序化修改的数据流的方式不同。
+下面的图表以上文定义的 favorite-color 输入框为例，展示了每种表单的两类数据流。
 
-### Data flow in reactive forms
+### 响应式表单中的数据流 {#data-flow-in-reactive-forms}
 
-In reactive forms, each form element in the view is directly linked to the form model (a `FormControl` instance).
-Updates from the view to the model and from the model to the view are synchronous and do not depend on how the UI is rendered.
+在响应式表单中，视图中的每个表单元素都直接链接到表单模型（一个 `FormControl` 实例）。
+从视图到模型、从模型到视图的更新都是同步的，并且不依赖于 UI 的渲染方式。
 
-The view-to-model diagram shows how data flows when an input field's value is changed from the view through the following steps:
+视图到模型的图表展示了当输入框的值在视图中发生变化时，数据如何按以下步骤流动：
 
-1. The user types a value into the input element, in this case the favorite color _Blue_.
-1. The form input element emits an "input" event with the latest value.
-1. The `ControlValueAccessor` listening for events on the form input element immediately relays the new value to the `FormControl` instance.
-1. The `FormControl` instance emits the new value through the `valueChanges` observable.
-1. Any subscribers to the `valueChanges` observable receive the new value.
+1. 用户在输入元素中输入一个值，这里是最喜欢的颜色 *Blue*。
+1. 表单输入元素发出一个带有最新值的 "input" 事件。
+1. 监听表单输入元素事件的 `ControlValueAccessor` 立即把新值转发给 `FormControl` 实例。
+1. `FormControl` 实例通过 `valueChanges` 可观察对象发出新值。
+1. `valueChanges` 可观察对象的所有订阅者都会收到新值。
 
 ```txt
 flowchart TB
@@ -161,12 +157,12 @@ flowchart TB
     FC-.->|Fires a 'valueChanges' event to observers|O
 ```
 
-The model-to-view diagram shows how a programmatic change to the model is propagated to the view through the following steps.
+模型到视图的图表展示了对模型的程序化修改如何按以下步骤传播到视图。
 
-1. The user calls the `favoriteColorControl.setValue()` method, which updates the `FormControl` value.
-1. The `FormControl` instance emits the new value through the `valueChanges` observable.
-1. Any subscribers to the `valueChanges` observable receive the new value.
-1. The control value accessor on the form input element updates the element with the new value.
+1. 用户调用 `favoriteColorControl.setValue()` 方法，更新 `FormControl` 的值。
+1. `FormControl` 实例通过 `valueChanges` 可观察对象发出新值。
+1. `valueChanges` 可观察对象的所有订阅者都会收到新值。
+1. 表单输入元素上的控件值访问器（control value accessor）用新值更新该元素。
 
 ```txt
 flowchart TB
@@ -181,19 +177,19 @@ flowchart TB
     CVA-->|"Updates the value of the &lt;input&gt;"|I
 ```
 
-### Data flow in template-driven forms
+### 模板驱动表单中的数据流 {#data-flow-in-template-driven-forms}
 
-In template-driven forms, each form element is linked to a directive that manages the form model internally.
+在模板驱动表单中，每个表单元素都链接到一个在内部管理表单模型的指令。
 
-The view-to-model diagram shows how data flows when an input field's value is changed from the view through the following steps.
+视图到模型的图表展示了当输入框的值在视图中发生变化时，数据如何按以下步骤流动。
 
-1. The user types _Blue_ into the input element.
-1. The input element emits an "input" event with the value _Blue_.
-1. The control value accessor attached to the input triggers the `setValue()` method on the `FormControl` instance.
-1. The `FormControl` instance emits the new value through the `valueChanges` observable.
-1. Any subscribers to the `valueChanges` observable receive the new value.
-1. The control value accessor also calls the `NgModel.viewToModelUpdate()` method which emits an `ngModelChange` event.
-1. Because the component template uses two-way data binding for the `favoriteColor` property, the `favoriteColor` property in the component is updated to the value emitted by the `ngModelChange` event \(_Blue_\).
+1. 用户在输入元素中输入 *Blue*。
+1. 输入元素发出一个值为 *Blue* 的 "input" 事件。
+1. 附加在该输入框上的控件值访问器触发 `FormControl` 实例的 `setValue()` 方法。
+1. `FormControl` 实例通过 `valueChanges` 可观察对象发出新值。
+1. `valueChanges` 可观察对象的所有订阅者都会收到新值。
+1. 控件值访问器还会调用 `NgModel.viewToModelUpdate()` 方法，该方法会发出一个 `ngModelChange` 事件。
+1. 由于组件模板对 `favoriteColor` 属性使用了双向数据绑定（two-way data binding），组件中的 `favoriteColor` 属性会被更新为 `ngModelChange` 事件发出的值（*Blue*）。
 
 ```txt
 flowchart TB
@@ -214,17 +210,17 @@ flowchart TB
     C-->|Updates the value of the two-way bound property|P
 ```
 
-The model-to-view diagram shows how data flows from model to view when the `favoriteColor` changes from _Blue_ to _Red_, through the following steps
+模型到视图的图表展示了当 `favoriteColor` 从 *Blue* 变为 *Red* 时，数据如何按以下步骤从模型流向视图
 
-1. The `favoriteColor` value is updated in the component.
-1. Change detection begins.
-1. During change detection, the `ngOnChanges` lifecycle hook is called on the `NgModel` directive instance because the value of one of its inputs has changed.
-1. The `ngOnChanges()` method queues an async task to set the value for the internal `FormControl` instance.
-1. Change detection completes.
-1. On the next tick, the task to set the `FormControl` instance value is executed.
-1. The `FormControl` instance emits the latest value through the `valueChanges` observable.
-1. Any subscribers to the `valueChanges` observable receive the new value.
-1. The control value accessor updates the form input element in the view with the latest `favoriteColor` value.
+1. 组件中的 `favoriteColor` 值被更新。
+1. 变更检测开始。
+1. 在变更检测期间，由于 `NgModel` 指令实例的某个输入（Input）的值发生了变化，该实例上的 `ngOnChanges` 生命周期钩子（Lifecycle Hook）会被调用。
+1. `ngOnChanges()` 方法把一个异步任务加入队列，用于设置内部 `FormControl` 实例的值。
+1. 变更检测完成。
+1. 在下一个 tick 中，设置 `FormControl` 实例值的任务被执行。
+1. `FormControl` 实例通过 `valueChanges` 可观察对象发出最新值。
+1. `valueChanges` 可观察对象的所有订阅者都会收到新值。
+1. 控件值访问器用最新的 `favoriteColor` 值更新视图中的表单输入元素。
 
 ```txt
 flowchart TB
@@ -255,60 +251,60 @@ flowchart TB
     end
 ```
 
-::: info NOTE
-`NgModel` triggers a second change detection to avoid `ExpressionChangedAfterItHasBeenChecked` errors, because the value change originates in an input binding.
+::: info 注意
+`NgModel` 会触发第二次变更检测，以避免出现 `ExpressionChangedAfterItHasBeenChecked` 错误，因为值的变化源自一个输入绑定。
 
 :::
 
-### Mutability of the data model
+### 数据模型的可变性 {#mutability-of-the-data-model}
 
-The change-tracking method plays a role in the efficiency of your application.
+变化跟踪方式会影响应用的效率。
 
-| Forms                 | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| :-------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reactive forms        | Keep the data model pure by providing it as an immutable data structure. Each time a change is triggered on the data model, the `FormControl` instance returns a new data model rather than updating the existing data model. This gives you the ability to track unique changes to the data model through the control's observable. Change detection is more efficient because it only needs to update on unique changes. Because data updates follow reactive patterns, you can integrate with observable operators to transform data. |
-| Template-driven forms | Rely on mutability with two-way data binding to update the data model in the component as changes are made in the template. Because there are no unique changes to track on the data model when using two-way data binding, change detection is less efficient at determining when updates are required.                                                                                                                                                                                                                                 |
+| 表单 | 详情 |
+| :-------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 响应式表单 | 通过把数据模型提供为不可变的数据结构来保持其纯净。每次数据模型上触发变化时，`FormControl` 实例都会返回一个新的数据模型，而不是更新现有的数据模型。这让你可以通过控件的可观察对象跟踪数据模型的每一次独立变化。变更检测也更高效，因为它只需要针对这些独立变化进行更新。由于数据更新遵循响应式模式，你可以结合可观察对象的操作符来转换数据。 |
+| 模板驱动表单 | 依靠可变性和双向数据绑定，在模板中发生变化时更新组件中的数据模型。由于使用双向数据绑定时数据模型上没有可跟踪的独立变化，变更检测在判断何时需要更新方面效率较低。 |
 
-The difference is demonstrated in the previous examples that use the favorite-color input element.
+前面使用 favorite-color 输入元素的例子就展示了这种区别。
 
-- With reactive forms, the **`FormControl` instance** always returns a new value when the control's value is updated
-- With template-driven forms, the **favorite color property** is always modified to its new value
+- 使用响应式表单时，每当控件的值更新，**`FormControl` 实例**总会返回一个新值
+- 使用模板驱动表单时，**favorite color 属性**总是被直接修改为新值
 
-## Form validation
+## 表单验证 {#form-validation}
 
-Validation is an integral part of managing any set of forms.
-Whether you're checking for required fields or querying an external API for an existing username, Angular provides a set of built-in validators as well as the ability to create custom validators.
+验证是管理任何表单的必要组成部分。
+无论是检查必填字段，还是查询外部 API 以确认用户名是否已存在，Angular 都提供了一组内置验证器（validator），也支持创建自定义验证器。
 
-| Forms                 | Details                                                                                                      |
+| 表单 | 详情 |
 | :-------------------- | :----------------------------------------------------------------------------------------------------------- |
-| Reactive forms        | Define custom validators as **functions** that receive a control to validate                                 |
-| Template-driven forms | Tied to template **directives**, and must provide custom validator directives that wrap validation functions |
+| 响应式表单 | 把自定义验证器定义为**函数**，接收要验证的控件 |
+| 模板驱动表单 | 与模板中的**指令**绑定，必须提供包装了验证函数的自定义验证器指令 |
 
-For more information, see [Form Validation](/guide/forms/form-validation#validating-input-in-reactive-forms).
+更多信息，请参阅[表单验证](/guide/forms/form-validation#validating-input-in-reactive-forms)。
 
-## Testing
+## 测试 {#testing}
 
-Testing plays a large part in complex applications.
-A simpler testing strategy is useful when validating that your forms function correctly.
-Reactive forms and template-driven forms have different levels of reliance on rendering the UI to perform assertions based on form control and form field changes.
-The following examples demonstrate the process of testing forms with reactive and template-driven forms.
+测试在复杂应用中扮演着重要角色。
+在验证表单是否正常工作时，更简单的测试策略会很有帮助。
+响应式表单和模板驱动表单在根据表单控件和表单字段的变化进行断言时，对 UI 渲染的依赖程度不同。
+下面的例子演示了测试响应式表单和模板驱动表单的过程。
 
-### Testing reactive forms
+### 测试响应式表单 {#testing-reactive-forms}
 
-Reactive forms provide a relatively straightforward testing strategy because they provide synchronous access to the form and data models, and they can be tested without rendering the UI.
-In these tests, status and data are queried and manipulated through the control without interacting with the change detection cycle.
+响应式表单提供了相对直接的测试策略，因为它们可以同步访问表单和数据模型，而且无需渲染 UI 就能测试。
+在这些测试中，状态和数据通过控件来查询和操作，无需与变更检测周期交互。
 
-The following tests use the favorite-color components from previous examples to verify the view-to-model and model-to-view data flows for a reactive form.
+下面的测试使用前面例子中的 favorite-color 组件，来验证响应式表单中视图到模型和模型到视图的数据流。
 
 <!--todo: make consistent with other topics -->
 
-#### Verifying view-to-model data flow
+#### 验证视图到模型的数据流 {#verifying-view-to-model-data-flow}
 
-The first example performs the following steps to verify the view-to-model data flow.
+第一个例子执行以下步骤来验证视图到模型的数据流。
 
-1. Query the view for the form input element, and create a custom "input" event for the test.
-1. Set the new value for the input to _Red_, and dispatch the "input" event on the form input element.
-1. Assert that the component's `favoriteColorControl` value matches the value from the input.
+1. 在视图中查询表单输入元素，并为测试创建一个自定义的 "input" 事件。
+1. 把输入框的新值设为 *Red*，并在表单输入元素上派发 "input" 事件。
+1. 断言组件的 `favoriteColorControl` 值与输入框中的值一致。
 
 ```ts [Favorite color test - view to model]
 it('should update the value of the input field', () => {
@@ -322,11 +318,11 @@ it('should update the value of the input field', () => {
 });
 ```
 
-The next example performs the following steps to verify the model-to-view data flow.
+下一个例子执行以下步骤来验证模型到视图的数据流。
 
-1. Use the `favoriteColorControl`, a `FormControl` instance, to set the new value.
-1. Query the view for the form input element.
-1. Assert that the new value set on the control matches the value in the input.
+1. 使用 `favoriteColorControl`（一个 `FormControl` 实例）设置新值。
+1. 在视图中查询表单输入元素。
+1. 断言在控件上设置的新值与输入框中的值一致。
 
 ```ts [Favorite color test - model to view]
 it('should update the value in the control', () => {
@@ -338,13 +334,13 @@ it('should update the value in the control', () => {
 });
 ```
 
-### Testing template-driven forms
+### 测试模板驱动表单 {#testing-template-driven-forms}
 
-Writing tests with template-driven forms requires a detailed knowledge of the change detection process and an understanding of how directives run on each cycle to ensure that elements are queried, tested, or changed at the correct time.
+为模板驱动表单编写测试，需要详细了解变更检测过程，并理解指令在每个周期中如何运行，才能确保在正确的时机查询、测试或修改元素。
 
-The following tests use the favorite color components mentioned earlier to verify the data flows from view to model and model to view for a template-driven form.
+下面的测试使用前面提到的 favorite color 组件，来验证模板驱动表单中从视图到模型、从模型到视图的数据流。
 
-The following test verifies the data flow from view to model.
+下面的测试验证从视图到模型的数据流。
 
 ```ts [Favorite color test - view to model]
 it('should update the favorite color in the component', async () => {
@@ -360,14 +356,14 @@ it('should update the favorite color in the component', async () => {
 });
 ```
 
-Here are the steps performed in the view to model test.
+以下是视图到模型测试中执行的步骤。
 
-1. Query the view for the form input element, and create a custom "input" event for the test.
-1. Set the new value for the input to _Red_, and dispatch the "input" event on the form input element.
-1. Use `await fixture.whenStable()` to wait for the update to be processed.
-1. Assert that the component `favoriteColor` property value matches the value from the input.
+1. 在视图中查询表单输入元素，并为测试创建一个自定义的 "input" 事件。
+1. 把输入框的新值设为 *Red*，并在表单输入元素上派发 "input" 事件。
+1. 使用 `await fixture.whenStable()` 等待更新处理完成。
+1. 断言组件的 `favoriteColor` 属性值与输入框中的值一致。
 
-The following test verifies the data flow from model to view.
+下面的测试验证从模型到视图的数据流。
 
 ```ts [Favorite color test - model to view]
 it('should update the favorite color on the input field', async () => {
@@ -380,25 +376,25 @@ it('should update the favorite color on the input field', async () => {
 });
 ```
 
-Here are the steps performed in the model to view test.
+以下是模型到视图测试中执行的步骤。
 
-1. Use the component instance to set the value of the `favoriteColor` property.
-1. Use `await fixture.whenStable()` to wait for the next rendering.
-1. Query the view for the form input element.
-1. Assert that the input value matches the value of the `favoriteColor` property in the component instance.
+1. 使用组件实例设置 `favoriteColor` 属性的值。
+1. 使用 `await fixture.whenStable()` 等待下一次渲染。
+1. 在视图中查询表单输入元素。
+1. 断言输入框的值与组件实例中 `favoriteColor` 属性的值一致。
 
-## Next steps
+## 下一步 {#next-steps}
 
-To learn more about reactive forms, see the following guides:
+要深入了解响应式表单，请参阅以下指南：
 
-- [Reactive forms](/guide/forms/reactive-forms)
-- [Form validation](/guide/forms/form-validation#validating-input-in-reactive-forms)
-- [Dynamic forms](/guide/forms/dynamic-forms)
+- [响应式表单](/guide/forms/reactive-forms)
+- [表单验证](/guide/forms/form-validation#validating-input-in-reactive-forms)
+- [动态表单](/guide/forms/dynamic-forms)
 
 
-To learn more about template-driven forms, see the following guides:
+要深入了解模板驱动表单，请参阅以下指南：
 
-- [Template Driven Forms tutorial](/guide/forms/template-driven-forms)
-- [Form validation](/guide/forms/form-validation#validating-input-in-template-driven-forms)
-- [NgForm directive API reference](https://angular.dev/api/forms/NgForm)
+- [模板驱动表单教程](/guide/forms/template-driven-forms)
+- [表单验证](/guide/forms/form-validation#validating-input-in-template-driven-forms)
+- [NgForm 指令 API 参考](https://angular.dev/api/forms/NgForm)
 

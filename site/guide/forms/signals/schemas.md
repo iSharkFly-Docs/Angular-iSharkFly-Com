@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# schema 与 schema 的可组合性 {#schemas-and-schema-composability}
 
-# Schemas and schema composability
+信号表单（Signal Forms）采用双层架构，把*表单的结构*与*表单在运行时的行为*区分开来。
 
-Signal Forms uses a two-layer architecture to separate _how your form is structured_ from _how it behaves at runtime_.
+当你把一个 schema 函数传给 `form()` 时，这个函数会在创建表单时*只运行一次*。它的任务是建立表单的逻辑树：声明哪些字段（field）有验证、哪些字段被禁用、哪些字段依赖于其他字段。这就是表单的**结构层**。
 
-When you pass a schema function to `form()`, that function _runs once_ during form creation. Its job is to set up the form's logic tree by declaring which fields have validation, which fields are disabled, and which fields depend on other fields. This is the **structural layer** of your form.
-
-Inside a schema function, you call rule functions such as `disabled()` and `validate()`. These rule functions accept reactive logic that recomputes whenever the signals they reference change. Conditional rules like `disabled()` and `required()` accept optional configuration, including a `when` function that activates the rule. Together, these form the **behavioral layer** of your form during runtime.
+在 schema 函数内部，你会调用 `disabled()`、`validate()` 等规则函数。这些规则函数接收响应式逻辑，只要其中引用的信号（Signal）发生变化，这些逻辑就会重新计算。像 `disabled()` 和 `required()` 这样的条件规则可以接收可选配置，其中包括用于激活该规则的 `when` 函数。它们共同构成了表单在运行时的**行为层**。
 
 ```ts
 contactForm = form(this.contactModel, (schemaPath) => {
-  // Schema function: runs ONCE during form creation
+  // schema 函数：在创建表单时只运行一次
   required(schemaPath.name);
   disabled(schemaPath.couponCode, {when: ({valueOf}) => valueOf(schemaPath.total) < 50});
-  //  ^^^ Reactive logic: recomputes when total changes
+  //  ^^^ 响应式逻辑：total 变化时重新计算
 });
 ```
 
@@ -33,11 +29,11 @@ graph TD
     B2 --> G
 ```
 
-This distinction is important when you compose schemas because functions like `apply()`, `applyWhen()`, and `schema()` all operate at the structural layer. Schemas control _which_ rules exist and _whether_ they're active, while rule functions define _what_ those rules evaluate.
+在组合 schema 时，这个区别非常重要，因为 `apply()`、`applyWhen()` 和 `schema()` 等函数都作用于结构层。schema 控制*哪些*规则存在以及它们*是否*处于激活状态，而规则函数定义的是这些规则要*计算什么*。
 
-## Create reusable schemas with `schema()`
+## 使用 `schema()` 创建可复用的 schema {#create-reusable-schemas-with-schema}
 
-When multiple forms share the same rules for a common data shape, you can use the `schema()` function to extract those rules into a reusable schema.
+当多个表单对同一种常见数据结构使用相同的规则时，可以使用 `schema()` 函数把这些规则提取成一个可复用的 schema。
 
 ```ts
 import {schema, required, minLength} from '@angular/forms/signals';
@@ -50,16 +46,16 @@ const nameSchema = schema<{first: string; last: string}>((name) => {
 });
 ```
 
-The `schema()` function wraps a function and converts it into a reusable `Schema<T>` object. Like any schema function, it _runs once_ per form, but the object itself can be shared across as many forms as you need.
+`schema()` 函数会包装一个函数，并将其转换为可复用的 `Schema<T>` 对象。和任何 schema 函数一样，它在每个表单中*只运行一次*，但这个对象本身可以在任意多个表单之间共享。
 
-::: tip TIP
-If rules only appear in one place, an inline schema function works just as well. Use `schema()` when you want to reuse the same schema across multiple forms or apply the same schema to multiple paths. Reusable `Schema` objects are cached per form compilation.
+::: tip 提示
+如果规则只出现在一个地方，使用内联的 schema 函数同样可以。当你想在多个表单之间复用同一个 schema，或者把同一个 schema 应用到多个路径上时，再使用 `schema()`。可复用的 `Schema` 对象会在每次表单编译时被缓存。
 
 :::
 
-### Using the schema with `apply()`
+### 通过 `apply()` 使用 schema {#using-the-schema-with-apply}
 
-You can apply a reusable schema to a specific path in a form by using the `apply()` function. When you call `apply()`, the schema receives a scoped path that only sees the fields within that sub-path:
+你可以使用 `apply()` 函数把可复用的 schema 应用到表单中的特定路径。调用 `apply()` 时，schema 会收到一个限定了作用域的路径，只能看到该子路径下的字段：
 
 ```ts
 import {apply, form} from '@angular/forms/signals';
@@ -73,20 +69,20 @@ registrationForm = form(this.registrationModel, (schemaPath) => {
 });
 ```
 
-## Conditional schemas with `applyWhen()`
+## 使用 `applyWhen()` 的条件 schema {#conditional-schemas-with-applywhen}
 
-::: info NOTE
-The [Adding form logic guide](/guide/forms/signals/form-logic) introduced `applyWhen()` for conditional rules with inline logic. This section covers how to compose `applyWhen()` with reusable schemas.
+::: info 注意
+[添加表单逻辑指南](/guide/forms/signals/form-logic)介绍了如何用 `applyWhen()` 配合内联逻辑实现条件规则。本节介绍如何把 `applyWhen()` 与可复用的 schema 组合使用。
 
 :::
 
-Some rules should only apply under certain conditions. For example, a zip code field might require validation only when the selected country is the United States.
+有些规则只应在特定条件下生效。例如，邮政编码字段可能只在所选国家是美国时才需要验证。
 
-The `applyWhen()` function applies a schema conditionally based on reactive state. It accepts three arguments:
+`applyWhen()` 函数会根据响应式状态有条件地应用 schema。它接收三个参数：
 
-1. A path to apply the schema to
-1. A reactive logic function that returns `true` when the schema should be active
-1. A schema or schema function containing the conditional rules
+1. 要应用 schema 的路径
+1. 一个响应式逻辑函数，在 schema 应当激活时返回 `true`
+1. 包含条件规则的 schema 或 schema 函数
 
 ```ts
 import {form, applyWhen, required, pattern} from '@angular/forms/signals';
@@ -103,15 +99,15 @@ addressForm = form(this.addressModel, (schemaPath) => {
 });
 ```
 
-The logic function receives a `FieldContext`, which provides access to `value`, `valueOf`, `stateOf`, and other reactive helpers. Because it's reactive, the condition is re-evaluated whenever the signals it reads change. When the condition becomes `false`, the rules inside the schema deactivate. When it becomes `true` again, they reactivate.
+逻辑函数会收到一个 `FieldContext`，通过它可以访问 `value`、`valueOf`、`stateOf` 以及其他响应式辅助函数。由于它是响应式的，只要它读取的信号发生变化，条件就会重新求值。当条件变为 `false` 时，schema 中的规则会停用；当它再次变为 `true` 时，这些规则会重新激活。
 
-The schema itself is still structural — the schema function runs once during form creation. The condition controls whether those rules are _active_, not whether they _exist_.
+schema 本身仍然属于结构层：schema 函数在创建表单时只运行一次。条件控制的是这些规则是否*激活*，而不是它们是否*存在*。
 
-Inside the conditional schema, use the scoped path parameter passed to that schema function. Paths from an outer schema are not valid inside a nested schema.
+在条件 schema 内部，请使用传给该 schema 函数的限定作用域的路径参数。外层 schema 的路径在嵌套 schema 中是无效的。
 
-### Combining `applyWhen()` with reusable schemas
+### 把 `applyWhen()` 与可复用 schema 组合使用 {#combining-applywhen-with-reusable-schemas}
 
-Since `applyWhen()` accepts a `Schema` object, you can pair it with `schema()` to conditionally apply reusable schemas:
+由于 `applyWhen()` 接受 `Schema` 对象，你可以把它与 `schema()` 搭配使用，有条件地应用可复用的 schema：
 
 ```ts
 const usZipCodeSchema = schema<{zipCode: string}>((address) => {
@@ -138,16 +134,16 @@ shippingForm = form(this.shippingModel, (schemaPath) => {
 });
 ```
 
-::: info NOTE
-The logic function accesses `valueOf(schemaPath.country)` even though the path argument is `schemaPath.address`. This is because the `valueOf` helper can access any field in the form, not just fields within the scoped path.
+::: info 注意
+尽管路径参数是 `schemaPath.address`，逻辑函数仍然访问了 `valueOf(schemaPath.country)`。这是因为 `valueOf` 辅助函数可以访问表单中的任何字段，而不仅限于该作用域路径内的字段。
 
 :::
 
-This pattern keeps validation logic modular — each country's address rules live in their own schema, and the form selects which one to activate based on the user's choice.
+这种模式让验证逻辑保持模块化：每个国家的地址规则都放在各自的 schema 中，表单则根据用户的选择决定激活哪一个。
 
-## Type-narrowing with `applyWhenValue()`
+## 使用 `applyWhenValue()` 进行类型收窄 {#type-narrowing-with-applywhenvalue}
 
-The `applyWhenValue()` function simplifies conditions that only need to check the field's value. Instead of receiving a `FieldContext`, the condition function receives the field's raw value directly.
+`applyWhenValue()` 函数简化了只需要检查字段值的条件。条件函数收到的不是 `FieldContext`，而是字段的原始值。
 
 ```ts [applyWhen — logic function receives FieldContext]
 applyWhen(schemaPath.payment, ({value}) => value().type === 'credit-card', creditCardSchema);
@@ -157,7 +153,7 @@ applyWhen(schemaPath.payment, ({value}) => value().type === 'credit-card', credi
 applyWhenValue(schemaPath.payment, (payment) => payment.type === 'credit-card', creditCardSchema);
 ```
 
-The main advantage of `applyWhenValue()` is TypeScript type guard support. When the condition function is a type guard, the schema's type parameter narrows to the guarded type. This is especially useful for discriminated unions, where each variant has different fields that need different rules.
+`applyWhenValue()` 的主要优势在于支持 TypeScript 类型守卫。当条件函数是一个类型守卫时，schema 的类型参数会被收窄为守卫所确定的类型。这对可辨识联合类型尤其有用，因为其中每个变体都有不同的字段，需要不同的规则。
 
 ```ts
 import {form, applyWhenValue, required} from '@angular/forms/signals';
@@ -187,25 +183,25 @@ function isBankTransfer(value: PaymentMethod): value is BankTransfer {
 
 paymentForm = form(this.paymentModel, (schemaPath) => {
   applyWhenValue(schemaPath, isCreditCard, (payment) => {
-    // TypeScript knows payment is scoped to CreditCard
+    // TypeScript 知道 payment 的作用域是 CreditCard
     required(payment.cardNumber);
     required(payment.expiry);
     required(payment.cvv);
   });
 
   applyWhenValue(schemaPath, isBankTransfer, (payment) => {
-    // TypeScript knows payment is scoped to BankTransfer
+    // TypeScript 知道 payment 的作用域是 BankTransfer
     required(payment.accountNumber);
     required(payment.routingNumber);
   });
 });
 ```
 
-Without the type guard, TypeScript would not know which fields are available inside each schema function. The type narrowing ensures that accessing `payment.cardNumber` is type-safe in the credit card branch and `payment.accountNumber` is type-safe in the bank transfer branch.
+如果没有类型守卫，TypeScript 就无法知道每个 schema 函数中有哪些字段可用。类型收窄确保了在信用卡分支中访问 `payment.cardNumber`、在银行转账分支中访问 `payment.accountNumber` 都是类型安全的。
 
-## Array items with `applyEach()`
+## 使用 `applyEach()` 处理数组项 {#array-items-with-applyeach}
 
-When a form contains an array of objects, you often need the same rules applied to every item. The `applyEach()` function applies a schema to each item in an array field, regardless of how many items exist.
+当表单包含一个对象数组时，你常常需要对每一项应用相同的规则。`applyEach()` 函数会把一个 schema 应用到数组字段中的每一项，无论有多少项。
 
 ```ts
 import {form, applyEach, required, min} from '@angular/forms/signals';
@@ -222,11 +218,11 @@ orderForm = form(this.orderModel, (schemaPath) => {
 });
 ```
 
-The schema function passed to `applyEach()` receives a `SchemaPathTree` scoped to a single array item. Rules declared inside apply to every item in the array, including items added after form creation.
+传给 `applyEach()` 的 schema 函数会收到一个作用域限定为单个数组项的 `SchemaPathTree`。其中声明的规则会应用到数组中的每一项，包括创建表单之后才添加的项。
 
-### Combining `applyEach()` with reusable schemas
+### 把 `applyEach()` 与可复用 schema 组合使用 {#combining-applyeach-with-reusable-schemas}
 
-Since `applyEach()` accepts a `Schema` object, you can extract item-level rules into a reusable schema and share them across forms:
+由于 `applyEach()` 接受 `Schema` 对象，你可以把项级别的规则提取到一个可复用的 schema 中，并在多个表单之间共享：
 
 ```ts
 const lineItemSchema = schema<LineItem>((item) => {
@@ -245,15 +241,15 @@ invoiceForm = form(this.invoiceModel, (schemaPath) => {
 });
 ```
 
-::: tip TIP
-For more on validating array items, including custom error messages per field, see the [Validation guide](/guide/forms/signals/validation).
+::: tip 提示
+关于验证数组项的更多内容（包括为每个字段自定义错误消息），请参阅[验证指南](/guide/forms/signals/validation)。
 
 :::
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-To learn more about Signal Forms, check out these related guides:
+要进一步了解信号表单，请查看以下相关指南：
 
-- [Adding form logic](/guide/forms/signals/form-logic) - Learn how to add conditional logic, dynamic behavior, and metadata to your forms
-- [Validation](/guide/forms/signals/validation) - Learn about validation rules and error handling
-- [Async operations](/guide/forms/signals/async-operations) - Learn how to handle form submission and async validation
+- [添加表单逻辑](/guide/forms/signals/form-logic) - 了解如何为表单添加条件逻辑、动态行为和元数据
+- [验证](/guide/forms/signals/validation) - 了解验证规则和错误处理
+- [异步操作](/guide/forms/signals/async-operations) - 了解如何处理表单提交和异步验证

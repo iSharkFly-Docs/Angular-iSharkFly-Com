@@ -1,45 +1,41 @@
----
-untranslated: true
----
+# 在 Angular 中使用 Tailwind CSS {#using-tailwind-css-with-angular}
 
-# Using Tailwind CSS with Angular
+[Tailwind CSS](https://tailwindcss.com/) 是一个实用类优先（utility-first）的 CSS 框架，让你无需离开 HTML 就能构建现代网站。本指南将带你在 Angular 项目中设置 Tailwind CSS。
 
-[Tailwind CSS](https://tailwindcss.com/) is a utility-first CSS framework that can be used to build modern websites without ever leaving your HTML. This guide will walk you through setting up Tailwind CSS in your Angular project.
+## 使用 `ng add` 自动设置 {#automated-setup-with-ng-add}
 
-## Automated Setup with `ng add`
+Angular CLI 提供了一种简便的方式，可以通过 `ng add` 命令把 Tailwind CSS 集成到你的项目中。该命令会自动安装所需的包、配置 Tailwind CSS，并更新项目的构建设置。
 
-Angular CLI provides a streamlined way to integrate Tailwind CSS into your project using the `ng add` command. This command automatically installs the necessary packages, configures Tailwind CSS, and updates your project's build settings.
-
-First, navigate to your Angular project's root directory in a terminal and run the following command:
+首先，在终端中进入 Angular 项目的根目录，然后运行以下命令：
 
 ```shell
 ng add tailwindcss
 ```
 
-This command performs the following actions:
+该命令会执行以下操作：
 
-- Installs `tailwindcss` and its peer dependencies.
-- Configures the project to use Tailwind CSS.
-- Adds the Tailwind CSS `@import` statement to your styles.
+- 安装 `tailwindcss` 及其对等依赖（peer dependencies）。
+- 配置项目以使用 Tailwind CSS。
+- 在你的样式中添加 Tailwind CSS 的 `@import` 语句。
 
-After running `ng add tailwindcss`, you can immediately start using Tailwind's utility classes in your component templates.
+运行 `ng add tailwindcss` 之后，你就可以立即在组件（Component）模板（Template）中使用 Tailwind 的实用类了。
 
-## Manual Setup (Alternative Method)
+## 手动设置（替代方法） {#manual-setup-alternative-method}
 
-If you prefer to set up Tailwind CSS manually, follow these steps:
+如果你更想手动设置 Tailwind CSS，请按以下步骤操作：
 
-### 1. Create an Angular project
+### 1. 创建 Angular 项目 {#_1-create-an-angular-project}
 
-First, create a new Angular project if you don't have one set up already.
+首先，如果你还没有 Angular 项目，请创建一个新项目。
 
 ```shell
 ng new my-project
 cd my-project
 ```
 
-### 2. Install Tailwind CSS
+### 2. 安装 Tailwind CSS {#_2-install-tailwind-css}
 
-Next, open a terminal in your Angular project's root directory and run the following command to install Tailwind CSS and its peer dependencies:
+接下来，在 Angular 项目的根目录中打开终端，运行以下命令来安装 Tailwind CSS 及其对等依赖：
 
 ::: code-group
 
@@ -61,10 +57,10 @@ bun add tailwindcss @tailwindcss/postcss postcss
 
 :::
 
-### 3. Configure PostCSS Plugins
+### 3. 配置 PostCSS 插件 {#_3-configure-postcss-plugins}
 
-Next, add a `.postcssrc.json` file in the file root of the project.
-Add the `@tailwindcss/postcss` plugin into your PostCSS configuration.
+接下来，在项目根目录中添加一个 `.postcssrc.json` 文件。
+把 `@tailwindcss/postcss` 插件添加到 PostCSS 配置中。
 
 ```json [.postcssrc.json]
 {
@@ -74,30 +70,30 @@ Add the `@tailwindcss/postcss` plugin into your PostCSS configuration.
 }
 ```
 
-### 4. Import Tailwind CSS
+### 4. 导入 Tailwind CSS {#_4-import-tailwind-css}
 
-Add an `@import` to `./src/styles.css` that imports Tailwind CSS.
+在 `./src/styles.css` 中添加一条 `@import`，用于导入 Tailwind CSS。
 
 ```css [src/styles.css]
 @import 'tailwindcss';
 ```
 
-If you're using SCSS, add `@use` to `./src/styles.scss`.
+如果你使用的是 SCSS，请在 `./src/styles.scss` 中添加 `@use`。
 
 ```scss [src/styles.scss]
 @use 'tailwindcss';
 ```
 
-### 5. Start using Tailwind in your project
+### 5. 在项目中开始使用 Tailwind {#_5-start-using-tailwind-in-your-project}
 
-You can now start using Tailwind's utility classes in your component templates to style your application. Run your build process with `ng serve` and you should see the styled heading.
+现在，你可以在组件模板中使用 Tailwind 的实用类来为应用设置样式了。用 `ng serve` 运行构建过程，你应该就能看到带样式的标题。
 
-For example, you can add the following to your `app.html` file:
+例如，你可以在 `app.html` 文件中添加以下内容：
 
 ```html
 <h1 class="text-3xl font-bold underline">Hello world!</h1>
 ```
 
-## Additional Resources
+## 更多资源 {#additional-resources}
 
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Tailwind CSS 文档](https://tailwindcss.com/docs)

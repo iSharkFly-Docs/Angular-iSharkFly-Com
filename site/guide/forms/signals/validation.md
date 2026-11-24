@@ -1,22 +1,18 @@
----
-untranslated: true
----
+# 验证 {#validation}
 
-# Validation
+表单需要验证（validation），以确保用户在提交前提供正确、完整的数据。没有验证，你就得在服务器端处理数据质量问题，用含糊的错误消息带来糟糕的用户体验，还要手动检查每一条约束。
 
-Forms need validation to ensure users provide correct, complete data before submission. Without validation, you would need to handle data quality issues on the server, provide poor user experience with unclear error messages, and manually check every constraint.
+信号表单（Signal Forms）提供了一种基于 schema 的验证方式。验证规则通过 schema 函数绑定到字段（field），在值变化时自动运行，并通过字段状态信号（signal）暴露错误。这样就能实现随用户与表单交互而实时更新的响应式验证。
 
-Signal Forms provides a schema-based validation approach. Validation rules bind to fields using a schema function, run automatically when values change, and expose errors through field state signals. This enables reactive validation that updates as users interact with the form.
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.css)
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/signal-forms/src/login-validation-complete/app/app.css)
+## 验证基础 {#validation-basics}
 
-## Validation basics
+信号表单中的验证是通过作为第二个参数传给 `form()` 的 schema 函数来定义的。
 
-Validation in Signal Forms is defined through a schema function passed as the second argument to `form()`.
+### schema 函数 {#the-schema-function}
 
-### The schema function
-
-The schema function receives a `SchemaPathTree` object that lets you define your validation rules:
+schema 函数会接收一个 `SchemaPathTree` 对象，你可以用它来定义验证规则：
 
 ```ts [app.ts]
 /**
@@ -59,7 +55,7 @@ export class App {
     submit(this.loginForm, {
       action: async () => {
         const credentials = this.loginModel();
-        // In a real app, this would be async:
+        // 在真实应用中，这里会是异步的：
         // await this.authService.login(credentials);
         console.log('Logging in with:', credentials);
       },
@@ -68,63 +64,63 @@ export class App {
 }
 ```
 
-The schema function runs once during form initialization. Validation rules bind to fields using the schema path parameter (such as `schemaPath.email`, `schemaPath.password`), and validation runs automatically whenever field values change.
+schema 函数只在表单初始化时运行一次。验证规则通过 schema 路径参数（例如 `schemaPath.email`、`schemaPath.password`）绑定到字段，每当字段值变化时，验证都会自动运行。
 
-::: info NOTE
-The schema callback parameter (`schemaPath` in these examples) is a `SchemaPathTree` object that provides paths to all fields in your form. You can name this parameter anything you like.
-
-:::
-
-### How validation works
-
-Validation in Signal Forms follows this pattern:
-
-1. **Define validation rules in schema** - Bind validation rules to fields in the schema function
-2. **Automatic execution** - Validation rules run when field values change
-3. **Error propagation** - Validation errors are exposed through field state signals
-4. **Reactive updates** - UI automatically updates when validation state changes
-
-Validation runs on every value change for interactive fields. Hidden, disabled, and readonly fields don't run validation - their validation rules are skipped until the field becomes interactive again.
-
-### Validation timing
-
-Validation rules execute in this order:
-
-1. **Synchronous validation** - All synchronous validation rules run when value changes
-2. **Asynchronous validation** - Asynchronous validation rules run only after all synchronous validation rules pass
-3. **Field state updates** - The `valid()`, `invalid()`, `errors()`, and `pending()` signals update
-
-Synchronous validation rules (like `required()`, `email()`) complete immediately. Asynchronous validation rules (like `validateHttp()`) may take time and set the `pending()` signal to `true` while executing.
-
-All validation rules run on every change - validation doesn't short-circuit after the first error. If a field has both `required()` and `email()` validation rules, both run, and both can produce errors simultaneously.
-
-### Native HTML validation
-
-Signal Forms **does not** use the browser's built-in [constraint validation](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation) to run validation rules. This is by design: Signal Forms allows any component to act as a form control, not just native form elements.
-
-Instead, your validation rules run entirely in Angular, and validation state is exposed through field state signals such as `valid()`, `invalid()`, and `errors()` rather than through the element's native validity state. The [`FormRoot` directive](/guide/forms/signals/form-submission) also sets the `novalidate` attribute on the form element so the browser does not block submission.
-
-When a field is bound to a native form element, some built-in validation rules mirror their constraint to the corresponding native attribute: `required()`, `min()`, `max()`, `minLength()`, and `maxLength()` set the `required`, `min`, `max`, `minlength`, and `maxlength` attributes when the element supports them. An exception is `pattern()`, which does not set the native `pattern` attribute. Signal Forms sets these attributes to control input behavior and to improve accessibility, **not to trigger native validation**.
-
-::: info NOTE
-There is one case where Signal Forms reads native validity state: when the browser cannot parse a native input's value (for example, a partially typed date), Signal Forms reports it as a parse error. Even then, the error surfaces through the field's `errors()` signal like any other validation error. See [Value transformation](/guide/forms/signals/custom-controls#value-transformation) for details.
+::: info 注意
+schema 回调参数（在这些示例中是 `schemaPath`）是一个 `SchemaPathTree` 对象，提供了指向表单中所有字段的路径。你可以随意给这个参数命名。
 
 :::
 
-::: warning IMPORTANT
-Do not rely on native validity features such as the `:valid` and `:invalid` CSS pseudo-classes, the element's `validity` property, or `validationMessage`. The browser may report some inputs as invalid as a side effect of the mirrored attributes (for example, a number input whose value is below its `min`), but this behavior varies by validation rule and input type and is not a supported way to observe validation state.
+### 验证的工作原理 {#how-validation-works}
+
+信号表单中的验证遵循以下模式：
+
+1. **在 schema 中定义验证规则**：在 schema 函数中把验证规则绑定到字段
+2. **自动执行**：字段值变化时运行验证规则
+3. **错误传播**：验证错误通过字段状态信号暴露出来
+4. **响应式更新**：验证状态变化时 UI 自动更新
+
+对于可交互的字段，每次值变化都会运行验证。隐藏、禁用和只读的字段不会运行验证，它们的验证规则会被跳过，直到字段重新变为可交互状态。
+
+### 验证时机 {#validation-timing}
+
+验证规则按以下顺序执行：
+
+1. **同步验证**：值变化时运行所有同步验证规则
+2. **异步验证**：只有在所有同步验证规则都通过后，才会运行异步验证规则
+3. **字段状态更新**：`valid()`、`invalid()`、`errors()` 和 `pending()` 信号随之更新
+
+同步验证规则（如 `required()`、`email()`）会立即完成。异步验证规则（如 `validateHttp()`）可能需要一些时间，并在执行期间把 `pending()` 信号设为 `true`。
+
+每次变化时所有验证规则都会运行，验证不会在出现第一个错误后短路。如果一个字段同时有 `required()` 和 `email()` 验证规则，两者都会运行，并且可以同时产生错误。
+
+### 原生 HTML 验证 {#native-html-validation}
+
+信号表单**不会**使用浏览器内置的[约束验证](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation)来运行验证规则。这是有意为之：信号表单允许任何组件（component）充当表单控件，而不仅限于原生表单元素。
+
+你的验证规则完全在 Angular 中运行，验证状态通过 `valid()`、`invalid()` 和 `errors()` 等字段状态信号暴露出来，而不是通过元素的原生有效性状态。[`FormRoot` 指令](/guide/forms/signals/form-submission)还会在 form 元素上设置 `novalidate` attribute，避免浏览器阻止提交。
+
+当字段绑定到原生表单元素时，一些内置验证规则会把约束同步到对应的原生 attribute 上：`required()`、`min()`、`max()`、`minLength()` 和 `maxLength()` 会在元素支持时设置 `required`、`min`、`max`、`minlength` 和 `maxlength` attribute。`pattern()` 是个例外，它不会设置原生的 `pattern` attribute。信号表单设置这些 attribute 是为了控制输入行为并提升无障碍性，**而不是为了触发原生验证**。
+
+::: info 注意
+有一种情况下信号表单会读取原生有效性状态：当浏览器无法解析原生输入框的值时（例如只输入了一部分的日期），信号表单会将其报告为解析错误。即便如此，这个错误也和其他验证错误一样，通过字段的 `errors()` 信号呈现。详情参见[值转换](/guide/forms/signals/custom-controls#value-transformation)。
 
 :::
 
-To style controls based on validation state, bind classes to field state signals (see [Field state management](/guide/forms/signals/field-state-management#conditional-error-display)) or configure automatic status classes (see [Automatic status classes](/guide/forms/signals/migration#automatic-status-classes)).
+::: warning 重要
+不要依赖原生有效性特性，例如 `:valid` 和 `:invalid` CSS 伪类、元素的 `validity` 属性或 `validationMessage`。由于同步过去的 attribute，浏览器可能会附带地把某些输入框报告为无效（例如值低于 `min` 的数字输入框），但这种行为因验证规则和输入框类型而异，并不是观察验证状态的受支持方式。
 
-## Built-in validation rules
+:::
 
-Signal Forms provides validation rules for common validation scenarios. All built-in validation rules accept an options object for custom error messages and conditional logic.
+要根据验证状态为控件设置样式，可以把 class 绑定到字段状态信号（参见[字段状态管理](/guide/forms/signals/field-state-management#conditional-error-display)），或者配置自动状态类（参见[自动状态类](/guide/forms/signals/migration#automatic-status-classes)）。
 
-### required()
+## 内置验证规则 {#built-in-validation-rules}
 
-The `required()` validation rule ensures a field has a value:
+信号表单为常见的验证场景提供了验证规则。所有内置验证规则都接受一个选项对象，用于自定义错误消息和条件逻辑。
+
+### required() {#required}
+
+`required()` 验证规则确保字段有值：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -162,24 +158,24 @@ export class RegistrationComponent {
 }
 ```
 
-A field is considered "empty" when its value is one of the following, and non-empty for every other
-value — including `0` and the empty array `[]`:
+当字段的值是以下之一时，它被视为「空」；其他任何值都视为非空，
+包括 `0` 和空数组 `[]`：
 
-| Condition                | Example     |
+| 条件                     | 示例        |
 | ------------------------ | ----------- |
-| Value is `null`          | `null`      |
-| Value is `undefined`     | `undefined` |
-| Value is an empty string | `''`        |
-| Value is `false`         | `false`     |
-| Value is `NaN`           | `NaN`       |
+| 值为 `null`              | `null`      |
+| 值为 `undefined`         | `undefined` |
+| 值为空字符串             | `''`        |
+| 值为 `false`             | `false`     |
+| 值为 `NaN`               | `NaN`       |
 
-The last two are worth calling out:
+最后两项值得特别说明：
 
-- `false` is empty to follow the native semantics of `required` on `<input type="checkbox">`, where
-  an unchecked box fails validation.
-- `NaN` is empty because it is usually the result of a parsing error, and is not a valid number.
+- `false` 被视为空，是为了遵循 `<input type="checkbox">` 上 `required` 的原生语义，
+  即未勾选的复选框无法通过验证。
+- `NaN` 被视为空，是因为它通常是解析错误的结果，而且不是一个有效的数字。
 
-For conditional requirements, use the `when` option:
+对于有条件的必填要求，使用 `when` 选项：
 
 ```ts
 registrationForm = form(this.registrationModel, (schemaPath) => {
@@ -190,16 +186,16 @@ registrationForm = form(this.registrationModel, (schemaPath) => {
 });
 ```
 
-The validation rule only runs when the `when` function returns `true`.
+只有当 `when` 函数返回 `true` 时，该验证规则才会运行。
 
-::: info NOTE
-`required` treats an empty array as present (valid), so use [`minLength()`](#minlength-and-maxlength) to enforce a minimum number of array items.
+::: info 注意
+`required` 会把空数组视为有值（有效），所以要使用 [`minLength()`](#minlength-and-maxlength) 来强制数组项的最少数量。
 
 :::
 
-### email()
+### email() {#email}
 
-The `email()` validation rule checks for valid email format:
+`email()` 验证规则检查邮箱格式是否有效：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -226,11 +222,11 @@ export class ContactComponent {
 }
 ```
 
-The `email()` validation rule uses a standard email format regex. It accepts addresses like `user@example.com` but rejects malformed addresses like `user@` or `@example.com`.
+`email()` 验证规则使用标准的邮箱格式正则表达式。它接受 `user@example.com` 这样的地址，但会拒绝 `user@` 或 `@example.com` 这类格式错误的地址。
 
-### min() and max()
+### min() 和 max() {#min-and-max}
 
-The `min()` and `max()` validation rules work with numeric values:
+`min()` 和 `max()` 验证规则用于数值：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -269,7 +265,7 @@ export class AgeFormComponent {
 }
 ```
 
-You can use computed values for dynamic constraints:
+你可以使用计算出的值来实现动态约束：
 
 ```ts
 ageForm = form(this.ageModel, (schemaPath) => {
@@ -279,9 +275,9 @@ ageForm = form(this.ageModel, (schemaPath) => {
 });
 ```
 
-### minDate() and maxDate()
+### minDate() 和 maxDate() {#mindate-and-maxdate}
 
-The `minDate()` and `maxDate()` validation rules work with `Date` values, such as a field bound to `<input type="date">`. They also set the `min` and `max` attributes of that input.
+`minDate()` 和 `maxDate()` 验证规则用于 `Date` 值，例如绑定到 `<input type="date">` 的字段。它们还会设置该输入框的 `min` 和 `max` attribute。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -309,12 +305,12 @@ export class BookingFormComponent {
 }
 ```
 
-::: warning IMPORTANT
-An `<input type="date">` reads and writes `Date` values at midnight UTC, whatever the user's time zone, because that is how the browser's `valueAsDate` works. Build the limits the same way, for example with `new Date('2026-06-01')` or `new Date(Date.UTC(2026, 5, 1))`. A `Date` created from local time, such as `new Date(2026, 5, 1)` or `new Date()`, is shifted by the user's UTC offset. Depending on the time zone, the `min` or `max` attribute can then be off by a day, and the limit date itself can be rejected.
+::: warning 重要
+无论用户处于哪个时区，`<input type="date">` 读写的 `Date` 值都是 UTC 午夜，因为浏览器的 `valueAsDate` 就是这样工作的。请用同样的方式构造边界值，例如 `new Date('2026-06-01')` 或 `new Date(Date.UTC(2026, 5, 1))`。由本地时间创建的 `Date`，例如 `new Date(2026, 5, 1)` 或 `new Date()`，会按用户的 UTC 偏移量发生偏移。根据时区不同，`min` 或 `max` attribute 可能因此相差一天，边界日期本身也可能被拒绝。
 
 :::
 
-To require a date that is not before today, use today's calendar date in the user's time zone, expressed at midnight UTC:
+要求日期不早于今天时，应使用用户所在时区的今天日历日期，并以 UTC 午夜表示：
 
 ```ts
 const now = new Date();
@@ -323,11 +319,11 @@ const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()
 minDate(schemaPath.checkIn, today, {message: 'Check-in cannot be in the past'});
 ```
 
-Passing `new Date()` directly can reject today's date, because the value picked in the input is midnight UTC, which is earlier than the current time. This happens in UTC and in the time zones behind it.
+直接传入 `new Date()` 可能会拒绝今天的日期，因为在输入框中选取的值是 UTC 午夜，早于当前时间。这种情况会出现在 UTC 时区以及比 UTC 晚的时区中。
 
-### minLength() and maxLength()
+### minLength() 和 maxLength() {#minlength-and-maxlength}
 
-The `minLength()` and `maxLength()` validation rules work with strings and arrays:
+`minLength()` 和 `maxLength()` 验证规则用于字符串和数组：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -365,11 +361,11 @@ export class PasswordFormComponent {
 }
 ```
 
-For strings, "length" means the number of characters. For arrays, "length" means the number of elements.
+对于字符串，「长度」指字符数；对于数组，「长度」指元素个数。
 
-### pattern()
+### pattern() {#pattern}
 
-The `pattern()` validation rule validates against a regular expression:
+`pattern()` 验证规则根据正则表达式进行验证：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -410,18 +406,18 @@ export class PhoneFormComponent {
 }
 ```
 
-Common patterns:
+常用模式：
 
-| Pattern Type     | Regular Expression      | Example      |
+| 模式类型         | 正则表达式              | 示例         |
 | ---------------- | ----------------------- | ------------ |
-| Phone            | `/^\d{3}-\d{3}-\d{4}$/` | 555-123-4567 |
-| Postal code (US) | `/^\d{5}$/`             | 12345        |
-| Alphanumeric     | `/^[a-zA-Z0-9]+$/`      | abc123       |
-| URL-safe         | `/^[a-zA-Z0-9_-]+$/`    | my-url_123   |
+| 电话             | `/^\d{3}-\d{3}-\d{4}$/` | 555-123-4567 |
+| 邮政编码（美国） | `/^\d{5}$/`             | 12345        |
+| 字母数字         | `/^[a-zA-Z0-9]+$/`      | abc123       |
+| URL 安全         | `/^[a-zA-Z0-9_-]+$/`    | my-url_123   |
 
-## Validation of array items
+## 数组项的验证 {#validation-of-array-items}
 
-Forms can include arrays of nested objects (for example, a list of order items). To apply validation rules to each item in an array, use `applyEach()` inside your schema function. `applyEach()` iterates the array path and supplies a path for each item where you can apply validators just like top-level fields.
+表单中可以包含嵌套对象的数组（例如订单项列表）。要对数组中的每一项应用验证规则，请在 schema 函数中使用 `applyEach()`。`applyEach()` 会遍历数组路径，并为每一项提供一个路径，你可以像对顶层字段一样在上面应用验证器（validator）。
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -457,29 +453,29 @@ export class OrderComponent {
 }
 ```
 
-## Validation errors
+## 验证错误 {#validation-errors}
 
-When validation rules fail, they produce error objects that describe what went wrong. Understanding error structure helps you provide clear feedback to users.
+验证规则失败时，会产生描述问题所在的错误对象。理解错误的结构有助于你向用户提供清晰的反馈。
 
-::: info NOTE
-This section covers the errors that validation rules produce. For displaying and using validation errors in your UI, see the [Field State Management guide](/guide/forms/signals/field-state-management).
+::: info 注意
+本节介绍验证规则产生的错误。关于如何在 UI 中显示和使用验证错误，请参见[字段状态管理指南](/guide/forms/signals/field-state-management)。
 
 :::
 
-### Error structure
+### 错误结构 {#error-structure}
 
-Each validation error object contains these properties:
+每个验证错误对象都包含以下属性：
 
-| Property  | Description                                                              |
+| 属性      | 说明                                                                     |
 | --------- | ------------------------------------------------------------------------ |
-| `kind`    | The validation rule that failed (e.g., "required", "email", "minLength") |
-| `message` | Optional human-readable error message                                    |
+| `kind`    | 失败的验证规则（例如 "required"、"email"、"minLength"）                  |
+| `message` | 可选的、供人阅读的错误消息                                               |
 
-Built-in validation rules automatically set the `kind` property. The `message` property is optional - you can provide custom messages through validation rule options.
+内置验证规则会自动设置 `kind` 属性。`message` 属性是可选的，你可以通过验证规则的选项提供自定义消息。
 
-### Custom error messages
+### 自定义错误消息 {#custom-error-messages}
 
-All built-in validation rules accept a `message` option for custom error text:
+所有内置验证规则都接受 `message` 选项，用于自定义错误文本：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -523,11 +519,11 @@ export class SignupComponent {
 }
 ```
 
-Custom messages should be clear, specific, and tell users how to fix the problem. Instead of "Invalid input", use "Password must be at least 12 characters for security".
+自定义消息应当清晰、具体，并告诉用户如何解决问题。不要写 "Invalid input"，而应写 "Password must be at least 12 characters for security"。
 
-### Multiple errors per field
+### 每个字段的多个错误 {#multiple-errors-per-field}
 
-When a field has multiple validation rules, each validation rule runs independently and can produce an error:
+当一个字段有多条验证规则时，每条验证规则都会独立运行，并且都可能产生错误：
 
 ```ts
 signupForm = form(this.signupModel, (schemaPath) => {
@@ -537,25 +533,25 @@ signupForm = form(this.signupModel, (schemaPath) => {
 });
 ```
 
-If the email field is empty, only the `required()` error appears. If the user types "a@", both `email()` and `minLength()` errors appear. All validation rules run - validation doesn't stop after the first failure.
+如果 email 字段为空，只会出现 `required()` 错误。如果用户输入 "a@"，`email()` 和 `minLength()` 错误都会出现。所有验证规则都会运行，验证不会在第一次失败后停止。
 
-::: tip TIP
-Use the `touched() && invalid()` pattern in your templates to prevent errors from appearing before users have interacted with a field. For comprehensive guidance on displaying validation errors, see the [Field State Management guide](/guide/forms/signals/field-state-management#conditional-error-display).
+::: tip 提示
+在模板（template）中使用 `touched() && invalid()` 模式，可以避免在用户与字段交互之前就显示错误。关于显示验证错误的完整指导，请参见[字段状态管理指南](/guide/forms/signals/field-state-management#conditional-error-display)。
 
 :::
 
-## Custom validation rules
+## 自定义验证规则 {#custom-validation-rules}
 
-While built-in validation rules handle common cases, you'll often need custom validation logic for business rules, complex formats, or domain-specific constraints.
+虽然内置验证规则能处理常见情况，但你经常还需要自定义验证逻辑，用于业务规则、复杂格式或特定领域的约束。
 
-### Using validate()
+### 使用 validate() {#using-validate}
 
-The `validate()` function creates custom validation rules. It receives a validator function that accesses the field context and returns:
+`validate()` 函数用于创建自定义验证规则。它接收一个验证器函数，该函数可以访问字段上下文，并返回：
 
-| Return Value          | Meaning          |
-| --------------------- | ---------------- |
-| Error object          | Value is invalid |
-| `null` or `undefined` | Value is valid   |
+| 返回值                | 含义         |
+| --------------------- | ------------ |
+| 错误对象              | 值无效       |
+| `null` 或 `undefined` | 值有效       |
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -591,28 +587,28 @@ export class UrlFormComponent {
 }
 ```
 
-The validator function receives a `FieldContext` object with:
+验证器函数接收的 `FieldContext` 对象包含：
 
-| Property        | Type       | Description                                 |
+| 属性            | 类型       | 说明                                        |
 | --------------- | ---------- | ------------------------------------------- |
-| `value`         | Signal     | Signal containing the current field value   |
-| `state`         | FieldState | The field state reference                   |
-| `fieldTree`     | FieldTree  | The field tree reference                    |
-| `valueOf()`     | Method     | Get the value of another field by path      |
-| `stateOf()`     | Method     | Get the state of another field by path      |
-| `fieldTreeOf()` | Method     | Get the field tree of another field by path |
-| `pathKeys`      | Signal     | Path keys from root to current field        |
+| `value`         | Signal     | 包含当前字段值的信号                        |
+| `state`         | FieldState | 字段状态的引用                              |
+| `fieldTree`     | FieldTree  | 字段树的引用                                |
+| `valueOf()`     | Method     | 按路径获取另一个字段的值                    |
+| `stateOf()`     | Method     | 按路径获取另一个字段的状态                  |
+| `fieldTreeOf()` | Method     | 按路径获取另一个字段的字段树                |
+| `pathKeys`      | Signal     | 从根到当前字段的路径键                      |
 
-::: info NOTE
-Child fields also have a `key` signal, and array item fields have both `key` and `index` signals.
+::: info 注意
+子字段还有一个 `key` 信号，数组项字段则同时具有 `key` 和 `index` 信号。
 
 :::
 
-Return an error object with `kind` and `message` when validation fails. Return `null` or `undefined` when validation passes.
+验证失败时，返回带有 `kind` 和 `message` 的错误对象；验证通过时，返回 `null` 或 `undefined`。
 
-### Using validateTree()
+### 使用 validateTree() {#using-validatetree}
 
-The `validateTree()` function creates custom validation rules that can target multiple fields or provide complex validation logic for a whole subtree.
+`validateTree()` 函数用于创建可以针对多个字段、或为整个子树提供复杂验证逻辑的自定义验证规则。
 
 ```ts
 import {Component, model} from '@angular/core';
@@ -646,11 +642,11 @@ export class UserFormComponent {
 }
 ```
 
-The `validateTree()` validator function receives the same `FieldContext` object as `validate()`.
+`validateTree()` 的验证器函数接收的 `FieldContext` 对象与 `validate()` 相同。
 
-### Reusable validation rules
+### 可复用的验证规则 {#reusable-validation-rules}
 
-Create reusable validation rule functions by wrapping `validate()`:
+通过包装 `validate()` 来创建可复用的验证规则函数：
 
 ```ts
 function url(path: SchemaPath<string>, options?: {message?: string}) {
@@ -683,7 +679,7 @@ function phoneNumber(path: SchemaPath<string>, options?: {message?: string}) {
 }
 ```
 
-You can use custom validation rules just like built-in validation rules:
+你可以像使用内置验证规则一样使用自定义验证规则：
 
 ```ts
 urlForm = form(this.urlModel, (schemaPath) => {
@@ -692,11 +688,11 @@ urlForm = form(this.urlModel, (schemaPath) => {
 });
 ```
 
-## Cross-field validation
+## 跨字段验证 {#cross-field-validation}
 
-Cross-field validation compares or relates multiple field values.
+跨字段验证用于比较或关联多个字段的值。
 
-A common scenario for cross-field validation is password confirmation:
+跨字段验证的一个常见场景是确认密码：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -750,26 +746,26 @@ export class PasswordChangeComponent {
 }
 ```
 
-The confirmation validation rule accesses the password field value using `valueOf(schemaPath.password)` and compares it to the confirmation value. This validation rule runs reactively - if either password changes, validation reruns automatically.
+这条确认验证规则通过 `valueOf(schemaPath.password)` 访问密码字段的值，并与确认值进行比较。该验证规则是响应式运行的：任意一个密码发生变化，验证都会自动重新运行。
 
-## Conditional validation
+## 条件验证 {#conditional-validation}
 
-Sometimes a validation rule should apply only under certain conditions, such as validating a shipping address only when an order ships internationally, or applying a different set of rules to each variant of a union-typed field.
+有时某条验证规则只应在特定条件下生效，例如只有订单寄往国际时才验证收货地址，或者对联合类型字段的每种变体应用不同的规则集。
 
-Because validation rules live in the schema function, you apply them conditionally with the same structural functions that compose schemas:
+由于验证规则位于 schema 函数中，你可以用组合 schema 时所用的那些结构函数来有条件地应用它们：
 
-- Use [`applyWhen()`](/guide/forms/signals/form-logic#conditional-logic-with-applywhen) to activate a group of rules based on reactive form state, including the values of other fields.
-- Use [`applyWhenValue()`](/guide/forms/signals/schemas#type-narrowing-with-applywhenvalue) to apply rules based on a field's own value. When the predicate is a type guard, the rules are typed to the narrowed value, which makes it the recommended way to validate discriminated unions and other variant types.
+- 使用 [`applyWhen()`](/guide/forms/signals/form-logic#conditional-logic-with-applywhen) 根据响应式的表单状态（包括其他字段的值）启用一组规则。
+- 使用 [`applyWhenValue()`](/guide/forms/signals/schemas#type-narrowing-with-applywhenvalue) 根据字段自身的值应用规则。当谓词是类型守卫时，这些规则的类型会收窄到相应的值，因此它是验证可辨识联合类型及其他变体类型的推荐方式。
 
-For complete examples, including reusable schemas and discriminated unions, see the [Schemas and schema composability guide](/guide/forms/signals/schemas).
+完整示例（包括可复用 schema 和可辨识联合类型）参见 [schema 与 schema 的可组合性指南](/guide/forms/signals/schemas)。
 
-## Async validation
+## 异步验证 {#async-validation}
 
-Async validation handles validation that requires external data sources, like checking username availability on a server or validating against an API.
+异步验证用于处理需要外部数据源的验证，例如在服务器上检查用户名是否可用，或根据某个 API 进行验证。
 
-### Using validateHttp()
+### 使用 validateHttp() {#using-validatehttp}
 
-The `validateHttp()` function performs HTTP-based validation:
+`validateHttp()` 函数执行基于 HTTP 的验证：
 
 ```ts
 import {Component, signal} from '@angular/core';
@@ -817,17 +813,17 @@ export class UsernameFormComponent {
 }
 ```
 
-The `validateHttp()` validation rule:
+`validateHttp()` 验证规则会：
 
-1. Calls the URL or request returned by the `request` function
-2. Maps the successful response to a validation error or `null` using `onSuccess`
-3. Handles request failures (network errors, HTTP errors) using `onError`
-4. Sets `pending()` to `true` while the request is in progress
-5. Only runs after all synchronous validation rules pass
+1. 调用 `request` 函数返回的 URL 或请求
+2. 使用 `onSuccess` 把成功的响应映射为验证错误或 `null`
+3. 使用 `onError` 处理请求失败（网络错误、HTTP 错误）
+4. 在请求进行期间把 `pending()` 设为 `true`
+5. 只在所有同步验证规则都通过后才运行
 
-### Pending state
+### 待定状态 {#pending-state}
 
-While async validation runs, the field's `pending()` signal returns `true`. Use this to show loading indicators:
+异步验证运行期间，字段的 `pending()` 信号返回 `true`。可以用它来显示加载指示器：
 
 ```html
 @if (form.username().pending()) {
@@ -835,32 +831,32 @@ While async validation runs, the field's `pending()` signal returns `true`. Use 
 }
 ```
 
-The `valid()` signal returns `false` while validation is pending, even if there are no errors yet. The `invalid()` signal only returns `true` if errors exist.
+验证处于待定状态时，即使还没有错误，`valid()` 信号也会返回 `false`。而 `invalid()` 信号只有在存在错误时才返回 `true`。
 
-## Integration with schema validation libraries
+## 与 schema 验证库集成 {#integration-with-schema-validation-libraries}
 
-Signal Forms have built-in support for libraries that conform to [Standard Schema](https://standardschema.dev/) like [Zod](https://zod.dev/) or [Valibot](https://valibot.dev/). The integration is provided via the `validateStandardSchema` function. This allows you to use existing schemas while maintaining Signal Forms' reactive validation benefits.
+信号表单内置支持符合 [Standard Schema](https://standardschema.dev/) 规范的库，例如 [Zod](https://zod.dev/) 或 [Valibot](https://valibot.dev/)。这一集成通过 `validateStandardSchema` 函数提供。这样你就可以沿用现有的 schema，同时保留信号表单响应式验证的优势。
 
 ```ts
 import {form, validateStandardSchema} from '@angular/forms/signals';
 import {signal} from '@angular/core';
 import * as z from 'zod';
 
-// Define your schema
+// 定义 schema
 const userSchema = z.object({
   email: z.email(),
   password: z.string().min(8),
 });
 
-// Use with Signal Forms
+// 在信号表单中使用
 const userForm = form(signal({email: '', password: ''}), (schemaPath) => {
   validateStandardSchema(schemaPath, userSchema);
 });
 ```
 
-### Dynamic schemas
+### 动态 schema {#dynamic-schemas}
 
-Instead of a static schema, you can pass a function that returns the schema. The validation then updates automatically when the signals read by the function change.
+除了静态 schema，你还可以传入一个返回 schema 的函数。这样当该函数读取的信号发生变化时，验证会自动更新。
 
 ```ts
 import {Component, computed, signal} from '@angular/core';
@@ -871,7 +867,7 @@ import * as z from 'zod';
 export class DynamicSchema {
   model = signal({document: '', type: 'dni'});
 
-  // Schema reacts automatically to type changes
+  // schema 会随 type 的变化自动响应
   schema = computed(() =>
     z.object({
       document:
@@ -885,12 +881,12 @@ export class DynamicSchema {
 }
 ```
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-This guide covered creating and applying validation rules. Related guides explore other aspects of Signal Forms:
+本指南介绍了如何创建和应用验证规则。以下相关指南探讨了信号表单的其他方面：
 
-- [Field state management](/guide/forms/signals/field-state-management)
-- [Form models](/guide/forms/signals/models)
-- [Adding form logic](/guide/forms/signals/form-logic)
-- [Schemas and schema composability](/guide/forms/signals/schemas)
+- [字段状态管理](/guide/forms/signals/field-state-management)
+- [表单模型](/guide/forms/signals/models)
+- [添加表单逻辑](/guide/forms/signals/form-logic)
+- [schema 与 schema 的可组合性](/guide/forms/signals/schemas)
 

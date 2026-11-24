@@ -526,7 +526,7 @@ profileForm = this.formBuilder.group({
 <p>Form Status: {{ profileForm.status }}</p>
 ```
 
-由于必填的 `firstName` 表单控件，`profileForm` 处于无效状态，因此 **Submit** 按钮被禁用。填写 `firstName` 输入框之后，表单就会变为有效，**Submit** 按钮也随之启用。
+由于必填的 `firstName` 表单控件，`profileForm` 处于无效状态，因此 **Submit** 按钮被禁用。填写 `firstName` 输入框之后，表单就会变为有效**，Submit** 按钮也随之启用。
 
 关于表单验证的更多信息，请参阅[表单验证](/guide/forms/form-validation)指南。
 

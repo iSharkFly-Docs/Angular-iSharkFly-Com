@@ -1,54 +1,50 @@
----
-untranslated: true
----
+# 使用守卫控制路由访问 {#control-route-access-with-guards}
 
-# Control route access with guards
-
-::: danger CRITICAL
-Never rely on client-side guards as the sole source of access control. All JavaScript that runs in a web browser can be modified by the user running the browser. Always enforce user authorization server-side, in addition to any client-side guards.
+::: danger 严重
+永远不要把客户端守卫当作访问控制的唯一手段。在浏览器中运行的所有 JavaScript 都可能被运行该浏览器的用户修改。除了客户端守卫之外，务必始终在服务端强制执行用户授权。
 
 :::
 
-Route guards are functions that control whether a user can navigate to or leave a particular route. They are like checkpoints that manage whether a user can access specific routes. Common examples of using route guards include authentication and access control.
+路由守卫（route guard）是一些函数，用于控制用户能否导航（navigation）到某个路由（route）或离开某个路由。它们就像检查站，决定用户能否访问特定路由。路由守卫的常见用例包括身份验证和访问控制。
 
-## Creating a route guard
+## 创建路由守卫 {#creating-a-route-guard}
 
-You can generate a route guard using the Angular CLI:
+你可以使用 Angular CLI 生成路由守卫：
 
 ```bash
 ng generate guard CUSTOM_NAME
 ```
 
-This will prompt you to select which [type of route guard](#types-of-route-guards) to use and then create the corresponding `CUSTOM_NAME-guard.ts` file.
+该命令会提示你选择要使用哪种[路由守卫类型](#types-of-route-guards)，然后创建对应的 `CUSTOM_NAME-guard.ts` 文件。
 
-::: tip TIP
-You can also create a route guard manually by creating a separate TypeScript file in your Angular project. Developers typically add a suffix of `-guard.ts` in the filename to distinguish it from other files.
+::: tip 提示
+你也可以在 Angular 项目中单独创建一个 TypeScript 文件来手动创建路由守卫。开发者通常会在文件名中添加 `-guard.ts` 后缀，以便与其他文件区分。
 
 :::
 
-## Route guard return types
+## 路由守卫的返回类型 {#route-guard-return-types}
 
-All route guards share the same possible return types. This gives you flexibility in how you control navigation:
+所有路由守卫都共享同样的可能返回类型。这让你可以灵活地控制导航：
 
-| Return types                    | Description                                                                       |
+| 返回类型                        | 说明                                                                       |
 | ------------------------------- | --------------------------------------------------------------------------------- |
-| `boolean`                       | `true` allows navigation, `false` blocks it (see note for `CanMatch` route guard) |
-| `UrlTree` or `RedirectCommand`  | Redirects to another route instead of blocking                                    |
-| `Promise<T>` or `Observable<T>` | Router uses the first emitted value and then unsubscribes                         |
+| `boolean`                       | `true` 允许导航，`false` 阻止导航（关于 `CanMatch` 路由守卫请参阅注意） |
+| `UrlTree` 或 `RedirectCommand`  | 重定向到另一个路由，而不是阻止导航                                    |
+| `Promise<T>` 或 `Observable<T>` | 路由器使用第一个发出的值，然后取消订阅                         |
 
-::: info NOTE
-A route guard must emit a value. An `Observable` that completes without emitting, such as `EMPTY` or any `Observable<never>`, leaves the router without a result, so the navigation fails with an RxJS `EmptyError`. This often comes from a request that an interceptor cancels. If your source can complete empty, give it a value with `defaultIfEmpty(false)`.
-
-:::
-
-::: info NOTE
-`CanMatch` is different. When it returns `false`, Angular tries other matching routes instead of blocking navigation.
+::: info 注意
+路由守卫必须发出一个值。没有发出任何值就完成的 `Observable`（例如 `EMPTY` 或任何 `Observable<never>`）会让路由器（router）得不到结果，导致导航失败并抛出 RxJS `EmptyError`。这种情况通常来自被拦截器（interceptor）取消的请求。如果你的数据源可能不发出值就完成，请使用 `defaultIfEmpty(false)` 为它提供一个值。
 
 :::
 
-## Types of route guards
+::: info 注意
+`CanMatch` 有所不同。当它返回 `false` 时，Angular 会尝试其他匹配的路由，而不是阻止导航。
 
-Angular provides four types of route guards, each serving different purposes:
+:::
+
+## 路由守卫的类型 {#types-of-route-guards}
+
+Angular 提供了四种路由守卫，各自用于不同的目的：
 
 - [CanActivate](#canactivate)
 - [CanActivateChild](#canactivatechild)
@@ -56,18 +52,18 @@ Angular provides four types of route guards, each serving different purposes:
 - [CanMatch](#canmatch)
 
 
-All the guards have access to [services provided at the route level](/guide/di/defining-dependency-providers#route-providers) as well as route-specific information via the `route` argument.
+所有守卫都可以访问[在路由级别提供的服务](/guide/di/defining-dependency-providers#route-providers)，也可以通过 `route` 参数访问路由相关的信息。
 
-### CanActivate
+### CanActivate {#canactivate}
 
-The `CanActivate` guard determines whether a user can access a route. It is most commonly used for authentication and authorization.
+`CanActivate` 守卫决定用户能否访问某个路由。它最常用于身份验证和授权。
 
-It has access to the following default arguments:
+它可以访问以下默认参数：
 
-- `route`: `ActivatedRouteSnapshot` - Contains information about the route being activated
-- `state`: `RouterStateSnapshot` - Contains the state the router is navigating to, not the current state (use `Router.routerState` for that)
+- `route`: `ActivatedRouteSnapshot` - 包含正在激活的路由的信息
+- `state`: `RouterStateSnapshot` - 包含路由器正在导航前往的状态，而不是当前状态（当前状态请使用 `Router.routerState`）
 
-It can return the [standard return guard types](#route-guard-return-types).
+它可以返回[标准的守卫返回类型](#route-guard-return-types)。
 
 ```ts
 export const authGuard: CanActivateFn = (
@@ -79,23 +75,23 @@ export const authGuard: CanActivateFn = (
 };
 ```
 
-::: tip TIP
-If you need to redirect the user, return a [`URLTree`](https://angular.dev/api/router/UrlTree) or [`RedirectCommand`](https://angular.dev/api/router/RedirectCommand). Do **not** return `false` and then programmatically `navigate` the user.
+::: tip 提示
+如果需要重定向（redirect）用户，请返回 [`URLTree`](https://angular.dev/api/router/UrlTree) 或 [`RedirectCommand`](https://angular.dev/api/router/RedirectCommand)。**不要**先返回 `false`，再以编程方式 `navigate` 用户。
 
 :::
 
-For more information, check out the [API docs for CanActivateFn](https://angular.dev/api/router/CanActivateFn).
+更多信息请参阅 [CanActivateFn 的 API 文档](https://angular.dev/api/router/CanActivateFn)。
 
-### CanActivateChild
+### CanActivateChild {#canactivatechild}
 
-The `CanActivateChild` guard determines whether a user can access child routes of a particular parent route. This is useful when you want to protect an entire section of nested routes. In other words, `canActivateChild` runs for _all_ children. If there is a child component with another child component underneath of it, `canActivateChild` will run once for each of them.
+`CanActivateChild` 守卫决定用户能否访问某个父路由下的子路由。当你想保护整个嵌套路由区域时，这会很有用。换句话说，`canActivateChild` 会对*所有*子路由运行。如果某个子组件下面还有另一个子组件，`canActivateChild` 会对它们各运行一次。
 
-It has access to the following default arguments:
+它可以访问以下默认参数：
 
-- `childRoute`: `ActivatedRouteSnapshot` - Contains information about the "future" snapshot (i.e., state the router is attempting to navigate to) of the child route being activated
-- `state`: `RouterStateSnapshot` - Contains the state the router is navigating to, not the current state (use `Router.routerState` for that)
+- `childRoute`: `ActivatedRouteSnapshot` - 包含正在激活的子路由的“未来”快照信息（即路由器正尝试导航前往的状态）
+- `state`: `RouterStateSnapshot` - 包含路由器正在导航前往的状态，而不是当前状态（当前状态请使用 `Router.routerState`）
 
-It can return the [standard return guard types](#route-guard-return-types).
+它可以返回[标准的守卫返回类型](#route-guard-return-types)。
 
 ```ts
 export const adminChildGuard: CanActivateChildFn = (
@@ -107,20 +103,20 @@ export const adminChildGuard: CanActivateChildFn = (
 };
 ```
 
-For more information, check out the [API docs for CanActivateChildFn](https://angular.dev/api/router/CanActivateChildFn).
+更多信息请参阅 [CanActivateChildFn 的 API 文档](https://angular.dev/api/router/CanActivateChildFn)。
 
-### CanDeactivate
+### CanDeactivate {#candeactivate}
 
-The `CanDeactivate` guard determines whether a user can leave a route. A common scenario is preventing navigation away from unsaved forms.
+`CanDeactivate` 守卫决定用户能否离开某个路由。一个常见场景是阻止用户在表单未保存时离开。
 
-It has access to the following default arguments:
+它可以访问以下默认参数：
 
-- `component`: `T` - The component instance being deactivated
-- `currentRoute`: `ActivatedRouteSnapshot` - Contains information about the current route
-- `currentState`: `RouterStateSnapshot` - Contains the current router state
-- `nextState`: `RouterStateSnapshot` - Contains the next router state being navigated to
+- `component`: `T` - 正在停用的组件（component）实例
+- `currentRoute`: `ActivatedRouteSnapshot` - 包含当前路由的信息
+- `currentState`: `RouterStateSnapshot` - 包含当前的路由器状态
+- `nextState`: `RouterStateSnapshot` - 包含即将导航前往的下一个路由器状态
 
-It can return the [standard return guard types](#route-guard-return-types).
+它可以返回[标准的守卫返回类型](#route-guard-return-types)。
 
 ```ts
 export const unsavedChangesGuard: CanDeactivateFn<Form> = (
@@ -135,19 +131,19 @@ export const unsavedChangesGuard: CanDeactivateFn<Form> = (
 };
 ```
 
-For more information, check out the [API docs for CanDeactivateFn](https://angular.dev/api/router/CanDeactivateFn).
+更多信息请参阅 [CanDeactivateFn 的 API 文档](https://angular.dev/api/router/CanDeactivateFn)。
 
-### CanMatch
+### CanMatch {#canmatch}
 
-The `CanMatch` guard determines whether a route can be matched during path matching. Unlike other guards, rejection falls through to try other matching routes instead of blocking navigation entirely. This can be useful for feature flags, A/B testing, or conditional route loading.
+`CanMatch` 守卫决定在路径匹配过程中某个路由能否被匹配。与其他守卫不同，被拒绝时会继续尝试其他匹配的路由，而不是完全阻止导航。这对于功能开关、A/B 测试或有条件地加载路由很有用。
 
-It has access to the following default arguments:
+它可以访问以下默认参数：
 
-- `route`: `Route` - The route configuration being evaluated
-- `segments`: `UrlSegment[]` - The URL segments that have not been consumed by previous parent route evaluations
-- `currentSnapshot: PartialMatchRouteSnapshot` - The current route snapshot up to this point in the matching process
+- `route`: `Route` - 正在评估的路由配置
+- `segments`: `UrlSegment[]` - 尚未被之前的父路由评估消费的 URL 片段
+- `currentSnapshot: PartialMatchRouteSnapshot` - 匹配过程进行到此时的当前路由快照
 
-It can return the [standard return guard types](#route-guard-return-types), but when it returns `false`, Angular tries other matching routes instead of completely blocking navigation.
+它可以返回[标准的守卫返回类型](#route-guard-return-types)，但当它返回 `false` 时，Angular 会尝试其他匹配的路由，而不是完全阻止导航。
 
 ```ts
 export const featureToggleGuard: CanMatchFn = (
@@ -160,7 +156,7 @@ export const featureToggleGuard: CanMatchFn = (
 };
 ```
 
-It can also allow you to use different components for the same path.
+它还可以让你为同一路径使用不同的组件。
 
 ```ts [routes.ts]
 const routes: Routes = [
@@ -177,20 +173,20 @@ const routes: Routes = [
 ];
 ```
 
-In this example, when the user visits `/dashboard`, the first one that matches the correct guard will be used.
+在这个例子中，当用户访问 `/dashboard` 时，会使用第一个通过对应守卫的路由。
 
-For more information, check out the [API docs for CanMatchFn](https://angular.dev/api/router/CanMatchFn).
+更多信息请参阅 [CanMatchFn 的 API 文档](https://angular.dev/api/router/CanMatchFn)。
 
-## Applying guards to routes
+## 把守卫应用到路由上 {#applying-guards-to-routes}
 
-Once you've created your route guards, you need to configure them in your route definitions.
+创建好路由守卫后，需要在路由定义中配置它们。
 
-Guards are specified as arrays in the route configuration in order to allow you to apply multiple guards to a single route. The router starts the guards in the order they appear in the array, but it does not wait for one guard to finish before starting the next. Guards that return a `Promise` or an `Observable` therefore run concurrently.
+守卫在路由配置中以数组的形式指定，这样就可以为单个路由应用多个守卫。路由器会按照守卫在数组中出现的顺序启动它们，但不会等一个守卫完成后再启动下一个。因此，返回 `Promise` 或 `Observable` 的守卫会并发运行。
 
-The array order determines which result takes priority. Navigation continues only if every guard returns `true`. Otherwise the router uses the result of the first guard in the array that did not return `true`, even if a later guard finished earlier.
+数组顺序决定了哪个结果优先。只有每个守卫都返回 `true` 时导航才会继续。否则，路由器会采用数组中第一个没有返回 `true` 的守卫的结果，即使后面的守卫更早完成也是如此。
 
-::: info NOTE
-Because asynchronous guards run concurrently, a guard must not rely on work done by an earlier guard in the same array, such as loading the current user. Put that work in a service that both guards use, or combine the checks into a single guard.
+::: info 注意
+由于异步守卫会并发运行，守卫不能依赖同一数组中靠前的守卫所做的工作，例如加载当前用户。请把这类工作放到两个守卫都使用的服务（service）中，或者把这些检查合并到一个守卫里。
 
 :::
 
@@ -202,21 +198,21 @@ import {canDeactivateGuard} from './guards/can-deactivate.guard';
 import {featureToggleGuard} from './guards/feature-toggle.guard';
 
 const routes: Routes = [
-  // Basic CanActivate - requires authentication
+  // 基本的 CanActivate - 需要身份验证
   {
     path: 'dashboard',
     component: Dashboard,
     canActivate: [authGuard],
   },
 
-  // Multiple CanActivate guards - requires authentication AND admin role
+  // 多个 CanActivate 守卫 - 需要身份验证并且具有管理员角色
   {
     path: 'admin',
     component: Admin,
     canActivate: [authGuard, adminGuard],
   },
 
-  // CanActivate + CanDeactivate - protected route with unsaved changes check
+  // CanActivate + CanDeactivate - 受保护的路由，并检查未保存的更改
   {
     path: 'profile',
     component: Profile,
@@ -224,26 +220,26 @@ const routes: Routes = [
     canDeactivate: [canDeactivateGuard],
   },
 
-  // CanActivateChild - protects all child routes
+  // CanActivateChild - 保护所有子路由
   {
-    path: 'users', // /user - NOT protected
+    path: 'users', // /user - 不受保护
     canActivateChild: [authGuard],
     children: [
-      // /users/list - PROTECTED
+      // /users/list - 受保护
       {path: 'list', component: UserList},
-      // /users/detail/:id - PROTECTED
+      // /users/detail/:id - 受保护
       {path: 'detail/:id', component: UserDetail},
     ],
   },
 
-  // CanMatch - conditionally matches route based on feature flag
+  // CanMatch - 根据功能开关有条件地匹配路由
   {
     path: 'beta-feature',
     component: BetaFeature,
     canMatch: [featureToggleGuard],
   },
 
-  // Fallback route if beta feature is disabled
+  // 测试版功能被禁用时的后备路由
   {
     path: 'beta-feature',
     component: ComingSoon,

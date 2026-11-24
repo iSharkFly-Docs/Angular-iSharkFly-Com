@@ -1,51 +1,47 @@
----
-untranslated: true
----
-
-# Forms with Angular Signals
+# 使用 Angular 信号构建表单 {#forms-with-angular-signals}
 
 
 
 
-Signal Forms is a library that allows you to manage form state in Angular applications by building on the reactive foundation of signals. With automatic two-way binding, type-safe field access, and schema-based validation, Signal Forms help you create robust forms.
+信号表单（Signal Forms）是一个库，它构建在信号（Signal）的响应式基础之上，用于管理 Angular 应用中的表单状态。借助自动的双向绑定（Two-way Binding）、类型安全的字段访问以及基于 schema 的验证，信号表单可以帮你构建健壮的表单。
 
-::: tip TIP
-For a quick introduction to Signal Forms, see the [Signal Forms essentials guide](/essentials/signal-forms).
+::: tip 提示
+如需快速了解信号表单，请参阅[信号表单基础指南](/essentials/signal-forms)。
 
 :::
 
-## Why Signal Forms?
+## 为什么选择信号表单？ {#why-signal-forms}
 
-Building forms in web applications involves managing several interconnected concerns: tracking field values, validating user input, handling error states, and keeping the UI synchronized with your data model. Managing these concerns separately creates boilerplate code and complexity.
+在 Web 应用中构建表单，需要处理多个相互关联的问题：跟踪字段值、验证用户输入、处理错误状态，以及让 UI 与数据模型保持同步。分别处理这些问题会产生大量样板代码，也会增加复杂度。
 
-Signal Forms address these challenges by:
+信号表单通过以下方式应对这些挑战：
 
-- **Synchronizing state automatically** - Automatically syncs the form data model with bound form fields
-- **Providing type safety** - Supports fully type safe schemas & bindings between your UI controls and data model
-- **Centralizing validation logic** - Define all validation rules in one place using a validation schema
+- **自动同步状态** - 自动将表单数据模型与绑定的表单字段同步
+- **提供类型安全** - 在 UI 控件与数据模型之间支持完全类型安全的 schema 和绑定
+- **集中管理验证逻辑** - 使用验证 schema 在一处定义所有验证规则
 
-Signal Forms work best in new applications built with signals. If you're working with an existing application that uses reactive forms, reactive forms remain a solid choice.
+信号表单最适合使用信号构建的新应用。如果你正在维护一个使用响应式表单（Reactive Forms）的现有应用，响应式表单依然是可靠的选择。
 
-::: info NOTE
-If you're coming from template or reactive forms, you may be interested in the [comparison guide](/guide/forms/signals/comparison).
+::: info 注意
+如果你之前使用的是模板驱动表单或响应式表单，可能会对[对比指南](/guide/forms/signals/comparison)感兴趣。
 
 :::
 
-## Prerequisites
+## 前提条件 {#prerequisites}
 
-Signal Forms require:
+信号表单要求：
 
-- Angular v21 or higher
+- Angular v21 或更高版本
 
-## Setup
+## 设置 {#setup}
 
-Signal Forms are already included in the `@angular/forms` package. Import the necessary functions and directives from `@angular/forms/signals`:
+信号表单已经包含在 `@angular/forms` 包中。从 `@angular/forms/signals` 导入所需的函数和指令（Directive）：
 
 ```ts
 import {form, FormField, required, email} from '@angular/forms/signals';
 ```
 
-The `FormField` directive must be imported into any component that binds form fields to HTML inputs:
+任何把表单字段绑定到 HTML 输入框的组件（Component），都必须导入 `FormField` 指令：
 
 ```ts
 @Component({
@@ -54,15 +50,15 @@ The `FormField` directive must be imported into any component that binds form fi
 })
 ```
 
-## Next steps
+## 后续步骤 {#next-steps}
 
-To learn more about how Signal Forms work, check out the following guides:
+要进一步了解信号表单的工作原理，请查看以下指南：
 
-- [Signal forms essentials](/essentials/signal-forms)
-- [Form models](/guide/forms/signals/models)
-- [Designing your form model](/guide/forms/signals/model-design)
-- [Field state management](/guide/forms/signals/field-state-management)
-- [Validation](/guide/forms/signals/validation)
-- [Custom controls](/guide/forms/signals/custom-controls)
-- [Comparison with other form systems](/guide/forms/signals/comparison)
+- [信号表单基础](/essentials/signal-forms)
+- [表单模型](/guide/forms/signals/models)
+- [设计表单模型](/guide/forms/signals/model-design)
+- [字段状态管理](/guide/forms/signals/field-state-management)
+- [验证](/guide/forms/signals/validation)
+- [自定义控件](/guide/forms/signals/custom-controls)
+- [与其他表单系统的对比](/guide/forms/signals/comparison)
 

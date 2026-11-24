@@ -315,7 +315,7 @@ this.viewContainer.createEmbeddedView(this.myFragment, context, {
 
 ## 结构型指令
 
-**结构型指令（Structural Directive）**是指满足以下条件的任何指令：
+**结构型指令**（Structural Directive）是指满足以下条件的任何指令：
 
 - 注入 `TemplateRef`
 - 注入 `ViewContainerRef`，并以编程方式渲染注入的 `TemplateRef`

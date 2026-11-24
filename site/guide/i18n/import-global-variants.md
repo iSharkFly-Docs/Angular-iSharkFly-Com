@@ -1,34 +1,30 @@
----
-untranslated: true
----
+# 导入语言环境数据的全局变体 {#import-global-variants-of-the-locale-data}
 
-# Import global variants of the locale data
-
-The [Angular CLI][CliMain] automatically includes locale data if you run the [`ng build`][CliBuild] command with the `--localize` option.
+如果你使用 `--localize` 选项运行 [`ng build`][CliBuild] 命令，[Angular CLI][CliMain] 会自动包含语言环境（locale）数据。
 
 ```shell
 ng build --localize
 ```
 
-::: tip HELPFUL
-The initial installation of Angular already contains locale data for English in the United States \(`en-US`\).
-The [Angular CLI][CliMain] automatically includes the locale data and sets the `LOCALE_ID` value when you use the `--localize` option with [`ng build`][CliBuild] command.
+::: tip 提示
+Angular 的初始安装就已经包含了美国英语 \(`en-US`\) 的语言环境数据。
+当你在 [`ng build`][CliBuild] 命令中使用 `--localize` 选项时，[Angular CLI][CliMain] 会自动包含语言环境数据并设置 `LOCALE_ID` 的值。
 
 :::
 
-The `@angular/common` package on npm contains the locale data files.
-Global variants of the locale data are available in `@angular/common/locales/global`.
+npm 上的 `@angular/common` 包中含有语言环境数据文件。
+语言环境数据的全局变体位于 `@angular/common/locales/global` 中。
 
-## `import` example for French
+## 法语的 `import` 示例 {#import-example-for-french}
 
-For example, you could import the global variants for French \(`fr`\) in `main.ts` where you bootstrap the application.
+例如，你可以在引导应用的 `main.ts` 中导入法语 \(`fr`\) 的全局变体。
 
 ```ts [src/main.ts (import locale)]
 import '@angular/common/locales/global/fr';
 ```
 
-::: tip HELPFUL
-In an `NgModules` application, you would import it in your `app.module`.
+::: tip 提示
+在基于 `NgModules` 的应用中，你应该在 `app.module` 中导入它。
 
 :::
 

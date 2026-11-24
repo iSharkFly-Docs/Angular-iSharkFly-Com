@@ -1,78 +1,74 @@
----
-untranslated: true
----
+# 通过 ID 引用语言环境 {#refer-to-locales-by-id}
 
-# Refer to locales by ID
+Angular 使用 Unicode *语言环境标识符*（Unicode locale ID）来查找正确的语言环境（locale）数据，以便对文本字符串进行国际化。
 
-Angular uses the Unicode _locale identifier_ \(Unicode locale ID\) to find the correct locale data for internationalization of text strings.
+::: tip Unicode 语言环境 ID
+- 语言环境 ID 遵循 [Unicode 通用语言环境数据仓库（CLDR）核心规范][UnicodeCldrDevelopmentCoreSpecification]。
+  关于语言环境 ID 的更多信息，请参阅 [Unicode 语言和语言环境标识符][UnicodeCldrDevelopmentCoreSpecificationLocaleID]。
 
-::: tip Unicode locale ID
-- A locale ID conforms to the [Unicode Common Locale Data Repository (CLDR) core specification][UnicodeCldrDevelopmentCoreSpecification].
-  For more information about locale IDs, see [Unicode Language and Locale Identifiers][UnicodeCldrDevelopmentCoreSpecificationLocaleID].
-
-- CLDR and Angular use [BCP 47 tags][RfcEditorInfoBcp47] as the base for the locale ID
+- CLDR 和 Angular 使用 [BCP 47 标签][RfcEditorInfoBcp47]作为语言环境 ID 的基础
 :::
 
-A locale ID specifies the language, country, and an optional code for further variants or subdivisions.
-A locale ID consists of the language identifier, a hyphen \(`-`\) character, and the locale extension.
+语言环境 ID 指定了语言、国家/地区，以及一个可选的代码，用于表示进一步的变体或细分。
+语言环境 ID 由语言标识符、连字符（`-`）和语言环境扩展组成。
 
 ```html
 {language_id}-{locale_extension}
 ```
 
-::: tip HELPFUL
-To accurately translate your Angular project, you must decide which languages and locales you are targeting for internationalization.
+::: tip 提示
+要准确地翻译 Angular 项目，你必须先确定国际化所面向的语言和语言环境。
 
 :::
 
-Many countries share the same language, but differ in usage.
-The differences include grammar, punctuation, formats for currency, decimal numbers, dates, and so on.
+许多国家使用同一种语言，但用法有所不同。
+这些差异包括语法、标点，以及货币、小数、日期等的格式。
 
-For the examples in this guide, use the following languages and locales.
+本指南中的示例使用下列语言和语言环境。
 
-| Language | Locale                   | Unicode locale ID |
-| :------- | :----------------------- | :---------------- |
-| English  | Canada                   | `en-CA`           |
-| English  | United States of America | `en-US`           |
-| French   | Canada                   | `fr-CA`           |
-| French   | France                   | `fr-FR`           |
+| 语言   | 语言环境         | Unicode 语言环境 ID |
+| :----- | :--------------- | :------------------ |
+| 英语   | 加拿大           | `en-CA`             |
+| 英语   | 美国             | `en-US`             |
+| 法语   | 加拿大           | `fr-CA`             |
+| 法语   | 法国             | `fr-FR`             |
 
-The [Angular repository][GithubAngularAngularTreeMasterPackagesCommonLocales] includes common locales.
+[Angular 代码仓库][GithubAngularAngularTreeMasterPackagesCommonLocales]中包含了常用的语言环境。
 
 ::: tip 
-For a list of language codes, see [ISO 639-2](https://www.loc.gov/standards/iso639-2).
+关于语言代码的列表，请参阅 [ISO 639-2](https://www.loc.gov/standards/iso639-2)。
 :::
 
-## Set the source locale ID
+## 设置源语言环境 ID {#set-the-source-locale-id}
 
-Use the Angular CLI to set the source language in which you are writing the component template and code.
+使用 Angular CLI 设置你编写组件（Component）模板（Template）和代码时所用的源语言。
 
-By default, Angular uses `en-US` as the source locale of your project.
+默认情况下，Angular 使用 `en-US` 作为项目的源语言环境。
 
-To change the source locale of your project for the build, complete the following actions.
+要为构建修改项目的源语言环境，请完成以下操作。
 
-1. Open the [`angular.json`][GuideWorkspaceConfig] workspace build configuration file.
-2. Add or modify the `sourceLocale` field inside the `i18n` section:
+1. 打开 [`angular.json`][GuideWorkspaceConfig] 工作区构建配置文件。
+2. 在 `i18n` 部分中添加或修改 `sourceLocale` 字段：
 
 ```json
 {
   "projects": {
     "your-project": {
       "i18n": {
-        "sourceLocale": "ca" // Use your desired locale code
+        "sourceLocale": "ca" // 使用你想要的语言环境代码
       }
     }
   }
 }
 ```
 
-## Read the active locale outside dependency injection
+## 在依赖注入之外读取当前语言环境 {#read-the-active-locale-outside-dependency-injection}
 
-Inside a component or service, inject the `LOCALE_ID` token to get the active locale.
+在组件或服务（Service）中，注入 `LOCALE_ID` 令牌即可获取当前的语言环境。
 
-If you can't inject `LOCALE_ID`, for example in a plain function outside an injection context, read `$localize.locale`.
-Each localized build sets this value, and it is what the default `LOCALE_ID` factory reads.
-If your application provides its own `LOCALE_ID`, `$localize.locale` does not reflect it.
+如果无法注入 `LOCALE_ID`，例如在注入上下文（Injection Context）之外的普通函数中，请读取 `$localize.locale`。
+每次本地化构建都会设置这个值，它也正是默认的 `LOCALE_ID` 工厂所读取的值。
+如果你的应用提供了自己的 `LOCALE_ID`，`$localize.locale` 不会反映它。
 
 ```ts
 declare const $localize: {locale?: string};
@@ -80,11 +76,11 @@ declare const $localize: {locale?: string};
 export const locale = (typeof $localize !== 'undefined' && $localize.locale) || 'en-US';
 ```
 
-Put this in a file that has an `import` or `export`. If your project already includes the `@angular/localize` types, omit the `declare` line.
+请把这段代码放在一个包含 `import` 或 `export` 的文件中。如果你的项目已经包含了 `@angular/localize` 的类型，请省略 `declare` 那一行。
 
-## What's next
+## 下一步 {#what-s-next}
 
-- [Format data based on locale](/guide/i18n/format-data-locale)
+- [根据语言环境格式化数据](/guide/i18n/format-data-locale)
 
 
 [GuideWorkspaceConfig]: reference/configs/workspace-config 'Angular workspace configuration | Angular'

@@ -1,23 +1,19 @@
----
-untranslated: true
----
+# 测试请求 {#test-requests}
 
-# Test requests
+和任何外部依赖一样，你必须模拟（mock）HTTP 后端，这样测试才能模拟与远程服务器的交互。`@angular/common/http/testing` 库提供了一些工具，用于捕获应用发出的请求、对这些请求进行断言，并模拟响应以仿真后端的行为。
 
-As for any external dependency, you must mock the HTTP backend so your tests can simulate interaction with a remote server. The `@angular/common/http/testing` library provides tools to capture requests made by the application, make assertions about them, and mock the responses to emulate your backend's behavior.
+这个测试库是为这样一种模式设计的：应用先执行代码并发出请求；然后测试预期某些请求已经发出或没有发出，对这些请求执行断言，最后通过「冲刷（flush）」每个预期的请求来提供响应。
 
-The testing library is designed for a pattern where the app executes code and makes requests first. The test then expects that certain requests have or have not been made, performs assertions against those requests, and finally provides responses by "flushing" each expected request.
+最后，测试还可以验证应用没有发出任何意外的请求。
 
-Finally, tests can verify that the app made no unexpected requests.
+## 测试的准备工作 {#setup-for-testing}
 
-## Setup for testing
-
-To begin testing usage of `HttpClient`, configure `TestBed` and include `provideHttpClientTesting()` in your test's setup. `HttpClient` is provided by Angular's test environment, and `provideHttpClientTesting()` configures it to use a test backend instead of the real network. It also provides `HttpTestingController`, which you'll use to interact with the test backend, set expectations about which requests have been made, and flush responses to those requests. `HttpTestingController` can be injected from `TestBed` once configured.
+要开始测试 `HttpClient` 的用法，请配置 `TestBed`，并在测试的准备代码中引入 `provideHttpClientTesting()`。`HttpClient` 由 Angular 的测试环境提供，而 `provideHttpClientTesting()` 会把它配置为使用测试后端，而不是真实网络。它还会提供 `HttpTestingController`，你可以用它与测试后端交互、设置关于哪些请求已发出的预期，并为这些请求冲刷响应。配置完成后，就可以从 `TestBed` 中注入 `HttpTestingController`。
 
 ```ts
 TestBed.configureTestingModule({
   providers: [
-    // ... other test providers
+    // ... 其他测试提供者
     provideHttpClientTesting(),
   ],
 });
@@ -25,13 +21,13 @@ TestBed.configureTestingModule({
 const httpTesting = TestBed.inject(HttpTestingController);
 ```
 
-Now when your tests make requests, they will hit the testing backend instead of the normal one. You can use `httpTesting` to make assertions about those requests.
+现在，当测试发出请求时，这些请求会到达测试后端，而不是正常的后端。你可以使用 `httpTesting` 对这些请求进行断言。
 
-### Configuring `HttpClient` in tests
+### 在测试中配置 `HttpClient` {#configuring-httpclient-in-tests}
 
-If a test needs to configure `HttpClient` features, such as interceptors, include `provideHttpClient(...)` before `provideHttpClientTesting()`.
-::: warning IMPORTANT
-Keep in mind to provide `provideHttpClient()` **before** `provideHttpClientTesting()`, as `provideHttpClientTesting()` will overwrite parts of `provideHttpClient()`. Doing it the other way around can potentially break your tests.
+如果测试需要配置 `HttpClient` 的功能（例如拦截器（interceptor）），请在 `provideHttpClientTesting()` 之前引入 `provideHttpClient(...)`。
+::: warning 重要
+记住要在 `provideHttpClientTesting()` **之前**提供 `provideHttpClient()`，因为 `provideHttpClientTesting()` 会覆盖 `provideHttpClient()` 的部分内容。如果顺序反过来，可能会破坏你的测试。
 
 :::
 
@@ -41,9 +37,9 @@ TestBed.configureTestingModule({
 });
 ```
 
-## Expecting and answering requests
+## 预期并应答请求 {#expecting-and-answering-requests}
 
-For example, you can write a test that expects a GET request to occur and provides a mock response:
+例如，你可以编写一个测试，预期会发生一个 GET 请求，并提供一个模拟响应：
 
 ```ts
 TestBed.configureTestingModule({
@@ -52,37 +48,37 @@ TestBed.configureTestingModule({
 
 const httpTesting = TestBed.inject(HttpTestingController);
 
-// Load `ConfigService` and request the current configuration.
+// 加载 `ConfigService` 并请求当前配置。
 const service = TestBed.inject(ConfigService);
 const config$ = service.getConfig<Config>();
 
-// `firstValueFrom` subscribes to the `Observable`, which makes the HTTP request,
-// and creates a `Promise` of the response.
+// `firstValueFrom` 会订阅这个 `Observable`，从而发出 HTTP 请求，
+// 并创建一个代表响应的 `Promise`。
 const configPromise = firstValueFrom(config$);
 
-// At this point, the request is pending, and we can assert it was made
-// via the `HttpTestingController`:
+// 此时请求处于待处理状态，我们可以通过 `HttpTestingController`
+// 断言它已经发出：
 const req = httpTesting.expectOne('/api/config', 'Request to load the configuration');
 
-// We can assert various properties of the request if desired.
+// 如有需要，我们可以对请求的各个属性进行断言。
 expect(req.request.method).toBe('GET');
 
-// Flushing the request causes it to complete, delivering the result.
+// 冲刷请求会让它完成，并交付结果。
 req.flush(DEFAULT_CONFIG);
 
-// We can then assert that the response was successfully delivered by the `ConfigService`:
+// 然后我们可以断言 `ConfigService` 已成功交付响应：
 expect(await configPromise).toEqual(DEFAULT_CONFIG);
 
-// Finally, we can assert that no other requests were made.
+// 最后，我们可以断言没有发出其他请求。
 httpTesting.verify();
 ```
 
-::: info NOTE
-`expectOne` will fail if the test has made more than one request which matches the given criteria.
+::: info 注意
+如果测试发出了不止一个符合给定条件的请求，`expectOne` 就会失败。
 
 :::
 
-As an alternative to asserting on `req.method`, you could instead use an expanded form of `expectOne` to also match the request method:
+除了对 `req.method` 进行断言之外，你也可以使用 `expectOne` 的展开形式来同时匹配请求方法：
 
 ```ts
 const req = httpTesting.expectOne(
@@ -94,79 +90,79 @@ const req = httpTesting.expectOne(
 );
 ```
 
-::: tip HELPFUL
-The expectation APIs match against the full URL of requests, including any query parameters.
+::: tip 提示
+这些预期 API 会针对请求的完整 URL 进行匹配，包括所有查询参数。
 
 :::
 
-The last step, verifying that no requests remain outstanding, is common enough for you to move it into an `afterEach()` step:
+最后一步，即验证没有遗留未完成的请求，非常常见，因此你可以把它移到 `afterEach()` 步骤中：
 
 ```ts
 afterEach(() => {
-  // Verify that none of the tests make any extra HTTP requests.
+  // 验证所有测试都没有发出任何额外的 HTTP 请求。
   TestBed.inject(HttpTestingController).verify();
 });
 ```
 
-## Handling more than one request at once
+## 同时处理多个请求 {#handling-more-than-one-request-at-once}
 
-If you need to respond to duplicate requests in your test, use the `match()` API instead of `expectOne()`. It takes the same arguments but returns an array of matching requests. Once returned, these requests are removed from future matching and you are responsible for flushing and verifying them.
+如果你需要在测试中响应重复的请求，请使用 `match()` API，而不是 `expectOne()`。它接受相同的参数，但会返回一个由匹配请求组成的数组。一旦返回，这些请求就不会再参与后续的匹配，你需要负责冲刷并验证它们。
 
 ```ts
 const allGetRequests = httpTesting.match({method: 'GET'});
 for (const req of allGetRequests) {
-  // Handle responding to each request.
+  // 处理对每个请求的响应。
 }
 ```
 
-## Advanced matching
+## 高级匹配 {#advanced-matching}
 
-All matching functions accept a predicate function for custom matching logic:
+所有匹配函数都接受一个谓词函数，用于实现自定义的匹配逻辑：
 
 ```ts
-// Look for one request that has a request body.
+// 查找一个带有请求体的请求。
 const requestsWithBody = httpTesting.expectOne((req) => req.body !== null);
 ```
 
-The `expectNone` function asserts that no requests match the given criteria.
+`expectNone` 函数会断言没有任何请求符合给定条件。
 
 ```ts
-// Assert that no mutation requests have been issued.
+// 断言没有发出任何变更类请求。
 httpTesting.expectNone((req) => req.method !== 'GET');
 ```
 
-## Testing error handling
+## 测试错误处理 {#testing-error-handling}
 
-You should test your app's responses when HTTP requests fail.
+你应该测试应用在 HTTP 请求失败时的响应。
 
-### Backend errors
+### 后端错误 {#backend-errors}
 
-To test handling of backend errors (when the server returns a non-successful status code), flush requests with an error response that emulates what your backend would return when a request fails.
+要测试对后端错误（服务器返回非成功状态码的情况）的处理，可以用一个错误响应来冲刷请求，以仿真请求失败时后端会返回的内容。
 
 ```ts
 const req = httpTesting.expectOne('/api/config');
 req.flush('Failed!', {status: 500, statusText: 'Internal Server Error'});
 
-// Assert that the application successfully handled the backend error.
+// 断言应用成功处理了后端错误。
 ```
 
-### Network errors
+### 网络错误 {#network-errors}
 
-Requests can also fail due to network errors, which `HttpClient` reports as an `HttpErrorResponse` with a `status` of `0`. These can be simulated with the `error()` method, which wraps the given `ProgressEvent` in such a response:
+请求也可能因为网络错误而失败，`HttpClient` 会把这类错误报告为 `status` 为 `0` 的 `HttpErrorResponse`。可以使用 `error()` 方法来模拟这种情况，它会把给定的 `ProgressEvent` 包装进这样一个响应中：
 
 ```ts
 const req = httpTesting.expectOne('/api/config');
 req.error(new ProgressEvent('network error!'));
 
-// Assert that the application successfully handled the network error.
+// 断言应用成功处理了网络错误。
 ```
 
-## Testing an Interceptor
+## 测试拦截器 {#testing-an-interceptor}
 
-You should test that your interceptors work under the desired circumstances.
+你应该测试拦截器在预期的情况下能正常工作。
 
-For example, an application may be required to add an authentication token generated by a service to each outgoing request.
-This behavior can be enforced with the use of an interceptor:
+例如，某个应用可能要求为每个发出的请求添加一个由服务（Service）生成的身份验证令牌。
+这种行为可以借助拦截器来实现：
 
 ```ts
 export function authInterceptor(
@@ -182,26 +178,26 @@ export function authInterceptor(
 }
 ```
 
-The `TestBed` configuration for this interceptor should rely on the `withInterceptors` feature.
+这个拦截器的 `TestBed` 配置应该依赖 `withInterceptors` 功能。
 
 ```ts
 TestBed.configureTestingModule({
   providers: [
     AuthService,
-    // Testing one interceptor at a time is recommended.
+    // 建议一次只测试一个拦截器。
     provideHttpClient(withInterceptors([authInterceptor])),
     provideHttpClientTesting(),
   ],
 });
 ```
 
-The `HttpTestingController` can retrieve the request instance that can then be inspected to ensure that the request was modified.
+`HttpTestingController` 可以获取请求实例，然后你可以检查这个实例，以确保请求已被修改。
 
 ```ts
 const service = TestBed.inject(AuthService);
 const http = TestBed.inject(HttpClient);
 
-// Make an HTTP request.
+// 发出一个 HTTP 请求。
 const response = firstValueFrom(http.get('/api/config'));
 
 const req = httpTesting.expectOne('/api/config');
@@ -209,7 +205,7 @@ const req = httpTesting.expectOne('/api/config');
 expect(req.request.headers.get('X-Authentication-Token')).toEqual(service.getAuthToken());
 ```
 
-A similar interceptor could be implemented with class-based interceptors:
+类似的拦截器也可以用基于类的拦截器来实现：
 
 ```ts
 @Injectable()
@@ -225,7 +221,7 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 ```
 
-In order to test it, the `TestBed` configuration should instead be:
+要测试它，`TestBed` 配置应改为：
 
 ```ts
 TestBed.configureTestingModule({
@@ -233,7 +229,7 @@ TestBed.configureTestingModule({
     AuthService,
     provideHttpClient(withInterceptorsFromDi()),
     provideHttpClientTesting(),
-    // We rely on the HTTP_INTERCEPTORS token to register the AuthInterceptor as an HttpInterceptor
+    // 我们依赖 HTTP_INTERCEPTORS 令牌把 AuthInterceptor 注册为 HttpInterceptor
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
   ],
 });

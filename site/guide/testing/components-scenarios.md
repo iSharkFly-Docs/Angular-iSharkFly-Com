@@ -1,16 +1,12 @@
----
-untranslated: true
----
+# 组件测试场景 {#component-testing-scenarios}
 
-# Component testing scenarios
+本指南探讨常见的组件（component）测试用例。
 
-This guide explores common component testing use cases.
+## 组件绑定 {#component-binding}
 
-## Component binding
+在示例应用中，`Banner` 组件在 HTML 模板（template）中展示静态的标题文本。
 
-In the example application, the `Banner` component presents static title text in the HTML template.
-
-After a few changes, the `Banner` component presents a dynamic title by binding to the component's `title` property like this.
+经过一些修改后，`Banner` 组件通过绑定（binding）到组件的 `title` 属性来展示动态标题，如下所示。
 
 ```ts [banner.ts]
 import {Component, signal} from '@angular/core';
@@ -25,13 +21,13 @@ export class Banner {
 }
 ```
 
-As minimal as this is, you decide to add a test to confirm that component actually displays the right content where you think it should.
+尽管它如此简单，你还是决定添加一个测试，确认组件确实在你认为应该显示的位置显示了正确的内容。
 
-### Query for the `<h1>`
+### 查询 `<h1>` {#query-for-the}
 
-You'll write a sequence of tests that inspect the value of the `<h1>` element that wraps the _title_ property interpolation binding.
+你将编写一系列测试，检查包裹着 *title* 属性插值绑定的 `<h1>` 元素的值。
 
-You update the `beforeEach` to find that element with a standard HTML `querySelector` and assign it to the `h1` variable.
+你更新 `beforeEach`，用标准的 HTML `querySelector` 找到该元素，并把它赋值给 `h1` 变量。
 
 ```ts [banner.component.spec.ts]
 let component: Banner;
@@ -40,15 +36,15 @@ let h1: HTMLElement;
 
 beforeEach(() => {
   fixture = TestBed.createComponent(Banner);
-  component = fixture.componentInstance; // Banner test instance
+  component = fixture.componentInstance; // Banner 测试实例
   h1 = fixture.nativeElement.querySelector('h1');
 });
 ```
 
-### `createComponent()` does not bind data
+### `createComponent()` 不会绑定数据 {#createcomponent-does-not-bind-data}
 
-For your first test you'd like to see that the screen displays the default `title`.
-Your instinct is to write a test that immediately inspects the `<h1>` like this:
+在第一个测试中，你想确认屏幕上显示的是默认的 `title`。
+你的直觉是编写一个立即检查 `<h1>` 的测试，如下所示：
 
 ```ts
 it('should display original title', () => {
@@ -56,17 +52,17 @@ it('should display original title', () => {
 });
 ```
 
-_That test fails_ with the message:
+*这个测试会失败*，并给出如下消息：
 
 ```shell
 expected '' to contain 'Test Tour of Heroes'.
 ```
 
-Binding happens when Angular performs **change detection**.
+绑定发生在 Angular 执行**变更检测**（change detection）的时候。
 
-In production, change detection kicks in automatically when Angular creates a component or the user enters a keystroke, for example.
+在生产环境中，变更检测会自动触发，例如在 Angular 创建组件或用户按下按键时。
 
-The `TestBed.createComponent` does not trigger change detection synchronously; a fact confirmed in the revised test:
+`TestBed.createComponent` 不会同步触发变更检测；修改后的测试证实了这一点：
 
 ```ts
 it('no title in the DOM after createComponent()', () => {
@@ -74,10 +70,10 @@ it('no title in the DOM after createComponent()', () => {
 });
 ```
 
-### `whenStable()`
+### `whenStable()` {#whenstable}
 
-You can tell the `TestBed` to wait for change detection to run with `await fixture.whenStable()`.
-Only then does the `<h1>` have the expected title.
+你可以用 `await fixture.whenStable()` 让 `TestBed` 等待变更检测运行。
+只有这样，`<h1>` 才会有预期的标题。
 
 ```ts
 it('should display original title', async () => {
@@ -86,10 +82,10 @@ it('should display original title', async () => {
 });
 ```
 
-Delayed change detection is intentional and useful.
-It gives the tester an opportunity to inspect and change the state of the component _before Angular initiates data binding and calls [lifecycle hooks](/guide/components/lifecycle)_.
+延迟变更检测是有意为之的，而且很有用。
+它让测试者有机会*在 Angular 发起数据绑定并调用[生命周期钩子](/guide/components/lifecycle)之前*检查并修改组件的状态。
 
-Here's another test that changes the component's `title` property _before_ calling `fixture.whenStable()`.
+下面是另一个测试，它在调用 `fixture.whenStable()` *之前*修改了组件的 `title` 属性。
 
 ```ts
 it('should display a different test title', async () => {
@@ -99,9 +95,9 @@ it('should display a different test title', async () => {
 });
 ```
 
-### Binding signals to inputs
+### 把信号绑定到输入 {#binding-signals-to-inputs}
 
-To reflect changes to inputs and listen to outputs you can dynamically bind signals to inputs and functions to outputs.
+为了反映输入（input）的变化并监听输出（output），你可以动态地把信号（signal）绑定到输入，把函数绑定到输出。
 
 ```ts
 import {inputBinding, outputBinding} from '@angular/core';
@@ -115,16 +111,16 @@ const fixture = TestBed.createComponent(ValueDisplay, {
 });
 ```
 
-### Change an input value with `dispatchEvent()`
+### 用 `dispatchEvent()` 修改输入值 {#change-an-input-value-with-dispatchevent}
 
-To simulate user input, find the input element and set its `value` property.
+要模拟用户输入，请找到 input 元素并设置它的 `value` 属性。
 
-But there is an essential, intermediate step.
+但还有一个必不可少的中间步骤。
 
-Angular doesn't know that you set the input element's `value` property.
-It won't read that property until you raise the element's `input` event by calling `dispatchEvent()`.
+Angular 并不知道你设置了 input 元素的 `value` 属性。
+在你调用 `dispatchEvent()` 触发该元素的 `input` 事件之前，它不会读取这个属性。
 
-The following example of a component using the `TitleCasePipe` demonstrates the proper sequence.
+下面这个使用 `TitleCasePipe` 的组件示例演示了正确的步骤顺序。
 
 ```ts
 it('should convert hero name to Title Case', async () => {
@@ -132,25 +128,25 @@ it('should convert hero name to Title Case', async () => {
   const nameInput: HTMLInputElement = hostElement.querySelector('input')!;
   const nameDisplay: HTMLElement = hostElement.querySelector('span')!;
 
-  // simulate user entering a new name into the input box
+  // 模拟用户在输入框中输入新名字
   nameInput.value = 'quick BROWN  fOx';
 
-  // Dispatch a DOM event so that Angular learns of input value change.
+  // 派发一个 DOM 事件，让 Angular 知道输入值发生了变化
   nameInput.dispatchEvent(new Event('input'));
 
-  // Wait for Angular to update the display binding through the title pipe
+  // 等待 Angular 通过 title 管道更新显示的绑定
   await fixture.whenStable();
 
   expect(nameDisplay.textContent).toBe('Quick Brown  Fox');
 });
 ```
 
-## Component with a dependency
+## 带有依赖的组件 {#component-with-a-dependency}
 
-Components often have service dependencies.
+组件经常会依赖服务（service）。
 
-The `Welcome` component displays a welcome message to the logged-in user.
-It knows who the user is based on a property of the injected `UserAuthentication`:
+`Welcome` 组件向已登录的用户显示欢迎消息。
+它根据注入的 `UserAuthentication` 的某个属性来知道用户是谁：
 
 ```ts
 import {Component, computed, inject} from '@angular/core';
@@ -168,75 +164,75 @@ export class Welcome {
 }
 ```
 
-The `Welcome` component has decision logic that interacts with the service, logic that makes this component worth testing.
+`Welcome` 组件包含与服务交互的决策逻辑，正是这些逻辑让这个组件值得测试。
 
-### Provide service test doubles
+### 提供服务的测试替身 {#provide-service-test-doubles}
 
-A _component-under-test_ doesn't have to be provided with real services.
+*被测组件*不一定要使用真实的服务。
 
-Injecting the real `UserAuthentication` could be difficult.
-The real service might ask the user for login credentials and attempt to reach an authentication server.
-These behaviors can be hard to intercept. Be aware that using test doubles makes the test behave differently from production so use them sparingly.
+注入真实的 `UserAuthentication` 可能会很困难。
+真实的服务可能会要求用户输入登录凭据，并尝试连接认证服务器。
+这些行为可能很难拦截。请注意，使用测试替身会让测试的行为与生产环境不同，所以要谨慎使用。
 
-### Get injected services
+### 获取注入的服务 {#get-injected-services}
 
-The tests need access to the `UserAuthentication` injected into the `Welcome` component.
+测试需要访问注入到 `Welcome` 组件中的 `UserAuthentication`。
 
-Angular has a hierarchical injection system.
-There can be injectors at multiple levels, from the root injector created by the `TestBed` down through the component tree.
+Angular 有一个分层的注入系统。
+注入器（injector）可以存在于多个层级，从 `TestBed` 创建的根注入器一直向下贯穿整棵组件树。
 
-The safest way to get the injected service, the way that **_always works_**,
-is to **get it from the injector of the _component-under-test_**.
-The component injector is a property of the fixture's `DebugElement`.
+获取注入服务最安全的方式，也就是***始终有效***的方式，
+是**从*被测组件*的注入器中获取它**。
+组件注入器是 fixture 的 `DebugElement` 的一个属性。
 
 ```ts
-// UserAuthentication actually injected into the component
+// 实际注入到组件中的 UserAuthentication
 userAuth = fixture.debugElement.injector.get(UserAuthentication);
 ```
 
-::: tip HELPFUL
-This is _usually_ not necessary. Services are often provided in the root or the TestBed overrides and can be retrieved more easily with `TestBed.inject()` (see below).
+::: tip 提示
+这*通常*是不必要的。服务通常在根级别或 TestBed 的覆盖配置中提供，可以更方便地用 `TestBed.inject()` 获取（见下文）。
 
 :::
 
-### `TestBed.inject()`
+### `TestBed.inject()` {#testbed-inject}
 
-This is easier to remember and less verbose than retrieving a service using the fixture's `DebugElement`.
+与通过 fixture 的 `DebugElement` 获取服务相比，这种方式更容易记住，也更简洁。
 
-In this test suite, the _only_ provider of `UserAuthentication` is the root testing module, so it is safe to call `TestBed.inject()` as follows:
+在这个测试套件中，`UserAuthentication` *唯一*的提供者（provider）是根测试模块，所以可以放心地像下面这样调用 `TestBed.inject()`：
 
 ```ts
 userAuth = TestBed.inject(UserAuthentication);
 ```
 
-::: tip HELPFUL
-For a use case in which `TestBed.inject()` does not work, see the [_Override component providers_](#override-component-providers) section that explains when and why you must get the service from the component's injector instead.
+::: tip 提示
+关于 `TestBed.inject()` 不起作用的用例，请参阅[*覆盖组件的提供者*](#override-component-providers)一节，其中解释了何时以及为什么必须改为从组件的注入器中获取服务。
 
 :::
 
-### Final setup and tests
+### 最终的设置和测试 {#final-setup-and-tests}
 
-Here's the complete `beforeEach()`, using `TestBed.inject()`:
+下面是使用 `TestBed.inject()` 的完整 `beforeEach()`：
 
 ```ts
 let fixture: ComponentFixture<Welcome>;
 let comp: Welcome;
-let userAuth: UserAuthentication; // the TestBed injected service
-let el: HTMLElement; // the DOM element with the welcome message
+let userAuth: UserAuthentication; // TestBed 注入的服务
+let el: HTMLElement; // 包含欢迎消息的 DOM 元素
 
 beforeEach(() => {
   fixture = TestBed.createComponent(Welcome);
   comp = fixture.componentInstance;
 
-  // UserAuthentication from the root injector
+  // 来自根注入器的 UserAuthentication
   userAuth = TestBed.inject(UserAuthentication);
 
-  //  get the "welcome" element by CSS selector (e.g., by class name)
+  //  通过 CSS 选择器（例如类名）获取 "welcome" 元素
   el = fixture.nativeElement.querySelector('.welcome');
 });
 ```
 
-And here are some tests:
+下面是一些测试：
 
 ```ts
 it('should welcome the user', async () => {
@@ -248,14 +244,14 @@ it('should welcome the user', async () => {
 });
 
 it('should welcome "Bubba"', async () => {
-  userAuth.user.set({name: 'Bubba'}); // welcome message hasn't been shown yet
+  userAuth.user.set({name: 'Bubba'}); // 欢迎消息还没有显示
   await fixture.whenStable();
 
   expect(el.textContent).toContain('Bubba');
 });
 
 it('should request login if not logged in', async () => {
-  userAuth.isLoggedIn.set(false); // welcome message hasn't been shown yet
+  userAuth.isLoggedIn.set(false); // 欢迎消息还没有显示
   await fixture.whenStable();
   const content = el.textContent;
 
@@ -264,23 +260,23 @@ it('should request login if not logged in', async () => {
 });
 ```
 
-The first is a sanity test; it confirms that the `UserAuthentication` is called and working.
+第一个是健全性测试；它确认 `UserAuthentication` 被调用并且正常工作。
 
-::: tip HELPFUL
-The 2nd argument of `expect` \(for example, `'expected name'`\) is an optional failure label.
-If the expectation fails, Vitest appends this label to the expectation failure message.
-In a spec with multiple expectations, it can help clarify what went wrong and which expectation failed.
+::: tip 提示
+`expect` 的第二个参数（例如 `'expected name'`）是一个可选的失败标签。
+如果断言失败，Vitest 会把这个标签附加到断言失败消息中。
+在包含多个断言的测试规约中，它有助于说明出了什么问题以及哪个断言失败了。
 
 :::
 
-The remaining tests confirm the logic of the component when the service returns different values.
-The second test validates the effect of changing the user name.
-The third test checks that the component displays the proper message when there is no logged-in user.
+其余测试确认了服务返回不同值时组件的逻辑。
+第二个测试验证修改用户名的效果。
+第三个测试检查没有已登录用户时，组件是否显示了正确的消息。
 
-## Component with async service
+## 带有异步服务的组件 {#component-with-async-service}
 
-In this sample, the `About` component template hosts a `Twain` component.
-The `Twain` component displays Mark Twain quotes.
+在这个示例中，`About` 组件的模板中托管了一个 `Twain` 组件。
+`Twain` 组件显示马克·吐温的名言。
 
 ```html
 <p class="twain">
@@ -292,13 +288,13 @@ The `Twain` component displays Mark Twain quotes.
 }
 ```
 
-::: tip HELPFUL
-The value of the component's `quote` property passes through an `AsyncPipe`.
-That means the property returns either a `Promise` or an `Observable`.
+::: tip 提示
+组件的 `quote` 属性的值会经过一个 `AsyncPipe`。
+这意味着该属性返回的要么是 `Promise`，要么是 `Observable`。
 
 :::
 
-In this example, the `TwainQuotes.getQuote()` method tells you that the `quote` property returns an `Observable`.
+在这个例子中，`TwainQuotes.getQuote()` 方法告诉你 `quote` 属性返回的是一个 `Observable`。
 
 ```ts
 getQuote() {
@@ -307,34 +303,34 @@ getQuote() {
     startWith('...'),
     catchError((err: any) => {
       this.errorMessage.set(err.message || err.toString());
-      return of('...'); // reset message to placeholder
+      return of('...'); // 把消息重置为占位符
     }),
   );
 }
 ```
 
-The `Twain` component gets quotes from an injected `TwainQuotes`.
-The component starts the returned `Observable` with a placeholder value \(`'...'`\), before the service can return its first quote.
+`Twain` 组件从注入的 `TwainQuotes` 获取名言。
+在服务返回第一条名言之前，组件会让返回的 `Observable` 以一个占位值（`'...'`）开始。
 
-The `catchError` intercepts service errors, prepares an error message, and returns the placeholder value on the success channel.
+`catchError` 会拦截服务的错误，准备一条错误消息，并在成功通道上返回占位值。
 
-These are all features you'll want to test.
+这些都是你需要测试的特性。
 
-### Testing by mocking http requests with the `HttpTestingController`.
+### 使用 `HttpTestingController` 模拟 http 请求进行测试。 {#testing-by-mocking-http-requests-with-the-httptestingcontroller}
 
-When testing a component, only the service's public API should matter.
-In general, tests themselves should not make calls to remote servers.
-They should emulate such calls.
+测试组件时，只有服务的公共 API 才是重要的。
+一般来说，测试本身不应该调用远程服务器。
+它们应该模拟这类调用。
 
-In the case your async service relies on the `HttpClient` to load remote data, it is recommended to return mock responses at the HTTP level with the `HttpTestingController`.
+如果你的异步服务依赖 `HttpClient` 来加载远程数据，建议使用 `HttpTestingController` 在 HTTP 层面返回模拟响应。
 
-For more details on mocking the `HttpBackend`, refer to the [dedicated guide](/guide/http/testing).
+关于模拟 `HttpBackend` 的更多细节，请参阅[专门的指南](/guide/http/testing)。
 
-### Testing by providing a stubbed implementation of a service.
+### 通过提供服务的桩实现进行测试。 {#testing-by-providing-a-stubbed-implementation-of-a-service}
 
-When mocking async request at the http level isn't possible, an alternative is to leverage spies.
+当无法在 http 层面模拟异步请求时，另一种做法是利用间谍（spy）。
 
-The setup in this `app/twain/twain-quotes.spec.ts` shows one way to do that:
+这个 `app/twain/twain-quotes.spec.ts` 中的设置展示了一种实现方式：
 
 ```ts [twain.spec.ts]
 class TwainQuotesStub implements TwainQuotes {
@@ -344,7 +340,7 @@ class TwainQuotesStub implements TwainQuotes {
     return of(this.testQuote);
   }
 
-  // ... Implement everything to conform to the API
+  // ... 实现所有内容以符合该 API
 }
 
 beforeEach(async () => {
@@ -359,7 +355,7 @@ beforeEach(async () => {
 });
 ```
 
-Focus on the how the stub implementation replaces the original one.
+重点关注桩实现是如何替换原始实现的。
 
 ```ts
 TestBed.configureTestingModule({
@@ -367,14 +363,14 @@ TestBed.configureTestingModule({
 });
 ```
 
-The stub is designed in such a way that any component or service that injects it will receive the stubbed implementation.
-It means that any call to `getQuote` receives an observable with a test quote.
+这个桩的设计使得任何注入它的组件或服务都会得到桩实现。
+这意味着对 `getQuote` 的任何调用都会得到一个带有测试名言的 observable。
 
-Unlike the real `getQuote()` method, this spy bypasses the server and returns a synchronous observable whose value is available immediately.
+与真实的 `getQuote()` 方法不同，这个间谍绕过了服务器，返回一个同步的 observable，其值立即可用。
 
-### Async test with a Vitest fake timers
+### 使用 Vitest 假定时器进行异步测试 {#async-test-with-a-vitest-fake-timers}
 
-To mock async functions like `setTimeout` or `Promise`s, you can leverage Vitest fake timers to control whenever they fire.
+要模拟 `setTimeout` 或 `Promise` 这样的异步函数，可以利用 Vitest 的假定时器来控制它们何时触发。
 
 ```ts
 it('should display error when TwainQuotes service fails', async () => {
@@ -387,31 +383,31 @@ it('should display error when TwainQuotes service fails', async () => {
       });
     }
 
-    // ... Implement everything to conform to the API
+    // ... 实现所有内容以符合该 API
   }
 
   TestBed.configureTestingModule({
     providers: [{provide: TwainQuotes, useClass: TwainQuotesStub}],
   });
 
-  vi.useFakeTimers(); // setting up the fake timers
+  vi.useFakeTimers(); // 设置假定时器
   const fixture = TestBed.createComponent(TwainComponent);
 
-  // rendering isn't async, we need to flush
+  // 渲染不是异步的，我们需要刷新
   await vi.runAllTimersAsync();
 
   await expect(fixture.nativeElement.querySelector('.error')!.textContent).toMatch(/test failure/);
   expect(fixture.nativeElement.querySelector('.twain')!.textContent).toBe('...');
 
-  vi.useRealTimers(); // resets to regular async execution
+  vi.useRealTimers(); // 恢复为常规的异步执行
 });
 ```
 
-### More async tests
+### 更多异步测试 {#more-async-tests}
 
-With the stubbed service returning async observables, most of your tests will have to be async as well.
+由于桩服务返回的是异步 observable，你的大多数测试也必须是异步的。
 
-Here's a test that demonstrates the data flow you'd expect in the real world.
+下面这个测试演示了你在真实世界中预期的数据流。
 
 ```ts
 class MockTwainQuotes implements TwainQuotes {
@@ -435,13 +431,13 @@ it('should show quote after getQuote (success)', async () => {
 
   const fixture = TestBed.createComponent(TwainComponent);
   const twainQuotes = TestBed.inject(TwainQuotes) as MockTwainQuotes;
-  await vi.runAllTimersAsync(); // render before the quote is received
+  await vi.runAllTimersAsync(); // 在收到名言之前渲染
 
   const quoteEl = fixture.nativeElement.querySelector('.twain');
   expect(quoteEl.textContent).toBe('...');
 
-  twainQuotes.emit('Twain Quote'); // emits the quote
-  await vi.runAllTimersAsync(); // render with the quote received
+  twainQuotes.emit('Twain Quote'); // 发出名言
+  await vi.runAllTimersAsync(); // 收到名言后渲染
 
   expect(quoteEl.textContent).toBe('Twain Quote');
   expect(fixture.nativeElement.querySelector('.error')).toBeNull();
@@ -450,38 +446,38 @@ it('should show quote after getQuote (success)', async () => {
 });
 ```
 
-Notice that the quote element displays the placeholder value \(`'...'`\) on first rendering.
-The first quote hasn't arrived yet.
+注意，名言元素在首次渲染时显示的是占位值（`'...'`）。
+第一条名言还没有到达。
 
-Then you can assert that the quote element displays the expected text.
+然后你就可以断言名言元素显示了预期的文本。
 
-### Async tests with `zone.js` and `fakeAsync`
+### 使用 `zone.js` 和 `fakeAsync` 进行异步测试 {#async-tests-with-zone-js-and-fakeasync}
 
-The `fakeAsync` helper function is another mock clock that relies on patching asynchronous APIs with `zone.js`. It was commonly used in `zone.js` based applications for testing. The use of `fakeAsync` is no longer recommended.
+`fakeAsync` 辅助函数是另一种模拟时钟，它依赖于用 `zone.js` 修补异步 API。它过去在基于 `zone.js` 的应用中常用于测试。现在已不再推荐使用 `fakeAsync`。
 
-::: tip TIP
-Prefer using native async testing strategies or other fake timers (also called mock clocks) like those from Vitest or Jasmine.
-
-:::
-
-::: warning IMPORTANT
-`fakeAsync` requires `zone.js`. To use it with the Vitest test runner, add the `zone.js/plugins/vitest-patch` polyfill as described in [the Vitest migration guide](/guide/testing/migrating-to-vitest#zonejs-vitest-patch).
+::: tip 提示
+优先使用原生的异步测试策略，或者其他假定时器（也称为模拟时钟），例如 Vitest 或 Jasmine 提供的假定时器。
 
 :::
 
-## Component with inputs and outputs
+::: warning 重要
+`fakeAsync` 需要 `zone.js`。要在 Vitest 测试运行器中使用它，请按照 [Vitest 迁移指南](/guide/testing/migrating-to-vitest#zonejs-vitest-patch)中的说明添加 `zone.js/plugins/vitest-patch` 腻子脚本（polyfill）。
 
-A component with inputs and outputs typically appears inside the view template of a host component.
-The host uses a property binding to set the input property and an event binding to listen to events raised by the output property.
+:::
 
-The testing goal is to verify that such bindings work as expected.
-The tests should set input values and listen for output events.
+## 带有输入和输出的组件 {#component-with-inputs-and-outputs}
 
-The `DashboardHero` component is a tiny example of a component in this role.
-It displays an individual hero provided by the `Dashboard` component.
-Clicking that hero tells the `Dashboard` component that the user has selected the hero.
+带有输入和输出的组件通常出现在宿主组件的视图模板中。
+宿主使用属性绑定（property binding）来设置输入属性，并使用事件绑定（event binding）来监听输出属性发出的事件。
 
-The `DashboardHero` component is embedded in the `Dashboard` component template like this:
+测试的目标是验证这些绑定是否按预期工作。
+测试应该设置输入值并监听输出事件。
+
+`DashboardHero` 组件就是一个扮演这种角色的小例子。
+它显示由 `Dashboard` 组件提供的单个英雄。
+点击该英雄会告诉 `Dashboard` 组件用户选中了这个英雄。
+
+`DashboardHero` 组件像这样嵌入在 `Dashboard` 组件的模板中：
 
 ```html
 @for (hero of heroes; track hero) {
@@ -489,9 +485,9 @@ The `DashboardHero` component is embedded in the `Dashboard` component template 
 }
 ```
 
-The `DashboardHero` component appears in an `@for` block, which sets each component's `hero` input property to the looping value and listens for the component's `selected` event.
+`DashboardHero` 组件出现在一个 `@for` 块中，它把每个组件的 `hero` 输入属性设置为循环的值，并监听组件的 `selected` 事件。
 
-Here's the component's full definition:
+下面是该组件的完整定义：
 
 ```ts
 @Component({
@@ -513,18 +509,18 @@ export class DashboardHero {
 }
 ```
 
-While testing a component this simple has little intrinsic value, it's worth knowing how.
-Use one of these approaches:
+虽然测试这样一个简单的组件本身没什么价值，但了解怎么做还是值得的。
+可以使用下列方法之一：
 
-- Test it as used by the `Dashboard` component
-- Test it as a standalone component
-- Test it as used by a substitute for the `Dashboard` component
+- 按照 `Dashboard` 组件使用它的方式进行测试
+- 把它作为独立（standalone）组件进行测试
+- 按照 `Dashboard` 组件的替代品使用它的方式进行测试
 
-The immediate goal is to test the `DashboardHero` component, not the `Dashboard` component, so, try the second and third options.
+当前的目标是测试 `DashboardHero` 组件，而不是 `Dashboard` 组件，所以尝试第二种和第三种方法。
 
-### Test the `DashboardHero` component standalone
+### 独立测试 `DashboardHero` 组件 {#test-the-dashboardhero-component-standalone}
 
-Here's the meat of the spec file setup.
+下面是测试规约文件设置的核心部分。
 
 ```ts
 let fixture: ComponentFixture<DashboardHero>;
@@ -537,24 +533,24 @@ beforeEach(async () => {
   fixture = TestBed.createComponent(DashboardHero);
   comp = fixture.componentInstance;
 
-  // find the hero's DebugElement and element
+  // 找到英雄的 DebugElement 和元素
   heroDe = fixture.debugElement.query(By.css('.hero'));
   heroEl = heroDe.nativeElement;
 
-  // mock the hero supplied by the parent component
+  // 模拟由父组件提供的英雄
   expectedHero = {id: 42, name: 'Test Name'};
 
-  // simulate the parent setting the input property with that hero
+  // 模拟父组件用该英雄设置输入属性
   fixture.componentRef.setInput('hero', expectedHero);
 
-  // wait for initial data binding
+  // 等待初始数据绑定
   await fixture.whenStable();
 });
 ```
 
-Notice how the setup code assigns a test hero \(`expectedHero`\) to the component's `hero` property, emulating the way the `Dashboard` would set it using the property binding in its repeater.
+注意设置代码是如何把一个测试英雄（`expectedHero`）赋值给组件的 `hero` 属性的，这模拟了 `Dashboard` 在其循环中使用属性绑定设置它的方式。
 
-The following test verifies that the hero name is propagated to the template using a binding.
+下面的测试验证英雄的名字通过绑定传递到了模板中。
 
 ```ts
 it('should display hero name in uppercase', () => {
@@ -563,11 +559,11 @@ it('should display hero name in uppercase', () => {
 });
 ```
 
-Because the template passes the hero name through the Angular `UpperCasePipe`, the test must match the element value with the upper-cased name.
+因为模板会让英雄的名字经过 Angular 的 `UpperCasePipe`，所以测试必须用大写的名字来匹配元素的值。
 
-### Clicking
+### 点击 {#clicking}
 
-Clicking the hero should raise a `selected` event that the host component \(`Dashboard` presumably\) can hear:
+点击英雄应该会触发一个 `selected` 事件，宿主组件（大概是 `Dashboard`）能够监听到它：
 
 ```ts
 it('should raise selected event when clicked (triggerEventHandler)', () => {
@@ -579,42 +575,42 @@ it('should raise selected event when clicked (triggerEventHandler)', () => {
 });
 ```
 
-The component's `selected` property is an `OutputEmitterRef`, whose `subscribe` method notifies subscribers synchronously.
-The test subscribes to it _explicitly_ just as the host component does _implicitly_.
+组件的 `selected` 属性是一个 `OutputEmitterRef`，它的 `subscribe` 方法会同步通知订阅者。
+测试*显式地*订阅它，就像宿主组件*隐式地*订阅它一样。
 
-If the component behaves as expected, clicking the hero's element should tell the component's `selected` property to emit the `hero` object.
+如果组件的行为符合预期，点击英雄的元素应该会让组件的 `selected` 属性发出 `hero` 对象。
 
-The test detects that event through its subscription to `selected`.
+测试通过对 `selected` 的订阅来检测该事件。
 
-### `triggerEventHandler`
+### `triggerEventHandler` {#triggereventhandler}
 
-The `heroDe` in the previous test is a `DebugElement` that represents the hero `<button>`.
+上一个测试中的 `heroDe` 是一个代表英雄 `<button>` 的 `DebugElement`。
 
-It has Angular properties and methods that abstract interaction with the native element.
-This test calls the `DebugElement.triggerEventHandler` with the "click" event name.
-The "click" event binding responds by calling `DashboardHero.click()`.
+它拥有一些 Angular 属性和方法，用于抽象与原生元素的交互。
+这个测试用 "click" 事件名调用 `DebugElement.triggerEventHandler`。
+"click" 事件绑定的响应是调用 `DashboardHero.click()`。
 
-The Angular `DebugElement.triggerEventHandler` can raise _any data-bound event_ by its _event name_.
-The second parameter is the event object passed to the handler.
+Angular 的 `DebugElement.triggerEventHandler` 可以通过*事件名*触发*任何数据绑定的事件*。
+第二个参数是传给处理函数的事件对象。
 
-The test triggered a "click" event.
+这个测试触发了一个 "click" 事件。
 
 ```ts
 heroDe.triggerEventHandler('click');
 ```
 
-In this case, the test correctly assumes that the runtime event handler, the component's `click()` method, doesn't care about the event object.
+在这个例子中，测试正确地假设了运行时的事件处理函数（即组件的 `click()` 方法）并不关心事件对象。
 
-::: tip HELPFUL
-Other handlers are less forgiving.
-For example, the `RouterLink` directive expects an object with a `button` property that identifies which mouse button, if any, was pressed during the click.
-The `RouterLink` directive throws an error if the event object is missing.
+::: tip 提示
+其他处理函数就没这么宽容了。
+例如，`RouterLink` 指令（directive）期望一个带有 `button` 属性的对象，用来标识点击时按下的是哪个鼠标按键（如果有的话）。
+如果缺少事件对象，`RouterLink` 指令会抛出错误。
 
 :::
 
-### Click the element
+### 点击元素 {#click-the-element}
 
-The following test alternative calls the native element's own `click()` method, which is perfectly fine for _this component_.
+下面这个替代测试调用了原生元素自己的 `click()` 方法，这对*这个组件*来说完全没问题。
 
 ```ts
 it('should raise selected event when clicked (element.click)', () => {
@@ -626,20 +622,20 @@ it('should raise selected event when clicked (element.click)', () => {
 });
 ```
 
-### `click()` helper
+### `click()` 辅助函数 {#click-helper}
 
-Clicking a button, an anchor, or an arbitrary HTML element is a common test task.
+点击按钮、链接或任意 HTML 元素是常见的测试任务。
 
-Make that consistent and straightforward by encapsulating the _click-triggering_ process in a helper such as the following `click()` function:
+把*触发点击*的过程封装到一个辅助函数中（例如下面的 `click()` 函数），可以让这件事变得一致而直接：
 
 ```ts
-/** Button events to pass to `DebugElement.triggerEventHandler` for RouterLink event handler */
+/** 传给 `DebugElement.triggerEventHandler` 的按钮事件，用于 RouterLink 事件处理函数 */
 export const ButtonClickEvents = {
   left: {button: 0},
   right: {button: 2},
 };
 
-/** Simulate element click. Defaults to mouse left-button click event. */
+/** 模拟元素点击。默认为鼠标左键点击事件。 */
 export function click(
   el: DebugElement | HTMLElement,
   eventObj: any = ButtonClickEvents.left,
@@ -652,35 +648,35 @@ export function click(
 }
 ```
 
-The first parameter is the _element-to-click_.
-If you want, pass a custom event object as the second parameter.
-The default is a partial [left-button mouse event object](https://developer.mozilla.org/docs/Web/API/MouseEvent/button) accepted by many handlers including the `RouterLink` directive.
+第一个参数是*要点击的元素*。
+如果需要，可以把自定义的事件对象作为第二个参数传入。
+默认值是一个部分的[鼠标左键事件对象](https://developer.mozilla.org/docs/Web/API/MouseEvent/button)，包括 `RouterLink` 指令在内的许多处理函数都接受它。
 
-::: warning IMPORTANT
-The `click()` helper function is **not** one of the Angular testing utilities.
-It's a function defined in _this guide's sample code_.
-All of the sample tests use it.
-If you like it, add it to your own collection of helpers.
+::: warning 重要
+`click()` 辅助函数**不是** Angular 测试工具的一部分。
+它是*本指南示例代码*中定义的一个函数。
+所有示例测试都使用了它。
+如果你喜欢它，可以把它加入你自己的辅助函数集合中。
 
 :::
 
-Here's the previous test, rewritten using the click helper.
+下面是用 click 辅助函数重写的上一个测试。
 
 ```ts
 it('should raise selected event when clicked (click helper with DebugElement)', () => {
   let selectedHero: Hero | undefined;
   comp.selected.subscribe((hero: Hero) => (selectedHero = hero));
 
-  click(heroDe); // click helper with DebugElement
+  click(heroDe); // 对 DebugElement 使用 click 辅助函数
 
   expect(selectedHero).toBe(expectedHero);
 });
 ```
 
-## Component inside a test host
+## 测试宿主中的组件 {#component-inside-a-test-host}
 
-The previous tests played the role of the host `Dashboard` component themselves.
-But does the `DashboardHero` component work correctly when properly data-bound to a host component?
+前面的测试自己扮演了宿主 `Dashboard` 组件的角色。
+但是，当 `DashboardHero` 组件正确地数据绑定到宿主组件时，它能正常工作吗？
 
 ```ts
 @Component({
@@ -697,16 +693,16 @@ class TestHost {
 }
 ```
 
-The test host sets the component's `hero` input property with its test hero.
-It binds the component's `selected` event with its `onSelected` handler, which records the emitted hero in its `selectedHero` property.
+测试宿主用它的测试英雄设置组件的 `hero` 输入属性。
+它把组件的 `selected` 事件绑定到自己的 `onSelected` 处理函数，该函数把发出的英雄记录在 `selectedHero` 属性中。
 
-Later, the tests will be able to check `selectedHero` to verify that the `DashboardHero.selected` event emitted the expected hero.
+之后，测试就可以检查 `selectedHero` 来验证 `DashboardHero.selected` 事件发出了预期的英雄。
 
-The setup for the `test-host` tests is similar to the setup for the stand-alone tests:
+`test-host` 测试的设置与独立测试的设置类似：
 
 ```ts
 beforeEach(async () => {
-  // create TestHost instead of DashboardHero
+  // 创建 TestHost 而不是 DashboardHero
   fixture = TestBed.createComponent(TestHost);
   testHost = fixture.componentInstance;
   heroEl = fixture.nativeElement.querySelector('.hero');
@@ -715,17 +711,17 @@ beforeEach(async () => {
 });
 ```
 
-This testing module configuration shows two important differences:
+这个测试模块的配置体现了两个重要的区别：
 
-- It _creates_ the `TestHost` component instead of the `DashboardHero`
-- The `TestHost` component sets the `DashboardHero.hero` with a binding
+- 它*创建*的是 `TestHost` 组件，而不是 `DashboardHero`
+- `TestHost` 组件通过绑定来设置 `DashboardHero.hero`
 
-The `createComponent` returns a `fixture` that holds an instance of `TestHost` instead of an instance of `DashboardHero`.
+`createComponent` 返回的 `fixture` 持有的是 `TestHost` 的实例，而不是 `DashboardHero` 的实例。
 
-Creating the `TestHost` has the side effect of creating a `DashboardHero` because the latter appears within the template of the former.
-The query for the hero element \(`heroEl`\) still finds it in the test DOM, albeit at greater depth in the element tree than before.
+创建 `TestHost` 会带来创建 `DashboardHero` 的副作用，因为后者出现在前者的模板中。
+对英雄元素（`heroEl`）的查询仍然能在测试 DOM 中找到它，只是它在元素树中的位置比之前更深。
 
-The tests themselves are almost identical to the stand-alone version:
+测试本身与独立版本几乎完全相同：
 
 ```ts
 it('should display hero name', () => {
@@ -735,20 +731,20 @@ it('should display hero name', () => {
 
 it('should raise selected event when clicked', () => {
   click(heroEl);
-  // selected hero should be the same data bound hero
+  // 选中的英雄应该就是数据绑定的那个英雄
   expect(testHost.selectedHero).toBe(testHost.hero);
 });
 ```
 
-Only the selected event test differs.
-It confirms that the selected `DashboardHero` hero really does find its way up through the event binding to the host component.
+只有选中事件的测试有所不同。
+它确认了选中的 `DashboardHero` 英雄确实通过事件绑定向上传递到了宿主组件。
 
-## Routing component
+## 路由组件 {#routing-component}
 
-A _routing component_ is a component that tells the `Router` to navigate to another component.
-The `Dashboard` component is a _routing component_ because the user can navigate to the `HeroDetail` component by clicking on one of the _hero buttons_ on the dashboard.
+*路由组件*是指示 `Router` 导航到另一个组件的组件。
+`Dashboard` 组件就是一个*路由组件*，因为用户可以通过点击仪表盘上的某个*英雄按钮*导航到 `HeroDetail` 组件。
 
-Angular provides test helpers to reduce boilerplate and more effectively test code which depends on `HttpClient`. The `provideRouter` function can be used directly in the test module as well.
+Angular 提供了一些测试辅助工具，用来减少样板代码，并更有效地测试依赖于 `HttpClient` 的代码。`provideRouter` 函数也可以直接在测试模块中使用。
 
 ```ts
 beforeEach(async () => {
@@ -765,15 +761,15 @@ beforeEach(async () => {
 });
 ```
 
-The following test clicks the displayed hero and confirms that we navigate to the expected URL.
+下面的测试点击显示的英雄，并确认我们导航到了预期的 URL。
 
 ```ts
 it('should tell navigate when hero clicked', async () => {
-  // get first <dashboard-hero> DebugElement
+  // 获取第一个 <dashboard-hero> 的 DebugElement
   const heroDe = harness.routeDebugElement!.query(By.css('dashboard-hero'));
   heroDe.triggerEventHandler('selected', comp.heroes[0]);
 
-  // expecting to navigate to id of the component's first hero
+  // 预期导航到组件第一个英雄的 id
   const id = comp.heroes[0].id;
   expect(TestBed.inject(Router).url, 'should nav to HeroDetail for first hero').toEqual(
     `/heroes/${id}`,
@@ -781,19 +777,19 @@ it('should tell navigate when hero clicked', async () => {
 });
 ```
 
-## Routed components
+## 被路由的组件 {#routed-components}
 
-A _routed component_ is the destination of a `Router` navigation.
-It can be trickier to test, especially when the route to the component _includes parameters_.
-The `HeroDetail` is a _routed component_ that is the destination of such a route.
+*被路由的组件*是 `Router` 导航的目标。
+它可能更难测试，尤其是当通往该组件的路由（route）*包含参数*时。
+`HeroDetail` 就是这样一个路由的目标，它是一个*被路由的组件*。
 
-When a user clicks a _Dashboard_ hero, the `Dashboard` tells the `Router` to navigate to `heroes/:id`.
-The `:id` is a route parameter whose value is the `id` of the hero to edit.
+当用户点击 *Dashboard* 上的英雄时，`Dashboard` 会指示 `Router` 导航到 `heroes/:id`。
+`:id` 是一个路由参数，它的值是要编辑的英雄的 `id`。
 
-The `Router` matches that URL to a route to the `HeroDetail`.
-It creates an `ActivatedRoute` object with the routing information and injects it into a new instance of the `HeroDetail`.
+`Router` 把这个 URL 匹配到通往 `HeroDetail` 的路由。
+它会创建一个包含路由信息的 `ActivatedRoute` 对象，并把它注入到 `HeroDetail` 的新实例中。
 
-Here are the services injected into `HeroDetail`:
+下面是注入到 `HeroDetail` 中的服务：
 
 ```ts
 private heroDetailService = inject(HeroDetailService);
@@ -801,28 +797,28 @@ private route = inject(ActivatedRoute);
 private router = inject(Router);
 ```
 
-The `HeroDetail` component needs the `id` parameter so it can fetch the corresponding hero using the `HeroDetailService`.
-The component has to get the `id` from the `ActivatedRoute.paramMap` property which is an `Observable`.
+`HeroDetail` 组件需要 `id` 参数，以便使用 `HeroDetailService` 获取对应的英雄。
+组件必须从 `ActivatedRoute.paramMap` 属性中获取 `id`，而这个属性是一个 `Observable`。
 
-It can't just reference the `id` property of the `ActivatedRoute.paramMap`.
-The component has to _subscribe_ to the `ActivatedRoute.paramMap` observable and be prepared for the `id` to change during its lifetime.
+它不能直接引用 `ActivatedRoute.paramMap` 的 `id` 属性。
+组件必须*订阅* `ActivatedRoute.paramMap` 这个 observable，并准备好应对 `id` 在其生命周期内发生变化。
 
 ```ts
 constructor() {
-  // get hero when `id` param changes
+  // 当 `id` 参数变化时获取英雄
   this.route.paramMap.subscribe((pmap) => this.getHero(pmap.get('id')));
 }
 ```
 
-Tests can explore how the `HeroDetail` responds to different `id` parameter values by navigating to different routes.
+测试可以通过导航到不同的路由，来探究 `HeroDetail` 如何响应不同的 `id` 参数值。
 
-## Nested component tests
+## 嵌套组件测试 {#nested-component-tests}
 
-Component templates often have nested components, whose templates might contain more components.
+组件模板中经常有嵌套的组件，而这些组件的模板中可能还包含更多组件。
 
-The component tree can be very deep and sometimes the nested components play no role in testing the component at the top of the tree.
+组件树可能非常深，有时嵌套的组件在测试树顶端的组件时不起任何作用。
 
-The `App` component, for example, displays a navigation bar with anchors and their `RouterLink` directives.
+例如，`App` 组件显示了一个导航栏，其中包含链接及其 `RouterLink` 指令。
 
 ```html
 <app-banner />
@@ -837,22 +833,22 @@ The `App` component, for example, displays a navigation bar with anchors and the
 <router-outlet />
 ```
 
-To validate the links but not the navigation, you don't need the `Router` to navigate and you don't need the `<router-outlet>` to mark where the `Router` inserts _routed components_.
+要验证链接而不验证导航（navigation），你不需要 `Router` 去导航，也不需要 `<router-outlet>` 来标记 `Router` 插入*被路由的组件*的位置。
 
-The `Banner` and `Welcome` components \(indicated by `<app-banner>` and `<app-welcome>`\) are also irrelevant.
+`Banner` 和 `Welcome` 组件（由 `<app-banner>` 和 `<app-welcome>` 表示）同样无关紧要。
 
-Yet any test that creates the `App` component in the DOM also creates instances of these three components and, if you let that happen, you'll have to configure the `TestBed` to create them.
+然而，任何在 DOM 中创建 `App` 组件的测试也会创建这三个组件的实例；如果你任由这种情况发生，就必须配置 `TestBed` 来创建它们。
 
-If you neglect to declare them, the Angular compiler won't recognize the `<app-banner>`, `<app-welcome>`, and `<router-outlet>` tags in the `App` template and will throw an error.
+如果你没有声明它们，Angular 编译器将无法识别 `App` 模板中的 `<app-banner>`、`<app-welcome>` 和 `<router-outlet>` 标签，并会抛出错误。
 
-If you declare the real components, you'll also have to declare _their_ nested components and provide for _all_ services injected in _any_ component in the tree.
+如果你声明了真实的组件，就还必须声明*它们*的嵌套组件，并为树中*任何*组件所注入的*所有*服务提供支持。
 
-This section describes two techniques for minimizing the setup.
-Use them, alone or in combination, to stay focused on testing the primary component.
+本节介绍两种最大限度减少设置工作的技术。
+单独或组合使用它们，可以让你专注于测试主要组件。
 
-### Stubbing unneeded components
+### 为不需要的组件创建桩 {#stubbing-unneeded-components}
 
-In the first technique, you create and declare stub versions of the components and directive that play little or no role in the tests.
+在第一种技术中，你为那些在测试中作用很小或不起作用的组件和指令创建并声明桩版本。
 
 ```ts
 @Component({selector: 'app-banner', template: ''})
@@ -865,10 +861,10 @@ class RouterOutletStub {}
 class WelcomeStub {}
 ```
 
-The stub selectors match the selectors for the corresponding real components.
-But their templates and classes are empty.
+桩的选择器（selector）与对应的真实组件的选择器相匹配。
+但它们的模板和类都是空的。
 
-Then declare them by overriding the `imports` of your component using `TestBed.overrideComponent`.
+然后使用 `TestBed.overrideComponent` 覆盖组件的 `imports` 来声明它们。
 
 ```ts
 let comp: App;
@@ -888,14 +884,14 @@ beforeEach(() => {
 });
 ```
 
-::: tip HELPFUL
-The `set` key in this example replaces all the existing imports on your component, make sure to import all dependencies, not only the stubs. Alternatively you can use the `remove`/`add` keys to selectively remove and add imports.
+::: tip 提示
+这个例子中的 `set` 键会替换组件上所有现有的导入，所以请确保导入所有依赖，而不仅仅是桩。或者，你也可以使用 `remove`/`add` 键有选择地移除和添加导入。
 
 :::
 
-### `NO_ERRORS_SCHEMA`
+### `NO_ERRORS_SCHEMA` {#noerrorsschema}
 
-In the second approach, add `NO_ERRORS_SCHEMA` to the metadata overrides of your component.
+在第二种方法中，把 `NO_ERRORS_SCHEMA` 添加到组件的元数据覆盖配置中。
 
 ```ts
 beforeEach(() => {
@@ -903,35 +899,35 @@ beforeEach(() => {
     providers: [provideRouter([]), UserAuthentication],
   }).overrideComponent(App, {
     set: {
-      imports: [], // resets all imports
+      imports: [], // 重置所有导入
       schemas: [NO_ERRORS_SCHEMA],
     },
   });
 });
 ```
 
-The `NO_ERRORS_SCHEMA` tells the Angular compiler to ignore unrecognized elements and attributes.
+`NO_ERRORS_SCHEMA` 告诉 Angular 编译器忽略无法识别的元素和 attribute。
 
-The compiler recognizes the `<app-root>` element and the `routerLink` attribute because you declared a corresponding `App` component and `RouterLink` in the `TestBed` configuration.
+编译器能识别 `<app-root>` 元素和 `routerLink` attribute，因为你在 `TestBed` 配置中声明了对应的 `App` 组件和 `RouterLink`。
 
-But the compiler won't throw an error when it encounters `<app-banner>`, `<app-welcome>`, or `<router-outlet>`.
-It simply renders them as empty tags and the browser ignores them.
+但编译器在遇到 `<app-banner>`、`<app-welcome>` 或 `<router-outlet>` 时不会抛出错误。
+它只是把它们渲染为空标签，浏览器会忽略它们。
 
-You no longer need the stub components.
+你不再需要桩组件了。
 
-### Use both techniques together
+### 同时使用两种技术 {#use-both-techniques-together}
 
-These are techniques for _Shallow Component Testing_, so-named because they reduce the visual surface of the component to just those elements in the component's template that matter for tests.
+这些是用于*浅层组件测试*的技术，之所以这样命名，是因为它们把组件的可视范围缩小到组件模板中对测试有意义的那些元素。
 
-The `NO_ERRORS_SCHEMA` approach is the easier of the two but don't overuse it.
+`NO_ERRORS_SCHEMA` 方法是两者中更简单的一种，但不要过度使用它。
 
-The `NO_ERRORS_SCHEMA` also prevents the compiler from telling you about the missing components and attributes that you omitted inadvertently or misspelled.
-You could waste hours chasing phantom bugs that the compiler would have caught in an instant.
+`NO_ERRORS_SCHEMA` 还会阻止编译器告诉你那些因疏忽而遗漏或拼错的组件和 attribute。
+你可能会浪费好几个小时去追查编译器本可以瞬间发现的幽灵 bug。
 
-The _stub component_ approach has another advantage.
-While the stubs in _this_ example were empty, you could give them stripped-down templates and classes if your tests need to interact with them in some way.
+*桩组件*方法还有另一个优点。
+虽然*这个*例子中的桩是空的，但如果你的测试需要以某种方式与它们交互，你可以给它们提供精简的模板和类。
 
-In practice you will combine the two techniques in the same setup, as seen in this example.
+在实践中，你会在同一个设置中组合使用这两种技术，就像这个例子中这样。
 
 ```ts
 beforeEach(() => {
@@ -944,32 +940,32 @@ beforeEach(() => {
 });
 ```
 
-The Angular compiler creates the `BannerStub` for the `<app-banner>` element and applies the `RouterLink` to the anchors with the `routerLink` attribute, but it ignores the `<app-welcome>` and `<router-outlet>` tags.
+Angular 编译器为 `<app-banner>` 元素创建 `BannerStub`，并把 `RouterLink` 应用到带有 `routerLink` attribute 的链接上，但它会忽略 `<app-welcome>` 和 `<router-outlet>` 标签。
 
-### `By.directive` and injected directives
+### `By.directive` 与注入的指令 {#by-directive-and-injected-directives}
 
-A little more setup triggers the initial data binding and gets references to the navigation links:
+再做一点设置，就可以触发初始数据绑定并获取导航链接的引用：
 
 ```ts
 beforeEach(async () => {
   await fixture.whenStable();
 
-  // find DebugElements with an attached RouterLinkStubDirective
+  // 找到附加了 RouterLinkStubDirective 的 DebugElement
   linkDes = fixture.debugElement.queryAll(By.directive(RouterLink));
 
-  // get attached link directive instances
-  // using each DebugElement's injector
+  // 使用每个 DebugElement 的注入器
+  // 获取附加的链接指令实例
   routerLinks = linkDes.map((de) => de.injector.get(RouterLink));
 });
 ```
 
-Three points of special interest:
+有三点特别值得关注：
 
-- Locate the anchor elements with an attached directive using `By.directive`
-- The query returns `DebugElement` wrappers around the matching elements
-- Each `DebugElement` exposes a dependency injector with the specific instance of the directive attached to that element
+- 使用 `By.directive` 定位附加了指令的链接元素
+- 查询返回的是包裹着匹配元素的 `DebugElement` 包装器
+- 每个 `DebugElement` 都暴露了一个依赖注入器，其中包含附加到该元素上的特定指令实例
 
-The `App` component links to validate are as follows:
+要验证的 `App` 组件链接如下：
 
 ```html
 <nav>
@@ -979,7 +975,7 @@ The `App` component links to validate are as follows:
 </nav>
 ```
 
-Here are some tests that confirm those links are wired to the `routerLink` directives as expected:
+下面是一些测试，用于确认这些链接按预期连接到了 `routerLink` 指令：
 
 ```ts
 it('can get RouterLinks from template', () => {
@@ -990,7 +986,7 @@ it('can get RouterLinks from template', () => {
 });
 
 it('can click Heroes link in template', async () => {
-  const heroesLinkDe = linkDes[1]; // heroes link DebugElement
+  const heroesLinkDe = linkDes[1]; // heroes 链接的 DebugElement
 
   TestBed.inject(Router).resetConfig([{path: '**', children: []}]);
   heroesLinkDe.triggerEventHandler('click', {button: 0});
@@ -1001,11 +997,11 @@ it('can click Heroes link in template', async () => {
 });
 ```
 
-## Use a `page` object
+## 使用 `page` 对象 {#use-a-page-object}
 
-The `HeroDetail` component is a simple view with a title, two hero fields, and two buttons.
+`HeroDetail` 组件是一个简单的视图，包含一个标题、两个英雄字段和两个按钮。
 
-But there's plenty of template complexity even in this simple form.
+但即使是这样简单的表单，模板也相当复杂。
 
 ```html
 @if (hero) {
@@ -1024,22 +1020,22 @@ But there's plenty of template complexity even in this simple form.
 }
 ```
 
-Tests that exercise the component need …
+用来测试这个组件的测试需要……
 
-- To wait until a hero arrives before elements appear in the DOM
-- A reference to the title text
-- A reference to the name input box to inspect and set it
-- References to the two buttons so they can click them
+- 等待英雄到达，元素才会出现在 DOM 中
+- 对标题文本的引用
+- 对名字输入框的引用，以便检查和设置它
+- 对两个按钮的引用，以便点击它们
 
-Even a small form such as this one can produce a mess of tortured conditional setup and CSS element selection.
+即使是这样一个小表单，也可能产生一堆繁琐的条件设置和 CSS 元素选择代码。
 
-Tame the complexity with a `Page` class that handles access to component properties and encapsulates the logic that sets them.
+用一个 `Page` 类来驯服这种复杂性，由它处理对组件属性的访问，并封装设置这些属性的逻辑。
 
-Here is such a `Page` class for the `hero-detail.component.spec.ts`
+下面就是为 `hero-detail.component.spec.ts` 编写的这样一个 `Page` 类
 
 ```ts
 class Page {
-  // getter properties wait to query the DOM until called.
+  // getter 属性在被调用时才去查询 DOM。
   get buttons() {
     return this.queryAll<HTMLButtonElement>('button');
   }
@@ -1056,7 +1052,7 @@ class Page {
     return this.query<HTMLInputElement>('input');
   }
 
-  //// query helpers ////
+  //// 查询辅助函数 ////
   private query<T>(selector: string): T {
     return harness.routeNativeElement!.querySelector(selector)! as T;
   }
@@ -1067,9 +1063,9 @@ class Page {
 }
 ```
 
-Now the important hooks for component manipulation and inspection are neatly organized and accessible from an instance of `Page`.
+现在，用于操作和检查组件的重要钩子都被整齐地组织起来，并且可以通过 `Page` 的实例访问。
 
-A `createComponent` method creates a `page` object and fills in the blanks once the `hero` arrives.
+`createComponent` 方法会创建一个 `page` 对象，并在 `hero` 到达后填充空白部分。
 
 ```ts
 async function createComponent(id: number) {
@@ -1084,7 +1080,7 @@ async function createComponent(id: number) {
 }
 ```
 
-Here are a few more `HeroDetail` component tests to reinforce the point.
+下面是另外几个 `HeroDetail` 组件测试，用来强化这一点。
 
 ```ts
 it("should display that hero's name", () => {
@@ -1109,27 +1105,27 @@ it('should navigate when click save and save resolves', async () => {
 });
 
 it('should convert hero name to Title Case', async () => {
-  // get the name's input and display elements from the DOM
+  // 从 DOM 中获取名字的输入框和显示元素
   const hostElement: HTMLElement = harness.routeNativeElement!;
   const nameInput: HTMLInputElement = hostElement.querySelector('input')!;
   const nameDisplay: HTMLElement = hostElement.querySelector('span')!;
 
-  // simulate user entering a new name into the input box
+  // 模拟用户在输入框中输入新名字
   nameInput.value = 'quick BROWN  fOx';
 
-  // Dispatch a DOM event so that Angular learns of input value change.
+  // 派发一个 DOM 事件，让 Angular 知道输入值发生了变化
   nameInput.dispatchEvent(new Event('input'));
 
-  // Wait for Angular to update the display binding through the title pipe
+  // 等待 Angular 通过 title 管道更新显示的绑定
   await harness.fixture.whenStable();
 
   expect(nameDisplay.textContent).toBe('Quick Brown  Fox');
 });
 ```
 
-## Override component providers
+## 覆盖组件的提供者 {#override-component-providers}
 
-The `HeroDetail` provides its own `HeroDetailService`.
+`HeroDetail` 提供了它自己的 `HeroDetailService`。
 
 ```ts
 @Component({
@@ -1143,25 +1139,25 @@ export class HeroDetail {
 }
 ```
 
-It's not possible to stub the component's `HeroDetailService` in the `providers` of the `TestBed.configureTestingModule`.
-Those are providers for the _testing module_, not the component.
-They prepare the dependency injector at the _fixture level_.
+无法在 `TestBed.configureTestingModule` 的 `providers` 中为组件的 `HeroDetailService` 提供桩。
+那些是*测试模块*的提供者，而不是组件的提供者。
+它们在 *fixture 层级*准备依赖注入器。
 
-Angular creates the component with its _own_ injector, which is a _child_ of the fixture injector.
-It registers the component's providers \(the `HeroDetailService` in this case\) with the child injector.
+Angular 会用组件*自己的*注入器来创建组件，这个注入器是 fixture 注入器的*子*注入器。
+它把组件的提供者（本例中是 `HeroDetailService`）注册到这个子注入器中。
 
-A test cannot get to child injector services from the fixture injector.
-And `TestBed.configureTestingModule` can't configure them either.
+测试无法从 fixture 注入器访问子注入器中的服务。
+`TestBed.configureTestingModule` 也无法配置它们。
 
-Angular has created new instances of the real `HeroDetailService` all along!
+Angular 一直在创建真实的 `HeroDetailService` 的新实例！
 
-::: tip HELPFUL
-These tests could fail or timeout if the `HeroDetailService` made its own XHR calls to a remote server.
-There might not be a remote server to call.
+::: tip 提示
+如果 `HeroDetailService` 自己向远程服务器发起 XHR 调用，这些测试可能会失败或超时。
+可能根本就没有可供调用的远程服务器。
 
 :::
 
-Fortunately, the `HeroDetailService` delegates responsibility for remote data access to an injected `HeroService`.
+幸运的是，`HeroDetailService` 把访问远程数据的职责委托给了注入的 `HeroService`。
 
 ```ts
 @Service()
@@ -1170,13 +1166,13 @@ export class HeroDetailService {
 }
 ```
 
-The previous test configuration replaces the real `HeroService` with a `TestHeroService` that intercepts server requests and fakes their responses.
+之前的测试配置用 `TestHeroService` 替换了真实的 `HeroService`，它会拦截服务器请求并伪造响应。
 
-What if you aren't so lucky.
-What if faking the `HeroService` is hard?
-What if `HeroDetailService` makes its own server requests?
+如果你没那么幸运呢？
+如果伪造 `HeroService` 很困难呢？
+如果 `HeroDetailService` 自己发起服务器请求呢？
 
-The `TestBed.overrideComponent` method can replace the component's `providers` with easy-to-manage _test doubles_ as seen in the following setup variation:
+`TestBed.overrideComponent` 方法可以用易于管理的*测试替身*替换组件的 `providers`，如下面这个设置变体所示：
 
 ```ts
 beforeEach(async () => {
@@ -1186,7 +1182,7 @@ beforeEach(async () => {
         {path: 'heroes', component: HeroList},
         {path: 'heroes/:id', component: HeroDetail},
       ]),
-      // HeroDetailService at this level is IRRELEVANT!
+      // 这一层级的 HeroDetailService 无关紧要！
       {provide: HeroDetailService, useValue: {}},
     ],
   }).overrideComponent(HeroDetail, {
@@ -1195,11 +1191,11 @@ beforeEach(async () => {
 });
 ```
 
-Notice that `TestBed.configureTestingModule` no longer provides a fake `HeroService` because it's [not needed](#provide-a-spy-stub-herodetailservicespy).
+注意，`TestBed.configureTestingModule` 不再提供伪造的 `HeroService`，因为[不需要它](#provide-a-spy-stub-herodetailservicespy)。
 
-### The `overrideComponent` method
+### `overrideComponent` 方法 {#the-overridecomponent-method}
 
-Focus on the `overrideComponent` method.
+重点关注 `overrideComponent` 方法。
 
 ```ts
 .overrideComponent(HeroDetail, {
@@ -1207,8 +1203,8 @@ Focus on the `overrideComponent` method.
 });
 ```
 
-It takes two arguments: the component type to override \(`HeroDetail`\) and an override metadata object.
-The [override metadata object](/guide/testing/utility-apis#testbed-class-summary) is a generic defined as follows:
+它接受两个参数：要覆盖的组件类型（`HeroDetail`）和一个覆盖元数据对象。
+[覆盖元数据对象](/guide/testing/utility-apis#testbed-class-summary)是一个泛型，定义如下：
 
 ```ts
 type MetadataOverride<T> = {
@@ -1218,10 +1214,10 @@ type MetadataOverride<T> = {
 };
 ```
 
-A metadata override object can either add-and-remove elements in metadata properties or completely reset those properties.
-This example resets the component's `providers` metadata.
+元数据覆盖对象既可以在元数据属性中添加和移除元素，也可以完全重置这些属性。
+这个例子重置了组件的 `providers` 元数据。
 
-The type parameter, `T`, is the kind of metadata you'd pass to the `@Component` decorator:
+类型参数 `T` 是你会传给 `@Component` 装饰器的那种元数据：
 
 ```ts
 selector?: string;
@@ -1231,15 +1227,15 @@ providers?: any[];
 …
 ```
 
-### Provide a _spy stub_ (`HeroDetailServiceSpy`)
+### 提供*间谍桩*（`HeroDetailServiceSpy`） {#provide-a-spy-stub-herodetailservicespy}
 
-This example completely replaces the component's `providers` array with a new array containing a `HeroDetailServiceSpy`.
+这个例子用一个包含 `HeroDetailServiceSpy` 的新数组完全替换了组件的 `providers` 数组。
 
-The `HeroDetailServiceSpy` is a stubbed version of the real `HeroDetailService` that fakes all necessary features of that service.
-It neither injects nor delegates to the lower level `HeroService` so there's no need to provide a test double for that.
+`HeroDetailServiceSpy` 是真实 `HeroDetailService` 的桩版本，它伪造了该服务所有必要的功能。
+它既不注入也不委托给更底层的 `HeroService`，因此不需要为后者提供测试替身。
 
-The related `HeroDetail` component tests will assert that methods of the `HeroDetailService` were called by spying on the service methods.
-Accordingly, the stub implements its methods as spies:
+相关的 `HeroDetail` 组件测试会通过监视服务方法来断言 `HeroDetailService` 的方法被调用了。
+因此，这个桩把它的方法实现为间谍：
 
 ```ts
 import {vi} from 'vitest';
@@ -1247,17 +1243,17 @@ import {vi} from 'vitest';
 class HeroDetailServiceSpy {
   testHero: Hero = {...testHero};
 
-  /* emit cloned test hero */
+  /* 发出克隆的测试英雄 */
   getHero = vi.fn(() => asyncData({...this.testHero}));
 
-  /* emit clone of test hero, with changes merged in */
+  /* 发出合并了修改的测试英雄克隆 */
   saveHero = vi.fn((hero: Hero) => asyncData(Object.assign(this.testHero, hero)));
 }
 ```
 
-### The override tests
+### 覆盖后的测试 {#the-override-tests}
 
-Now the tests can control the component's hero directly by manipulating the spy-stub's `testHero` and confirm that service methods were called.
+现在，测试可以通过操作间谍桩的 `testHero` 直接控制组件的英雄，并确认服务方法被调用了。
 
 ```ts
 let hdsSpy: HeroDetailServiceSpy;
@@ -1266,7 +1262,7 @@ beforeEach(async () => {
   harness = await RouterTestingHarness.create();
   component = await harness.navigateByUrl(`/heroes/${testHero.id}`, HeroDetail);
   page = new Page();
-  // get the component's injected HeroDetailServiceSpy
+  // 获取组件注入的 HeroDetailServiceSpy
   hdsSpy = harness.routeDebugElement!.injector.get(HeroDetailService) as any;
 
   harness.detectChanges();
@@ -1286,7 +1282,7 @@ it('should save stub hero change', async () => {
 
   page.nameInput.value = newName;
 
-  page.nameInput.dispatchEvent(new Event('input')); // tell Angular
+  page.nameInput.dispatchEvent(new Event('input')); // 通知 Angular
 
   expect(component.hero.name, 'component hero has new name').toBe(newName);
   expect(hdsSpy.testHero.name, 'service hero unchanged before save').toBe(origName);
@@ -1300,9 +1296,9 @@ it('should save stub hero change', async () => {
 });
 ```
 
-### More overrides
+### 更多覆盖 {#more-overrides}
 
-The `TestBed.overrideComponent` method can be called multiple times for the same or different components.
-The `TestBed` offers similar `overrideDirective`, `overrideModule`, and `overridePipe` methods for digging into and replacing parts of these other classes.
+`TestBed.overrideComponent` 方法可以针对相同或不同的组件多次调用。
+`TestBed` 还提供了类似的 `overrideDirective`、`overrideModule` 和 `overridePipe` 方法，用于深入并替换这些其他类的部分内容。
 
-Explore the options and combinations on your own.
+请自行探索各种选项和组合。

@@ -1,128 +1,124 @@
----
-untranslated: true
----
+# 工具栏 {#toolbar}
 
-# Toolbar
-
-- [Toolbar ARIA pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/)
-- [Toolbar API Reference](https://angular.dev/api/aria/toolbar/Toolbar)
+- [工具栏 ARIA 模式](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/)
+- [Toolbar API 参考](https://angular.dev/api/aria/toolbar/Toolbar)
 
 
-## Overview
+## 概览 {#overview}
 
-A container for grouping related controls and actions with keyboard navigation, commonly used for text formatting, toolbars, and command panels.
+工具栏（toolbar）是一个容器，用于对相关的控件和操作进行分组，并支持键盘导航（keyboard navigation），常用于文本格式设置、工具条和命令面板。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-## Usage
+## 用法 {#usage}
 
-Toolbar works best for grouping related controls that users access frequently. Consider using toolbar when:
+工具栏最适合用来对用户经常使用的相关控件进行分组。以下情况可以考虑使用工具栏：
 
-- **Multiple related actions** - You have several controls that perform related functions (like text formatting buttons)
-- **Keyboard efficiency matters** - Users benefit from quick keyboard navigation through arrow keys
-- **Grouped controls** - You need to organize controls into logical sections with separators
-- **Frequent access** - Controls are used repeatedly within a workflow
+- **多个相关操作** - 有多个执行相关功能的控件（例如文本格式按钮）
+- **注重键盘操作效率** - 用户可以通过方向键快速进行键盘导航
+- **分组的控件** - 需要用分隔符把控件组织成若干逻辑分区
+- **频繁使用** - 控件会在某个工作流中被反复使用
 
-Avoid toolbar when:
+以下情况应避免使用工具栏：
 
-- A simple button group is sufficient - For just 2-3 unrelated actions, individual buttons work better
-- Controls aren't related - Toolbar implies a logical grouping; unrelated controls confuse users
-- Complex nested navigation - Deep hierarchies are better served by menus or navigation components
+- 简单的按钮组就足够 - 如果只有 2-3 个不相关的操作，单独的按钮效果更好
+- 控件之间不相关 - 工具栏意味着逻辑上的分组，不相关的控件会让用户困惑
+- 复杂的嵌套导航 - 层级较深的结构更适合使用菜单或导航组件（component）
 
-## Features
+## 特性 {#features}
 
-Angular's toolbar provides a fully accessible toolbar implementation with:
+Angular 的工具栏提供了完全无障碍的工具栏实现，具有以下特性：
 
-- **Keyboard Navigation** - Navigate widgets with arrow keys, Home, and End using roving tabindex, while controls retain native activation
-- **Screen Reader Support** - Built-in ARIA attributes for assistive technologies
-- **Widget Groups** - Organize related widgets like radio button groups or toggle button groups
-- **Flexible Orientation** - Horizontal or vertical layouts with automatic keyboard navigation
-- **Signal-Based Reactivity** - Reactive state management using Angular signals
-- **Bidirectional Text Support** - Automatically handles right-to-left (RTL) languages
-- **Configurable Focus** - Choose between wrapping navigation or hard stops at edges
+- **键盘导航** - 借助 roving tabindex，用方向键、Home 和 End 在各个部件之间导航，同时控件保留原生的激活方式
+- **屏幕阅读器（screen reader）支持** - 为辅助技术内置 ARIA 属性
+- **部件组** - 组织相关的部件，例如单选按钮组或切换按钮组
+- **灵活的方向** - 支持水平或垂直布局，并自动适配键盘导航
+- **基于信号的响应式** - 使用 Angular 信号（signal）进行响应式状态管理
+- **双向文本支持** - 自动处理从右到左（RTL）书写的语言
+- **可配置的焦点（focus）行为** - 可选择在边缘处循环导航或直接停止
 
-## Examples
+## 示例 {#examples}
 
-### Basic horizontal toolbar
+### 基本水平工具栏 {#basic-horizontal-toolbar}
 
-Horizontal toolbars organize controls from left to right, matching the common pattern in text editors and design tools. Arrow keys navigate between widgets, maintaining focus within the toolbar until users press Tab to move to the next page element.
+水平工具栏把控件从左到右排列，与文本编辑器和设计工具中的常见模式一致。方向键用于在部件之间导航，焦点会一直保持在工具栏内，直到用户按 Tab 移到页面的下一个元素。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/basic/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-### Vertical toolbar
+### 垂直工具栏 {#vertical-toolbar}
 
-Vertical toolbars stack controls top to bottom, useful for side panels or vertical command palettes. Up and down arrow keys navigate between widgets.
+垂直工具栏把控件从上到下堆叠，适用于侧边面板或纵向的命令面板。用上下方向键在部件之间导航。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/vertical/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-### Widget groups
+### 部件组 {#widget-groups}
 
-Widget groups organize related controls that work together, such as text alignment options or formatting toggles. Groups maintain roving tabindex navigation while presenting the appropriate semantic structure to assistive technologies.
+部件组用于组织协同工作的相关控件，例如文本对齐选项或格式切换按钮。部件组既保持 roving tabindex 导航，又能向辅助技术呈现恰当的语义结构。
 
-In the examples above, the alignment buttons are wrapped in `ngToolbarWidgetGroup` with `role="radiogroup"`. Selection is decoupled from the toolbar container, allowing you to manage state using Angular signals or custom directives:
+在上面的示例中，对齐按钮被包裹在带有 `role="radiogroup"` 的 `ngToolbarWidgetGroup` 中。选择状态与工具栏容器解耦，因此你可以用 Angular 信号或自定义指令（directive）来管理状态：
 
 ```html
-<!-- Mutually exclusive radio group -->
+<!-- 互斥的单选按钮组 -->
 <div ngToolbarWidgetGroup role="radiogroup" aria-label="Alignment">
   <button
     ngToolbarWidget
@@ -153,7 +149,7 @@ In the examples above, the alignment buttons are wrapped in `ngToolbarWidgetGrou
   </button>
 </div>
 
-<!-- Toggle button group -->
+<!-- 切换按钮组 -->
 <div class="group" role="group" aria-label="Text styling">
   <button ngToolbarWidget type="button" [attr.aria-pressed]="bold()" (click)="bold.set(!bold())">
     Bold
@@ -169,74 +165,74 @@ In the examples above, the alignment buttons are wrapped in `ngToolbarWidgetGrou
 </div>
 ```
 
-### Disabled widgets
+### 禁用的部件 {#disabled-widgets}
 
-Toolbars support two disabled modes:
+工具栏支持两种禁用模式：
 
-1. **Soft-disabled** widgets remain focusable but visually indicate they're unavailable
-2. **Hard-disabled** widgets are completely removed from keyboard navigation.
+1. **软禁用**（soft-disabled）的部件仍可获得焦点，但会在视觉上表明自己不可用
+2. **硬禁用**（hard-disabled）的部件会完全从键盘导航中移除。
 
-By default, `softDisabled` is `true`, which allows disabled widgets to still receive focus. If you want to enable hard-disabled mode, set `[softDisabled]="false"` on the toolbar.
-
-<Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
-
-<TabItem value="t0">
-
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.css)
-
-</TabItem>
-
-<TabItem value="t1">
-
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.css)
-
-</TabItem>
-
-<TabItem value="t2">
-
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.css)
-
-</TabItem>
-
-</Tabs>
-
-### Right-to-left (RTL) support
-
-Toolbars automatically support right-to-left languages. Wrap the toolbar in a container with `dir="rtl"` to reverse the layout and keyboard navigation direction. Arrow key navigation adjusts automatically: left arrow moves to the next widget, right arrow to the previous.
+默认情况下，`softDisabled` 为 `true`，即禁用的部件仍然可以获得焦点。如果想启用硬禁用模式，请在工具栏上设置 `[softDisabled]="false"`。
 
 <Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
 
 <TabItem value="t0">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/app/app.css)
 
 </TabItem>
 
 <TabItem value="t1">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/material/app/app.css)
 
 </TabItem>
 
 <TabItem value="t2">
 
-Example source: [app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.css)
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/disabled/retro/app/app.css)
 
 </TabItem>
 
 </Tabs>
 
-## Testing
+### 从右到左（RTL）支持 {#right-to-left-rtl-support}
 
-Angular Aria provides component harnesses for testing toolbar components.
-Here is an example of how to use the harnesses in a component test:
+工具栏自动支持从右到左书写的语言。把工具栏包裹在带有 `dir="rtl"` 的容器中，即可反转布局和键盘导航方向。方向键导航会自动调整：左方向键移到下一个部件，右方向键移到上一个部件。
+
+<Tabs :tabs="[{label:'Basic',value:'t0'},{label:'Material',value:'t1'},{label:'Retro',value:'t2'}]">
+
+<TabItem value="t0">
+
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/app/app.css)
+
+</TabItem>
+
+<TabItem value="t1">
+
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/material/app/app.css)
+
+</TabItem>
+
+<TabItem value="t2">
+
+示例源码：[app.ts](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.ts) · [app.html](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.html) · [app.css](https://github.com/angular/angular/blob/main/adev/src/content/examples/aria/toolbar/src/rtl/retro/app/app.css)
+
+</TabItem>
+
+</Tabs>
+
+## 测试 {#testing}
+
+Angular Aria 提供了组件测试工具（harness），用于测试工具栏组件（component）。
+下面是在组件测试中使用这些测试工具的示例：
 
 ```ts
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ToolbarHarness} from '@angular/aria/toolbar/testing';
-import {MyToolbarComponent} from './my-toolbar'; // Your component
+import {MyToolbarComponent} from './my-toolbar'; // 你的组件
 
 describe('MyToolbarComponent', () => {
   let fixture: ComponentFixture<MyToolbarComponent>;
@@ -253,25 +249,25 @@ describe('MyToolbarComponent', () => {
   });
 
   it('should have widgets and update toggle state on click', async () => {
-    // Load the toolbar harness
+    // 加载工具栏测试工具
     const toolbar = await loader.getHarness(ToolbarHarness);
 
-    // Get all widgets
+    // 获取所有部件
     const widgets = await toolbar.getWidgets();
     expect(widgets.length).toBe(3);
 
-    // Click the first widget
+    // 点击第一个部件
     await widgets[0].click();
 
-    // Verify pressed state updated via click handler
+    // 验证按下状态已通过点击处理器更新
     expect(await widgets[0].isSelected()).toBe(true);
   });
 });
 ```
 
-## API reference
+## API 参考 {#api-reference}
 
-For detailed API documentation, inspect the following API references:
+详细的 API 文档请参阅以下 API 参考：
 
 - [`Toolbar`](https://angular.dev/api/aria/toolbar/Toolbar)
 - [`ToolbarWidget`](https://angular.dev/api/aria/toolbar/ToolbarWidget)

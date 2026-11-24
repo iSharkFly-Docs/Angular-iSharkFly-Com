@@ -1,6 +1,6 @@
 # 绑定动态文本、属性和 attribute
 
-在 Angular 中，**绑定（Binding）**会在组件（Component）的模板（Template）与其数据之间建立动态连接。这种连接可以确保组件数据的变化会自动更新渲染出的模板。
+在 Angular 中，**绑定**（Binding）会在组件（Component）的模板（Template）与其数据之间建立动态连接。这种连接可以确保组件数据的变化会自动更新渲染出的模板。
 
 ## 使用文本插值渲染动态文本
 

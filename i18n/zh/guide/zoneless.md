@@ -69,7 +69,8 @@ Angular 依靠来自核心 API 的通知来决定何时运行变更检测，以�
 同样，`NgZone.isStable` 将始终为 `true`，不应把它用作代码执行的条件。
 
 `NgZone.onMicrotaskEmpty` 和 `NgZone.onStable` 这两个 Observable 最常用于在执行某个任务之前等待 Angular
-完成变更检测。作为替代，如果只需要等待一次变更检测，可以改用 `afterNextRender`；
+完成变更检测。作为替代，
+如果只需要等待一次变更检测，可以改用 `afterNextRender`；
 如果存在可能跨越多轮变更检测的条件，则可以改用 `afterEveryRender`。在其他情况下，使用这些 Observable 只是因为碰巧
 比较熟悉，并且时机与需要的差不多。这时可以改用更简单或更直接的 DOM API，
 例如当代码需要等待某种 DOM 状态时使用 `MutationObserver`（而不是通过 Angular 的渲染钩子
@@ -147,14 +148,17 @@ await fixture.whenStable();
 ```
 
 为了让测试的行为尽可能接近生产代码，
-应尽量避免使用 `fixture.detectChanges()`。它会在 Angular
-原本可能不会调度变更检测的时候强制运行变更检测。测试应当确保这些通知
+应尽量避免使用 `fixture.detectChanges()`。它会
+在 Angular 原本可能不会调度变更检测的时候
+强制运行变更检测。测试应当确保这些通知
 确实会发生，并让 Angular 自己决定何时同步
 状态，而不是在测试中手动强制同步。
 
 对于现有的测试套件，使用 `fixture.detectChanges()` 是一种常见模式，
-把它们全部改成 `await fixture.whenStable()` 很可能并不值得。`TestBed` 仍然会强制要求
-fixture 的组件兼容 `OnPush`，如果发现模板中的值在没有
+把它们全部改成
+`await fixture.whenStable()` 很可能并不值得。`TestBed` 仍然会强制要求
+fixture 的组件兼容 `OnPush`，
+如果发现模板中的值在没有
 变更通知的情况下被更新（例如 `fixture.componentInstance.someValue = 'newValue';`），就会抛出 `ExpressionChangedAfterItHasBeenCheckedError`。
 如果该组件用于生产环境，应该通过更新组件来解决这个问题：
 使用信号来保存状态，或者调用 `ChangeDetectorRef.markForCheck()`。
@@ -180,4 +184,5 @@ Angular 还提供了一个额外的工具，帮助验证应用是否以兼容无
 更新状态。`provideCheckNoChangesConfig({exhaustive: true, interval: <milliseconds>})`
 可用于定期检查，确保没有任何绑定在没有通知的情况下
 被更新。如果存在某个无 Zone 变更检测
-不会刷新的已更新绑定，Angular 会抛出 `ExpressionChangedAfterItHasBeenCheckedError`。
+不会刷新的已更新绑定，
+Angular 会抛出 `ExpressionChangedAfterItHasBeenCheckedError`。

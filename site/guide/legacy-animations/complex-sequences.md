@@ -1,63 +1,59 @@
----
-untranslated: true
----
+# 复杂动画序列 {#complex-animation-sequences}
 
-# Complex animation sequences
-
-::: warning IMPORTANT
-The `@angular/animations` package is now deprecated. The Angular team recommends using native CSS with `animate.enter` and `animate.leave` for animations for all new code. Learn more at the new enter and leave [animation guide](/guide/animations). Also see [Migrating away from Angular's Animations package](/guide/animations/migration) to learn how you can start migrating to pure CSS animations in your apps.
+::: warning 重要
+`@angular/animations` 包现已弃用。Angular 团队建议所有新代码都使用原生 CSS 配合 `animate.enter` 和 `animate.leave` 来实现动画。请参阅新的进入与离开[动画指南](/guide/animations)了解更多信息。另请参阅[迁移出 Angular 的 Animations 包](/guide/animations/migration)，了解如何开始将应用迁移到纯 CSS 动画。
 
 :::
 
-So far, we've learned simple animations of single HTML elements.
-Angular also lets you animate coordinated sequences, such as an entire grid or list of elements as they enter and leave a page.
-You can choose to run multiple animations in parallel, or run discrete animations sequentially, one following another.
+到目前为止，我们已经学习了单个 HTML 元素的简单动画（animation）。
+Angular 还允许你为协同的动画序列添加动画，例如整个网格或元素列表在进入和离开页面时的动画。
+你可以选择并行运行多个动画，也可以依次顺序运行多个独立的动画。
 
-The functions that control complex animation sequences are:
+控制复杂动画序列的函数如下：
 
-| Functions                         | Details                                                        |
+| 函数                              | 详情                                                           |
 | :-------------------------------- | :------------------------------------------------------------- |
-| `query()`                         | Finds one or more inner HTML elements.                         |
-| `stagger()`                       | Applies a cascading delay to animations for multiple elements. |
-| [`group()`](https://angular.dev/api/animations/group) | Runs multiple animation steps in parallel.                     |
-| `sequence()`                      | Runs animation steps one after another.                        |
+| `query()`                         | 查找一个或多个内部 HTML 元素。                                 |
+| `stagger()`                       | 为多个元素的动画应用级联延迟。                                 |
+| [`group()`](https://angular.dev/api/animations/group) | 并行运行多个动画步骤。                     |
+| `sequence()`                      | 依次运行各个动画步骤。                                         |
 
-## The query() function
+## query() 函数 {#the-query-function}
 
-Most complex animations rely on the `query()` function to find child elements and apply animations to them. Basic examples include:
+大多数复杂动画都依赖 `query()` 函数来查找子元素并为其应用动画。基本示例包括：
 
-| Examples                               | Details                                                                                                                                                                                            |
-| :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `query()` followed by `animate()`      | Used to query simple HTML elements and directly apply animations to them.                                                                                                                          |
-| `query()` followed by `animateChild()` | Used to query child elements, which themselves have animation metadata applied to them and trigger such animations \(which would otherwise be blocked by the current/parent element's animation\). |
+| 示例                                   | 详情                                                                                                                                         |
+| :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query()` 后接 `animate()`             | 用于查询简单的 HTML 元素，并直接为其应用动画。                                                                                               |
+| `query()` 后接 `animateChild()`        | 用于查询本身已应用了动画元数据的子元素，并触发这些动画（否则它们会被当前元素 / 父元素的动画所阻塞）。                                        |
 
-The first argument of `query()` is a [css selector](https://developer.mozilla.org/docs/Web/CSS/CSS_Selectors) string which can also contain the following Angular-specific tokens:
+`query()` 的第一个参数是一个 [CSS 选择器（selector）](https://developer.mozilla.org/docs/Web/CSS/CSS_Selectors)字符串，其中还可以包含以下 Angular 特有的标记：
 
-| Tokens                     | Details                                      |
+| 标记                       | 详情                                         |
 | :------------------------- | :------------------------------------------- |
-| `:enter` <br /> `:leave`   | For entering/leaving elements.               |
-| `:animating`               | For elements currently animating.            |
-| `@*` <br /> `@triggerName` | For elements with any—or a specific—trigger. |
-| `:self`                    | The animating element itself.                |
+| `:enter` <br /> `:leave`   | 用于正在进入 / 离开的元素。                  |
+| `:animating`               | 用于当前正在执行动画的元素。                 |
+| `@*` <br /> `@triggerName` | 用于带有任意触发器或特定触发器的元素。       |
+| `:self`                    | 正在执行动画的元素本身。                     |
 
-::: tip Entering and Leaving Elements
-Not all child elements are actually considered as entering/leaving; this can, at times, be counterintuitive and confusing. Please see the [query api docs](https://angular.dev/api/animations/query#entering-and-leaving-elements) for more information.
+::: tip 进入和离开的元素
+并非所有子元素都会被视为正在进入 / 离开；这有时会违反直觉、令人困惑。更多信息请参阅 [query API 文档](https://angular.dev/api/animations/query#entering-and-leaving-elements)。
 
-You can also see an illustration of this in the animations example \(introduced in the animations [introduction section](/guide/legacy-animations#about-this-guide)\) under the Querying tab.
+你还可以在动画示例（在动画[简介部分](/guide/legacy-animations#about-this-guide)中介绍）的 Querying 标签页下看到相关演示。
 :::
 
-## Animate multiple elements using query() and stagger() functions
+## 使用 query() 和 stagger() 函数为多个元素添加动画 {#animate-multiple-elements-using-query-and-stagger-functions}
 
-After querying child elements via `query()`, the `stagger()` function lets you define a timing gap between each item, animating elements with a delay between them.
+通过 `query()` 查询到子元素后，可以用 `stagger()` 函数在各个条目之间定义时间间隔，让元素之间带着延迟依次执行动画。
 
-The following example demonstrates how to use the `query()` and `stagger()` functions to animate a list \(of heroes\) adding each in sequence, with a slight delay, from top to bottom.
+下面的示例演示了如何使用 `query()` 和 `stagger()` 函数为一个（英雄）列表添加动画，让各个条目从上到下依次带着轻微延迟加入。
 
-- Use `query()` to look for an element entering the page that meets certain criteria
-- For each of these elements, use `style()` to set the same initial style for the element.
-  Make it transparent and use `transform` to move it out of position so that it can slide into place.
+- 使用 `query()` 查找满足特定条件、正在进入页面的元素
+- 对每个元素，使用 `style()` 为其设置相同的初始样式。
+  让它变为透明，并使用 `transform` 把它移出原位，以便它能滑入到位。
 
-- Use `stagger()` to delay each animation by 30 milliseconds
-- Animate each element on screen for 0.5 seconds using a custom-defined easing curve, simultaneously fading it in and un-transforming it
+- 使用 `stagger()` 让每个动画延迟 30 毫秒
+- 使用自定义的缓动曲线，在 0.5 秒内为屏幕上的每个元素添加动画，同时让它淡入并取消变换
 
 ```ts [hero-list-page.ts]
 animations: [
@@ -73,19 +69,19 @@ animations: [
   ]),
 ```
 
-## Parallel animation using group() function
+## 使用 group() 函数实现并行动画 {#parallel-animation-using-group-function}
 
-You've seen how to add a delay between each successive animation.
-But you might also want to configure animations that happen in parallel.
-For example, you might want to animate two CSS properties of the same element but use a different `easing` function for each one.
-For this, you can use the animation [`group()`](https://angular.dev/api/animations/group) function.
+你已经看到了如何在相邻的动画之间添加延迟。
+不过，你可能还想配置并行发生的动画。
+例如，你可能想为同一个元素的两个 CSS 属性添加动画，但为每个属性使用不同的 `easing` 函数。
+为此，可以使用动画的 [`group()`](https://angular.dev/api/animations/group) 函数。
 
-::: tip HELPFUL
-The [`group()`](https://angular.dev/api/animations/group) function is used to group animation _steps_, rather than animated elements.
+::: tip 提示
+[`group()`](https://angular.dev/api/animations/group) 函数用于对动画*步骤*进行分组，而不是对执行动画的元素进行分组。
 
 :::
 
-The following example uses [`group()`](https://angular.dev/api/animations/group)s on both `:enter` and `:leave` for two different timing configurations, thus applying two independent animations to the same element in parallel.
+下面的示例在 `:enter` 和 `:leave` 上都使用了 [`group()`](https://angular.dev/api/animations/group)，以实现两种不同的时间配置，从而把两个独立的动画并行地应用到同一个元素上。
 
 ```ts [hero-list-groups.ts (excerpt)]
 animations: [
@@ -137,27 +133,27 @@ animations: [
 ],
 ```
 
-## Sequential vs. parallel animations
+## 顺序动画与并行动画 {#sequential-vs-parallel-animations}
 
-Complex animations can have many things happening at once.
-But what if you want to create an animation involving several animations happening one after the other? Earlier you used [`group()`](https://angular.dev/api/animations/group) to run multiple animations all at the same time, in parallel.
+复杂动画可能同时发生很多事情。
+但如果你想创建一个由多个动画依次发生组成的动画呢？前面你使用了 [`group()`](https://angular.dev/api/animations/group) 来同时并行运行多个动画。
 
-A second function called `sequence()` lets you run those same animations one after the other.
-Within `sequence()`, the animation steps consist of either `style()` or `animate()` function calls.
+另一个名为 `sequence()` 的函数可以让这些动画依次运行。
+在 `sequence()` 中，动画步骤由 `style()` 或 `animate()` 函数调用组成。
 
-- Use `style()` to apply the provided styling data immediately.
-- Use `animate()` to apply styling data over a given time interval.
+- 使用 `style()` 立即应用所提供的样式数据。
+- 使用 `animate()` 在给定的时间间隔内应用样式数据。
 
-## Filter animation example
+## 筛选动画示例 {#filter-animation-example}
 
-Take a look at another animation on the example page.
-Under the Filter/Stagger tab, enter some text into the **Search Heroes** text box, such as `Magnet` or `tornado`.
+再看看示例页面上的另一个动画。
+在 Filter/Stagger 标签页下，在 **Search Heroes** 文本框中输入一些文字，例如 `Magnet` 或 `tornado`。
 
-The filter works in real time as you type.
-Elements leave the page as you type each new letter and the filter gets progressively stricter.
-The heroes list gradually re-enters the page as you delete each letter in the filter box.
+筛选会在你输入时实时生效。
+每输入一个新字母，筛选条件就会更严格，元素随之离开页面。
+当你逐个删除筛选框中的字母时，英雄列表又会逐渐重新进入页面。
 
-The HTML template contains a trigger called `filterAnimation`.
+HTML 模板（template）中包含一个名为 `filterAnimation` 的触发器（trigger）。
 
 ```html [hero-list-page.html]
 <label for="search">Search heroes: </label>
@@ -181,7 +177,7 @@ The HTML template contains a trigger called `filterAnimation`.
 </ul>
 ```
 
-The `filterAnimation` in the component's decorator contains three transitions.
+组件（component）装饰器中的 `filterAnimation` 包含三个过渡（transition）。
 
 ```ts [hero-list-page.ts]
 @Component({
@@ -233,51 +229,51 @@ export class HeroListPage implements OnInit {
 }
 ```
 
-The code in this example performs the following tasks:
+这个示例中的代码执行以下任务：
 
-- Skips animations when the user first opens or navigates to this page \(the filter animation narrows what is already there, so it only works on elements that already exist in the DOM\)
-- Filters heroes based on the search input's value
+- 在用户首次打开或导航到此页面时跳过动画（筛选动画是对已有内容进行收窄，因此它只作用于 DOM 中已经存在的元素）
+- 根据搜索输入框的值筛选英雄
 
-For each change:
+每次发生变化时：
 
-- Hides an element leaving the DOM by setting its opacity and width to 0
-- Animates an element entering the DOM over 300 milliseconds.
-  During the animation, the element assumes its default width and opacity.
+- 通过把不透明度和宽度设置为 0 来隐藏正在离开 DOM 的元素
+- 在 300 毫秒内为正在进入 DOM 的元素添加动画。
+  在动画过程中，该元素会恢复其默认的宽度和不透明度。
 
-- If there are multiple elements entering or leaving the DOM, staggers each animation starting at the top of the page, with a 50-millisecond delay between each element
+- 如果有多个元素正在进入或离开 DOM，则从页面顶部开始依次错开每个动画，每个元素之间间隔 50 毫秒
 
-## Animating the items of a reordering list
+## 为重新排序的列表条目添加动画 {#animating-the-items-of-a-reordering-list}
 
-Although Angular animates correctly `*ngFor` list items out of the box, it will not be able to do so if their ordering changes.
-This is because it will lose track of which element is which, resulting in broken animations.
-The only way to help Angular keep track of such elements is by assigning a `TrackByFunction` to the `NgForOf` directive.
-This makes sure that Angular always knows which element is which, thus allowing it to apply the correct animations to the correct elements all the time.
+尽管 Angular 开箱即可为 `*ngFor` 列表条目正确地添加动画，但如果条目的顺序发生变化，它就无法做到了。
+这是因为它会无法区分哪个元素是哪个，从而导致动画出错。
+帮助 Angular 跟踪这些元素的唯一方法，就是为 `NgForOf` 指令（directive）指定一个 `TrackByFunction`。
+这样可以确保 Angular 始终知道哪个元素是哪个，从而始终把正确的动画应用到正确的元素上。
 
-::: warning IMPORTANT
-If you need to animate the items of an `*ngFor` list and there is a possibility that the order of such items will change during runtime, always use a `TrackByFunction`.
+::: warning 重要
+如果你需要为 `*ngFor` 列表的条目添加动画，并且这些条目的顺序有可能在运行时发生变化，请务必使用 `TrackByFunction`。
 
 :::
 
-## Animations and Component View Encapsulation
+## 动画与组件视图封装 {#animations-and-component-view-encapsulation}
 
-Angular animations are based on the components DOM structure and do not directly take [View Encapsulation](/guide/components/styling#style-scoping) into account, this means that components using `ViewEncapsulation.Emulated` behave exactly as if they were using `ViewEncapsulation.None` (`ViewEncapsulation.ShadowDom` and `ViewEncapsulation.ExperimentalIsolatedShadowDom` behave differently as we'll discuss shortly).
+Angular 动画基于组件的 DOM 结构，并不会直接考虑[视图封装（View Encapsulation）](/guide/components/styling#style-scoping)。这意味着使用 `ViewEncapsulation.Emulated` 的组件，其行为与使用 `ViewEncapsulation.None` 时完全相同（`ViewEncapsulation.ShadowDom` 和 `ViewEncapsulation.ExperimentalIsolatedShadowDom` 的行为则不同，稍后会讨论）。
 
-For example if the `query()` function (which you'll see more of in the rest of the Animations guide) were to be applied at the top of a tree of components using the emulated view encapsulation, such query would be able to identify (and thus animate) DOM elements on any depth of the tree.
+例如，如果把 `query()` 函数（在动画指南的其余部分中你会看到更多相关内容）应用在一棵使用模拟视图封装的组件树的顶部，这样的查询能够识别（从而为其添加动画）树中任意深度的 DOM 元素。
 
-On the other hand the `ViewEncapsulation.ShadowDom` and `ViewEncapsulation.ExperimentalIsolatedShadowDom` changes the component's DOM structure by "hiding" DOM elements inside [`ShadowRoot`](https://developer.mozilla.org/docs/Web/API/ShadowRoot) elements. Such DOM manipulations do prevent some of the animations implementation to work properly since it relies on simple DOM structures and doesn't take `ShadowRoot` elements into account. Therefore it is advised to avoid applying animations to views incorporating components using the ShadowDom view encapsulation.
+另一方面，`ViewEncapsulation.ShadowDom` 和 `ViewEncapsulation.ExperimentalIsolatedShadowDom` 会通过把 DOM 元素「隐藏」在 [`ShadowRoot`](https://developer.mozilla.org/docs/Web/API/ShadowRoot) 元素中来改变组件的 DOM 结构。这类 DOM 操作确实会导致部分动画实现无法正常工作，因为动画实现依赖于简单的 DOM 结构，并不考虑 `ShadowRoot` 元素。因此，建议避免对包含使用 ShadowDom 视图封装的组件的视图应用动画。
 
-## Animation sequence summary
+## 动画序列小结 {#animation-sequence-summary}
 
-Angular functions for animating multiple elements start with `query()` to find inner elements; for example, gathering all images within a `<div>`.
-The remaining functions, `stagger()`, [`group()`](https://angular.dev/api/animations/group), and `sequence()`, apply cascades or let you control how multiple animation steps are applied.
+用于为多个元素添加动画的 Angular 函数，都从使用 `query()` 查找内部元素开始；例如，收集某个 `<div>` 中的所有图片。
+其余函数 `stagger()`、[`group()`](https://angular.dev/api/animations/group) 和 `sequence()` 用于应用级联效果，或让你控制多个动画步骤的应用方式。
 
-## More on Angular animations
+## 更多 Angular 动画相关内容 {#more-on-angular-animations}
 
-You might also be interested in the following:
+你可能还对以下内容感兴趣：
 
-- [Introduction to Angular animations](/guide/legacy-animations)
-- [Transition and triggers](/guide/legacy-animations/transition-and-triggers)
-- [Reusable animations](/guide/legacy-animations/reusable-animations)
-- [Route transition animations](/guide/routing/route-transition-animations)
-- [Migrating to Native CSS Animations](/guide/animations/migration)
+- [Angular 动画简介](/guide/legacy-animations)
+- [过渡与触发器](/guide/legacy-animations/transition-and-triggers)
+- [可复用动画](/guide/legacy-animations/reusable-animations)
+- [路由过渡动画](/guide/routing/route-transition-animations)
+- [迁移到原生 CSS 动画](/guide/animations/migration)
 
