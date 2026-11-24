@@ -1,30 +1,26 @@
----
-untranslated: true
----
+# RouterTestingModule 迁移 {#routertestingmodule-migration}
 
-# RouterTestingModule migration
+此原理图（Schematic）会把测试中 `RouterTestingModule` 的用法迁移为 `RouterModule`。
 
-This schematic migrates usages of `RouterTestingModule` inside tests to `RouterModule`.
+当某个测试从 `@angular/common/testing` 导入了 `SpyLocation` 并使用了 `urlChanges` 属性时，原理图还会添加 `provideLocationMocks()` 以保留原有行为。
 
-When a test imports `SpyLocation` from `@angular/common/testing` and uses the `urlChanges` property, the schematic will also add `provideLocationMocks()` to preserve the original behavior.
-
-Run the schematic with:
+使用以下命令运行该原理图：
 
 ```shell
 ng generate @angular/core:router-testing-module-migration
 ```
 
-## Options
+## 选项 {#options}
 
-| Option | Details                                                                                                                       |
+| 选项   | 详情                                                                                                                          |
 | :----- | :---------------------------------------------------------------------------------------------------------------------------- |
-| `path` | The path (relative to project root) to migrate. Defaults to `./`. Use this to incrementally migrate a subset of your project. |
+| `path` | 要迁移的路径（相对于项目根目录）。默认为 `./`。可以用它来逐步迁移项目的一部分。 |
 
-## Examples
+## 示例 {#examples}
 
-### Preserve router options
+### 保留路由器选项 {#preserve-router-options}
 
-Before:
+迁移前：
 
 ```ts
 import {RouterTestingModule} from '@angular/router/testing';
@@ -40,7 +36,7 @@ describe('test', () => {
 });
 ```
 
-After:
+迁移后：
 
 ```ts
 import {RouterModule} from '@angular/router';
@@ -56,9 +52,9 @@ describe('test', () => {
 });
 ```
 
-### Add provideLocationMocks when `SpyLocation` is imported and `urlChanges` is used
+### 导入了 `SpyLocation` 并使用了 `urlChanges` 时添加 provideLocationMocks {#add-providelocationmocks-when-spylocation-is-imported-and-urlchanges-is-used}
 
-Before:
+迁移前：
 
 ```ts
 import {RouterTestingModule} from '@angular/router/testing';
@@ -81,7 +77,7 @@ describe('test', () => {
 });
 ```
 
-After:
+迁移后：
 
 ```ts
 import {RouterModule} from '@angular/router';

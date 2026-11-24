@@ -1,26 +1,22 @@
----
-untranslated: true
----
+# 迁移到自闭合标签 {#migration-to-self-closing-tags}
 
-# Migration to self-closing tags
+从 [v16](https://blog.angular.dev/angular-v16-is-here-4d7a28ec680d#7065) 开始，Angular 模板就支持自闭合标签了。
 
-Self-closing tags are supported in Angular templates since [v16](https://blog.angular.dev/angular-v16-is-here-4d7a28ec680d#7065). .
+此原理图（Schematic）会把应用中的模板迁移为使用自闭合标签。
 
-This schematic migrates the templates in your application to use self-closing tags.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```shell
 ng generate @angular/core:self-closing-tag
 ```
 
-#### Before
+#### 迁移前 {#before}
 
 ```html
 <hello-world></hello-world>
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```html
 <hello-world />

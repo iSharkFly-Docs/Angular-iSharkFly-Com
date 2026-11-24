@@ -1,39 +1,35 @@
----
-untranslated: true
----
+# 迁移到延迟加载路由 {#migration-to-lazy-loaded-routes}
 
-# Migration to lazy-loaded routes
+此原理图（Schematic）帮助开发者把立即加载的组件路由转换为延迟加载（Lazy Loading）路由。这样构建过程就可以把生产环境的包（bundle）拆分成更小的块，避免产生一个包含所有路由的巨大 JS 包，因为这会对应用的首屏加载产生负面影响。
 
-This schematic helps developers to convert eagerly loaded component routes to lazy loaded routes. This allows the build process to split the production bundle into smaller chunks, to avoid a big JS bundle that includes all routes, which negatively affects initial page load of an application.
-
-Run the schematic using the following command:
+使用以下命令运行该原理图：
 
 ```shell
 ng generate @angular/core:route-lazy-loading
 ```
 
-### `path` config option
+### `path` 配置选项 {#path-config-option}
 
-By default, migration will go over the entire application. If you want to apply this migration to a subset of the files, you can pass the path argument as shown below:
+默认情况下，迁移（migration）会处理整个应用。如果你只想对部分文件应用此迁移，可以按如下方式传入 path 参数：
 
 ```shell
 ng generate @angular/core:route-lazy-loading --path src/app/sub-component
 ```
 
-The value of the path parameter is a relative path within the project.
+path 参数的值是项目内的相对路径。
 
-### How does it work?
+### 它是如何工作的？ {#how-does-it-work}
 
-The schematic will attempt to find all the places where the application routes as defined:
+原理图会尝试找出应用中定义路由的所有位置：
 
-- `RouterModule.forRoot` and `RouterModule.forChild`
+- `RouterModule.forRoot` 和 `RouterModule.forChild`
 - `Router.resetConfig`
 - `provideRouter`
-- variables of type `Routes` or `Route[]` (e.g. `const routes: Routes = [{...}]`)
+- 类型为 `Routes` 或 `Route[]` 的变量（例如 `const routes: Routes = [{...}]`）
 
-The migration will check all the components in the routes, check if they are standalone and eagerly loaded, and if so, it will convert them to lazy loaded routes.
+迁移会检查路由中的所有组件，判断它们是否为独立组件且是立即加载的，如果是，就把它们转换为延迟加载路由。
 
-#### Before
+#### 迁移前 {#before}
 
 ```ts [app.module.ts]
 import {NgModule} from '@angular/core';
@@ -45,7 +41,7 @@ import {Home} from './home';
     RouterModule.forRoot([
       {
         path: 'home',
-        // Home is standalone and eagerly loaded
+        // Home 是独立组件，并且是立即加载的
         component: Home,
       },
     ]),
@@ -54,7 +50,7 @@ import {Home} from './home';
 export class AppModule {}
 ```
 
-#### After
+#### 迁移后 {#after}
 
 ```ts [app.module.ts]
 @NgModule({
@@ -62,7 +58,7 @@ export class AppModule {}
     RouterModule.forRoot([
       {
         path: 'home',
-        // ↓ Home is now lazy loaded
+        // ↓ Home 现在是延迟加载的
         loadComponent: () => import('./home').then((m) => m.Home),
       },
     ]),
@@ -71,4 +67,4 @@ export class AppModule {}
 export class AppModule {}
 ```
 
-This migration will also collect information about all the components declared in NgModules and output the list of routes that use them (including corresponding location of the file). Consider making those components standalone and run this migration again. You can use an existing migration ([see](/reference/migrations/standalone)) to convert those components to standalone.
+此迁移还会收集所有在 NgModule 中声明的组件的信息，并输出使用这些组件的路由列表（包括对应文件的位置）。可以考虑把这些组件改为独立组件，然后再次运行此迁移。你可以使用现有的迁移（[参见](/reference/migrations/standalone)）把这些组件转换为独立组件（Standalone Component）。

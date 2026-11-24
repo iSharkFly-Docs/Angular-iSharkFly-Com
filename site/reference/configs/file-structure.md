@@ -1,116 +1,112 @@
----
-untranslated: true
----
+# 工作区与项目文件结构 {#workspace-and-project-file-structure}
 
-# Workspace and project file structure
+你在 Angular 工作区（workspace）的上下文中开发应用。
+一个工作区包含一个或多个项目的文件。
+项目是构成一个应用或一个可共享库的一组文件。
 
-You develop applications in the context of an Angular workspace.
-A workspace contains the files for one or more projects.
-A project is the set of files that comprise an application or a shareable library.
-
-The Angular CLI `ng new` command creates a workspace.
+Angular CLI 的 `ng new` 命令会创建一个工作区。
 
 ```shell
 ng new my-project
 ```
 
-When you run this command, the CLI installs the necessary Angular npm packages and other dependencies in a new workspace, with a root-level application named _my-project_.
+运行此命令时，CLI 会在一个新工作区中安装必要的 Angular npm 包及其他依赖，并创建一个名为 _my-project_ 的根级应用。
 
-By default, `ng new` creates an initial skeleton application at the root level of the workspace.
-The skeleton is for a simple welcome application that is ready to run and easy to modify.
-The root-level application has the same name as the workspace, and the source files reside in the `src/` subfolder of the workspace.
+默认情况下，`ng new` 会在工作区的根级创建一个初始骨架应用。
+这个骨架是一个简单的欢迎应用，可以直接运行，也易于修改。
+根级应用与工作区同名，其源文件位于工作区的 `src/` 子文件夹中。
 
-This default behavior is suitable for a typical "multi-repo" development style where each application resides in its own workspace.
-Beginners and intermediate users are encouraged to use `ng new` to create a separate workspace for each application.
+这种默认行为适合典型的“多仓库（multi-repo）”开发风格，即每个应用都位于各自的工作区中。
+建议初学者和中级用户使用 `ng new` 为每个应用创建单独的工作区。
 
-Angular also supports workspaces with [multiple projects](#multiple-projects).
-This type of development environment is suitable for advanced users who are developing shareable libraries,
-and for enterprises that use a "monorepo" development style, with a single repository and global configuration for all Angular projects.
+Angular 也支持包含[多个项目](#multiple-projects)的工作区。
+这种开发环境适合正在开发可共享库的高级用户，
+以及采用“单体仓库（monorepo）”开发风格的企业，即所有 Angular 项目使用单个仓库和全局配置。
 
-To set up a monorepo workspace, you should skip creating the root application.
-See [Setting up for a multi-project workspace](#multiple-projects) below.
+要设置单体仓库工作区，应跳过创建根应用。
+请参阅下文的[设置多项目工作区](#multiple-projects)。
 
-## Workspace configuration files
+## 工作区配置文件 {#workspace-configuration-files}
 
-All projects within a workspace share a [configuration](/reference/configs/workspace-config).
-The top level of the workspace contains workspace-wide configuration files, configuration files for the root-level application, and subfolders for the root-level application source and test files.
+工作区中的所有项目共享同一份[配置](/reference/configs/workspace-config)。
+工作区的顶层包含工作区级的配置文件、根级应用的配置文件，以及存放根级应用源文件和测试文件的子文件夹。
 
-| Workspace configuration files | Purpose                                                                                                                                                                                                                                                                                                          |
+| 工作区配置文件 | 用途 |
 | :---------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.editorconfig`               | Configuration for code editors. See [EditorConfig](https://editorconfig.org).                                                                                                                                                                                                                                    |
-| `.gitignore`                  | Specifies intentionally untracked files that [Git](https://git-scm.com) should ignore.                                                                                                                                                                                                                           |
-| `README.md`                   | Documentation for the workspace.                                                                                                                                                                                                                                                                                 |
-| `angular.json`                | CLI configuration for all projects in the workspace, including configuration options for how to build, serve, and test each project. For details, see [Angular Workspace Configuration](/reference/configs/workspace-config).                                                                                     |
-| `package.json`                | Configures [npm package dependencies](/reference/configs/npm-packages) that are available to all projects in the workspace. See [npm documentation](https://docs.npmjs.com/files/package.json) for the specific format and contents of this file.                                                                 |
-| `package-lock.json`           | Provides version information for all packages installed into `node_modules` by the npm client. See [npm documentation](https://docs.npmjs.com/files/package-lock.json) for details.                                                                                                                              |
-| `src/`                        | Source files for the root-level application project.                                                                                                                                                                                                                                                             |
-| `public/`                     | Contains image and other asset files to be served as static files by the dev server and copied as-is when you build your application.                                                                                                                                                                            |
-| `node_modules/`               | Installed [npm packages](/reference/configs/npm-packages) for the entire workspace. Workspace-wide `node_modules` dependencies are visible to all projects.                                                                                                                                                       |
-| `tsconfig.json`               | The base [TypeScript](https://www.typescriptlang.org) configuration for projects in the workspace. All other configuration files inherit from this base file. For more information, see the [relevant TypeScript documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#tsconfig-bases). |
+| `.editorconfig` | 代码编辑器的配置。请参阅 [EditorConfig](https://editorconfig.org)。 |
+| `.gitignore` | 指定 [Git](https://git-scm.com) 应当忽略的、有意不纳入跟踪的文件。 |
+| `README.md` | 工作区的文档。 |
+| `angular.json` | 工作区中所有项目的 CLI 配置，包括如何构建、启动开发服务器和测试每个项目的配置选项。详情请参阅 [Angular 工作区配置](/reference/configs/workspace-config)。 |
+| `package.json` | 配置工作区中所有项目都可使用的 [npm 包依赖](/reference/configs/npm-packages)。有关此文件的具体格式和内容，请参阅 [npm 文档](https://docs.npmjs.com/files/package.json)。 |
+| `package-lock.json` | 提供 npm 客户端安装到 `node_modules` 中的所有包的版本信息。详情请参阅 [npm 文档](https://docs.npmjs.com/files/package-lock.json)。 |
+| `src/` | 根级应用项目的源文件。 |
+| `public/` | 包含图片及其他资源文件，这些文件由开发服务器作为静态文件提供，并在构建应用时原样复制。 |
+| `node_modules/` | 为整个工作区安装的 [npm 包](/reference/configs/npm-packages)。工作区级的 `node_modules` 依赖对所有项目可见。 |
+| `tsconfig.json` | 工作区中各项目的基础 [TypeScript](https://www.typescriptlang.org) 配置。所有其他配置文件都继承自这个基础文件。更多信息请参阅 [TypeScript 相关文档](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#tsconfig-bases)。 |
 
-## Application project files
+## 应用项目文件 {#application-project-files}
 
-By default, the CLI command `ng new my-app` creates a workspace folder named "my-app" and generates a new application skeleton in a `src/` folder at the top level of the workspace.
-A newly generated application contains source files for a root component and template.
+默认情况下，CLI 命令 `ng new my-app` 会创建一个名为 "my-app" 的工作区文件夹，并在工作区顶层的 `src/` 文件夹中生成一个新的应用骨架。
+新生成的应用包含根组件（Component）及其模板（Template）的源文件。
 
-When the workspace file structure is in place, you can use the `ng generate` command on the command line to add functionality and data to the application.
-This initial root-level application is the _default app_ for CLI commands (unless you change the default after creating [additional apps](#multiple-projects)).
+工作区文件结构就绪后，你可以在命令行中使用 `ng generate` 命令为应用添加功能和数据。
+这个初始的根级应用是 CLI 命令的 _默认应用_（除非你在创建[其他应用](#multiple-projects)之后更改了默认设置）。
 
-For a single-application workspace, the `src` subfolder of the workspace contains the source files (application logic, data, and assets) for the root application.
-For a multi-project workspace, additional projects in the `projects` folder contain a `project-name/src/` subfolder with the same structure.
+对于单应用工作区，工作区的 `src` 子文件夹包含根应用的源文件（应用逻辑、数据和资源）。
+对于多项目工作区，`projects` 文件夹中的其他项目都包含一个结构相同的 `project-name/src/` 子文件夹。
 
-### Application source files
+### 应用源文件 {#application-source-files}
 
-Files at the top level of `src/` support running your application.
-Subfolders contain the application source and application-specific configuration.
+`src/` 顶层的文件用于支持应用的运行。
+子文件夹中包含应用源代码和应用专属的配置。
 
-| Application support files | Purpose                                                                                                                                                                                                                           |
+| 应用支持文件 | 用途 |
 | :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/`                    | Contains the component files in which your application logic and data are defined. See details below.                                                                                                                             |
-| `index.html`              | The main HTML page that is served when someone visits your site. The CLI automatically adds all JavaScript and CSS files when building your app, so you typically don't need to add any `<script>` or`<link>` tags here manually. |
-| `main.ts`                 | The main entry point for your application.                                                                                                                                                                                        |
-| `styles.css`              | Global CSS styles applied to the entire application.                                                                                                                                                                              |
+| `app/` | 包含定义应用逻辑和数据的组件文件。详见下文。 |
+| `index.html` | 有人访问你的网站时所提供的主 HTML 页面。CLI 在构建应用时会自动添加所有 JavaScript 和 CSS 文件，因此通常无需在这里手动添加任何 `<script>` 或`<link>` 标签。 |
+| `main.ts` | 应用的主入口点（entry point）。 |
+| `styles.css` | 应用于整个应用的全局 CSS 样式。 |
 
-Inside the `src` folder, the `app` folder contains your project's logic and data.
-Angular components, templates, and styles go here.
+在 `src` 文件夹中，`app` 文件夹包含项目的逻辑和数据。
+Angular 组件、模板和样式都放在这里。
 
-| `src/app/` files | Purpose                                                                                                                                                                                                                                                                             |
+| `src/app/` 文件 | 用途 |
 | :--------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app.config.ts`  | Defines the application configuration that tells Angular how to assemble the application. As you add more providers to the app, they should be declared here.<br><br>_Only generated when using the `--standalone` option._                                                         |
-| `app.ts`         | Defines the application's root component, named `App`. The view associated with this root component becomes the root of the view hierarchy as you add components and services to your application.                                                                                  |
-| `app.html`       | Defines the HTML template associated with `App`.                                                                                                                                                                                                                                    |
-| `app.css`        | Defines the CSS stylesheet for `App`.                                                                                                                                                                                                                                               |
-| `app.spec.ts`    | Defines a unit test for `App`.                                                                                                                                                                                                                                                      |
-| `app-module.ts`  | Defines the root module, named `AppModule`, that tells Angular how to assemble the application. Initially declares only the `App` component. As you add more components to the app, they must be declared here.<br><br>_Only generated when using the `--standalone false` option._ |
-| `app.routes.ts`  | Defines the application's routing configuration.                                                                                                                                                                                                                                    |
+| `app.config.ts` | 定义应用配置，告诉 Angular 如何组装应用。当你向应用中添加更多提供者（Provider）时，应在这里声明它们。<br><br>_仅在使用 `--standalone` 选项时生成。_ |
+| `app.ts` | 定义应用的根组件，名为 `App`。当你向应用中添加组件和服务（Service）时，与此根组件关联的视图会成为视图层次结构的根。 |
+| `app.html` | 定义与 `App` 关联的 HTML 模板。 |
+| `app.css` | 定义 `App` 的 CSS 样式表。 |
+| `app.spec.ts` | 定义 `App` 的单元测试。 |
+| `app-module.ts` | 定义名为 `AppModule` 的根模块，告诉 Angular 如何组装应用。最初只声明了 `App` 组件。当你向应用中添加更多组件时，必须在这里声明它们。<br><br>_仅在使用 `--standalone false` 选项时生成。_ |
+| `app.routes.ts` | 定义应用的路由配置。 |
 
-### Application configuration files
+### 应用配置文件 {#application-configuration-files}
 
-Application-specific configuration files for the root application reside at the workspace root level.
-For a multi-project workspace, project-specific configuration files are in the project root, under `projects/project-name/`.
+根应用的应用专属配置文件位于工作区根级。
+对于多项目工作区，项目专属的配置文件位于项目根目录 `projects/project-name/` 下。
 
-Project-specific [TypeScript](https://www.typescriptlang.org) configuration files inherit from the workspace-wide `tsconfig.json`.
+项目专属的 [TypeScript](https://www.typescriptlang.org) 配置文件继承自工作区级的 `tsconfig.json`。
 
-| Application-specific configuration files | Purpose                                                                                                                                                                                             |
+| 应用专属配置文件 | 用途 |
 | :--------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tsconfig.app.json`                      | Application-specific [TypeScript configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html), including [Angular compiler options](/reference/configs/angular-compiler-options). |
-| `tsconfig.spec.json`                     | [TypeScript configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) for application tests.                                                                                  |
+| `tsconfig.app.json` | 应用专属的 [TypeScript 配置](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)，包括 [Angular 编译器选项](/reference/configs/angular-compiler-options)。 |
+| `tsconfig.spec.json` | 应用测试的 [TypeScript 配置](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)。 |
 
-## Multiple projects
+## 多个项目 {#multiple-projects}
 
-A multi-project workspace is suitable for an organization that uses a single repository and global configuration for multiple Angular projects (the "monorepo" model).
-A multi-project workspace also supports library development.
+多项目工作区适合那些为多个 Angular 项目使用单个仓库和全局配置的组织（即“单体仓库”模式）。
+多项目工作区也支持库的开发。
 
-### Setting up for a multi-project workspace
+### 设置多项目工作区 {#setting-up-for-a-multi-project-workspace}
 
-If you intend to have multiple projects in a workspace, you can skip the initial application generation when you create the workspace, and give the workspace a unique name.
-The following command creates a workspace with all of the workspace-wide configuration files, but no root-level application.
+如果你打算在一个工作区中包含多个项目，可以在创建工作区时跳过初始应用的生成，并为工作区指定一个唯一的名称。
+以下命令会创建一个包含所有工作区级配置文件、但没有根级应用的工作区。
 
 ```shell
 ng new my-workspace --no-create-application
 ```
 
-You can then generate applications and libraries with names that are unique within the workspace.
+然后，你就可以生成在工作区内名称唯一的应用和库了。
 
 ```shell
 cd my-workspace
@@ -118,35 +114,35 @@ ng generate application my-app
 ng generate library my-lib
 ```
 
-### Multiple project file structure
+### 多项目文件结构 {#multiple-project-file-structure}
 
-The first explicitly generated application goes into the `projects` folder along with all other projects in the workspace.
-Newly generated libraries are also added under `projects`.
-When you create projects this way, the file structure of the workspace is entirely consistent with the structure of the [workspace configuration file](/reference/configs/workspace-config), `angular.json`.
+第一个显式生成的应用会与工作区中的所有其他项目一起放入 `projects` 文件夹中。
+新生成的库也会添加到 `projects` 下。
+以这种方式创建项目时，工作区的文件结构与[工作区配置文件](/reference/configs/workspace-config) `angular.json` 的结构完全一致。
 
 ```markdown
 my-workspace/
-├── … (workspace-wide configuration files)
-└── projects/ (applications and libraries)
-├── my-app/ (an explicitly generated application)
-│ └── … (application-specific code and configuration)
-└── my-lib/ (a generated library)
-└── … (library-specific code and configuration)
+├── … (工作区级配置文件)
+└── projects/ (应用和库)
+├── my-app/ (显式生成的应用)
+│ └── … (应用专属的代码和配置)
+└── my-lib/ (生成的库)
+└── … (库专属的代码和配置)
 ```
 
-## Library project files
+## 库项目文件 {#library-project-files}
 
-When you generate a library using the CLI (with a command such as `ng generate library my-lib`), the generated files go into the `projects/` folder of the workspace.
-For more information about creating your own libraries, see [Creating Libraries](/tools/libraries/creating-libraries).
+当你使用 CLI 生成库时（例如使用 `ng generate library my-lib` 命令），生成的文件会放入工作区的 `projects/` 文件夹中。
+关于如何创建你自己的库，请参阅[创建库](/tools/libraries/creating-libraries)。
 
-Unlike an application, a library has its own `package.json` configuration file.
+与应用不同，库有自己的 `package.json` 配置文件。
 
-Under the `projects/` folder, the `my-lib` folder contains your library code.
+在 `projects/` 文件夹下，`my-lib` 文件夹包含你的库代码。
 
-| Library source files | Purpose                                                                                                                                                                                         |
+| 库源文件 | 用途 |
 | :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/lib`            | Contains your library project's logic and data. Like an application project, a library project can contain components, services, modules, directives, and pipes.                                |
-| `src/public-api.ts`  | Specifies all files that are exported from your library's primary entry point.                                                                                                                  |
-| `package.json`       | Configures [npm package dependencies](/reference/configs/npm-packages) and entry points (`exports`) for this library.                                                                            |
-| `tsconfig.lib.json`  | Library-specific [TypeScript Configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html), including [Angular compiler options](/reference/configs/angular-compiler-options). |
-| `tsconfig.spec.json` | [TypeScript Configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) for the library's unit tests.                                                                       |
+| `src/lib` | 包含库项目的逻辑和数据。与应用项目一样，库项目可以包含组件、服务、模块、指令和管道。 |
+| `src/public-api.ts` | 指定从库的主入口点导出的所有文件。 |
+| `package.json` | 为此库配置 [npm 包依赖](/reference/configs/npm-packages)和入口点（`exports`）。 |
+| `tsconfig.lib.json` | 库专属的 [TypeScript 配置](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)，包括 [Angular 编译器选项](/reference/configs/angular-compiler-options)。 |
+| `tsconfig.spec.json` | 库单元测试的 [TypeScript 配置](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)。 |
