@@ -1,24 +1,20 @@
----
-untranslated: true
----
+# 属性型指令 {#attribute-directives}
 
-# Attribute directives
+属性型指令（Attribute Directive）用于改变 DOM 元素和 Angular 组件（Component）的外观或行为。
 
-Attribute directives change the appearance or behavior of DOM elements and Angular components.
+## 一次性的行为请使用模板绑定 {#use-template-bindings-for-one-off-behavior}
 
-## Use template bindings for one-off behavior
+Angular 的模板（Template）语法已经涵盖了修改单个元素的 CSS 类、样式、属性和事件：
 
-Angular's template syntax already covers changing a single element's classes, styles, properties, and events:
+- [CSS 类和样式绑定](/guide/templates/binding#css-class-and-style-property-bindings)用于添加和移除 CSS 类及内联样式。
+- [属性绑定和 attribute 绑定](/guide/templates/binding)用于设置 DOM 属性和 HTML attribute。
+- [事件监听器](/guide/templates/event-listeners)用于响应用户交互。
 
-- [Class and style bindings](/guide/templates/binding#css-class-and-style-property-bindings) add and remove CSS classes and inline styles.
-- [Property and attribute bindings](/guide/templates/binding) set DOM properties and HTML attributes.
-- [Event listeners](/guide/templates/event-listeners) respond to user interaction.
+如果你想把这类行为打包成一个可复用的单元，应用到任意元素或组件上，属性型指令就派上用场了。
 
-Attribute directives are useful when you want to package this kind of behavior into a reusable unit that you can apply to any element or component.
+## 构建属性型指令 {#building-an-attribute-directive}
 
-## Building an attribute directive
-
-A custom attribute directive is a JavaScript class with the `@Directive()` decorator. The decorator's `selector` defines the attribute that applies the directive. The square brackets make this an attribute selector, so the directive matches elements that carry the attribute. By convention, use a prefix such as `app` to avoid naming collisions:
+自定义属性型指令是一个带有 `@Directive()` 装饰器的 JavaScript 类。装饰器的 `selector` 定义了用来应用该指令的属性。方括号使其成为属性选择器（Selector），因此该指令会匹配带有该属性的元素。按照惯例，请使用 `app` 之类的前缀来避免命名冲突：
 
 ```ts
 import {Directive} from '@angular/core';
@@ -29,12 +25,12 @@ import {Directive} from '@angular/core';
 export class HighlightDirective {}
 ```
 
-::: tip HELPFUL
-The CLI command [`ng generate directive`](/tools/cli/schematics) scaffolds a directive along with its test file.
+::: tip 提示
+CLI 命令 [`ng generate directive`](/tools/cli/schematics) 会生成指令的骨架代码及其测试文件。
 
 :::
 
-A directive can change its host declaratively through host bindings or imperatively through a reference to the host element. This example [injects](/guide/di) [`ElementRef`](https://angular.dev/api/core/ElementRef) and accesses the element through its `nativeElement` property to set the background to yellow:
+指令可以通过宿主绑定（Host Binding）声明式地修改其宿主，也可以通过对宿主元素（Host Element）的引用命令式地修改它。这个例子[注入](/guide/di)了 [`ElementRef`](https://angular.dev/api/core/ElementRef)，并通过它的 `nativeElement` 属性访问元素，把背景设置为黄色：
 
 ```ts [highlight.directive.ts]
 import {Directive, ElementRef, inject} from '@angular/core';
@@ -51,8 +47,8 @@ export class HighlightDirective {
 }
 ```
 
-::: warning IMPORTANT
-Directives _do not_ support namespaces.
+::: warning 重要
+指令*不*支持命名空间。
 
 :::
 
@@ -60,19 +56,19 @@ Directives _do not_ support namespaces.
 <p app:Highlight>This is invalid</p>
 ```
 
-## Applying an attribute directive
+## 应用属性型指令 {#applying-an-attribute-directive}
 
-To apply the directive, add its selector as an attribute on an element:
+要应用该指令，请把它的选择器作为属性添加到元素上：
 
 ```html [app.component.html]
 <p appHighlight>Highlight me!</p>
 ```
 
-Angular creates an instance of `HighlightDirective` for that `<p>` element, injects a reference to the element, and sets its background to yellow.
+Angular 会为这个 `<p>` 元素创建一个 `HighlightDirective` 实例，注入对该元素的引用，并把它的背景设置为黄色。
 
-## Handling user events
+## 处理用户事件 {#handling-user-events}
 
-To respond to user interaction, bind host element events to handler methods through the `host` property of the `@Directive()` decorator. The following directive highlights the host element while the pointer is over it and clears the highlight when the pointer leaves:
+要响应用户交互，请通过 `@Directive()` 装饰器的 `host` 属性，把宿主元素的事件绑定到处理方法上。下面的指令会在指针位于宿主元素上方时高亮该元素，并在指针离开时清除高亮：
 
 ```ts [highlight.directive.ts]
 // #docplaster
@@ -102,17 +98,17 @@ export class HighlightDirective {
 }
 ```
 
-The `host` property maps the `mouseenter` and `mouseleave` events to the `onMouseEnter()` and `onMouseLeave()` methods, which delegate to a `highlight()` helper that sets the background color on the host element. For more on host event bindings, see [binding to the host element](/guide/components/host-elements#binding-to-the-host-element).
+`host` 属性把 `mouseenter` 和 `mouseleave` 事件映射到 `onMouseEnter()` 和 `onMouseLeave()` 方法，这两个方法再委托给 `highlight()` 辅助方法，由它设置宿主元素的背景色。关于宿主事件绑定的更多信息，请参阅[绑定到宿主元素](/guide/components/host-elements#binding-to-the-host-element)。
 
-## Accepting input values
+## 接受输入值 {#accepting-input-values}
 
-Like components, directives accept inputs through the [`input()`](/guide/components/inputs) function. Give an input the same name as the selector so that a single binding both applies the directive and passes a value to it:
+与组件一样，指令也通过 [`input()`](/guide/components/inputs) 函数接受输入（Input）。给输入取一个与选择器相同的名字，这样一个绑定（Binding）就能同时应用指令并向它传值：
 
 ```ts [highlight.directive.ts]
 appHighlight = input('');
 ```
 
-Read the input by calling it as a signal, and fall back to a default when no color is set:
+像调用信号（Signal）一样调用输入来读取它，并在没有设置颜色时回退到默认值：
 
 ```ts [highlight.directive.ts]
 onMouseEnter() {
@@ -120,7 +116,7 @@ onMouseEnter() {
 }
 ```
 
-In the template, bind the value to the selector. Because the input shares the selector's name, `[appHighlight]` both applies the directive and sets its value. Here the bound `color` is a property on the component:
+在模板中，把值绑定到选择器上。由于输入与选择器同名，`[appHighlight]` 既会应用指令，也会设置它的值。这里绑定的 `color` 是组件上的一个属性：
 
 ```html [app.component.html]
 <p [appHighlight]="color">Highlight me!</p>
@@ -132,7 +128,7 @@ export class AppComponent {
 }
 ```
 
-A directive can declare more than one input. The following directive adds a `defaultColor` input, then falls back through `appHighlight`, `defaultColor`, and finally `red`:
+一个指令可以声明多个输入。下面的指令添加了一个 `defaultColor` 输入，然后依次回退到 `appHighlight`、`defaultColor`，最后是 `red`：
 
 ```ts [highlight.directive.ts]
 import {Directive, ElementRef, inject, input} from '@angular/core';
@@ -165,27 +161,27 @@ export class HighlightDirective {
 }
 ```
 
-Bind both inputs on the same element. Because `defaultColor` takes a static string rather than a dynamic expression, it doesn't need square brackets:
+在同一个元素上绑定这两个输入。由于 `defaultColor` 接受的是静态字符串而不是动态表达式，因此不需要方括号：
 
 ```html [app.component.html]
 <p [appHighlight]="color" defaultColor="violet">Highlight me too!</p>
 ```
 
-## Deactivating Angular processing with `NgNonBindable`
+## 使用 `NgNonBindable` 停用 Angular 处理 {#deactivating-angular-processing-with-ngnonbindable}
 
-To prevent expression evaluation in the browser, add `ngNonBindable` to the host element.
-`ngNonBindable` deactivates interpolation, directives, and binding in templates.
+要阻止浏览器中的表达式求值，请在宿主元素上添加 `ngNonBindable`。
+`ngNonBindable` 会停用模板中的插值（Interpolation）、指令和绑定。
 
-In the following example, the expression `{{ 1 + 1 }}` renders just as it does in your code editor, and does not display `2`.
+在下面的例子中，表达式 `{{ 1 + 1 }}` 会按照它在代码编辑器中的样子原样渲染，而不会显示 `2`。
 
 ```html [app.component.html]
 <p>Use ngNonBindable to stop evaluation.</p>
 <p ngNonBindable>This should not evaluate: {{ 1 + 1 }}</p>
 ```
 
-Applying `ngNonBindable` to an element stops binding for that element's child elements.
-However, `ngNonBindable` still lets directives work on the element where you apply `ngNonBindable`.
-In the following example, the `appHighlight` directive is still active but Angular does not evaluate the expression `{{ 1 + 1 }}`.
+在元素上应用 `ngNonBindable` 会停止该元素的子元素上的绑定。
+不过，`ngNonBindable` 仍然允许指令作用于应用了 `ngNonBindable` 的那个元素本身。
+在下面的例子中，`appHighlight` 指令仍然有效，但 Angular 不会对表达式 `{{ 1 + 1 }}` 求值。
 
 ```html [app.component.html]
 <h3>ngNonBindable with a directive</h3>
@@ -194,10 +190,10 @@ In the following example, the `appHighlight` directive is still active but Angul
 </div>
 ```
 
-If you apply `ngNonBindable` to a parent element, Angular disables interpolation and binding of any sort, such as property binding or event binding, for the element's children.
+如果你在父元素上应用 `ngNonBindable`，Angular 就会对该元素的子元素禁用插值和任何类型的绑定，例如属性绑定（Property Binding）或事件绑定（Event Binding）。
 
-## What's next
+## 下一步 {#what-s-next}
 
-- [Structural directives](/guide/directives/structural-directives)
-- [Directive composition API](/guide/directives/directive-composition-api)
+- [结构型指令](/guide/directives/structural-directives)
+- [指令组合 API](/guide/directives/directive-composition-api)
 

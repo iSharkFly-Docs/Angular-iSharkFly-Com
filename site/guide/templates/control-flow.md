@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 控制流 {#control-flow}
 
-# Control flow
+Angular 模板（Template）支持控制流（Control Flow）块，可以用来有条件地显示、隐藏和重复元素。
 
-Angular templates support control flow blocks that let you conditionally show, hide, and repeat elements.
+## 使用 `@if`、`@else if` 和 `@else` 有条件地显示内容 {#conditionally-display-content-with-if-else-if-and-else}
 
-## Conditionally display content with `@if`, `@else if` and `@else`
-
-The `@if` block conditionally displays its content when its condition expression is truthy:
+当条件表达式为真值（truthy）时，`@if` 块会显示其中的内容：
 
 ```html
 @if (a > b) {
@@ -16,7 +12,7 @@ The `@if` block conditionally displays its content when its condition expression
 }
 ```
 
-If you want to display alternative content, you can do so by providing any number of `@else if` blocks and a singular `@else` block.
+如果要显示备选内容，可以提供任意数量的 `@else if` 块和一个 `@else` 块。
 
 ```html
 @if (a > b) {
@@ -28,9 +24,9 @@ If you want to display alternative content, you can do so by providing any numbe
 }
 ```
 
-### Referencing the conditional expression's result
+### 引用条件表达式的结果 {#referencing-the-conditional-expression-s-result}
 
-The `@if` conditional supports saving the result of the conditional expression into a variable for reuse inside of the block.
+`@if` 条件支持把条件表达式的结果保存到一个变量中，以便在块内复用。
 
 ```html
 @if (user.profile.settings.startDate; as startDate) {
@@ -38,13 +34,13 @@ The `@if` conditional supports saving the result of the conditional expression i
 }
 ```
 
-This can be useful for referencing longer expressions that would be easier to read and maintain within the template.
+对于较长的表达式，这种写法可以让模板更易读、更易维护。
 
-## Repeat content with the `@for` block
+## 使用 `@for` 块重复内容 {#repeat-content-with-the-for-block}
 
-The `@for` block loops through a collection and repeatedly renders the content of a block. The collection can be any JavaScript [iterable](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Iteration_protocols), but Angular has additional performance optimizations for `Array` values.
+`@for` 块会遍历一个集合，并重复渲染块中的内容。集合可以是任何 JavaScript [可迭代对象（iterable）](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Iteration_protocols)，不过 Angular 对 `Array` 值做了额外的性能优化。
 
-A typical `@for` loop looks like:
+一个典型的 `@for` 循环如下：
 
 ```html
 @for (item of items; track item.id) {
@@ -52,19 +48,19 @@ A typical `@for` loop looks like:
 }
 ```
 
-Angular's `@for` block does not support flow-modifying statements like JavaScript's `continue` or `break`.
+Angular 的 `@for` 块不支持 JavaScript 中 `continue` 或 `break` 这类改变流程的语句。
 
-### Why is `track` in `@for` blocks important?
+### 为什么 `@for` 块中的 `track` 很重要？ {#why-is-track-in-for-blocks-important}
 
-The `track` expression allows Angular to maintain a relationship between your data and the DOM nodes on the page. This allows Angular to optimize performance by executing the minimum necessary DOM operations when the data changes.
+`track` 表达式让 Angular 能够维护数据与页面上 DOM 节点之间的对应关系。这样，当数据变化时，Angular 只需执行最少的必要 DOM 操作，从而优化性能。
 
-Using track effectively can significantly improve your application's rendering performance when looping over data collections.
+在遍历数据集合时，合理使用 track 可以显著提升应用的渲染性能。
 
-Select a property that uniquely identifies each item in the `track` expression. If your data model includes a uniquely identifying property, commonly `id` or `uuid`, use this value. If your data does not include a field like this, strongly consider adding one.
+请在 `track` 表达式中选择一个能唯一标识每个条目的属性。如果你的数据模型中有唯一标识属性（通常是 `id` 或 `uuid`），就使用它。如果数据中没有这样的字段，强烈建议加上一个。
 
-For static collections that never change, you can use `$index` to tell Angular to track each item by its index in the collection.
+对于永远不会变化的静态集合，可以使用 `$index`，让 Angular 按照每个条目在集合中的索引进行跟踪。
 
-If no other option is available, you can use the item itself as a tracking key. This tells Angular to track the item by its reference identity using the triple-equals operator (`===`). Avoid this option whenever possible as it can lead to significantly slower rendering updates, as Angular has no way to map which data item corresponds to which DOM nodes.
+如果没有其他选择，可以把条目本身用作跟踪键。这会让 Angular 使用全等运算符（`===`）按引用标识来跟踪条目。请尽量避免这种做法，因为 Angular 无法判断哪个数据条目对应哪些 DOM 节点，渲染更新可能会明显变慢。
 
 ```html
 @for (item of items; track item) {
@@ -72,25 +68,25 @@ If no other option is available, you can use the item itself as a tracking key. 
 }
 ```
 
-::: info NOTE
-Unlike `*ngFor`, the `@for` block prioritizes view reuse. If a tracked property changes but the object reference remains the same, Angular updates the view's bindings (including component inputs) rather than destroying and recreating the entire element.
+::: info 注意
+与 `*ngFor` 不同，`@for` 块优先复用视图。如果被跟踪的属性发生变化，但对象引用保持不变，Angular 会更新视图的绑定（包括组件输入），而不是销毁并重新创建整个元素。
 
 :::
 
-### Contextual variables in `@for` blocks
+### `@for` 块中的上下文变量 {#contextual-variables-in-for-blocks}
 
-Inside `@for` blocks, several implicit variables are always available:
+在 `@for` 块内部，始终可以使用以下几个隐式变量：
 
-| Variable | Meaning                                       |
+| 变量     | 含义                                          |
 | -------- | --------------------------------------------- |
-| `$count` | Number of items in a collection iterated over |
-| `$index` | Index of the current row                      |
-| `$first` | Whether the current row is the first row      |
-| `$last`  | Whether the current row is the last row       |
-| `$even`  | Whether the current row index is even         |
-| `$odd`   | Whether the current row index is odd          |
+| `$count` | 被遍历集合中的条目数量                        |
+| `$index` | 当前行的索引                                  |
+| `$first` | 当前行是否为第一行                            |
+| `$last`  | 当前行是否为最后一行                          |
+| `$even`  | 当前行的索引是否为偶数                        |
+| `$odd`   | 当前行的索引是否为奇数                        |
 
-These variables are always available with these names, but can be aliased via a `let` segment:
+这些变量始终以上述名称提供，但也可以通过 `let` 片段为它们起别名：
 
 ```html
 @for (item of items; track item.id; let idx = $index, e = $even) {
@@ -98,11 +94,11 @@ These variables are always available with these names, but can be aliased via a 
 }
 ```
 
-The aliasing is useful when nesting `@for` blocks, letting you read variables from the outer `@for` block from an inner `@for` block.
+在嵌套 `@for` 块时，别名很有用，可以让你在内层 `@for` 块中读取外层 `@for` 块的变量。
 
-### Providing a fallback for `@for` blocks with the `@empty` block
+### 使用 `@empty` 块为 `@for` 块提供后备内容 {#providing-a-fallback-for-for-blocks-with-the-empty-block}
 
-You can optionally include an `@empty` section immediately after the `@for` block content. The content of the `@empty` block displays when there are no items:
+你可以选择在 `@for` 块内容之后紧接着加上一个 `@empty` 部分。当没有任何条目时，会显示 `@empty` 块的内容：
 
 ```html
 @for (item of items; track item.name) {
@@ -112,9 +108,9 @@ You can optionally include an `@empty` section immediately after the `@for` bloc
 }
 ```
 
-## Conditionally display content with the `@switch` block
+## 使用 `@switch` 块有条件地显示内容 {#conditionally-display-content-with-the-switch-block}
 
-While the `@if` block is great for most scenarios, the `@switch` block provides an alternate syntax to conditionally render data. Its syntax closely resembles JavaScript's `switch` statement.
+虽然 `@if` 块适用于大多数场景，但 `@switch` 块提供了另一种有条件渲染数据的语法。它的语法与 JavaScript 的 `switch` 语句非常相似。
 
 ```html
 @switch (userPermissions) {
@@ -131,24 +127,24 @@ While the `@if` block is great for most scenarios, the `@switch` block provides 
 }
 ```
 
-The value of the conditional expression is compared to the case expression using the triple-equals (`===`) operator.
+条件表达式的值会使用全等（`===`）运算符与 case 表达式进行比较。
 
-**`@switch` does not have a fallthrough**, so you do not need an equivalent to a `break` or `return` statement in the block.
+**`@switch` 没有贯穿（fallthrough）行为**，因此不需要在块中使用类似 `break` 或 `return` 的语句。
 
-You can specify multiple conditions for a single block by having consecutive `@case` statements.
+可以通过连续书写多个 `@case` 语句，为同一个块指定多个条件。
 
-You can optionally include a `@default` block. The content of the `@default` block displays if none of the preceding case expressions match the switch value.
+你可以选择加上一个 `@default` 块。如果前面所有 case 表达式都不匹配 switch 的值，就会显示 `@default` 块的内容。
 
-If no `@case` matches the expression and there is no `@default` block, nothing is shown.
+如果没有任何 `@case` 与表达式匹配，并且也没有 `@default` 块，则什么都不会显示。
 
-### Exhaustive type checking
+### 穷尽性类型检查 {#exhaustive-type-checking}
 
-`@switch` supports exhaustive type checking, allowing Angular to verify at compile time that all possible values of a union type are handled.
+`@switch` 支持穷尽性类型检查（exhaustive type checking），让 Angular 能在编译时验证联合类型的所有可能取值都已被处理。
 
-By using `@default never;`, you explicitly declare that no remaining cases should exist. If the union type is later extended and a new case is not covered by an @case, Angular’s template type checker will report an error, helping you catch missing branches early.
+使用 `@default never;` 可以显式声明不应再有剩余的情况。如果之后扩展了联合类型，而新的情况没有被某个 @case 覆盖，Angular 的模板类型检查器就会报错，帮你尽早发现遗漏的分支。
 
-::: info NOTE
-Exhaustiveness checking relies on TypeScript's type narrowing, which only works on variables. It will not work if the switch condition is a function call or a signal (for example, `@switch (state())`). To work around this, assign the signal to a `@let` variable, e.g.: `@let mySignal = this.mySignal()`.
+::: info 注意
+穷尽性检查依赖 TypeScript 的类型收窄，而类型收窄只对变量有效。如果 switch 条件是函数调用或信号（Signal）（例如 `@switch (state())`），检查就不会生效。解决方法是把信号赋值给一个 `@let` 变量，例如：`@let mySignal = this.mySignal()`。
 
 :::
 
@@ -165,7 +161,7 @@ Exhaustiveness checking relies on TypeScript's type narrowing, which only works 
       }
 
       @default never;
-      <!-- throws because @case ('loading') is missing -->
+      <!-- 会报错，因为缺少 @case ('loading') -->
     }
   `,
 })
@@ -174,7 +170,7 @@ export class AppComponent {
 }
 ```
 
-When the switched expression is nested within a union, you must explicitly specify the expression to check for exhaustiveness.
+当被 switch 的表达式嵌套在联合类型中时，必须显式指定要检查穷尽性的表达式。
 
 <!-- prettier-ignore -->
 ```ts

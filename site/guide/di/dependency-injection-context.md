@@ -1,33 +1,29 @@
----
-untranslated: true
----
+# 注入上下文 {#injection-context}
 
-# Injection context
+依赖注入（Dependency Injection，DI）系统依赖于一个运行时上下文，在这个上下文中可以拿到当前的注入器（Injector）。
 
-The dependency injection (DI) system relies on a runtime context where the current injector is available.
+这意味着只有当代码在这个上下文中执行时，注入器才能工作。
 
-This means that injectors only work when you execute code within this context.
+在以下情况下，你可以使用注入上下文（injection context）：
 
-You have an injection context available in the following situations:
+- 在由 DI 系统实例化的类（例如 `@Injectable` 或 `@Component`）的构造期间（通过 `constructor`）。
+- 在这些类的字段初始化器中。
+- 在为 `Provider` 或 `@Injectable` 的 `useFactory` 指定的工厂函数中。
+- 在为 `InjectionToken` 指定的 `factory` 函数中。
+- 在运行于注入上下文中的栈帧内。
 
-- During construction (via the `constructor`) of a class instantiated by the DI system, such as an `@Injectable` or `@Component`.
-- In field initializers of such classes.
-- In the factory function specified for `useFactory` of a `Provider` or an `@Injectable`.
-- In the `factory` function specified for an `InjectionToken`.
-- Within a stack frame that runs in an injection context.
+知道自己何时处于注入上下文中，你就可以使用 [`inject`](https://angular.dev/api/core/inject) 函数来获取依赖。
 
-Knowing when you are in an injection context allows you to use the [`inject`](https://angular.dev/api/core/inject) function to retrieve dependencies.
-
-::: info NOTE
-For basic examples of using `inject()` in class constructors and field initializers, see the [overview guide](/guide/di#where-can-inject-be-used).
+::: info 注意
+关于在类构造函数和字段初始化器中使用 `inject()` 的基础示例，请参阅[概览指南](/guide/di#where-can-inject-be-used)。
 
 :::
 
-## Stack frame in context
+## 上下文中的栈帧 {#stack-frame-in-context}
 
-Some APIs are designed to run within an injection context. This is the case, for example, with router guards. This allows you to use [`inject`](https://angular.dev/api/core/inject) within the guard function to access services.
+有些 API 被设计为在注入上下文中运行，例如路由守卫。这让你可以在守卫函数中使用 [`inject`](https://angular.dev/api/core/inject) 来访问服务（Service）。
 
-Here is an example for `CanActivateFn`
+下面是 `CanActivateFn` 的一个例子
 
 ```ts
 const canActivateTeam: CanActivateFn = (
@@ -38,10 +34,10 @@ const canActivateTeam: CanActivateFn = (
 };
 ```
 
-## Run within an injection context
+## 在注入上下文中运行 {#run-within-an-injection-context}
 
-If you need to run a function within an injection context without already being in one, you can use `runInInjectionContext`.
-This requires access to an injector, such as the `EnvironmentInjector`:
+如果你需要在注入上下文中运行某个函数，但当前并不处于注入上下文中，可以使用 `runInInjectionContext`。
+这需要能访问某个注入器，例如 `EnvironmentInjector`：
 
 ```ts [hero.service.ts]
 @Service()
@@ -50,17 +46,17 @@ export class HeroService {
 
   someMethod() {
     runInInjectionContext(this.environmentInjector, () => {
-      inject(SomeService); // Do what you need with the injected service
+      inject(SomeService); // 用注入的服务做你需要的事
     });
   }
 }
 ```
 
-Note that [`inject`](https://angular.dev/api/core/inject) returns an instance only if the injector can resolve the requested token.
+注意，只有当注入器能够解析所请求的令牌时，[`inject`](https://angular.dev/api/core/inject) 才会返回实例。
 
-## Asserts the context
+## 断言上下文 {#asserts-the-context}
 
-Angular provides the `assertInInjectionContext` helper function to verify that the current context is an injection context and throw a clear error if it is not. Pass a reference to the calling function so the error message points to the correct API entry point. This produces a clearer, more actionable message than the default generic injection error.
+Angular 提供了 `assertInInjectionContext` 辅助函数，用于验证当前上下文是否为注入上下文，如果不是，就抛出一个清晰的错误。传入调用方函数的引用，这样错误消息就会指向正确的 API 入口点。与默认的通用注入错误相比，这样产生的消息更清晰，也更便于采取行动。
 
 ```ts
 import {ElementRef, assertInInjectionContext, inject} from '@angular/core';
@@ -71,7 +67,7 @@ export function injectNativeElement<T extends Element>(): T {
 }
 ```
 
-You can then call this helper **from an injection context** (constructor, field initializer, provider factory, or code executed via `runInInjectionContext`):
+之后你就可以 **在注入上下文中**（构造函数、字段初始化器、提供者工厂，或通过 `runInInjectionContext` 执行的代码）调用这个辅助函数：
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -79,14 +75,14 @@ import {injectNativeElement} from './dom-helpers';
 
 @Component({/* … */})
 export class PreviewCard {
-  readonly hostEl = injectNativeElement<HTMLElement>(); // Field initializer runs in an injection context.
+  readonly hostEl = injectNativeElement<HTMLElement>(); // 字段初始化器在注入上下文中运行。
 
   onAction() {
-    const anotherRef = injectNativeElement<HTMLElement>(); // Fails: runs outside an injection context.
+    const anotherRef = injectNativeElement<HTMLElement>(); // 失败：在注入上下文之外运行。
   }
 }
 ```
 
-## Using DI outside of a context
+## 在上下文之外使用 DI {#using-di-outside-of-a-context}
 
-If you call [`inject`](https://angular.dev/api/core/inject) or `assertInInjectionContext` outside of an injection context, Angular throws [error NG0203](/errors/NG0203).
+如果你在注入上下文之外调用 [`inject`](https://angular.dev/api/core/inject) 或 `assertInInjectionContext`，Angular 会抛出 [NG0203 错误](/errors/NG0203)。

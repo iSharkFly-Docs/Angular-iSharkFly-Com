@@ -1,18 +1,14 @@
----
-untranslated: true
----
+# 指令组合 API {#directive-composition-api}
 
-# Directive composition API
+Angular 指令（Directive）是封装可复用行为的好方式。指令可以为元素应用属性、CSS 类和事件监听器（Event Listener）。
 
-Angular directives offer a great way to encapsulate reusable behaviors. Directives can apply attributes, CSS classes, and event listeners to an element.
+*指令组合 API* 让你可以在组件（Component）的 TypeScript 类*内部*，把指令应用到该组件的宿主元素（Host Element）上。
 
-The _directive composition API_ lets you apply directives to a component's host element from _within_ the component TypeScript class.
+## 向组件添加指令 {#adding-directives-to-a-component}
 
-## Adding directives to a component
+要把指令应用到组件上，请在组件的装饰器中添加 `hostDirectives` 属性。这类指令被称为*宿主指令*（Host Directive）。
 
-You apply directives to a component by adding a `hostDirectives` property to a component's decorator. Such directives are called _host directives_.
-
-In this example, the `MenuBehavior` directive is applied to the host element of `AdminMenu`. This works similarly to applying the `MenuBehavior` to the `<admin-menu>` element in a template.
+在这个例子中，`MenuBehavior` 指令被应用到 `AdminMenu` 的宿主元素上。这与在模板（Template）中把 `MenuBehavior` 应用到 `<admin-menu>` 元素上的效果类似。
 
 ```ts
 @Component({
@@ -23,18 +19,18 @@ In this example, the `MenuBehavior` directive is applied to the host element of 
 export class AdminMenu {}
 ```
 
-When the framework renders a component, Angular also creates an instance of each host directive. The directives' host bindings apply to the component's host element. By default, host directive inputs and outputs are not exposed as part of the component's public API. See [Including inputs and outputs](#including-inputs-and-outputs) below for more information.
+框架渲染组件时，Angular 还会为每个宿主指令创建一个实例。这些指令的宿主绑定（Host Binding）会应用到组件的宿主元素上。默认情况下，宿主指令的输入（Input）和输出（Output）不会作为组件公共 API 的一部分对外暴露。更多信息请参阅下文的[包含输入和输出](#including-inputs-and-outputs)。
 
-Host directives come with the following constraints:
+宿主指令有以下限制：
 
-- **Angular applies host directives statically at compile time.** You cannot dynamically add
-  directives at runtime.
-- **Directives used in `hostDirectives` may not specify `standalone: false`.**
-- **Angular ignores the `selector` of directives applied in the `hostDirectives` property.**
+- **Angular 在编译期静态地应用宿主指令。** 你无法在运行时动态添加
+  指令。
+- **在 `hostDirectives` 中使用的指令不能指定 `standalone: false`。**
+- **对于在 `hostDirectives` 属性中应用的指令，Angular 会忽略它们的 `selector`。**
 
-## Including inputs and outputs
+## 包含输入和输出 {#including-inputs-and-outputs}
 
-When you apply `hostDirectives` to your component, the inputs and outputs from the host directives are not included in your component's API by default. You can explicitly include inputs and outputs in your component's API by expanding the entry in `hostDirectives`:
+当你为组件应用 `hostDirectives` 时，默认情况下宿主指令的输入和输出不会包含在组件的 API 中。你可以展开 `hostDirectives` 中的条目，显式地把输入和输出包含到组件的 API 中：
 
 ```ts
 @Component({
@@ -51,13 +47,13 @@ When you apply `hostDirectives` to your component, the inputs and outputs from t
 export class AdminMenu {}
 ```
 
-By explicitly specifying the inputs and outputs, consumers of the component with `hostDirectives` can bind them in a template:
+通过显式指定输入和输出，带有 `hostDirectives` 的组件的使用者就可以在模板中绑定它们：
 
 ```html
 <admin-menu menuId="top-menu" (menuClosed)="logMenuClosed()"></admin-menu>
 ```
 
-Furthermore, you can alias inputs and outputs from a host directive to customize the API of your component:
+此外，你还可以为宿主指令的输入和输出设置别名，以定制组件的 API：
 
 ```ts
 @Component({
@@ -78,13 +74,13 @@ export class AdminMenu {}
 <admin-menu id="top-menu" (closed)="logMenuClosed()"></admin-menu>
 ```
 
-## Adding directives to another directive
+## 向其他指令添加指令 {#adding-directives-to-another-directive}
 
-You can also add `hostDirectives` to other directives, in addition to components. This enables the transitive aggregation of multiple behaviors.
+除了组件之外，你也可以为其他指令添加 `hostDirectives`。这样就能以传递的方式聚合多种行为。
 
-The following example defines two directives, `Menu` and `Tooltip`, then composes their behavior in `MenuWithTooltip`. Finally, it applies `MenuWithTooltip` to `SpecializedMenuWithTooltip`.
+下面的例子定义了两个指令 `Menu` 和 `Tooltip`，然后在 `MenuWithTooltip` 中组合它们的行为。最后，再把 `MenuWithTooltip` 应用到 `SpecializedMenuWithTooltip` 上。
 
-When `SpecializedMenuWithTooltip` is used in a template, it creates instances of all of `Menu`, `Tooltip`, and `MenuWithTooltip`. Each of these directives' host bindings apply to the host element of `SpecializedMenuWithTooltip`.
+当在模板中使用 `SpecializedMenuWithTooltip` 时，它会创建 `Menu`、`Tooltip` 和 `MenuWithTooltip` 的全部实例。这些指令各自的宿主绑定都会应用到 `SpecializedMenuWithTooltip` 的宿主元素上。
 
 ```ts
 @Directive({/* ... */})
@@ -93,26 +89,26 @@ export class Menu {}
 @Directive({/* ... */})
 export class Tooltip {}
 
-// MenuWithTooltip can compose behaviors from multiple other directives
+// MenuWithTooltip 可以组合来自多个其他指令的行为
 @Directive({
   hostDirectives: [Tooltip, Menu],
 })
 export class MenuWithTooltip {}
 
-// CustomWidget can apply the already-composed behaviors from MenuWithTooltip
+// CustomWidget 可以应用 MenuWithTooltip 中已经组合好的行为
 @Directive({
   hostDirectives: [MenuWithTooltip],
 })
 export class SpecializedMenuWithTooltip {}
 ```
 
-## Host directive semantics
+## 宿主指令的语义 {#host-directive-semantics}
 
-### Directive execution order
+### 指令的执行顺序 {#directive-execution-order}
 
-Host directives go through the same lifecycle as components and directives used directly in a template. However, host directives always execute their constructor, lifecycle hooks, and bindings _before_ the component or directive on which they are applied.
+宿主指令与直接在模板中使用的组件和指令经历相同的生命周期。不过，宿主指令总是*先于*它所应用到的组件或指令执行其构造函数、生命周期钩子（Lifecycle Hook）和绑定。
 
-The following example shows minimal use of a host directive:
+下面的例子展示了宿主指令的最简用法：
 
 ```ts
 @Component({
@@ -123,18 +119,18 @@ The following example shows minimal use of a host directive:
 export class AdminMenu {}
 ```
 
-The order of execution here is:
+这里的执行顺序是：
 
-1. `MenuBehavior` instantiated
-2. `AdminMenu` instantiated
-3. `MenuBehavior` receives inputs (`ngOnInit`)
-4. `AdminMenu` receives inputs (`ngOnInit`)
-5. `MenuBehavior` applies host bindings
-6. `AdminMenu` applies host bindings
+1. `MenuBehavior` 被实例化
+2. `AdminMenu` 被实例化
+3. `MenuBehavior` 接收输入（`ngOnInit`）
+4. `AdminMenu` 接收输入（`ngOnInit`）
+5. `MenuBehavior` 应用宿主绑定
+6. `AdminMenu` 应用宿主绑定
 
-This order of operations means that components with `hostDirectives` can override any host bindings specified by a host directive.
+这种执行顺序意味着，带有 `hostDirectives` 的组件可以覆盖宿主指令所指定的任何宿主绑定。
 
-This order of operations extends to nested chains of host directives, as shown in the following example.
+这种执行顺序同样适用于嵌套的宿主指令链，如下例所示。
 
 ```ts
 @Directive({...})
@@ -151,35 +147,35 @@ export class CustomTooltip { }
 export class EvenMoreCustomTooltip { }
 ```
 
-In the example above, the order of execution is:
+在上面的例子中，执行顺序是：
 
-1. `Tooltip` instantiated
-2. `CustomTooltip` instantiated
-3. `EvenMoreCustomTooltip` instantiated
-4. `Tooltip` receives inputs (`ngOnInit`)
-5. `CustomTooltip` receives inputs (`ngOnInit`)
-6. `EvenMoreCustomTooltip` receives inputs (`ngOnInit`)
-7. `Tooltip` applies host bindings
-8. `CustomTooltip` applies host bindings
-9. `EvenMoreCustomTooltip` applies host bindings
+1. `Tooltip` 被实例化
+2. `CustomTooltip` 被实例化
+3. `EvenMoreCustomTooltip` 被实例化
+4. `Tooltip` 接收输入（`ngOnInit`）
+5. `CustomTooltip` 接收输入（`ngOnInit`）
+6. `EvenMoreCustomTooltip` 接收输入（`ngOnInit`）
+7. `Tooltip` 应用宿主绑定
+8. `CustomTooltip` 应用宿主绑定
+9. `EvenMoreCustomTooltip` 应用宿主绑定
 
-### Dependency injection
+### 依赖注入 {#dependency-injection}
 
-A component or directive that specifies `hostDirectives` can inject the instances of those host directives and vice versa.
+指定了 `hostDirectives` 的组件或指令可以注入这些宿主指令的实例，反之亦然。
 
-When applying host directives to a component, both the component and host directives can define providers.
+为组件应用宿主指令时，组件和宿主指令都可以定义提供者（Provider）。
 
-If a component or directive with `hostDirectives` and those host directives both provide the same injection token, the providers defined by class with `hostDirectives` take precedence over providers defined by the host directives.
+如果带有 `hostDirectives` 的组件或指令与这些宿主指令提供了同一个注入令牌（Injection Token），那么带有 `hostDirectives` 的类所定义的提供者，优先于宿主指令所定义的提供者。
 
-### Host directive de-duplication
+### 宿主指令去重 {#host-directive-de-duplication}
 
-When the same directive appears more than once in the resolved host directive tree, it is automatically de-duplicated rather than throwing an error. Two deterministic rules are used to decide which match survives.
+当同一个指令在解析后的宿主指令树中出现不止一次时，它会被自动去重，而不是抛出错误。Angular 使用两条确定性的规则来决定保留哪一个匹配。
 
-#### Template match takes precedence
+#### 模板匹配优先 {#template-match-takes-precedence}
 
-If a directive matches an element once through a **template selector** and also appears as a **host directive**, Angular keeps only the template match and discards all host directive matches.
+如果一个指令既通过**模板选择器**与某个元素匹配了一次，又作为**宿主指令**出现，Angular 只会保留模板匹配，并丢弃所有宿主指令匹配。
 
-The mental model is that a host directive match represents `Partial<YourDirective>`, a partial application where only the inputs and outputs explicitly listed in `hostDirectives` are exposed, while a template match represents the full directive with its complete public API.
+可以这样理解：宿主指令匹配代表 `Partial<YourDirective>`，是一种部分应用，只暴露在 `hostDirectives` 中显式列出的输入和输出；而模板匹配代表完整的指令，带有其全部公共 API。
 
 ```ts
 @Directive({selector: '[hoverable]'})
@@ -193,19 +189,19 @@ export class Button {}
 ```
 
 ```html
-<!-- Hoverable is matched by selector AND as a host directive of Button. -->
-<!-- Angular keeps only the selector match, which has the full public API. -->
+<!-- Hoverable 既通过选择器匹配，又作为 Button 的宿主指令匹配。 -->
+<!-- Angular 只保留选择器匹配，它拥有完整的公共 API。 -->
 <app-button hoverable></app-button>
 ```
 
-#### Multiple host directive matches are merged
+#### 多个宿主指令匹配会被合并 {#multiple-host-directive-matches-are-merged}
 
-If the same directive appears **more than once as a host directive**, for example, when two directives both declare a common dependency in their `hostDirectives`, Angular merges all instances into a single directive instance. The input and output mappings from all instances are combined.
+如果同一个指令**作为宿主指令出现了不止一次**，例如两个指令都在各自的 `hostDirectives` 中声明了一个共同的依赖，Angular 会把所有实例合并成一个指令实例。所有实例的输入和输出映射也会被合并。
 
-This resolves the classic [diamond problem](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem) in host directive composition:
+这解决了宿主指令组合中经典的[菱形问题](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem)：
 
 ```ts
-// A shared behavior that both triggers need
+// 两个触发器都需要的共享行为
 @Directive({
   host: {
     '[attr.data-trigger-id]': 'triggerId()',
@@ -215,7 +211,7 @@ export class TriggerRef {
   readonly triggerId = input(`trigger-${crypto.randomUUID()}`);
 }
 
-// Two separate triggers, each declaring TriggerRef as a host directive
+// 两个独立的触发器，都把 TriggerRef 声明为宿主指令
 @Directive({
   selector: '[popoverTrigger]',
   hostDirectives: [TriggerRef],
@@ -234,20 +230,20 @@ export class DropdownTrigger {
 ```
 
 ```html
-<!-- Angular keeps one TriggerRef instance, shared by both triggers. -->
+<!-- Angular 只保留一个 TriggerRef 实例，由两个触发器共享。 -->
 <button popoverTrigger dropdownTrigger>Actions</button>
 ```
 
-::: tip HELPFUL
-Because Angular produces only one instance of the shared directive, both `PopoverTrigger` and `DropdownTrigger` receive the same `TriggerRef` instance when they inject it.
+::: tip 提示
+由于 Angular 只为共享的指令创建一个实例，`PopoverTrigger` 和 `DropdownTrigger` 在注入 `TriggerRef` 时拿到的是同一个实例。
 
 :::
 
-#### Conflicting aliases
+#### 别名冲突 {#conflicting-aliases}
 
-When Angular merges duplicate host directive matches it also merges their input and output mappings.
+Angular 在合并重复的宿主指令匹配时，也会合并它们的输入和输出映射。
 
-If two instances of the same host directive expose the **same input or output under different aliases**, Angular throws an error at compile time ([NG8024](/errors/NG8024)).
+如果同一个宿主指令的两个实例以**不同的别名暴露同一个输入或输出**，Angular 会在编译期抛出错误（[NG8024](/errors/NG8024)）。
 
 ```ts
 @Directive({
@@ -259,21 +255,21 @@ export class PopoverTrigger {}
 @Directive({
   selector: '[dropdownTrigger]',
   hostDirectives: [
-    {directive: TriggerRef, inputs: ['triggerId: dropdownTriggerId']}, // different alias!
+    {directive: TriggerRef, inputs: ['triggerId: dropdownTriggerId']}, // 别名不同！
   ],
 })
 export class DropdownTrigger {}
 ```
 
 ```html
-<!-- Error: triggerId is exposed as both "popoverTriggerId" and "dropdownTriggerId". -->
+<!-- 错误：triggerId 同时以 "popoverTriggerId" 和 "dropdownTriggerId" 暴露。 -->
 <button popoverTrigger dropdownTrigger></button>
 ```
 
-To resolve this, ensure that both paths expose the shared input or output under the same alias, or do not expose it at all.
+要解决这个问题，请确保两条路径都以相同的别名暴露这个共享的输入或输出，或者干脆都不暴露它。
 
-## What's next
+## 下一步 {#what-s-next}
 
-- [Structural directives](/guide/directives/structural-directives)
-- [Component host elements](/guide/components/host-elements)
+- [结构型指令](/guide/directives/structural-directives)
+- [组件宿主元素](/guide/components/host-elements)
 

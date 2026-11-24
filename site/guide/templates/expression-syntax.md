@@ -1,158 +1,154 @@
----
-untranslated: true
----
+# 表达式语法 {#expression-syntax}
 
-# Expression Syntax
+Angular 表达式基于 JavaScript，但在一些关键方面有所不同。本指南介绍 Angular 表达式与标准 JavaScript 之间的异同。
 
-Angular expressions are based on JavaScript, but differ in some key ways. This guide walks through the similarities and differences between Angular expressions and standard JavaScript.
+## 值字面量 {#value-literals}
 
-## Value literals
+Angular 支持 JavaScript [字面量值](https://developer.mozilla.org/en-US/docs/Glossary/Literal)的一个子集。
 
-Angular supports a subset of [literal values](https://developer.mozilla.org/en-US/docs/Glossary/Literal) from JavaScript.
+### 支持的值字面量 {#supported-value-literals}
 
-### Supported value literals
-
-| Literal type           | Example values                  |
+| 字面量类型             | 示例值                          |
 | ---------------------- | ------------------------------- |
-| String                 | `'Hello'`, `"World"`            |
-| Boolean                | `true`, `false`                 |
-| Number                 | `123`, `3.14`                   |
-| Object                 | `{name: 'Alice'}`               |
-| Array                  | `['Onion', 'Cheese', 'Garlic']` |
+| 字符串                 | `'Hello'`, `"World"`            |
+| 布尔值                 | `true`, `false`                 |
+| 数字                   | `123`, `3.14`                   |
+| 对象                   | `{name: 'Alice'}`               |
+| 数组                   | `['Onion', 'Cheese', 'Garlic']` |
 | null                   | `null`                          |
-| RegExp                 | `/\d+/`                         |
-| Template string        | `` `Hello ${name}` ``           |
-| Tagged template string | `` tag`Hello ${name}` ``        |
+| 正则表达式             | `/\d+/`                         |
+| 模板字符串             | `` `Hello ${name}` ``           |
+| 带标签的模板字符串     | `` tag`Hello ${name}` ``        |
 
-### Unsupported value literals
+### 不支持的值字面量 {#unsupported-value-literals}
 
-| Literal type | Example values |
+| 字面量类型   | 示例值         |
 | ------------ | -------------- |
 | BigInt       | `1n`           |
 
-## Globals
+## 全局对象 {#globals}
 
-Angular expressions support the following [globals](https://developer.mozilla.org/en-US/docs/Glossary/Global_object):
+Angular 表达式支持以下[全局对象](https://developer.mozilla.org/en-US/docs/Glossary/Global_object)：
 
 - [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)
 - [$any](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#any)
 
-No other JavaScript globals are supported. Common JavaScript globals include `Number`, `Boolean`, `NaN`, `Infinity`, `parseInt`, and more.
+不支持其他任何 JavaScript 全局对象。常见的 JavaScript 全局对象包括 `Number`、`Boolean`、`NaN`、`Infinity`、`parseInt` 等。
 
-## Local variables
+## 局部变量 {#local-variables}
 
-Angular automatically makes special local variables available for use in expressions in specific contexts. These special variables always start with the dollar sign character (`$`).
+在特定上下文中，Angular 会自动提供一些特殊的局部变量，供表达式使用。这些特殊变量总是以美元符号（`$`）开头。
 
-For example, `@for` blocks make several local variables corresponding to information about the loop, such as `$index`.
+例如，`@for` 块提供了几个与循环信息相对应的局部变量，比如 `$index`。
 
-## What operators are supported?
+## 支持哪些运算符？ {#what-operators-are-supported}
 
-### Supported operators
+### 支持的运算符 {#supported-operators}
 
-Angular supports the following operators from standard JavaScript.
+Angular 支持标准 JavaScript 中的以下运算符。
 
-| Operator                      | Example(s)                                     |
+| 运算符                        | 示例                                           |
 | ----------------------------- | ---------------------------------------------- |
-| Add / Concatenate             | `1 + 2`                                        |
-| Subtract                      | `52 - 3`                                       |
-| Multiply                      | `41 * 6`                                       |
-| Divide                        | `20 / 4`                                       |
-| Remainder (Modulo)            | `17 % 5`                                       |
-| Exponentiation                | `10 ** 3`                                      |
-| Parenthesis                   | `9 * (8 + 4)`                                  |
-| Conditional (Ternary)         | `a > b ? true : false`                         |
-| And (Logical)                 | `&&`                                           |
-| Or (Logical)                  | `\|\|`                                         |
-| Not (Logical)                 | `!`                                            |
-| Nullish Coalescing            | `possiblyNullValue ?? 'default'`               |
-| Comparison Operators          | `<`, `<=`, `>`, `>=`, `==`, `===`, `!==`, `!=` |
-| Unary Negation                | `-x`                                           |
-| Unary Plus                    | `+y`                                           |
-| Property Accessor             | `person['name']`                               |
+| 加法 / 连接                   | `1 + 2`                                        |
+| 减法                          | `52 - 3`                                       |
+| 乘法                          | `41 * 6`                                       |
+| 除法                          | `20 / 4`                                       |
+| 取余（取模）                  | `17 % 5`                                       |
+| 求幂                          | `10 ** 3`                                      |
+| 圆括号                        | `9 * (8 + 4)`                                  |
+| 条件（三元）                  | `a > b ? true : false`                         |
+| 与（逻辑）                    | `&&`                                           |
+| 或（逻辑）                    | `\|\|`                                         |
+| 非（逻辑）                    | `!`                                            |
+| 空值合并                      | `possiblyNullValue ?? 'default'`               |
+| 比较运算符                    | `<`, `<=`, `>`, `>=`, `==`, `===`, `!==`, `!=` |
+| 一元负号                      | `-x`                                           |
+| 一元正号                      | `+y`                                           |
+| 属性访问器                    | `person['name']`                               |
 | typeof                        | `typeof 42`                                    |
 | void                          | `void 1`                                       |
 | in                            | `'model' in car`                               |
 | instanceof                    | `car instanceof Automobile`                    |
-| Assignment                    | `a = b`                                        |
-| Increment                     | `a++`, `++a`                                   |
-| Decrement                     | `a--`, `--a`                                   |
-| Addition Assignment           | `a += b`                                       |
-| Subtraction Assignment        | `a -= b`                                       |
-| Multiplication Assignment     | `a *= b`                                       |
-| Division Assignment           | `a /= b`                                       |
-| Remainder Assignment          | `a %= b`                                       |
-| Exponentiation Assignment     | `a **= b`                                      |
-| Logical AND Assignment        | `a &&= b`                                      |
-| Logical OR Assignment         | `a \|\|= b`                                    |
-| Nullish Coalescing Assignment | `a ??= b`                                      |
-| Spread in object literals     | `{...obj, foo: 'bar'}`                         |
-| Spread in array literals      | `[...arr, 1, 2, 3]`                            |
-| Rest in function calls        | `fn(...args)`                                  |
-| Arrow function                | `items.filter((i) => i.active)`                |
+| 赋值                          | `a = b`                                        |
+| 自增                          | `a++`, `++a`                                   |
+| 自减                          | `a--`, `--a`                                   |
+| 加法赋值                      | `a += b`                                       |
+| 减法赋值                      | `a -= b`                                       |
+| 乘法赋值                      | `a *= b`                                       |
+| 除法赋值                      | `a /= b`                                       |
+| 取余赋值                      | `a %= b`                                       |
+| 求幂赋值                      | `a **= b`                                      |
+| 逻辑与赋值                    | `a &&= b`                                      |
+| 逻辑或赋值                    | `a \|\|= b`                                    |
+| 空值合并赋值                  | `a ??= b`                                      |
+| 对象字面量中的展开            | `{...obj, foo: 'bar'}`                         |
+| 数组字面量中的展开            | `[...arr, 1, 2, 3]`                            |
+| 函数调用中的剩余参数          | `fn(...args)`                                  |
+| 箭头函数                      | `items.filter((i) => i.active)`                |
 
-::: info NOTE
-Assignment and increment/decrement operators are only valid in [event listener statements](#event-listener-statements). Using them in a binding or interpolation is a compile error, unless they are inside an arrow function.
+::: info 注意
+赋值运算符和自增 / 自减运算符只能用在[事件监听器语句](#event-listener-statements)中。在绑定（Binding）或插值（Interpolation）中使用它们会导致编译错误，除非它们位于箭头函数内部。
 
 :::
 
-Arrow functions must have an expression body. Pipes cannot be used inside an arrow function, but you can pass an arrow function as an argument to a pipe.
+箭头函数必须使用表达式体。不能在箭头函数内部使用管道（Pipe），但可以把箭头函数作为参数传给管道。
 
-Angular expressions additionally also support the following non-standard operators:
+此外，Angular 表达式还支持以下非标准运算符：
 
-| Operator                        | Example(s)                     |
+| 运算符                          | 示例                           |
 | ------------------------------- | ------------------------------ |
-| [Pipe](/guide/templates/pipes)  | `{{ total \| currency }}`      |
-| Optional chaining\*             | `someObj.someProp?.nestedProp` |
-| Non-null assertion (TypeScript) | `someObj!.someProp`            |
+| [管道](/guide/templates/pipes)  | `{{ total \| currency }}`      |
+| 可选链\*                        | `someObj.someProp?.nestedProp` |
+| 非空断言（TypeScript）          | `someObj!.someProp`            |
 
-### Safe navigation migration
+### 安全导航迁移 {#safe-navigation-migration}
 
-Prior to Angular 22, the optional chaining operator (`?.`) returned `null` when the left-hand side is `null` or `undefined`, whereas standard JavaScript's `?.` returns `undefined`.
-Since Angular 22, the optional chaining operator behavior in Angular expressions is aligned with the standard JavaScript behavior.
+在 Angular 22 之前，当左侧为 `null` 或 `undefined` 时，可选链运算符（`?.`）返回 `null`，而标准 JavaScript 的 `?.` 返回 `undefined`。
+从 Angular 22 开始，Angular 表达式中可选链运算符的行为已与标准 JavaScript 保持一致。
 
-During the migration to v22, the `ng update` schematics adds a `$safeNavigationMigration` function to existing expressions to preserve the previous behavior.
+在迁移到 v22 的过程中，`ng update` 原理图（Schematic）会给现有表达式加上 `$safeNavigationMigration` 函数，以保留之前的行为。
 
 ```html
 {{ $safeNavigationMigration(foo?.bar) }}
 ```
 
-`$safeNavigationMigration` is a **temporary migration aid only**. It instructs the compiler to compile the wrapped safe-navigation expression using the legacy null-returning semantics rather than the standard JavaScript `?.` semantics. It is not a real function and cannot be called from TypeScript.
+`$safeNavigationMigration` **只是一个临时的迁移辅助工具**。它指示编译器使用旧的返回 `null` 的语义来编译被包裹的安全导航表达式，而不是使用标准 JavaScript 的 `?.` 语义。它并不是一个真正的函数，也不能在 TypeScript 中调用。
 
-::: info NOTE
-Prefer migrating expressions to no longer rely on `null` vs `undefined` distinctions so that `$safeNavigationMigration` can be removed. This function may be removed in a future version of Angular.
+::: info 注意
+建议迁移表达式，使其不再依赖 `null` 与 `undefined` 的区别，从而可以移除 `$safeNavigationMigration`。这个函数可能会在 Angular 的未来版本中被移除。
 
 :::
 
-### Unsupported operators
+### 不支持的运算符 {#unsupported-operators}
 
-| Operator              | Example(s)                        |
+| 运算符                | 示例                              |
 | --------------------- | --------------------------------- |
-| All bitwise operators | `&`, `&=`, `~`, `\|=`, `^=`, etc. |
-| Object destructuring  | `const { name } = person`         |
-| Array destructuring   | `const [firstItem] = items`       |
-| Comma operator        | `x = (x++, x)`                    |
+| 所有位运算符          | `&`, `&=`, `~`, `\|=`, `^=`, etc. |
+| 对象解构              | `const { name } = person`         |
+| 数组解构              | `const [firstItem] = items`       |
+| 逗号运算符            | `x = (x++, x)`                    |
 | new                   | `new Car()`                       |
 
-## Lexical context for expressions
+## 表达式的词法上下文 {#lexical-context-for-expressions}
 
-Angular expressions are evaluated within the context of the component class as well as any relevant [template variables](/guide/templates/variables), locals, and globals.
+Angular 表达式在组件（Component）类的上下文中求值，同时也能访问相关的[模板变量（Template Variable）](/guide/templates/variables)、局部变量和全局对象。
 
-When referring to component class members, `this` is always implied. However, if a template declares a [template variables](/guide/templates/variables) with the same name as a member, the variable shadows that member. You can unambiguously reference such a class member by explicitly using `this.`. This can be useful when creating an `@let` declaration that shadows a class member, e.g. for signal narrowing purposes.
+引用组件类成员时，总是隐含 `this`。不过，如果模板声明了与某个成员同名的[模板变量](/guide/templates/variables)，该变量就会遮蔽这个成员。这时可以显式使用 `this.` 来明确引用该类成员。在创建遮蔽类成员的 `@let` 声明时（例如为了信号（Signal）类型收窄），这一点会很有用。
 
-## Declarations
+## 声明 {#declarations}
 
-Generally speaking, declarations are not supported in Angular expressions. This includes, but is not limited to:
+一般来说，Angular 表达式不支持声明。这包括但不限于：
 
-| Declarations                      | Example(s)                                  |
+| 声明                              | 示例                                        |
 | --------------------------------- | ------------------------------------------- |
-| Variables                         | `let label = 'abc'`, `const item = 'apple'` |
-| Functions                         | `function myCustomFunction() { }`           |
-| Arrow functions with block bodies | `() => { }`                                 |
-| Classes                           | `class Rectangle { }`                       |
+| 变量                              | `let label = 'abc'`, `const item = 'apple'` |
+| 函数                              | `function myCustomFunction() { }`           |
+| 带块体的箭头函数                  | `() => { }`                                 |
+| 类                                | `class Rectangle { }`                       |
 
-## Event listener statements
+## 事件监听器语句 {#event-listener-statements}
 
-Event handlers are **statements** rather than expressions. While they support all of the same syntax as Angular expressions, there are two key differences:
+事件处理器是**语句**而不是表达式。虽然它们支持与 Angular 表达式相同的所有语法，但有两个关键区别：
 
-1. Statements **do support** assignment operators (but not destructuring assignments)
-1. Statements **do not support** pipes
+1. 语句**支持**赋值运算符（但不支持解构赋值）
+1. 语句**不支持**管道

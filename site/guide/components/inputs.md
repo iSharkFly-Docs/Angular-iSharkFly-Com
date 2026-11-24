@@ -1,105 +1,101 @@
----
-untranslated: true
----
+# 通过输入属性接收数据 {#accepting-data-with-input-properties}
 
-# Accepting data with input properties
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular. If you're familiar with other web frameworks, input properties are similar to _props_.
+::: tip 提示
+本指南假定你已经读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。如果你熟悉其他 Web 框架，可以把输入属性理解为类似 **props** 的东西。
 
 :::
 
-When you use a component, you commonly want to pass some data to it. A component specifies the data that it accepts by declaring
-**inputs**:
+使用组件（Component）时，你通常希望向它传递一些数据。组件通过声明
+**输入**（input）来指定它接收哪些数据：
 
 ```ts
 import {Component, input} from '@angular/core';
 
 @Component(/* ... */)
 export class CustomSlider {
-  // Declare an input named 'value' with a default value of zero.
+  // 声明一个名为 'value' 的输入，默认值为 0。
   value = input(0);
 }
 ```
 
-This lets you bind to the property in a template:
+这样你就可以在模板（Template）中绑定到该属性：
 
 ```html
 <custom-slider [value]="50" />
 ```
 
-If an input has a default value, TypeScript infers the type from the default value:
+如果输入有默认值，TypeScript 会根据默认值推断其类型：
 
 ```ts
 @Component(/* ... */)
 export class CustomSlider {
-  // TypeScript infers that this input is a number, returning InputSignal<number>.
+  // TypeScript 推断该输入是 number 类型，返回 InputSignal<number>。
   value = input(0);
 }
 ```
 
-You can explicitly declare a type for the input by specifying a generic parameter to the function.
+你也可以为函数指定泛型参数，显式声明输入的类型。
 
-If an input without a default value is not set, its value is `undefined`:
+如果没有默认值的输入未被设置，它的值就是 `undefined`：
 
 ```ts
 @Component(/* ... */)
 export class CustomSlider {
-  // Produces an InputSignal<number | undefined> because `value` may not be set.
+  // 生成 InputSignal<number | undefined>，因为 `value` 可能未被设置。
   value = input<number>();
 }
 ```
 
-**Angular records inputs statically at compile-time**. Inputs cannot be added or removed at run-time.
+**Angular 在编译期静态记录输入**。输入不能在运行时添加或移除。
 
-The `input` function has special meaning to the Angular compiler. **You can exclusively call `input` in component and directive property initializers.**
+`input` 函数对 Angular 编译器有特殊意义。**你只能在组件和指令（Directive）的属性初始化器中调用 `input`。**
 
-When extending a component class, **inputs are inherited by the child class.**
+扩展组件类时，**输入会被子类继承。**
 
-**Input names are case-sensitive.**
+**输入名称区分大小写。**
 
-## Reading inputs
+## 读取输入 {#reading-inputs}
 
-The `input` function returns an `InputSignal`. You can read the value by calling the signal:
+`input` 函数返回一个 `InputSignal`。你可以通过调用该信号（Signal）来读取值：
 
 ```ts
 import {Component, input, computed} from '@angular/core';
 
 @Component(/* ... */)
 export class CustomSlider {
-  // Declare an input named 'value' with a default value of zero.
+  // 声明一个名为 'value' 的输入，默认值为 0。
   value = input(0);
 
-  // Create a computed expression that reads the value input
+  // 创建一个读取 value 输入的计算表达式
   label = computed(() => `The slider's value is ${this.value()}`);
 }
 ```
 
-Signals created by the `input` function are read-only.
+由 `input` 函数创建的信号是只读的。
 
-## Required inputs
+## 必需输入 {#required-inputs}
 
-You can declare that an input is `required` by calling `input.required` instead of `input`:
+你可以调用 `input.required` 而不是 `input`，把输入声明为 `required`（必需）：
 
 ```ts
 @Component(/* ... */)
 export class CustomSlider {
-  // Declare a required input named value. Returns an `InputSignal<number>`.
+  // 声明一个名为 value 的必需输入。返回 `InputSignal<number>`。
   value = input.required<number>();
 }
 ```
 
-Angular enforces that required inputs _must_ be set when the component is used in a template. If you try to use a component without specifying all of its required inputs, Angular reports an error at build-time.
+Angular 强制要求在模板中使用组件时**必须**设置必需输入。如果你在使用组件时没有指定它的所有必需输入，Angular 会在构建时报错。
 
-Required inputs do not automatically include `undefined` in the generic parameter of the returned `InputSignal`.
+必需输入不会自动在所返回 `InputSignal` 的泛型参数中包含 `undefined`。
 
-## Configuring inputs
+## 配置输入 {#configuring-inputs}
 
-The `input` function accepts a config object as a second parameter that lets you change the way that input works.
+`input` 函数接受一个配置对象作为第二个参数，用来改变输入的工作方式。
 
-### Input transforms
+### 输入转换 {#input-transforms}
 
-You can specify a `transform` function to change the value of an input when it's set by Angular.
+你可以指定一个 `transform` 函数，在 Angular 设置输入值时对其进行转换。
 
 ```ts
 @Component({
@@ -119,17 +115,17 @@ function trimString(value: string | undefined): string {
 <custom-slider [label]="systemVolume" />
 ```
 
-In the example above, whenever the value of `systemVolume` changes, Angular runs `trimString` and sets `label` to the result.
+在上面的例子中，每当 `systemVolume` 的值发生变化时，Angular 都会运行 `trimString`，并把结果设置给 `label`。
 
-The most common use-case for input transforms is to accept a wider range of value types in templates, often including `null` and `undefined`.
+输入转换最常见的用途是让模板可以传入更多类型的值，通常包括 `null` 和 `undefined`。
 
-**Input transform function must be statically analyzable at build-time.** You cannot set transform functions conditionally or as the result of an expression evaluation.
+**输入转换函数必须能在构建时被静态分析**。你不能有条件地设置转换函数，也不能把它设置为某个表达式求值的结果。
 
-**Input transform functions should always be [pure functions](https://en.wikipedia.org/wiki/Pure_function).** Relying on state outside the transform function can lead to unpredictable behavior.
+**输入转换函数应该始终是[纯函数](https://en.wikipedia.org/wiki/Pure_function)**。依赖转换函数之外的状态可能导致不可预测的行为。
 
-#### Type checking
+#### 类型检查 {#type-checking}
 
-When you specify an input transform, the type of the transform function's parameter determines the types of values that can be set to the input in a template.
+当你指定输入转换时，转换函数参数的类型决定了在模板中可以为该输入设置哪些类型的值。
 
 ```ts
 @Component(/* ... */)
@@ -142,11 +138,11 @@ function appendPx(value: number): string {
 }
 ```
 
-In the example above, the `widthPx` input accepts a `number` while the `InputSignal` property returns a `string`.
+在上面的例子中，`widthPx` 输入接受 `number`，而 `InputSignal` 属性返回的是 `string`。
 
-#### Built-in transformations
+#### 内置转换 {#built-in-transformations}
 
-Angular includes two built-in transform functions for the two most common scenarios: coercing values to boolean and numbers.
+Angular 内置了两个转换函数，用于两种最常见的场景：把值强制转换为布尔值和数字。
 
 ```ts
 import {Component, input, booleanAttribute, numberAttribute} from '@angular/core';
@@ -158,14 +154,14 @@ export class CustomSlider {
 }
 ```
 
-`booleanAttribute` imitates the behavior of standard HTML [boolean attributes](https://developer.mozilla.org/docs/Glossary/Boolean/HTML), where the
-_presence_ of the attribute indicates a "true" value. However, Angular's `booleanAttribute` treats the literal string `"false"` as the boolean `false`.
+`booleanAttribute` 模仿标准 HTML [布尔属性](https://developer.mozilla.org/docs/Glossary/Boolean/HTML)的行为，即
+只要**存在**该属性就表示“true”值。不过，Angular 的 `booleanAttribute` 会把字面字符串 `"false"` 视为布尔值 `false`。
 
-`numberAttribute` attempts to parse the given value to a number, producing `NaN` if parsing fails.
+`numberAttribute` 会尝试把给定的值解析为数字，解析失败时返回 `NaN`。
 
-### Input aliases
+### 输入别名 {#input-aliases}
 
-You can specify the `alias` option to change the name of an input in templates.
+你可以指定 `alias` 选项来更改输入在模板中的名称。
 
 ```ts
 @Component(/* ... */)
@@ -178,58 +174,58 @@ export class CustomSlider {
 <custom-slider [sliderValue]="50" />
 ```
 
-This alias does not affect usage of the property in TypeScript code.
+这个别名不会影响在 TypeScript 代码中对该属性的使用。
 
-While you should generally avoid aliasing inputs for components, this feature can be useful for renaming properties while preserving an alias for the original name or for avoiding collisions with the name of native DOM element properties.
+虽然一般应避免为组件的输入设置别名，但在重命名属性时，这个特性可以为原名称保留一个别名；它也可以用来避免与原生 DOM 元素属性的名称发生冲突。
 
-## Model inputs
+## 模型输入 {#model-inputs}
 
-**Model inputs** are a special type of input that enable a component to propagate new values back to its parent component.
+**模型输入**（Model input）是一种特殊的输入，它让组件能够把新值传回给父组件。
 
-When creating a component, you can define a model input similarly to how you create a standard input.
+创建组件时，你可以像创建标准输入一样定义模型输入。
 
-Both types of input allow someone to bind a value into the property. However, **model inputs allow the component author to write values into the property**. If the property is bound with a two-way binding, the new value propagates to that binding.
+两种输入都允许别人把值绑定到属性上。不过，**模型输入还允许组件作者向属性中写入值**。如果该属性使用了双向绑定（Two-way Binding），新值就会传播到该绑定上。
 
 ```ts
 @Component(/* ... */)
 export class CustomSlider {
-  // Define a model input named "value".
+  // 定义一个名为 "value" 的模型输入。
   value = model(0);
 
   increment() {
-    // Update the model input with a new value, propagating the value to any bindings.
+    // 用新值更新模型输入，并把该值传播到所有绑定。
     this.value.update((oldValue) => oldValue + 10);
   }
 }
 
 @Component({
   /* ... */
-  // Using the two-way binding syntax means that any changes to the slider's
-  // value automatically propagate back to the `volume` signal.
-  // Note that this binding uses the signal *instance*, not the signal value.
+  // 使用双向绑定语法意味着，slider 的值发生的任何变化
+  // 都会自动传播回 `volume` 信号。
+  // 注意，这个绑定使用的是信号*实例*，而不是信号的值。
   template: `<custom-slider [(value)]="volume" />`,
 })
 export class MediaControls {
-  // Create a writable signal for the `volume` local state.
+  // 为 `volume` 本地状态创建一个可写信号。
   volume = signal(0);
 }
 ```
 
-In the above example, the `CustomSlider` can write values into its `value` model input, which then propagates those values back to the `volume` signal in `MediaControls`. This binding keeps the values of `value` and `volume` in sync. Notice that the binding passes the `volume` signal instance, not the _value_ of the signal.
+在上面的例子中，`CustomSlider` 可以向它的 `value` 模型输入写入值，这些值随后会传播回 `MediaControls` 中的 `volume` 信号。这个绑定让 `value` 和 `volume` 的值保持同步。注意，绑定传递的是 `volume` 信号实例，而不是该信号的**值**。
 
-In other respects, model inputs work similarly to standard inputs. You can read the value by calling the signal function, including in [reactive contexts](/guide/signals#reactive-contexts) like `computed` and `effect`.
+在其他方面，模型输入的工作方式与标准输入类似。你可以通过调用信号函数来读取它的值，包括在 `computed` 和 `effect` 等[响应式上下文](/guide/signals#reactive-contexts)中。
 
-See [Two-way binding](/guide/templates/two-way-binding) for more details on two-way binding in templates.
+关于模板中双向绑定的更多细节，请参阅[双向绑定](/guide/templates/two-way-binding)。
 
-### Two-way binding with plain properties
+### 与普通属性进行双向绑定 {#two-way-binding-with-plain-properties}
 
-You can bind a plain JavaScript property to a model input.
+你可以把一个普通的 JavaScript 属性绑定到模型输入上。
 
 ```ts
 @Component({
   /* ... */
-  // `value` is a model input.
-  // The parenthesis-inside-square-brackets syntax (aka "banana-in-a-box") creates a two-way binding
+  // `value` 是一个模型输入。
+  // 方括号里套圆括号的语法（又称“盒子里的香蕉”）会创建一个双向绑定
   template: '<custom-slider [(value)]="volume" />',
 })
 export class MediaControls {
@@ -237,49 +233,49 @@ export class MediaControls {
 }
 ```
 
-In the example above, the `CustomSlider` can write values into its `value` model input, which then propagates those values back to the `volume` property in `MediaControls`. This binding keeps the values of `value` and `volume` in sync.
+在上面的例子中，`CustomSlider` 可以向它的 `value` 模型输入写入值，这些值随后会传播回 `MediaControls` 中的 `volume` 属性。这个绑定让 `value` 和 `volume` 的值保持同步。
 
-### Implicit `change` events
+### 隐式的 `change` 事件 {#implicit-change-events}
 
-When you declare a model input in a component or directive, Angular automatically creates a corresponding [output](/guide/components/outputs) for that model. The output's name is the model input's name suffixed with "Change".
+当你在组件或指令中声明模型输入时，Angular 会自动为该模型创建一个对应的[输出（output）](/guide/components/outputs)。输出的名称是模型输入的名称加上后缀“Change”。
 
 ```ts
 @Directive(/* ... */)
 export class CustomCheckbox {
-  // This automatically creates an output named "checkedChange".
-  // Can be subscribed to using `(checkedChange)="handler()"` in the template.
+  // 这会自动创建一个名为 "checkedChange" 的输出。
+  // 可以在模板中通过 `(checkedChange)="handler()"` 订阅它。
   checked = model(false);
 }
 ```
 
-Angular emits this change event whenever you write a new value into the model input by calling its `set` or `update` methods.
+每当你调用模型输入的 `set` 或 `update` 方法写入新值时，Angular 都会发出这个变更事件。
 
-See [Custom events with outputs](/guide/components/outputs) for more details on outputs.
+关于输出的更多细节，请参阅[使用输出自定义事件](/guide/components/outputs)。
 
-### Customizing model inputs
+### 自定义模型输入 {#customizing-model-inputs}
 
-You can mark a model input as [required](#required-inputs) or provide an [alias](#input-aliases) in the same way as a standard input.
+你可以像标准输入一样，把模型输入标记为[必需](#required-inputs)，或为它提供[别名](#input-aliases)。
 
-Model inputs do not support input transforms.
+模型输入不支持输入转换。
 
-### When to use model inputs
+### 何时使用模型输入 {#when-to-use-model-inputs}
 
-Use model inputs when you want a component to support two-way binding. This is typically appropriate when a component exists to modify a value based on user interaction. Most commonly, custom form controls, such as a date picker or combobox, should use model inputs for their primary value.
+当你希望组件支持双向绑定时，就使用模型输入。这通常适用于那些根据用户交互来修改某个值的组件。最常见的是自定义表单控件（例如日期选择器或组合框），它们的主值应该使用模型输入。
 
-## Choosing input names
+## 选择输入名称 {#choosing-input-names}
 
-Avoid choosing input names that collide with properties on DOM elements like HTMLElement. Name collisions introduce confusion about whether the bound property belongs to the component or the DOM element.
+避免选择与 DOM 元素（如 HTMLElement）上的属性相冲突的输入名称。名称冲突会让人搞不清所绑定的属性到底属于组件还是 DOM 元素。
 
-Avoid adding prefixes for component inputs like you would with component selectors. Since a given element can only host one component, any custom properties can be assumed to belong to the component.
+避免像给组件选择器（selector）加前缀那样给组件输入加前缀。由于一个元素只能承载一个组件，任何自定义属性都可以认为属于该组件。
 
-## Declaring inputs with the `@Input` decorator
+## 使用 `@Input` 装饰器声明输入 {#declaring-inputs-with-the-input-decorator}
 
-::: tip TIP
-While the Angular team recommends using the signal-based `input` function for new projects, the original decorator-based `@Input` API remains fully supported.
+::: tip 提示
+虽然 Angular 团队建议新项目使用基于信号的 `input` 函数，但原有的基于装饰器的 `@Input` API 仍然受到完全支持。
 
 :::
 
-You can alternatively declare component inputs by adding the `@Input` decorator to a property:
+你也可以给属性添加 `@Input` 装饰器来声明组件输入：
 
 ```ts
 @Component(/* ... */)
@@ -288,19 +284,19 @@ export class CustomSlider {
 }
 ```
 
-Binding to an input is the same in both signal-based and decorator-based inputs:
+无论是基于信号的输入还是基于装饰器的输入，绑定方式都是一样的：
 
 ```html
 <custom-slider [value]="50" />
 ```
 
-### Customizing decorator-based inputs
+### 自定义基于装饰器的输入 {#customizing-decorator-based-inputs}
 
-The `@Input` decorator accepts a config object that lets you change the way that input works.
+`@Input` 装饰器接受一个配置对象，用来改变输入的工作方式。
 
-#### Required inputs {#required-inputs-decorator}
+#### 必需输入 {#required-inputs-decorator}
 
-You can specify the `required` option to enforce that a given input must always have a value.
+你可以指定 `required` 选项，强制要求某个输入必须始终有值。
 
 ```ts
 @Component(/* ... */)
@@ -309,11 +305,11 @@ export class CustomSlider {
 }
 ```
 
-If you try to use a component without specifying all of its required inputs, Angular reports an error at build-time.
+如果你在使用组件时没有指定它的所有必需输入，Angular 会在构建时报错。
 
-#### Input transforms {#input-transforms-decorator}
+#### 输入转换 {#input-transforms-decorator}
 
-You can specify a `transform` function to change the value of an input when it's set by Angular. This transform function works identically to transform functions for signal-based inputs described above.
+你可以指定一个 `transform` 函数，在 Angular 设置输入值时对其进行转换。这个转换函数的工作方式与上文介绍的基于信号的输入的转换函数完全相同。
 
 ```ts
 @Component({
@@ -329,9 +325,9 @@ function trimString(value: string | undefined) {
 }
 ```
 
-#### Input aliases {#input-aliases-decorator}
+#### 输入别名 {#input-aliases-decorator}
 
-You can specify the `alias` option to change the name of an input in templates.
+你可以指定 `alias` 选项来更改输入在模板中的名称。
 
 ```ts
 @Component(/* ... */)
@@ -344,13 +340,13 @@ export class CustomSlider {
 <custom-slider [sliderValue]="50" />
 ```
 
-The `@Input` decorator also accepts the alias as its first parameter in place of the config object.
+`@Input` 装饰器也可以把别名作为第一个参数，来代替配置对象。
 
-Input aliases work the same way as for signal-based inputs described above.
+输入别名的工作方式与上文介绍的基于信号的输入相同。
 
-### Inputs with getters and setters
+### 带有 getter 和 setter 的输入 {#inputs-with-getters-and-setters}
 
-When using decorator-based inputs, a property implemented with a getter and setter can be an input:
+使用基于装饰器的输入时，用 getter 和 setter 实现的属性也可以作为输入：
 
 ```ts
 export class CustomSlider {
@@ -367,7 +363,7 @@ export class CustomSlider {
 }
 ```
 
-You can even create a _write-only_ input by only defining a public setter:
+你甚至可以只定义一个公共 setter，创建一个**只写**输入：
 
 ```ts
 export class CustomSlider {
@@ -380,16 +376,16 @@ export class CustomSlider {
 }
 ```
 
-**Prefer using input transforms instead of getters and setters** if possible.
+如果可能，**优先使用输入转换，而不是 getter 和 setter**。
 
-Avoid complex or costly getters and setters. Angular may invoke an input's setter multiple times, which may negatively impact application performance if the setter performs any costly behaviors, such as DOM manipulation.
+避免编写复杂或开销很大的 getter 和 setter。Angular 可能会多次调用输入的 setter，如果 setter 执行了 DOM 操作之类的高开销行为，就可能对应用性能产生负面影响。
 
-## Specify inputs in the `@Component` decorator
+## 在 `@Component` 装饰器中指定输入 {#specify-inputs-in-the-component-decorator}
 
-In addition to the `@Input` decorator, you can also specify a component's inputs with the `inputs` property in the `@Component` decorator. This can be useful when a component inherits a property from a base class:
+除了 `@Input` 装饰器之外，你还可以使用 `@Component` 装饰器中的 `inputs` 属性来指定组件的输入。当组件从基类继承某个属性时，这会很有用：
 
 ```ts
-// `CustomSlider` inherits the `disabled` property from `BaseSlider`.
+// `CustomSlider` 从 `BaseSlider` 继承了 `disabled` 属性。
 @Component({
   ...,
   inputs: ['disabled'],
@@ -397,10 +393,10 @@ In addition to the `@Input` decorator, you can also specify a component's inputs
 export class CustomSlider extends BaseSlider { }
 ```
 
-You can additionally specify an input alias in the `inputs` list by putting the alias after a colon in the string:
+你还可以在 `inputs` 列表中指定输入别名，方法是在字符串中把别名放在冒号之后：
 
 ```ts
-// `CustomSlider` inherits the `disabled` property from `BaseSlider`.
+// `CustomSlider` 从 `BaseSlider` 继承了 `disabled` 属性。
 @Component({
   ...,
   inputs: ['disabled: sliderDisabled'],

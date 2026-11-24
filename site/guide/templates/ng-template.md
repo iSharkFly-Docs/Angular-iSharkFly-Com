@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 使用 ng-template 创建模板片段 {#create-template-fragments-with-ng-template}
 
-# Create template fragments with ng-template
+受[原生 `<template>` 元素](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template)的启发，`<ng-template>` 元素让你可以声明一个**模板片段**：一段可以动态地或以编程方式渲染的内容。
 
-Inspired by the [native `<template>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template), the `<ng-template>` element lets you declare a **template fragment** – a section of content that you can dynamically or programmatically render.
+## 创建模板片段 {#creating-a-template-fragment}
 
-## Creating a template fragment
-
-You can create a template fragment inside of any component template with the `<ng-template>` element:
+你可以在任何组件（Component）模板（Template）中，使用 `<ng-template>` 元素创建模板片段：
 
 ```html
 <p>This is a normal element</p>
@@ -18,11 +14,11 @@ You can create a template fragment inside of any component template with the `<n
 </ng-template>
 ```
 
-When the above is rendered, the content of the `<ng-template>` element is not rendered on the page. Instead, you can get a reference to the template fragment and write code to dynamically render it.
+渲染上面的代码时，`<ng-template>` 元素的内容不会渲染到页面上。不过，你可以获取对这个模板片段的引用，并编写代码来动态渲染它。
 
-### Binding context for fragments
+### 片段的绑定上下文 {#binding-context-for-fragments}
 
-Template fragments may contain bindings with dynamic expressions:
+模板片段中可以包含带动态表达式的绑定（Binding）：
 
 ```ts
 @Component({
@@ -34,21 +30,21 @@ export class ItemCounter {
 }
 ```
 
-Expressions or statements in a template fragment are evaluated against the component in which the fragment is declared, regardless of where the fragment is rendered.
+模板片段中的表达式或语句，总是针对声明该片段的组件进行求值，与片段在哪里渲染无关。
 
-## Getting a reference to a template fragment
+## 获取对模板片段的引用 {#getting-a-reference-to-a-template-fragment}
 
-You can get a reference to a template fragment in one of three ways:
+获取模板片段的引用有以下三种方式：
 
-- By declaring a [template reference variable](/guide/templates/variables#template-reference-variables) on the `<ng-template>` element
-- By querying for the fragment with [a component or directive query](/guide/components/queries)
-- By injecting the fragment in a directive that's applied directly to an `<ng-template>` element.
+- 在 `<ng-template>` 元素上声明一个[模板引用变量](/guide/templates/variables#template-reference-variables)
+- 通过[组件或指令查询](/guide/components/queries)来查询该片段
+- 在直接应用于 `<ng-template>` 元素的指令中注入该片段。
 
-In all three cases, the fragment is represented by a [TemplateRef](https://angular.dev/api/core/TemplateRef) object.
+在这三种情况下，片段都由一个 [TemplateRef](https://angular.dev/api/core/TemplateRef) 对象表示。
 
-### Referencing a template fragment with a template reference variable
+### 使用模板引用变量引用模板片段 {#referencing-a-template-fragment-with-a-template-reference-variable}
 
-You can add a template reference variable to an `<ng-template>` element to reference that template fragment in other parts of the same template file:
+你可以给 `<ng-template>` 元素添加一个模板引用变量，以便在同一个模板文件的其他地方引用这个模板片段：
 
 ```html
 <p>This is a normal element</p>
@@ -58,13 +54,13 @@ You can add a template reference variable to an `<ng-template>` element to refer
 </ng-template>
 ```
 
-You can then reference this fragment anywhere else in the template via the `myFragment` variable.
+然后，你就可以在模板中的其他任何地方通过 `myFragment` 变量引用这个片段。
 
-### Referencing a template fragment with queries
+### 使用查询引用模板片段 {#referencing-a-template-fragment-with-queries}
 
-You can get a reference to a template fragment using any [component or directive query API](/guide/components/queries).
+你可以使用任何[组件或指令查询 API](/guide/components/queries) 来获取模板片段的引用。
 
-You can query the `TemplateRef` object directly using a `viewChild` query.
+你可以使用 `viewChild` 查询（Query）直接查询 `TemplateRef` 对象。
 
 ```ts
 @Component({
@@ -82,9 +78,9 @@ export class ComponentWithFragment {
 }
 ```
 
-You can then reference this fragment in your component code or the component's template like any other class member.
+然后，你就可以像引用其他类成员一样，在组件代码或组件的模板中引用这个片段。
 
-If a template contains multiple fragments, you can assign a name to each fragment by adding a template reference variable to each `<ng-template>` element and querying for the fragments based on that name:
+如果一个模板包含多个片段，你可以给每个 `<ng-template>` 元素添加一个模板引用变量，为每个片段指定名称，然后按名称查询这些片段：
 
 ```ts
 @Component({
@@ -107,11 +103,11 @@ export class ComponentWithFragment {
 }
 ```
 
-Again, you can then reference these fragments in your component code or the component's template like any other class members.
+同样，你随后就可以像引用其他类成员一样，在组件代码或组件的模板中引用这些片段。
 
-### Injecting a template fragment
+### 注入模板片段 {#injecting-a-template-fragment}
 
-A directive can inject a `TemplateRef` if that directive is applied directly to an `<ng-template>` element:
+如果指令（Directive）直接应用于 `<ng-template>` 元素，它就可以注入 `TemplateRef`：
 
 ```ts
 @Directive({
@@ -128,23 +124,23 @@ export class MyDirective {
 </ng-template>
 ```
 
-You can then reference this fragment in your directive code like any other class member.
+然后，你就可以像引用其他类成员一样，在指令代码中引用这个片段。
 
-## Rendering a template fragment
+## 渲染模板片段 {#rendering-a-template-fragment}
 
-Once you have a reference to a template fragment's `TemplateRef` object, you can render a fragment in one of two ways: in your template with the `NgTemplateOutlet` directive or in your TypeScript code with `ViewContainerRef`.
+拿到模板片段的 `TemplateRef` 对象引用之后，你可以用以下两种方式之一渲染片段：在模板中使用 `NgTemplateOutlet` 指令，或者在 TypeScript 代码中使用 `ViewContainerRef`。
 
-### Using `NgTemplateOutlet`
+### 使用 `NgTemplateOutlet` {#using-ngtemplateoutlet}
 
-The `NgTemplateOutlet` directive from `@angular/common` accepts a `TemplateRef` and renders the fragment as a **sibling** to the element with the outlet. You should generally use `NgTemplateOutlet` on an [`<ng-container>` element](/guide/templates/ng-container).
+`@angular/common` 中的 `NgTemplateOutlet` 指令接受一个 `TemplateRef`，并把片段渲染为出口所在元素的**兄弟节点**。通常应该在 [`<ng-container>` 元素](/guide/templates/ng-container)上使用 `NgTemplateOutlet`。
 
-First, import `NgTemplateOutlet`:
+首先，导入 `NgTemplateOutlet`：
 
 ```ts
 import {NgTemplateOutlet} from '@angular/common';
 ```
 
-The following example declares a template fragment and renders that fragment to a `<ng-container>` element with `NgTemplateOutlet`:
+下面的示例声明了一个模板片段，并使用 `NgTemplateOutlet` 把该片段渲染到一个 `<ng-container>` 元素：
 
 ```html
 <p>This is a normal element</p>
@@ -156,20 +152,20 @@ The following example declares a template fragment and renders that fragment to 
 <ng-container *ngTemplateOutlet="myFragment"></ng-container>
 ```
 
-This example produces the following rendered DOM:
+这个示例会生成如下渲染后的 DOM：
 
 ```html
 <p>This is a normal element</p>
 <p>This is a fragment</p>
 ```
 
-### Using `ViewContainerRef`
+### 使用 `ViewContainerRef` {#using-viewcontainerref}
 
-A **view container** is a node in Angular's component tree that can contain content. Any component or directive can inject `ViewContainerRef` to get a reference to a view container corresponding to that component or directive's location in the DOM.
+**视图容器**是 Angular 组件树中可以包含内容的节点。任何组件或指令都可以注入 `ViewContainerRef`，以获取与该组件或指令在 DOM 中的位置相对应的视图容器的引用。
 
-You can use the `createEmbeddedView` method on `ViewContainerRef` to dynamically render a template fragment. When you render a fragment with a `ViewContainerRef`, Angular appends it into the DOM as the next sibling of the component or directive that injected the `ViewContainerRef`.
+你可以使用 `ViewContainerRef` 上的 `createEmbeddedView` 方法动态渲染模板片段。使用 `ViewContainerRef` 渲染片段时，Angular 会把它作为注入了 `ViewContainerRef` 的组件或指令的下一个兄弟节点追加到 DOM 中。
 
-The following example shows a component that accepts a reference to a template fragment as an input and renders that fragment into the DOM on a button click.
+下面的示例展示了一个组件，它接受一个模板片段的引用作为输入（Input），并在点击按钮时把该片段渲染到 DOM 中。
 
 ```ts
 @Component({
@@ -200,7 +196,7 @@ export class MyOutlet {
 }
 ```
 
-In the example above, clicking the "Show" button results in the following output:
+在上面的示例中，点击 "Show" 按钮会产生如下输出：
 
 ```html
 <component-with-fragment>
@@ -212,11 +208,11 @@ In the example above, clicking the "Show" button results in the following output
 </component-with-fragment>
 ```
 
-## Passing parameters when rendering a template fragment
+## 渲染模板片段时传递参数 {#passing-parameters-when-rendering-a-template-fragment}
 
-When declaring a template fragment with `<ng-template>`, you can additionally declare parameters accepted by the fragment. When you render a fragment, you can optionally pass a `context` object corresponding to these parameters. You can use data from this context object in binding expressions and statements, in addition to referencing data from the component in which the fragment is declared.
+使用 `<ng-template>` 声明模板片段时，你还可以声明片段所接受的参数。渲染片段时，可以选择传入一个与这些参数相对应的 `context` 对象。除了引用声明该片段的组件中的数据之外，你还可以在绑定表达式和语句中使用这个上下文对象中的数据。
 
-Each parameter is written as an attribute prefixed with `let-` with a value matching a property name in the context object:
+每个参数都写成一个以 `let-` 为前缀的属性，其值与上下文对象中的某个属性名相对应：
 
 ```html
 <ng-template let-pizzaTopping="topping">
@@ -224,9 +220,9 @@ Each parameter is written as an attribute prefixed with `let-` with a value matc
 </ng-template>
 ```
 
-### Using `NgTemplateOutlet` {#using-ngtemplateoutlet-with-parameters}
+### 使用 `NgTemplateOutlet` {#using-ngtemplateoutlet-with-parameters}
 
-You can bind a context object to the `ngTemplateOutletContext` input:
+你可以把上下文对象绑定到 `ngTemplateOutletContext` 输入上：
 
 ```html
 <ng-template #myFragment let-pizzaTopping="topping">
@@ -236,21 +232,21 @@ You can bind a context object to the `ngTemplateOutletContext` input:
 <ng-container [ngTemplateOutlet]="myFragment" [ngTemplateOutletContext]="{topping: 'onion'}" />
 ```
 
-### Using `ViewContainerRef` {#using-viewcontainerref-with-parameters}
+### 使用 `ViewContainerRef` {#using-viewcontainerref-with-parameters}
 
-You can pass a context object as the second argument to `createEmbeddedView`:
+你可以把上下文对象作为第二个参数传给 `createEmbeddedView`：
 
 ```ts
 this.viewContainer.createEmbeddedView(this.myFragment, {topping: 'onion'});
 ```
 
-## Providing injectors to template fragments
+## 为模板片段提供注入器 {#providing-injectors-to-template-fragments}
 
-When you render a template fragment, its injector context comes from the **template declaration's location**, not from where it is rendered. You can override this behavior by providing a custom injector.
+渲染模板片段时，它的注入器（Injector）上下文来自**模板的声明位置**，而不是它被渲染的位置。你可以通过提供自定义注入器来覆盖这一行为。
 
-### Using `NgTemplateOutlet` {#using-ngtemplateoutlet-with-injectors}
+### 使用 `NgTemplateOutlet` {#using-ngtemplateoutlet-with-injectors}
 
-You can pass a custom `Injector` to the `ngTemplateOutletInjector` input:
+你可以把自定义的 `Injector` 传给 `ngTemplateOutletInjector` 输入：
 
 ```ts
 export const THEME_DATA = new InjectionToken<string>('THEME_DATA', {
@@ -282,9 +278,9 @@ export class Root {
 }
 ```
 
-#### Inheriting the outlet's injector
+#### 继承出口的注入器 {#inheriting-the-outlet-s-injector}
 
-You can set `ngTemplateOutletInjector` to the string `'outlet'` to make the embedded view inherit its injector from the outlet's location in the DOM instead of from where the template was declared.
+你可以把 `ngTemplateOutletInjector` 设置为字符串 `'outlet'`，让嵌入视图从出口在 DOM 中的位置继承注入器，而不是从模板的声明位置继承。
 
 ```html
 <ng-template #node let-items>
@@ -300,16 +296,16 @@ You can set `ngTemplateOutletInjector` to the string `'outlet'` to make the embe
 <ng-container *ngTemplateOutlet="node; context: {$implicit: topLevelItems}" />
 ```
 
-Each recursive rendering of the `node` template inherits the injector from the surrounding `<item-component>`, allowing each nested level to access providers scoped to its parent component.
+`node` 模板的每一次递归渲染都会从外围的 `<item-component>` 继承注入器，这样每一层嵌套都可以访问作用域限定在其父组件中的提供者（Provider）。
 
-::: info NOTE
-This is useful for building recursive structures or any situation where the rendered template needs access to providers from the component tree at the outlet site.
+::: info 注意
+在构建递归结构，或者渲染出的模板需要访问出口处组件树中的提供者时，这非常有用。
 
 :::
 
-### Using `ViewContainerRef` {#using-viewcontainerref-with-injectors}
+### 使用 `ViewContainerRef` {#using-viewcontainerref-with-injectors}
 
-You can pass a custom injector as part of the options object in `createEmbeddedView`:
+你可以在 `createEmbeddedView` 的选项对象中传入自定义注入器：
 
 ```ts
 this.viewContainer.createEmbeddedView(this.myFragment, context, {
@@ -317,14 +313,14 @@ this.viewContainer.createEmbeddedView(this.myFragment, context, {
 });
 ```
 
-## Structural directives
+## 结构型指令 {#structural-directives}
 
-A **structural directive** is any directive that:
+**结构型指令（Structural Directive）**是指满足以下条件的任何指令：
 
-- Injects `TemplateRef`
-- Injects `ViewContainerRef` and programmatically renders the injected `TemplateRef`
+- 注入 `TemplateRef`
+- 注入 `ViewContainerRef`，并以编程方式渲染注入的 `TemplateRef`
 
-Angular supports a special convenience syntax for structural directives. If you apply the directive to an element and prefix the directive's selector with an asterisk (`*`) character, Angular interprets the entire element and all of its content as a template fragment:
+Angular 为结构型指令提供了一种特殊的便捷语法。如果你把指令应用到一个元素上，并在指令的选择器（Selector）前加上星号（`*`）字符，Angular 就会把整个元素及其所有内容解释为一个模板片段：
 
 ```html
 <section *myDirective>
@@ -332,7 +328,7 @@ Angular supports a special convenience syntax for structural directives. If you 
 </section>
 ```
 
-This is equivalent to:
+这等价于：
 
 ```html
 <ng-template myDirective>
@@ -342,13 +338,13 @@ This is equivalent to:
 </ng-template>
 ```
 
-Developers typically use structural directives to conditionally render fragments or render fragments multiple times.
+开发者通常使用结构型指令来有条件地渲染片段，或者多次渲染片段。
 
-For more details, see [Structural Directives](/guide/directives/structural-directives).
+更多细节请参阅[结构型指令](/guide/directives/structural-directives)。
 
-## Additional resources
+## 其他资源 {#additional-resources}
 
-For examples of how `ng-template` is used in other libraries, check out:
+要了解 `ng-template` 在其他库中的用法示例，请参阅：
 
-- [Tabs from Angular Material](https://material.angular.dev/components/tabs/overview) - nothing gets rendered into the DOM until the tab is activated
-- [Table from Angular Material](https://material.angular.dev/components/table/overview) - allows developers to define different ways to render data
+- [Angular Material 的 Tabs](https://material.angular.dev/components/tabs/overview)：在标签页被激活之前，不会向 DOM 渲染任何内容
+- [Angular Material 的 Table](https://material.angular.dev/components/table/overview)：让开发者可以定义不同的数据渲染方式

@@ -1,31 +1,27 @@
----
-untranslated: true
----
+# 指令 {#directives}
 
-# Directives
-
-Directives add behavior to elements and components in your Angular applications.
+指令（Directive）为 Angular 应用中的元素和组件（Component）添加行为。
 
 
-A directive can change how an element looks, how it behaves, or how it fits into the DOM. Angular ships with several built-in directives, and you can write your own.
+指令可以改变元素的外观、行为，或者它在 DOM 中的位置。Angular 自带了若干内置指令，你也可以编写自己的指令。
 
-## When to use a directive
+## 何时使用指令 {#when-to-use-a-directive}
 
-Directives are most effective when they encapsulate **reusable** behavior that you want to apply to an existing element or component.
+当指令封装的是你想应用到现有元素或组件上的**可复用**行为时，它最能发挥作用。
 
-Common examples include:
+常见的例子包括：
 
-- Applying the same appearance or behavior across many elements, such as autofocus or a tooltip.
-- Reading from or writing to the host element's DOM, attributes, or classes.
-- Adding behavior to a component you don't own without changing its source.
+- 在许多元素上应用相同的外观或行为，例如自动聚焦或工具提示。
+- 读取或写入宿主元素（Host Element）的 DOM、属性或 CSS 类。
+- 在不修改源代码的情况下，为不归你所有的组件添加行为。
 
-If you need to render your own markup or manage a piece of UI with its own template, reach for a [component](/guide/components), a specialized directive with its own template.
+如果你需要渲染自己的标记，或者用自己的模板（Template）管理一块 UI，请使用[组件](/guide/components)——一种拥有自己模板的特殊指令。
 
-## A quick example
+## 一个简单的例子 {#a-quick-example}
 
-Suppose you want elements to highlight when the user hovers over them with a mouse, changing their background color to yellow. Rather than repeat the same event-handling logic on every element, you can package that behavior in a directive and apply it wherever you need it.
+假设你希望元素在用户鼠标悬停时高亮显示，把背景色变为黄色。与其在每个元素上重复同样的事件处理逻辑，不如把这种行为封装到一个指令中，在需要的地方应用它。
 
-The following `appHighlight` directive sets the host element's background color when the mouse enters and clears it when the mouse leaves:
+下面的 `appHighlight` 指令会在鼠标进入时设置宿主元素的背景色，在鼠标离开时清除它：
 
 ```ts
 import {Directive, signal} from '@angular/core';
@@ -43,31 +39,31 @@ export class HighlightDirective {
 }
 ```
 
-The `host` metadata listens for mouse events to update the `isHovered` signal, and binds the host element's `background-color` style to the signal's value.
+`host` 元数据监听鼠标事件来更新 `isHovered` 信号（Signal），并把宿主元素的 `background-color` 样式绑定到该信号的值。
 
-Apply the directive by adding its selector as an attribute on an element:
+把指令的选择器（Selector）作为属性添加到元素上，即可应用该指令：
 
 ```html
 <p appHighlight>Highlight me!</p>
 ```
 
-Every element that carries the `appHighlight` attribute gains the same hover behavior, with the logic defined in one place.
+每个带有 `appHighlight` 属性的元素都会获得相同的悬停行为，而逻辑只在一处定义。
 
-## Types of directives
+## 指令的类型 {#types-of-directives}
 
-Angular has three primary types of directives:
+Angular 有三种主要的指令类型：
 
-| Directive type                                                  | Details                                                                           |
+| 指令类型                                                        | 详情                                                                              |
 | :-------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
-| [Components](/guide/components)                                  | Define reusable UI with their own template.                                       |
-| [Attribute directives](/guide/directives/attribute-directives)   | Change the appearance or behavior of an element, component, or another directive. |
-| [Structural directives](/guide/directives/structural-directives) | Change the DOM layout by adding and removing DOM elements.                        |
+| [组件](/guide/components)                                  | 用自己的模板定义可复用的 UI。                                       |
+| [属性型指令](/guide/directives/attribute-directives)   | 改变元素、组件或其他指令的外观或行为。 |
+| [结构型指令](/guide/directives/structural-directives) | 通过添加和移除 DOM 元素来改变 DOM 布局。                        |
 
-## What's next
+## 下一步 {#what-s-next}
 
-Learn more about each type of directive in the following guides.
+在下面的指南中进一步了解每种类型的指令。
 
-- [Attribute directives](/guide/directives/attribute-directives)
-- [Structural directives](/guide/directives/structural-directives)
-- [Directive composition API](/guide/directives/directive-composition-api)
+- [属性型指令](/guide/directives/attribute-directives)
+- [结构型指令](/guide/directives/structural-directives)
+- [指令组合 API](/guide/directives/directive-composition-api)
 

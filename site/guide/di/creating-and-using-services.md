@@ -1,24 +1,20 @@
----
-untranslated: true
----
+# 创建和使用服务 {#creating-and-using-services}
 
-# Creating and using services
+服务（Service）是可以在整个 Angular 应用中共享的可复用代码片段。你通常用它们来处理数据获取、业务逻辑，或者多个组件（Component）都需要访问的其他功能。
 
-Services are reusable pieces of code that you can share across your Angular application. You commonly use them to handle data fetching, business logic, or other functionality that multiple components need to access.
+## 创建服务 {#creating-a-service}
 
-## Creating a service
-
-You can create a service using the [Angular CLI](/tools/cli) with the following command:
+你可以使用 [Angular CLI](/tools/cli) 通过以下命令创建服务：
 
 ```bash
 ng generate service CUSTOM_NAME
 ```
 
-This command creates a dedicated `CUSTOM_NAME.ts` file in your `src` directory.
+这个命令会在你的 `src` 目录中创建一个专门的 `CUSTOM_NAME.ts` 文件。
 
-You can also manually create a service by adding the `@Service()` decorator to a TypeScript class. This tells Angular that you can use the class as an injectable dependency.
+你也可以给 TypeScript 类添加 `@Service()` 装饰器来手动创建服务。这会告诉 Angular，这个类可以用作可注入的依赖。
 
-The following example defines a service that allows users to add and retrieve data:
+下面的例子定义了一个服务，允许用户添加和获取数据：
 
 ```ts [src/app/basic-data-store.ts]
 import {Service} from '@angular/core';
@@ -37,36 +33,36 @@ export class BasicDataStore {
 }
 ```
 
-## How services become available
+## 服务如何变得可用 {#how-services-become-available}
 
-Services are provisioned at the root level by default. When a service is provided globally, Angular guarantees three main benefits:
+默认情况下，服务在根级别提供。当服务在全局提供时，Angular 会保证三个主要好处：
 
-- **Singleton Instance:** Creates a single, shared instance for the entire application.
-- **Global Availability:** Automatically accessible anywhere without manual provider registration.
-- **Tree-shakability:** Ensures the service is excluded from the final production bundle if your code never explicitly uses it.
+- **单例实例：** 为整个应用创建一个共享的实例。
+- **全局可用：** 无需手动注册提供者（Provider），就能在任何地方自动访问。
+- **可摇树优化：** 如果你的代码从未显式使用该服务，就确保把它排除在最终的生产包（bundle）之外。
 
-### Using the `@Service` vs `@Injectable` decorator
+### 使用 `@Service` 与 `@Injectable` 装饰器 {#using-the-service-vs-injectable-decorator}
 
-The `@Service` decorator serves as a modern, ergonomic shorthand for the traditional `@Injectable({ providedIn: 'root' })` syntax.
+`@Service` 装饰器是传统 `@Injectable({ providedIn: 'root' })` 语法的一种现代、更顺手的简写形式。
 
-Use this quick reference to decide which decorator fits your scenario:
+可以参考下面的速查表来决定哪个装饰器适合你的场景：
 
-| Feature / Requirement                         | `@Service` | `@Injectable`                           |
+| 特性 / 需求                         | `@Service` | `@Injectable`                           |
 | --------------------------------------------- | ---------- | --------------------------------------- |
-| **`inject()` function support**               | Yes        | Yes                                     |
-| **Constructor-based DI**                      | ❌ No      | Yes                                     |
-| **Implicit root singleton provider**          | Yes        | ❌ No (requires `{providedIn: 'root'}`) |
-| **Advanced provider keys (`useClass`, etc.)** | ❌ No      | Yes                                     |
-| **Custom initialization factories**           | Yes        | Yes                                     |
-| **Non-root scopes (`platform`, etc.)**        | ❌ No      | Yes                                     |
+| **支持 `inject()` 函数**               | Yes        | Yes                                     |
+| **基于构造函数的 DI**                      | ❌ No      | Yes                                     |
+| **隐式的根级单例提供者**          | Yes        | ❌ No（需要 `{providedIn: 'root'}`） |
+| **高级提供者键（`useClass` 等）** | ❌ No      | Yes                                     |
+| **自定义初始化工厂**           | Yes        | Yes                                     |
+| **非根作用域（`platform` 等）**        | ❌ No      | Yes                                     |
 
-### Replacing the implementation with a factory
+### 用工厂替换实现 {#replacing-the-implementation-with-a-factory}
 
-If you need to control how the singleton is created, for example, to swap in a different implementation depending on the environment, pass a `factory` function.
+如果你需要控制单例的创建方式，例如根据环境换用不同的实现，可以传入一个 `factory` 函数。
 
-The factory runs in an [injection context](/guide/di/dependency-injection-context), so you can use [`inject()`](https://angular.dev/api/core/inject) inside it to read other dependencies.
+该工厂运行在[注入上下文（injection context）](/guide/di/dependency-injection-context)中，因此你可以在其中使用 [`inject()`](https://angular.dev/api/core/inject) 来读取其他依赖。
 
-The following `Analytics` service is a no-op locally so events don't pollute the console during development. In production, the factory reads an `ANALYTICS_ENABLED` token and returns a `GoogleAnalytics` subclass that forwards events to the real tracker:
+下面的 `Analytics` 服务在本地是空操作，这样在开发期间事件就不会污染控制台。在生产环境中，工厂会读取 `ANALYTICS_ENABLED` 令牌，并返回一个 `GoogleAnalytics` 子类，把事件转发给真正的跟踪器：
 
 ```ts [src/app/analytics.ts]
 import {inject, InjectionToken, Service} from '@angular/core';
@@ -77,25 +73,25 @@ import {ANALYTICS_ENABLED} from './token';
 })
 export class Analytics {
   track(event: string, payload?: Record<string, unknown>) {
-    // No-op by default.
+    // 默认什么也不做。
   }
 }
 
 class GoogleAnalytics extends Analytics {
   override track(event: string, payload?: Record<string, unknown>) {
-    // Dispatches an analytics event to Google Analytics
+    // 向 Google Analytics 派发一个分析事件
   }
 }
 ```
 
-::: info NOTE
-The `factory` option replaces the `useClass`, `useValue`, `useExisting`, and `useFactory` options of `@Injectable`. If you need any of those, keep using `@Injectable`.
+::: info 注意
+`factory` 选项取代了 `@Injectable` 的 `useClass`、`useValue`、`useExisting` 和 `useFactory` 选项。如果你需要其中任何一个，请继续使用 `@Injectable`。
 
 :::
 
-### Opting out of automatic provisioning
+### 退出自动提供 {#opting-out-of-automatic-provisioning}
 
-By default, `@Service` provides the class at the root injector. If you want to provide it manually, for example, to scope it to a specific route or component, set `autoProvided: false`:
+默认情况下，`@Service` 会在根注入器（Injector）中提供该类。如果你想手动提供它，例如把它的作用域限定在某个路由或组件中，请设置 `autoProvided: false`：
 
 ```ts [src/app/analytics-logger.ts]
 import {Service} from '@angular/core';
@@ -108,21 +104,21 @@ export class AnalyticsLogger {
 }
 ```
 
-You are then responsible for adding the service to a `providers` array, just like with a plain `@Injectable()`:
+之后你需要自己把该服务添加到某个 `providers` 数组中，就像使用普通的 `@Injectable()` 一样：
 
-### When to use `@Service` vs `@Injectable`
+### 何时使用 `@Service`，何时使用 `@Injectable` {#when-to-use-service-vs-injectable}
 
-Reach for `@Service` when you are creating a new singleton class that uses `inject()` for its dependencies. Keep using `@Injectable` when you need any of the following:
+当你要创建一个新的单例类，并且它使用 `inject()` 获取依赖时，就选用 `@Service`。如果你需要以下任何一项，请继续使用 `@Injectable`：
 
-- **Constructor-based dependency injection.** `@Service` only supports the [`inject()`](https://angular.dev/api/core/inject) function.
-- **Advanced provider configuration** such as `useClass`, `useValue`, `useExisting`, or `useFactory`. `@Service` exposes a single `factory` option instead.
-- **Non-root scopes** such as `providedIn: 'platform'`.
+- **基于构造函数的依赖注入（Dependency Injection）。** `@Service` 只支持 [`inject()`](https://angular.dev/api/core/inject) 函数。
+- **高级提供者配置**，例如 `useClass`、`useValue`、`useExisting` 或 `useFactory`。`@Service` 只提供了一个 `factory` 选项来代替它们。
+- **非根作用域**，例如 `providedIn: 'platform'`。
 
-## Injecting a service
+## 注入服务 {#injecting-a-service}
 
-Once you've created a service with `providedIn: 'root'`, you can inject it anywhere in your application using the `inject()` function from `@angular/core`.
+使用 `providedIn: 'root'` 创建服务之后，你就可以使用 `@angular/core` 中的 `inject()` 函数在应用的任何地方注入它。
 
-### Injecting into a component
+### 注入到组件中 {#injecting-into-a-component}
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -142,7 +138,7 @@ export class Example {
 }
 ```
 
-### Injecting into another service
+### 注入到另一个服务中 {#injecting-into-another-service}
 
 ```ts
 import {inject, Service} from '@angular/core';
@@ -163,13 +159,13 @@ export class BasicDataStore {
 }
 ```
 
-## Next steps
+## 下一步 {#next-steps}
 
-While `providedIn: 'root'` covers most use cases, Angular also provides additional ways you can configure services for more specialized scenarios:
+虽然 `providedIn: 'root'` 能覆盖大多数用例，但 Angular 还提供了其他方式，让你可以在更特殊的场景下配置服务：
 
-- **Component-specific instances** - When components need their own isolated service instances
-- **Manual configuration** - For services that require runtime configuration
-- **Factory providers** - For dynamic service creation based on runtime conditions
-- **Value providers** - For providing configuration objects or constants
+- **组件专属实例** - 当组件需要各自独立的服务实例时
+- **手动配置** - 用于需要运行时配置的服务
+- **工厂提供者** - 根据运行时条件动态创建服务
+- **值提供者** - 用于提供配置对象或常量
 
-You can learn more about these advanced patterns in the next guide: [defining dependency providers](/guide/di/defining-dependency-providers).
+你可以在下一篇指南中进一步了解这些高级模式：[定义依赖提供者](/guide/di/defining-dependency-providers)。

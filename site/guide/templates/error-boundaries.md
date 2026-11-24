@@ -1,21 +1,17 @@
----
-untranslated: true
----
+# 使用 `@boundary` 实现错误边界 {#error-boundaries-with-boundary}
 
-# Error boundaries with `@boundary`
-
-::: warning IMPORTANT
-`@boundary` is in [developer preview](/reference/releases#developer-preview).
+::: warning 重要
+`@boundary` 目前处于[开发者预览](/reference/releases#developer-preview)阶段。
 
 :::
 
-Angular templates support error boundaries to gracefully handle runtime errors that occur during rendering and change detection.
+Angular 模板（Template）支持错误边界（error boundary），用于优雅地处理在渲染和变更检测（Change Detection）期间发生的运行时错误。
 
-Error boundaries prevent a single component's failure from crashing the entire application and provide a way to display fallback UI to the user.
+错误边界可以防止单个组件（Component）的故障导致整个应用崩溃，并提供一种向用户显示后备 UI 的方式。
 
-## Catching errors with `@boundary` and `@error`
+## 使用 `@boundary` 和 `@error` 捕获错误 {#catching-errors-with-boundary-and-error}
 
-The `@boundary` block wraps a section of your template. If any component or directive inside this boundary throws an error during initialization or change detection, the framework catches the error and renders the `@error` block instead.
+`@boundary` 块用于包裹模板中的一部分。如果此边界内的任何组件或指令（Directive）在初始化或变更检测期间抛出错误，框架会捕获该错误，并改为渲染 `@error` 块。
 
 ```html
 @boundary {
@@ -25,9 +21,9 @@ The `@boundary` block wraps a section of your template. If any component or dire
 }
 ```
 
-## Accessing the error object
+## 访问错误对象 {#accessing-the-error-object}
 
-You can access the caught error by accessing the implicit `$error` variable:
+可以通过隐式变量 `$error` 访问捕获到的错误：
 
 ```html
 @boundary {
@@ -37,9 +33,9 @@ You can access the caught error by accessing the implicit `$error` variable:
 }
 ```
 
-## Resetting the boundary
+## 重置边界 {#resetting-the-boundary}
 
-You can attempt to re-render the content of the `@boundary` by calling the implicit `$reset` function in the `@error` block. When called, it resets the boundary state and tries to render the original content again.
+可以在 `@error` 块中调用隐式函数 `$reset`，尝试重新渲染 `@boundary` 的内容。调用它时，会重置边界的状态，并再次尝试渲染原来的内容。
 
 ```html
 @boundary {
@@ -50,9 +46,9 @@ You can attempt to re-render the content of the `@boundary` by calling the impli
 }
 ```
 
-## Conditional error handling with `when`
+## 使用 `when` 有条件地处理错误 {#conditional-error-handling-with-when}
 
-You can use `when` clauses to conditionally handle specific types of errors, allowing you to provide different fallback UIs. Angular evaluates this condition when it catches an error.
+可以使用 `when` 子句有条件地处理特定类型的错误，从而提供不同的后备 UI。Angular 会在捕获到错误时对该条件求值。
 
 ```html
 @boundary {
@@ -65,37 +61,37 @@ You can use `when` clauses to conditionally handle specific types of errors, all
 }
 ```
 
-Order your `@error` blocks from most specific to least specific, as Angular evaluates the `when` clauses in order and uses the first one that evaluates to true. A final `@error` block without a `when` clause acts as a catch-all fallback.
+请按照从最具体到最通用的顺序排列 `@error` 块，因为 Angular 会按顺序对 `when` 子句求值，并使用第一个结果为 true 的块。最后一个不带 `when` 子句的 `@error` 块充当兜底的后备。
 
-## Global error handler integration
+## 与全局错误处理器集成 {#global-error-handler-integration}
 
-When a boundary catches an error, Angular can still notify the global `ErrorHandler`. You can implement the optional `onViewError` hook in your custom `ErrorHandler` to log these caught errors to your error tracking service.
+当边界捕获到错误时，Angular 仍然可以通知全局的 `ErrorHandler`。你可以在自定义的 `ErrorHandler` 中实现可选的 `onViewError` 钩子，把这些被捕获的错误记录到你的错误追踪服务（Service）中。
 
 ```ts
 @Injectable()
 export class MyErrorHandler implements ErrorHandler {
   handleError(error: any): void {
-    // Handle uncaught errors
+    // 处理未捕获的错误
   }
 
   onViewError(error: Error, details: ErrorDetails): void {
-    // Handle errors caught by a @boundary
+    // 处理被 @boundary 捕获的错误
     console.warn('Caught by boundary:', details.boundary);
     myErrorTrackingService.log(error);
   }
 }
 ```
 
-::: warning IMPORTANT
-If an `@error` block itself throws an error, the error propagates to the next outer `@boundary` or Angular treats it as an unhandled application error.
+::: warning 重要
+如果 `@error` 块本身抛出错误，该错误会传播到外层的下一个 `@boundary`，否则 Angular 会把它当作未处理的应用错误。
 
 :::
 
-## Content projection
+## 内容投影 {#content-projection}
 
-If your component uses [content projection](/guide/components/content-projection), wrapping `<ng-content>` in a `@boundary` does not catch errors from projected content. That content belongs to the view that declares it, not the receiving component's view.
+如果你的组件使用了[内容投影（Content Projection）](/guide/components/content-projection)，那么用 `@boundary` 包裹 `<ng-content>` 并不能捕获来自投影内容的错误。这些内容属于声明它们的视图，而不属于接收它们的组件的视图。
 
-For example, a wrapper component with the following template does not catch errors from components projected into it:
+例如，一个模板如下的包装组件，无法捕获投影到其中的组件所抛出的错误：
 
 ```html
 @boundary {
@@ -105,7 +101,7 @@ For example, a wrapper component with the following template does not catch erro
 }
 ```
 
-To catch those errors, wrap the wrapper component and its projected content in a `@boundary` in the parent template:
+要捕获这些错误，请在父模板中用 `@boundary` 包裹该包装组件及其投影内容：
 
 ```html
 @boundary {
@@ -117,6 +113,6 @@ To catch those errors, wrap the wrapper component and its projected content in a
 }
 ```
 
-## Dynamic views and programmatic error handling
+## 动态视图与以编程方式处理错误 {#dynamic-views-and-programmatic-error-handling}
 
-Error handling isn't limited to template syntax. If you are creating components or embedded views dynamically, you can use the `onError` option to handle errors. See the [Handling rendering errors](/guide/components/programmatic-rendering#handling-rendering-errors) section in the programmatic rendering guide for more information.
+错误处理并不局限于模板语法。如果你在动态创建组件或嵌入式视图，可以使用 `onError` 选项来处理错误。更多信息请参阅编程式渲染指南中的[处理渲染错误](/guide/components/programmatic-rendering#handling-rendering-errors)一节。

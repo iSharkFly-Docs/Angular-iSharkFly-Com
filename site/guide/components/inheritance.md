@@ -1,18 +1,14 @@
----
-untranslated: true
----
+# 继承 {#inheritance}
 
-# Inheritance
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假设你已经阅读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-Angular components are TypeScript classes and participate in standard JavaScript inheritance
-semantics.
+Angular 组件（Component）就是 TypeScript 类，遵循标准的 JavaScript 继承
+语义。
 
-A component can extend any base class:
+组件可以继承任何基类：
 
 ```ts
 export class ListboxBase {
@@ -21,15 +17,15 @@ export class ListboxBase {
 
 @Component(/* ... */)
 export class CustomListbox extends ListboxBase {
-  // CustomListbox inherits the `value` property.
+  // CustomListbox 继承了 `value` 属性。
 }
 ```
 
-## Extending other components and directives
+## 继承其他组件和指令 {#extending-other-components-and-directives}
 
-When a component extends another component or a directive, it inherits some of the metadata defined in
-the base class's decorator and the base class's decorated members. This includes
-host bindings, inputs, outputs, lifecycle methods.
+当一个组件继承另一个组件或指令（Directive）时，它会继承基类装饰器中定义的部分元数据，
+以及基类中带装饰器的成员。这包括
+宿主绑定（Host Binding）、输入（Input）、输出（Output）和生命周期方法。
 
 ```ts
 @Component({
@@ -61,16 +57,16 @@ export class CustomListbox extends ListboxBase {
 }
 ```
 
-In the example above, `CustomListbox` inherits all the information associated with `ListboxBase`,
-overriding the selector and template with its own values. `CustomListbox` has two inputs (`value`
-and `disabled`) and two event listeners (`keydown` and `click`).
+在上面的例子中，`CustomListbox` 继承了与 `ListboxBase` 关联的所有信息，
+并用自己的值覆盖了选择器（Selector）和模板（Template）。`CustomListbox` 有两个输入（`value`
+和 `disabled`），以及两个事件监听器（Event Listener）（`keydown` 和 `click`）。
 
-Child classes end up with the _union_ of all of their ancestors' inputs, outputs, and host bindings
-and their own.
+子类最终拥有的是其所有祖先类的输入、输出和宿主绑定
+与其自身的这些内容的*并集*。
 
-### Forwarding injected dependencies
+### 转发注入的依赖 {#forwarding-injected-dependencies}
 
-When a base class uses `inject()` as a property initializer, the child class inherits the property automatically. No `super` forwarding is needed.
+当基类在属性初始化器中使用 `inject()` 时，子类会自动继承该属性，无需通过 `super` 转发。
 
 ```ts
 @Component(/* ... */)
@@ -80,11 +76,11 @@ export class ListboxBase {
 
 @Component(/* ... */)
 export class CustomListbox extends ListboxBase {
-  // `element` is inherited from `ListboxBase`.
+  // `element` 继承自 `ListboxBase`。
 }
 ```
 
-If a base class injects dependencies as constructor parameters, the child class must explicitly pass these dependencies to `super`.
+如果基类以构造函数参数的形式注入依赖，子类就必须显式地把这些依赖传给 `super`。
 
 ```ts
 @Component(/* ... */)
@@ -100,11 +96,11 @@ export class CustomListbox extends ListboxBase {
 }
 ```
 
-### Overriding lifecycle methods
+### 覆盖生命周期方法 {#overriding-lifecycle-methods}
 
-If a base class defines a lifecycle method, such as `ngOnInit`, a child class that also
-implements `ngOnInit` _overrides_ the base class's implementation. If you want to preserve the base
-class's lifecycle method, explicitly call the method with `super`:
+如果基类定义了某个生命周期方法（例如 `ngOnInit`），而子类也
+实现了 `ngOnInit`，那么子类就会*覆盖*基类的实现。如果你想保留基类的
+生命周期方法，请通过 `super` 显式调用该方法：
 
 ```ts
 @Component(/* ... */)

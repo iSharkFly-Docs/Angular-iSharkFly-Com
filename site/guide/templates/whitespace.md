@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 模板中的空白字符 {#whitespace-in-templates}
 
-# Whitespace in templates
+默认情况下，Angular 模板（Template）不会保留框架认为不必要的空白字符。这通常出现在两种情况下：元素之间的空白字符，以及文本内部可折叠的空白字符。
 
-By default, Angular templates do not preserve whitespace that the framework considers unnecessary. This commonly occurs in two situations: whitespace between elements, and collapsible whitespace inside of text.
+## 元素之间的空白字符 {#whitespace-between-elements}
 
-## Whitespace between elements
-
-Most developers prefer to format their templates with newlines and indentation to make the template readable:
+大多数开发者喜欢用换行和缩进来格式化模板，让模板更易读：
 
 ```html
 <section>
@@ -20,40 +16,40 @@ Most developers prefer to format their templates with newlines and indentation t
 </section>
 ```
 
-This template contains whitespace between all of the elements. The following snippet shows the same HTML with each whitespace character replaced with the hash (`#`) character to highlight how much whitespace is present:
+这个模板的所有元素之间都包含空白字符。下面的代码片段展示了同一段 HTML，其中每个空白字符都被替换成了井号（`#`），以突出显示到底有多少空白字符：
 
 <!-- prettier-ignore -->
 ```html
-<!-- Total Whitespace: 20 -->
+<!-- 空白字符总数：20 -->
 <section>###<h3>User profile</h3>###<label>#####User name#####<input>###</label>#</section>
 ```
 
-Preserving the whitespace as written in the template would result in many unnecessary [text nodes](https://developer.mozilla.org/en-US/docs/Web/API/Text) and increase page rendering overhead. By ignoring this whitespace between elements, Angular performs less work when rendering the template on the page, improving overall performance.
+如果按照模板中所写的那样保留空白字符，就会产生许多不必要的[文本节点](https://developer.mozilla.org/en-US/docs/Web/API/Text)，并增加页面渲染的开销。通过忽略元素之间的这些空白字符，Angular 在页面上渲染模板时要做的工作更少，从而提升整体性能。
 
-## Collapsible whitespace inside text
+## 文本内部可折叠的空白字符 {#collapsible-whitespace-inside-text}
 
-When your web browser renders HTML on a page, it collapses multiple consecutive whitespace characters to a single character:
+当 Web 浏览器在页面上渲染 HTML 时，会把多个连续的空白字符折叠成一个字符：
 
 <!-- prettier-ignore -->
 ```html
-<!-- What it looks like in the template -->
+<!-- 在模板中的样子 -->
 <p>Hello         world</p>
 ```
 
-In this example, the browser displays only a single space between "Hello" and "world".
+在这个例子中，浏览器只会在 "Hello" 和 "world" 之间显示一个空格。
 
 ```html
-<!-- What shows up in the browser -->
+<!-- 在浏览器中显示的样子 -->
 <p>Hello world</p>
 ```
 
-See [How whitespace is handled by HTML, CSS, and in the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace) for more context on how this works.
+关于其工作原理的更多背景，请参阅 [HTML、CSS 和 DOM 如何处理空白字符](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace)。
 
-Angular avoids sending these unnecessary whitespace characters to the browser in the first place by collapsing them to a single character when it compiles the template.
+Angular 在编译模板时会把这些不必要的空白字符折叠成一个字符，从一开始就避免把它们发送给浏览器。
 
-## Preserving whitespace
+## 保留空白字符 {#preserving-whitespace}
 
-You can tell Angular to preserve whitespace in a template by specifying `preserveWhitespaces: true` in the `@Component` decorator for a template.
+你可以在模板所属的 `@Component` 装饰器中指定 `preserveWhitespaces: true`，告诉 Angular 保留模板中的空白字符。
 
 ```ts
 @Component({
@@ -65,6 +61,6 @@ You can tell Angular to preserve whitespace in a template by specifying `preserv
 })
 ```
 
-Avoid setting this option unless absolutely necessary. Preserving whitespace can cause Angular to produce significantly more nodes while rendering, slowing down your application.
+除非确有必要，否则请避免设置此选项。保留空白字符可能会导致 Angular 在渲染时生成明显更多的节点，从而拖慢应用。
 
-You can additionally use a special HTML entity unique to Angular, `&ngsp;`. This entity produces a single space character that's preserved in the compiled output.
+你还可以使用 Angular 特有的一个特殊 HTML 实体 `&ngsp;`。这个实体会生成一个在编译输出中被保留下来的空格字符。

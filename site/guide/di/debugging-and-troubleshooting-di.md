@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 调试依赖注入及排查问题 {#debugging-and-troubleshooting-dependency-injection}
 
-# Debugging and troubleshooting dependency injection
+依赖注入（Dependency Injection，DI）问题通常源于配置错误、作用域问题或不正确的使用模式。本指南帮助你识别并解决开发者经常遇到的 DI 问题。
 
-Dependency injection (DI) issues typically stem from configuration mistakes, scope problems, or incorrect usage patterns. This guide helps you identify and resolve common DI problems that developers encounter.
+## 常见陷阱与解决方案 {#common-pitfalls-and-solutions}
 
-## Common pitfalls and solutions
+### 服务在预期的位置不可用 {#services-not-available-where-expected}
 
-### Services not available where expected
+最常见的 DI 问题之一是：你尝试注入某个服务（Service），但 Angular 在当前注入器（Injector）或任何父注入器中都找不到它。这通常是因为服务在错误的作用域中提供，或者根本没有提供。
 
-One of the most common DI issues occurs when you try to inject a service but Angular cannot find it in the current injector or any parent injector. This usually happens when the service is provided in the wrong scope or not provided at all.
+#### 提供者作用域不匹配 {#provider-scope-mismatch}
 
-#### Provider scope mismatch
-
-When you provide a service in a component's `providers` array, Angular creates an instance in that component's injector. This instance is only available to that component and its children. Parent components and sibling components cannot access it because they use different injectors.
+当你在组件（Component）的 `providers` 数组中提供某个服务时，Angular 会在该组件的注入器中创建一个实例。这个实例只对该组件及其子组件可用。父组件和兄弟组件无法访问它，因为它们使用的是不同的注入器。
 
 ```ts [child-view.ts]
 import {Component} from '@angular/core';
@@ -23,7 +19,7 @@ import {DataStore} from './data-store';
 @Component({
   selector: 'app-child',
   template: '<p>Child</p>',
-  providers: [DataStore], // Only available in this component and its children
+  providers: [DataStore], // 只在本组件及其子组件中可用
 })
 export class ChildView {}
 ```
@@ -37,31 +33,31 @@ import {DataStore} from './data-store';
   template: '<app-child />',
 })
 export class ParentView {
-  private dataService = inject(DataStore); // ERROR: Not available to parent
+  private dataService = inject(DataStore); // 错误：父组件无法访问
 }
 ```
 
-Angular only searches up the hierarchy, never down. Parent components cannot access services provided in child components.
+Angular 只会沿层级向上查找，绝不会向下查找。父组件无法访问在子组件中提供的服务。
 
-**Solution:** Provide the service at a higher level (application or parent component).
+**解决方案：** 在更高的层级（应用或父组件）提供该服务。
 
 ```ts
 import {Service} from '@angular/core';
 
 @Service()
 export class DataStore {
-  // Available everywhere
+  // 在任何地方都可用
 }
 ```
 
-::: tip TIP
-`@Service` makes services available everywhere and enables tree-shaking. If you don't want to scope it to the entire app, specify `autoProvided: false`.
+::: tip 提示
+`@Service` 让服务在任何地方都可用，并支持摇树优化（tree-shaking）。如果你不想把它的作用域设为整个应用，请指定 `autoProvided: false`。
 
 :::
 
-#### Services and lazy-loaded routes
+#### 服务与延迟加载的路由 {#services-and-lazy-loaded-routes}
 
-When you provide a service in a lazy-loaded route's `providers` array, Angular creates a child injector for that route. This injector and its services only become available after the route loads. Components in the eagerly-loaded parts of your application cannot access these services because they use different injectors that exist before the lazy-loaded injector is created.
+当你在延迟加载（lazy loading）路由的 `providers` 数组中提供某个服务时，Angular 会为该路由创建一个子注入器。这个注入器及其服务只有在路由加载之后才可用。应用中立即加载（eagerly loaded）部分的组件无法访问这些服务，因为它们使用的是在延迟加载注入器创建之前就已存在的其他注入器。
 
 ```ts [feature.routes.ts]
 import {Routes} from '@angular/router';
@@ -85,37 +81,37 @@ import {FeatureClient} from './feature-client';
   template: '<p>Eager Component</p>',
 })
 export class EagerView {
-  private featureService = inject(FeatureClient); // ERROR: Not available yet
+  private featureService = inject(FeatureClient); // 错误：此时还不可用
 }
 ```
 
-Lazy-loaded routes create child injectors that are only available after the route loads.
+延迟加载的路由会创建子注入器，这些子注入器只有在路由加载之后才可用。
 
-::: info NOTE
-By default, route injectors and their services persist even after navigating away from the route. They are not destroyed until the application is closed. For automatic cleanup of unused route injectors, see [customizing route behavior](/guide/routing/customizing-route-behavior#automatic-cleanup-of-unused-route-injectors).
+::: info 注意
+默认情况下，即使导航离开了某个路由，路由注入器及其服务也会继续存在，直到应用关闭才会被销毁。要自动清理未使用的路由注入器，请参阅[自定义路由行为](/guide/routing/customizing-route-behavior#automatic-cleanup-of-unused-route-injectors)。
 
 :::
 
-**Solution:** Use `@Service` for services that need to be shared across lazy boundaries.
+**解决方案：** 对需要跨延迟加载边界共享的服务使用 `@Service`。
 
 ```ts [Provide at root for shared services]
 import {Service} from '@angular/core';
 
 @Service()
 export class FeatureClient {
-  // Available everywhere, including before lazy load
+  // 在任何地方都可用，包括延迟加载之前
 }
 ```
 
-If the service should be lazy-loaded but still available to eager components, inject it only where needed and use optional injection to handle availability.
+如果服务应该延迟加载，但又要让立即加载的组件可以使用，那就只在需要的地方注入它，并使用可选注入来处理可用性问题。
 
-### Multiple instances instead of singletons
+### 得到多个实例而不是单例 {#multiple-instances-instead-of-singletons}
 
-You expect one shared instance (singleton) but get separate instances in different components.
+你期望得到一个共享实例（单例），却在不同组件中得到了各自独立的实例。
 
-#### Providing in component instead of root
+#### 在组件中而不是在根级别提供 {#providing-in-component-instead-of-root}
 
-When you add a service to a component's `providers` array, Angular creates a new instance of that service for each instance of the component. Each component gets its own separate service instance, which means changes in one component don't affect the service instance in other components. This is often unexpected when you want shared state across your application.
+当你把服务添加到组件的 `providers` 数组中时，Angular 会为该组件的每个实例都创建一个新的服务实例。每个组件都有自己独立的服务实例，这意味着一个组件中的修改不会影响其他组件中的服务实例。当你希望在整个应用中共享状态时，这往往出乎意料。
 
 ```ts [Component-level provider creates multiple instances]
 import {Component, inject} from '@angular/core';
@@ -124,7 +120,7 @@ import {UserClient} from './user-client';
 @Component({
   selector: 'app-profile',
   template: '<p>Profile</p>',
-  providers: [UserClient], // Creates new instance per component!
+  providers: [UserClient], // 每个组件都会创建新实例！
 })
 export class UserProfile {
   private userService = inject(UserClient);
@@ -133,34 +129,34 @@ export class UserProfile {
 @Component({
   selector: 'app-settings',
   template: '<p>Settings</p>',
-  providers: [UserClient], // Different instance!
+  providers: [UserClient], // 不同的实例！
 })
 export class UserSettings {
   private userService = inject(UserClient);
 }
 ```
 
-Each component gets its own `UserClient` instance. Changes in one component don't affect the other.
+每个组件都有自己的 `UserClient` 实例。一个组件中的修改不会影响另一个组件。
 
-**Solution:** Use `@Service` for singletons.
+**解决方案：** 对单例使用 `@Service`。
 
 ```ts [Root-level singleton]
 import {Service} from '@angular/core';
 
 @Service()
 export class UserClient {
-  // Single instance shared across all components
+  // 在所有组件之间共享的单个实例
 }
 ```
 
-#### When multiple instances are intentional
+#### 有意使用多个实例的情况 {#when-multiple-instances-are-intentional}
 
-Sometimes you want separate instances per component for component-specific state.
+有时你确实希望每个组件拥有独立的实例，用来保存组件专属的状态。
 
 ```ts [Intentional: Component-scoped state]
 import {Injectable, signal, Component, inject} from '@angular/core';
 
-@Injectable() // No providedIn - must be provided explicitly
+@Injectable() // 没有 providedIn —— 必须显式提供
 export class FormStateStore {
   private formData = signal({});
 
@@ -176,26 +172,26 @@ export class FormStateStore {
 @Component({
   selector: 'app-user-form',
   template: '<form>...</form>',
-  providers: [FormStateStore], // Each form gets its own state
+  providers: [FormStateStore], // 每个表单都有自己的状态
 })
 export class UserForm {
   private formState = inject(FormStateStore);
 }
 ```
 
-This pattern is useful for:
+这种模式适用于：
 
-- Form state management (each form has isolated state)
-- Component-specific caching
-- Temporary data that shouldn't be shared
+- 表单状态管理（每个表单的状态相互隔离）
+- 组件专属的缓存
+- 不应共享的临时数据
 
-### Incorrect inject() usage
+### 不正确的 inject() 用法 {#incorrect-inject-usage}
 
-The `inject()` function only works in specific contexts during class construction and factory execution.
+`inject()` 函数只在类构造和工厂执行期间的特定上下文中才能工作。
 
-#### Using inject() in lifecycle hooks
+#### 在生命周期钩子中使用 inject() {#using-inject-in-lifecycle-hooks}
 
-When you call the `inject()` function inside lifecycle hooks like `ngOnInit()`, `ngAfterViewInit()`, or `ngOnDestroy()`, Angular throws an error because these methods run outside the injection context. The injection context is only available during the synchronous execution of class construction, which happens before lifecycle hooks are called.
+当你在 `ngOnInit()`、`ngAfterViewInit()` 或 `ngOnDestroy()` 等生命周期钩子（Lifecycle Hook）中调用 `inject()` 函数时，Angular 会抛出错误，因为这些方法运行在注入上下文（injection context）之外。注入上下文只在类构造的同步执行期间可用，而类构造发生在生命周期钩子被调用之前。
 
 ```ts [inject() in ngOnInit]
 import {Component, inject} from '@angular/core';
@@ -209,13 +205,13 @@ export class UserProfile {
   userName = '';
 
   ngOnInit() {
-    const userService = inject(UserClient); // ERROR: Not an injection context
+    const userService = inject(UserClient); // 错误：不是注入上下文
     this.userName = userService.getUser().name;
   }
 }
 ```
 
-**Solution:** Capture dependencies and derive values in field initializers.
+**解决方案：** 在字段初始化器中获取依赖并派生值。
 
 ```ts [Derive values in field initializers]
 import {Component, inject} from '@angular/core';
@@ -231,9 +227,9 @@ export class UserProfile {
 }
 ```
 
-#### Using the Injector for deferred injection
+#### 使用 Injector 进行延后注入 {#using-the-injector-for-deferred-injection}
 
-When you need to retrieve services outside an injection context, use the captured `Injector` directly with `injector.get()`:
+当你需要在注入上下文之外获取服务时，可以直接对事先获取到的 `Injector` 调用 `injector.get()`：
 
 ```ts
 import {Component, inject, Injector} from '@angular/core';
@@ -255,9 +251,9 @@ export class UserProfile {
 }
 ```
 
-#### Using runInInjectionContext for callbacks
+#### 为回调使用 runInInjectionContext {#using-runininjectioncontext-for-callbacks}
 
-Use `runInInjectionContext()` when you need to enable **other code** to call `inject()`. This is useful when accepting callbacks that might use dependency injection:
+当你需要让 **其他代码** 能够调用 `inject()` 时，请使用 `runInInjectionContext()`。这在接收可能会使用依赖注入的回调时很有用：
 
 ```ts
 import {Component, inject, Injector, input, runInInjectionContext} from '@angular/core';
@@ -273,34 +269,34 @@ export class DataLoader {
   load() {
     const callback = this.onLoad();
     if (callback) {
-      // Enable the callback to use inject()
+      // 让回调可以使用 inject()
       runInInjectionContext(this.injector, callback);
     }
   }
 }
 ```
 
-The `runInInjectionContext()` function creates a temporary injection context, allowing code inside the callback to call `inject()`.
+`runInInjectionContext()` 函数会创建一个临时的注入上下文，让回调中的代码可以调用 `inject()`。
 
-::: warning IMPORTANT
-Always capture dependencies at the class level when possible. Use `injector.get()` for simple deferred retrieval, and `runInInjectionContext()` only when external code needs to call `inject()`.
-
-:::
-
-::: tip TIP
-Use `assertInInjectionContext()` to verify your code is running in a valid injection context. This is useful when creating reusable functions that call `inject()`. See [Asserting the context](/guide/di/dependency-injection-context#asserts-the-context) for details.
+::: warning 重要
+尽可能在类级别获取依赖。简单的延后获取请使用 `injector.get()`，只有当外部代码需要调用 `inject()` 时才使用 `runInInjectionContext()`。
 
 :::
 
-### providers vs viewProviders confusion
+::: tip 提示
+使用 `assertInInjectionContext()` 来验证你的代码是否运行在有效的注入上下文中。这在编写会调用 `inject()` 的可复用函数时很有用。详情请参阅[断言上下文](/guide/di/dependency-injection-context#asserts-the-context)。
 
-The difference between `providers` and `viewProviders` affects content projection scenarios.
+:::
 
-#### Understanding the difference
+### 混淆 providers 与 viewProviders {#providers-vs-viewproviders-confusion}
 
-**providers:** Available to the component's template AND any content projected into the component (ng-content).
+`providers` 与 `viewProviders` 之间的区别会影响内容投影（content projection）的场景。
 
-**viewProviders:** Only available to the component's template, NOT to projected content.
+#### 理解两者的区别 {#understanding-the-difference}
+
+**providers：** 对组件的模板（Template）以及投影到组件中的任何内容（ng-content）都可用。
+
+**viewProviders：** 只对组件的模板可用，对投影的内容 **不可用**。
 
 ```ts [parent-view.ts]
 import {Component, inject} from '@angular/core';
@@ -314,7 +310,7 @@ import {ThemeStore} from './theme-store';
       <ng-content />
     </div>
   `,
-  providers: [ThemeStore], // Available to content children
+  providers: [ThemeStore], // 对内容子组件可用
 })
 export class ParentView {
   protected themeService = inject(ThemeStore);
@@ -328,7 +324,7 @@ export class ParentView {
       <ng-content />
     </div>
   `,
-  viewProviders: [ThemeStore], // NOT available to content children
+  viewProviders: [ThemeStore], // 对内容子组件不可用
 })
 export class ParentViewOnly {
   protected themeService = inject(ThemeStore);
@@ -355,45 +351,45 @@ export class ChildView {
   template: `
     <app-parent>
       <app-child />
-      <!-- Can access ThemeStore -->
+      <!-- 可以访问 ThemeStore -->
     </app-parent>
 
     <app-parent-view>
       <app-child />
-      <!-- Cannot access ThemeStore -->
+      <!-- 无法访问 ThemeStore -->
     </app-parent-view>
   `,
 })
 export class App {}
 ```
 
-**When projected into `app-parent`:** The child component can inject `ThemeStore` because `providers` makes it available to projected content.
+**投影到 `app-parent` 中时：** 子组件可以注入 `ThemeStore`，因为 `providers` 让它对投影的内容可用。
 
-**When projected into `app-parent-view`:** The child component cannot inject `ThemeStore` because `viewProviders` restricts it to the parent's template only.
+**投影到 `app-parent-view` 中时：** 子组件无法注入 `ThemeStore`，因为 `viewProviders` 把它限制在父组件的模板之内。
 
-#### Choosing between providers and viewProviders
+#### 在 providers 与 viewProviders 之间选择 {#choosing-between-providers-and-viewproviders}
 
-Use `providers` when:
+以下情况使用 `providers`：
 
-- The service should be available to projected content
-- You want content children to access the service
-- You're providing general-purpose services
+- 服务应该对投影的内容可用
+- 你希望内容子组件能够访问该服务
+- 你提供的是通用服务
 
-Use `viewProviders` when:
+以下情况使用 `viewProviders`：
 
-- The service should only be available to your component's template
-- You want to hide implementation details from projected content
-- You're providing internal services that shouldn't leak out
+- 服务只应该对你组件的模板可用
+- 你希望对投影的内容隐藏实现细节
+- 你提供的是不应外泄的内部服务
 
-**Default recommendation:** Use `providers` unless you have a specific reason to restrict access with `viewProviders`.
+**默认建议：** 除非有特别的理由要用 `viewProviders` 限制访问，否则请使用 `providers`。
 
-### InjectionToken issues
+### InjectionToken 相关问题 {#injectiontoken-issues}
 
-When using `InjectionToken` for non-class dependencies, developers often encounter problems related to token identity, type safety, and provider configuration. These issues usually stem from how JavaScript handles object identity and how TypeScript infers types.
+在为非类依赖使用 `InjectionToken` 时，开发者经常会遇到与令牌身份、类型安全和提供者（Provider）配置相关的问题。这些问题通常源于 JavaScript 处理对象身份的方式以及 TypeScript 推断类型的方式。
 
-#### Token identity confusion
+#### 混淆令牌身份 {#token-identity-confusion}
 
-When you create a new `InjectionToken` instance, JavaScript creates a unique object in memory. Even if you create another `InjectionToken` with the exact same description string, it's a completely different object. Angular uses the token object's identity (not its description) to match providers with injection points, so tokens with the same description but different object identities cannot access each other's values.
+当你创建一个新的 `InjectionToken` 实例时，JavaScript 会在内存中创建一个唯一的对象。即使你用完全相同的描述字符串再创建一个 `InjectionToken`，它也是一个完全不同的对象。Angular 使用令牌对象的身份（而不是它的描述）来把提供者与注入点匹配起来，因此描述相同、但对象身份不同的令牌无法访问彼此的值。
 
 ```ts [config.token.ts]
 import {InjectionToken} from '@angular/core';
@@ -419,7 +415,7 @@ bootstrapApplication(App, {
 ```
 
 ```ts [feature-view.ts]
-// Creating new token with same description
+// 用相同的描述创建了新的令牌
 import {InjectionToken, inject, Component} from '@angular/core';
 import {AppConfig} from './config.token';
 
@@ -430,13 +426,13 @@ const APP_CONFIG = new InjectionToken<AppConfig>('app config');
   template: '<p>Feature</p>',
 })
 export class FeatureView {
-  private config = inject(APP_CONFIG); // ERROR: Different token instance!
+  private config = inject(APP_CONFIG); // 错误：不同的令牌实例！
 }
 ```
 
-Even though both tokens have the description `'app config'`, they are different objects. Angular compares tokens by reference, not by description.
+尽管两个令牌的描述都是 `'app config'`，它们却是不同的对象。Angular 按引用而不是按描述来比较令牌。
 
-**Solution:** Import the same token instance.
+**解决方案：** 导入同一个令牌实例。
 
 ```ts [feature-view.ts]
 import {inject, Component} from '@angular/core';
@@ -447,18 +443,18 @@ import {APP_CONFIG, AppConfig} from './config.token';
   template: '<p>API: {{config.apiUrl}}</p>',
 })
 export class FeatureView {
-  protected config = inject(APP_CONFIG); // Works: Same token instance
+  protected config = inject(APP_CONFIG); // 正常工作：同一个令牌实例
 }
 ```
 
-::: tip TIP
-Always export tokens from a shared file and import them everywhere they're needed. Never create multiple `InjectionToken` instances with the same description.
+::: tip 提示
+始终从一个共享文件中导出令牌，并在每个需要的地方导入它们。永远不要用相同的描述创建多个 `InjectionToken` 实例。
 
 :::
 
-#### Trying to inject interfaces
+#### 试图注入接口 {#trying-to-inject-interfaces}
 
-When you define a TypeScript interface, it only exists during compilation for type checking. TypeScript erases all interface definitions when it compiles to JavaScript, so at runtime there's no object for Angular to use as an injection token. If you try to inject an interface type, Angular has nothing to match against the provider configuration.
+TypeScript 接口只在编译期间用于类型检查。TypeScript 编译为 JavaScript 时会擦除所有接口定义，因此在运行时并不存在可供 Angular 用作注入令牌（injection token）的对象。如果你试图注入一个接口类型，Angular 就没有任何东西可以和提供者配置进行匹配。
 
 ```ts [Can]
 interface UserConfig {
@@ -471,12 +467,12 @@ interface UserConfig {
   template: '<p>Profile</p>',
 })
 export class UserProfile {
-  // ERROR: Interfaces don't exist at runtime
+  // 错误：接口在运行时并不存在
   constructor(private config: UserConfig) {}
 }
 ```
 
-**Solution:** Use `InjectionToken` for interface types.
+**解决方案：** 对接口类型使用 `InjectionToken`。
 
 ```ts [Use InjectionToken for interfaces]
 import {InjectionToken, inject, Component} from '@angular/core';
@@ -489,7 +485,7 @@ interface UserConfig {
 
 export const USER_CONFIG = new InjectionToken<UserConfig>('user configuration');
 
-// Provide the configuration
+// 提供配置
 bootstrapApplication(App, {
   providers: [
     {
@@ -499,7 +495,7 @@ bootstrapApplication(App, {
   ],
 });
 
-// Inject using the token
+// 使用令牌进行注入
 @Component({
   selector: 'app-profile',
   template: '<p>User: {{config.name}}</p>',
@@ -509,63 +505,63 @@ export class UserProfile {
 }
 ```
 
-The `InjectionToken` exists at runtime and can be used for injection, while the `UserConfig` interface provides type safety during development.
+`InjectionToken` 在运行时存在，可以用于注入；而 `UserConfig` 接口则在开发期间提供类型安全。
 
-### Circular dependencies
+### 循环依赖 {#circular-dependencies}
 
-Circular dependencies occur when services inject each other, creating a cycle that Angular cannot resolve. For detailed explanations and code examples, see [NG0200: Circular dependency](/errors/NG0200).
+当服务之间相互注入、形成 Angular 无法解析的环时，就会出现循环依赖（circular dependency）。详细的解释和代码示例请参阅 [NG0200: Circular dependency](/errors/NG0200)。
 
-**Resolution strategies** (in order of preference):
+**解决策略**（按优先顺序）：
 
-1. **Restructure** - Extract shared logic to a third service, breaking the cycle
-2. **Use events** - Replace direct dependencies with event-based communication (such as `Subject`)
-3. **Lazy injection** - Use `Injector.get()` to defer one dependency (last resort)
+1. **重构** - 把共享逻辑提取到第三个服务中，打破循环
+2. **使用事件** - 用基于事件的通信（例如 `Subject`）代替直接依赖
+3. **延迟注入** - 使用 `Injector.get()` 推迟其中一个依赖的获取（最后手段）
 
-::: info NOTE
-Do not use `forwardRef()` for service circular dependencies—it only solves circular imports in standalone component configurations.
+::: info 注意
+不要用 `forwardRef()` 来解决服务之间的循环依赖——它只能解决独立（standalone）组件配置中的循环导入问题。
 
 :::
 
-## Debugging dependency resolution
+## 调试依赖解析 {#debugging-dependency-resolution}
 
-### Understanding the resolution process
+### 理解解析过程 {#understanding-the-resolution-process}
 
-Angular resolves dependencies by walking up the injector hierarchy. When a `NullInjectorError` occurs, understanding this search order helps you identify where to add the missing provider.
+Angular 通过沿注入器层级向上查找来解析依赖。当出现 `NullInjectorError` 时，了解这个查找顺序有助于你确定应该在哪里添加缺失的提供者。
 
-Angular searches in this order:
+Angular 按以下顺序查找：
 
-1. **Element injector** - The current component or directive
-2. **Parent element injectors** - Up the DOM tree through parent components
-3. **Environment injector** - The route or application injector
-4. **NullInjector** - Throws `NullInjectorError` if not found
+1. **元素注入器（Element injector）** - 当前组件或指令（Directive）
+2. **父元素注入器** - 沿 DOM 树经由父组件向上
+3. **环境注入器（Environment injector）** - 路由或应用注入器
+4. **NullInjector** - 如果仍未找到，则抛出 `NullInjectorError`
 
-When you see a `NullInjectorError`, the service isn't provided at any level the component can access. Check that:
+当你看到 `NullInjectorError` 时，说明在该组件能访问到的任何层级上都没有提供这个服务。请检查：
 
-- The service has `@Service()` or
-- The service has `@Injectable({providedIn: 'root'})`, or
-- The service is in a `providers` array the component can reach
+- 该服务是否带有 `@Service()`，或者
+- 该服务是否带有 `@Injectable({providedIn: 'root'})`，或者
+- 该服务是否位于组件能够访问到的某个 `providers` 数组中
 
-You can modify this search behavior with resolution modifiers like `self`, `skipSelf`, `host`, and `optional`. For complete coverage of resolution rules and modifiers, see the [Hierarchical injectors guide](/guide/di/hierarchical-dependency-injection).
+你可以使用 `self`、`skipSelf`、`host` 和 `optional` 等解析修饰符（resolution modifier）来修改这种查找行为。有关解析规则和修饰符的完整介绍，请参阅[分层注入器指南](/guide/di/hierarchical-dependency-injection)。
 
-### Using Angular DevTools
+### 使用 Angular DevTools {#using-angular-devtools}
 
-Angular DevTools includes an injector tree inspector that visualizes the entire injector hierarchy and shows which providers are available at each level. For installation and general usage, see the [Angular DevTools injector documentation](/tools/devtools/injectors).
+Angular DevTools 包含一个注入器树检查器，它能可视化整个注入器层级，并显示每个层级上有哪些提供者可用。关于安装和一般用法，请参阅 [Angular DevTools 注入器文档](/tools/devtools/injectors)。
 
-When debugging DI issues, use DevTools to answer these questions:
+调试 DI 问题时，可以用 DevTools 回答以下问题：
 
-- **Is the service provided?** Select the component that fails to inject and check if the service appears in the Injector section.
-- **At what level?** Walk up the component tree to find where the service is actually provided (component, route, or application level).
-- **Multiple instances?** If a singleton service appears in multiple component injectors, it's likely provided in component `providers` arrays instead of using `@Service` or `providedIn: 'root'`.
+- **服务是否已提供？** 选中注入失败的组件，检查该服务是否出现在 Injector 区域中。
+- **在哪个层级提供？** 沿组件树向上查找，找到服务实际被提供的位置（组件、路由或应用级别）。
+- **是否有多个实例？** 如果某个单例服务出现在多个组件注入器中，那么它很可能是在组件的 `providers` 数组中提供的，而不是使用 `@Service` 或 `providedIn: 'root'`。
 
-If a service never appears in any injector, verify it has the `@Service` decorator or is listed in a `providers` array.
+如果某个服务从未出现在任何注入器中，请确认它带有 `@Service` 装饰器，或者已列在某个 `providers` 数组中。
 
-### Logging and tracing injection
+### 记录和追踪注入过程 {#logging-and-tracing-injection}
 
-When DevTools isn't enough, use logging to trace injection behavior.
+当 DevTools 不够用时，可以借助日志来追踪注入行为。
 
-#### Logging service creation
+#### 记录服务的创建 {#logging-service-creation}
 
-Add console logs to service constructors to see when services are created.
+在服务构造函数中添加控制台日志，看看服务是何时创建的。
 
 ```ts
 import {Service} from '@angular/core';
@@ -574,7 +570,7 @@ import {Service} from '@angular/core';
 export class UserClient {
   constructor() {
     console.log('UserClient created');
-    console.trace(); // Shows call stack
+    console.trace(); // 显示调用栈
   }
 
   getUser() {
@@ -583,17 +579,17 @@ export class UserClient {
 }
 ```
 
-When the service is created, you'll see the log message and a stack trace showing where the injection occurred.
+当服务被创建时，你会看到这条日志消息，以及显示注入发生位置的栈追踪。
 
-**What to look for:**
+**需要关注的内容：**
 
-- How many times is the constructor called? (should be once for singletons)
-- Where in the code is it being injected? (check the stack trace)
-- Is it created at the expected time? (application startup vs lazy)
+- 构造函数被调用了多少次？（单例应该只调用一次）
+- 它是在代码中的什么位置被注入的？（查看栈追踪）
+- 它是否在预期的时间被创建？（应用启动时还是延迟创建）
 
-#### Checking service availability
+#### 检查服务的可用性 {#checking-service-availability}
 
-Use optional injection with logging to determine if a service is available.
+结合可选注入和日志来判断某个服务是否可用。
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -611,17 +607,17 @@ export class DebugView {
       console.log('UserClient available:', this.userService);
     } else {
       console.warn('UserClient NOT available');
-      console.trace(); // Shows where we tried to inject
+      console.trace(); // 显示我们尝试注入的位置
     }
   }
 }
 ```
 
-This pattern helps you verify if a service is available without crashing the application.
+这种模式可以帮你在不让应用崩溃的情况下确认服务是否可用。
 
-#### Logging resolution modifiers
+#### 记录解析修饰符的效果 {#logging-resolution-modifiers}
 
-Test different resolution strategies with logging.
+借助日志测试不同的解析策略。
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -633,10 +629,10 @@ import {UserClient} from './user-client';
   providers: [UserClient],
 })
 export class DebugView {
-  // Try to get local instance
+  // 尝试获取本地实例
   private localService = inject(UserClient, {self: true, optional: true});
 
-  // Try to get parent instance
+  // 尝试获取父级实例
   private parentService = inject(UserClient, {
     skipSelf: true,
     optional: true,
@@ -650,64 +646,64 @@ export class DebugView {
 }
 ```
 
-This shows you which instances are available at different injector levels.
+这会显示在不同注入器层级上有哪些实例可用。
 
-### Debugging workflow
+### 调试流程 {#debugging-workflow}
 
-When DI fails, follow this systematic approach:
+当 DI 失败时，请按以下系统化的步骤进行：
 
-**Step 1: Read the error message**
+**第 1 步：阅读错误消息**
 
-- Identify the error code (NG0200, NG0203, etc.)
-- Read the dependency path
-- Note which token failed
+- 识别错误码（NG0200、NG0203 等）
+- 阅读依赖路径
+- 记下是哪个令牌失败了
 
-**Step 2: Check the basics**
+**第 2 步：检查基础配置**
 
-- Does the service have `@Service` or `@Injectable()`?
-- If you use `@Injectable`, is `providedIn` set correctly?
-- Are imports correct?
-- Is the file included in compilation?
+- 服务是否带有 `@Service` 或 `@Injectable()`？
+- 如果使用的是 `@Injectable`，`providedIn` 是否设置正确？
+- 导入是否正确？
+- 该文件是否被包含在编译中？
 
-**Step 3: Verify injection context**
+**第 3 步：确认注入上下文**
 
-- Is `inject()` called in a valid context?
-- Check for async issues (await, setTimeout, promises)
-- Verify timing (not after destroy)
+- `inject()` 是否在有效的上下文中调用？
+- 检查异步问题（await、setTimeout、promise）
+- 确认调用时机（不能在销毁之后）
 
-**Step 4: Use debugging tools**
+**第 4 步：使用调试工具**
 
-- Open Angular DevTools
-- Check injector hierarchy
-- Add console logs to constructors
-- Use optional injection to test availability
+- 打开 Angular DevTools
+- 检查注入器层级
+- 在构造函数中添加控制台日志
+- 使用可选注入来测试可用性
 
-**Step 5: Simplify and isolate**
+**第 5 步：简化并隔离问题**
 
-- Remove dependencies one by one
-- Test in a minimal component
-- Check each injector level separately
-- Create a reproduction case
+- 逐个移除依赖
+- 在一个最小化的组件中测试
+- 分别检查每个注入器层级
+- 创建一个复现用例
 
-## DI error reference
+## DI 错误参考 {#di-error-reference}
 
-This section provides detailed information about specific Angular DI error codes you may encounter. Use this as a reference when you see these errors in your console.
+本节详细介绍你可能遇到的 Angular DI 错误码。当你在控制台中看到这些错误时，可以把本节当作参考。
 
-### NullInjectorError: No provider for [Service]
+### NullInjectorError: No provider for [Service] {#nullinjectorerror-no-provider-for-service}
 
-**Error code:** [NG0201](/errors/NG0201)
+**错误码：** [NG0201](/errors/NG0201)
 
-This error occurs when Angular cannot find a provider for a token in the injector hierarchy. The error message includes a dependency path showing where the injection was attempted.
+当 Angular 在注入器层级中找不到某个令牌的提供者时，就会出现这个错误。错误消息中包含一条依赖路径，显示是在哪里尝试注入的。
 
 ```
 NG0201: No provider found for `UserClient`. Path: AuthClient -> UserClient.
 ```
 
-The dependency path shows that `AuthClient` tried to inject `UserClient`, but no provider was found.
+这条依赖路径表明，`AuthClient` 尝试注入 `UserClient`，但没有找到提供者。
 
-#### Missing the `@Service ` or `@Injectable` decorator
+#### 缺少 `@Service ` 或 `@Injectable` 装饰器 {#missing-the-service-or-injectable-decorator}
 
-The most common cause is forgetting the `@Service` or `@Injectable()` decorator on a service class.
+最常见的原因是忘了在服务类上添加 `@Service` 或 `@Injectable()` 装饰器。
 
 ```ts [Missing decorator]
 export class UserClient {
@@ -717,7 +713,7 @@ export class UserClient {
 }
 ```
 
-Angular requires the `@Service()` decorator to generate the metadata needed for dependency injection.
+Angular 需要 `@Service()` 装饰器来生成依赖注入所需的元数据。
 
 ```ts [Include @Service]
 import {Service} from '@angular/core';
@@ -730,14 +726,14 @@ export class UserClient {
 }
 ```
 
-::: info NOTE
-Classes with zero-argument constructors can work without `@Service()`, but this is not recommended. Always include the decorator for consistency and to avoid issues when adding dependencies later.
+::: info 注意
+构造函数没有参数的类即使不加 `@Service()` 也可以工作，但不推荐这样做。请始终加上这个装饰器，以保持一致，并避免日后添加依赖时出现问题。
 
 :::
 
-#### Missing providedIn configuration
+#### 缺少 providedIn 配置 {#missing-providedin-configuration}
 
-A service may have `@Injectable()` but not specify where it should be provided.
+服务可能带有 `@Injectable()`，却没有指定应该在哪里提供它。
 
 ```ts [No providedIn specified]
 import {Injectable} from '@angular/core';
@@ -750,7 +746,7 @@ export class UserClient {
 }
 ```
 
-Use the `@Service` decorator to make the service available throughout your application.
+使用 `@Service` 装饰器让该服务在整个应用中可用。
 
 ```ts [Specify providedIn]
 import {Service} from '@angular/core';
@@ -763,11 +759,11 @@ export class UserClient {
 }
 ```
 
-The `@Service` decorator makes the service available application-wide and enables tree-shaking (the service is removed from the bundle if never injected).
+`@Service` 装饰器让服务在整个应用范围内可用，并支持摇树优化（如果从未被注入，该服务就会从包（bundle）中移除）。
 
-#### Standalone component missing imports
+#### 独立组件缺少导入 {#standalone-component-missing-imports}
 
-In Angular v20+ with standalone components, you must explicitly import or provide dependencies in each component.
+在使用独立组件的 Angular v20+ 中，你必须在每个组件中显式导入或提供依赖。
 
 ```ts [Missing service import]
 import {Component, inject} from '@angular/core';
@@ -778,12 +774,12 @@ import {UserClient} from './user-client';
   template: '<p>User: {{user.name}}</p>',
 })
 export class UserProfile {
-  private userService = inject(UserClient); // ERROR: No provider
+  private userService = inject(UserClient); // 错误：没有提供者
   user = this.userService.getUser();
 }
 ```
 
-Ensure the service uses `@Service` or add it to the component's `providers` array.
+请确保该服务使用了 `@Service`，或者把它添加到组件的 `providers` 数组中。
 
 ```ts [Service uses providedIn: root]
 import {Component, inject} from '@angular/core';
@@ -794,30 +790,30 @@ import {UserClient} from './user-client';
   template: '<p>User: {{user.name}}</p>',
 })
 export class UserProfile {
-  private userService = inject(UserClient); // Works: providedIn: 'root'
+  private userService = inject(UserClient); // 正常工作：providedIn: 'root'
   user = this.userService.getUser();
 }
 ```
 
-#### Debugging with the dependency path
+#### 借助依赖路径进行调试 {#debugging-with-the-dependency-path}
 
-The dependency path in the error message shows the chain of injections that led to the failure.
+错误消息中的依赖路径显示了导致失败的注入链。
 
 ```
 NG0201: No provider found for `LoggerStore`. Path: DataStore -> ApiClient -> LoggerStore.
 ```
 
-This path tells you:
+这条路径告诉你：
 
-1. `DataStore` injected `ApiClient`
-2. `ApiClient` tried to inject `LoggerStore`
-3. No provider for `LoggerStore` was found
+1. `DataStore` 注入了 `ApiClient`
+2. `ApiClient` 尝试注入 `LoggerStore`
+3. 没有找到 `LoggerStore` 的提供者
 
-Start your investigation at the end of the chain (`LoggerStore`) and verify it has proper configuration.
+从链条的末端（`LoggerStore`）开始排查，确认它的配置是否正确。
 
-#### Checking provider availability with optional injection
+#### 用可选注入检查提供者是否可用 {#checking-provider-availability-with-optional-injection}
 
-Use optional injection to check if a provider exists without throwing an error.
+使用可选注入来检查某个提供者是否存在，而不会抛出错误。
 
 ```ts
 import {Component, inject} from '@angular/core';
@@ -833,13 +829,13 @@ export class DebugView {
 }
 ```
 
-Optional injection returns `null` if no provider is found, allowing you to handle the absence gracefully.
+如果找不到提供者，可选注入会返回 `null`，让你可以优雅地处理缺失的情况。
 
-### NG0203: inject() must be called from an injection context
+### NG0203: inject() must be called from an injection context {#ng0203-inject-must-be-called-from-an-injection-context}
 
-**Error code:** NG0203
+**错误码：** NG0203
 
-This error occurs when you call `inject()` outside of a valid injection context. Angular requires `inject()` to be called synchronously during class construction or factory execution.
+当你在有效的注入上下文之外调用 `inject()` 时，就会出现这个错误。Angular 要求在类构造或工厂执行期间同步调用 `inject()`。
 
 ```
 NG0203: The `UserClient` token injection failed. `inject()` function must
@@ -848,11 +844,11 @@ function, a field initializer, or a function used with
 `runInInjectionContext`.
 ```
 
-#### Valid injection contexts
+#### 有效的注入上下文 {#valid-injection-contexts}
 
-Angular allows `inject()` in these locations:
+Angular 允许在以下位置使用 `inject()`：
 
-1. **Class field initializers**
+1. **类字段初始化器**
 
    ```ts
    import {Component, inject} from '@angular/core';
@@ -863,12 +859,12 @@ Angular allows `inject()` in these locations:
      template: '<p>User: {{user.name}}</p>',
    })
    export class UserProfile {
-     private userService = inject(UserClient); // Valid
+     private userService = inject(UserClient); // 有效
      user = this.userService.getUser();
    }
    ```
 
-2. **Class constructor**
+2. **类构造函数**
 
    ```ts
    import {Component, inject} from '@angular/core';
@@ -883,13 +879,13 @@ Angular allows `inject()` in these locations:
      user: ReturnType<UserClient['getUser']>;
 
      constructor() {
-       this.userService = inject(UserClient); // Valid
+       this.userService = inject(UserClient); // 有效
        this.user = this.userService.getUser();
      }
    }
    ```
 
-3. **Provider factory functions**
+3. **提供者工厂函数**
 
    ```ts
    import {inject, InjectionToken} from '@angular/core';
@@ -897,14 +893,14 @@ Angular allows `inject()` in these locations:
 
    export const GREETING = new InjectionToken<string>('greeting', {
      factory() {
-       const userService = inject(UserClient); // Valid
+       const userService = inject(UserClient); // 有效
        const user = userService.getUser();
        return `Hello, ${user.name}`;
      },
    });
    ```
 
-4. **Inside runInInjectionContext()**
+4. **在 runInInjectionContext() 内部**
 
    ```ts
    import {Component, inject, Injector, runInInjectionContext} from '@angular/core';
@@ -919,41 +915,41 @@ Angular allows `inject()` in these locations:
 
      loadUser() {
        runInInjectionContext(this.injector, () => {
-         const userService = inject(UserClient); // Valid
+         const userService = inject(UserClient); // 有效
          console.log(userService.getUser());
        });
      }
    }
    ```
 
-Other injection contexts that `inject()` also works in include:
+`inject()` 还能在以下注入上下文中使用：
 
 - [provideAppInitializer](https://angular.dev/api/core/provideAppInitializer)
 - [provideEnvironmentInitializer](https://angular.dev/api/core/provideEnvironmentInitializer)
-- Functional [route guards](/guide/routing/route-guards)
-- Functional [data resolvers](/guide/routing/data-resolvers)
-- Route [resources](/guide/routing/data-fetching-with-resources)
+- 函数式[路由守卫](/guide/routing/route-guards)
+- 函数式[数据解析器](/guide/routing/data-resolvers)
+- 路由[资源](/guide/routing/data-fetching-with-resources)
 
-#### When this error occurs
+#### 何时会出现这个错误 {#when-this-error-occurs}
 
-This error occurs when:
+以下情况会出现这个错误：
 
-- Calling `inject()` in lifecycle hooks (`ngOnInit`, `ngAfterViewInit`, etc.)
-- Calling `inject()` after `await` in async functions
-- Calling `inject()` in callbacks (`setTimeout`, `Promise.then()`, etc.)
-- Calling `inject()` outside of class construction phase
+- 在生命周期钩子（`ngOnInit`、`ngAfterViewInit` 等）中调用 `inject()`
+- 在异步函数中的 `await` 之后调用 `inject()`
+- 在回调（`setTimeout`、`Promise.then()` 等）中调用 `inject()`
+- 在类构造阶段之外调用 `inject()`
 
-See the "Incorrect inject() usage" section for detailed examples and solutions.
+详细的示例和解决方案请参阅“不正确的 inject() 用法”一节。
 
-#### Solutions and workarounds
+#### 解决方案与变通办法 {#solutions-and-workarounds}
 
-**Solution 1:** Capture dependencies in field initializers (most common)
+**解决方案 1：** 在字段初始化器中获取依赖（最常见）
 
 ```ts
-private userService = inject(UserClient) // Capture at class level
+private userService = inject(UserClient) // 在类级别获取
 ```
 
-**Solution 2:** Use `runInInjectionContext()` for callbacks
+**解决方案 2：** 为回调使用 `runInInjectionContext()`
 
 ```ts
 private injector = inject(Injector)
@@ -965,76 +961,76 @@ someCallback() {
 }
 ```
 
-**Solution 3:** Pass dependencies as parameters instead of injecting them
+**解决方案 3：** 把依赖作为参数传入，而不是在内部注入
 
 ```ts
-// Instead of injecting inside a callback
+// 不要在回调内部注入
 setTimeout(() => {
-  const service = inject(MyClient) // ERROR
+  const service = inject(MyClient) // 错误
 }, 1000)
 
-// Capture first, then use
+// 先获取，再使用
 private service = inject(MyClient)
 
 setTimeout(() => {
-  this.service.doSomething() // Use captured reference
+  this.service.doSomething() // 使用已获取的引用
 }, 1000)
 ```
 
-### NG0200: Circular dependency detected
+### NG0200: Circular dependency detected {#ng0200-circular-dependency-detected}
 
-**Error code:** NG0200
+**错误码：** NG0200
 
-This error occurs when two or more services depend on each other, creating a circular dependency that Angular cannot resolve.
+当两个或多个服务相互依赖、形成 Angular 无法解析的循环依赖时，就会出现这个错误。
 
 ```
 NG0200: Circular dependency detected for `AuthClient`. Path: AuthClient -> UserClient -> AuthClient.
 ```
 
-The dependency path shows the cycle: `AuthClient` depends on `UserClient`, which depends back on `AuthClient`.
+这条依赖路径显示了循环：`AuthClient` 依赖 `UserClient`，而 `UserClient` 又反过来依赖 `AuthClient`。
 
-#### Understanding the error
+#### 理解这个错误 {#understanding-the-error}
 
-Angular creates service instances by calling their constructors and injecting dependencies. When services depend on each other circularly, Angular cannot determine which to create first.
+Angular 通过调用服务的构造函数并注入依赖来创建服务实例。当服务之间循环依赖时，Angular 无法确定应该先创建哪一个。
 
-#### Common causes
+#### 常见原因 {#common-causes}
 
-- Direct circular dependency (Service A → Service B → Service A)
-- Indirect circular dependency (Service A → Service B → Service C → Service A)
-- Import cycles in module files that also have service dependencies
+- 直接循环依赖（Service A → Service B → Service A）
+- 间接循环依赖（Service A → Service B → Service C → Service A）
+- 同时存在服务依赖的模块文件之间出现导入循环
 
-#### Resolution strategies
+#### 解决策略 {#resolution-strategies}
 
-See the "Circular dependencies" section for detailed examples and solutions:
+详细的示例和解决方案请参阅“循环依赖”一节：
 
-1. **Restructure** - Extract shared logic to a third service (recommended)
-2. **Use events** - Replace direct dependencies with event-based communication
-3. **Lazy injection** - Use `Injector.get()` to defer one dependency (last resort)
+1. **重构** - 把共享逻辑提取到第三个服务中（推荐）
+2. **使用事件** - 用基于事件的通信代替直接依赖
+3. **延迟注入** - 使用 `Injector.get()` 推迟其中一个依赖的获取（最后手段）
 
-Do NOT use `forwardRef()` for service circular dependencies. It only solves circular imports in component configurations.
+**不要** 用 `forwardRef()` 来解决服务之间的循环依赖。它只能解决组件配置中的循环导入问题。
 
-### Other DI error codes
+### 其他 DI 错误码 {#other-di-error-codes}
 
-For detailed explanations and solutions for these errors, see the [Angular error reference](/errors):
+关于这些错误的详细解释和解决方案，请参阅 [Angular 错误参考](/errors)：
 
-| Error Code              | Description                                                                                |
+| 错误码              | 说明                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
-| [NG0204](/errors/NG0204) | Can't resolve all parameters - missing `@Injectable()` decorator                           |
-| [NG0205](/errors/NG0205) | Injector already destroyed - accessing services after component destruction                |
-| [NG0207](/errors/NG0207) | EnvironmentProviders in wrong context - using `provideHttpClient()` in component providers |
+| [NG0204](/errors/NG0204) | 无法解析所有参数 - 缺少 `@Injectable()` 装饰器                           |
+| [NG0205](/errors/NG0205) | 注入器已被销毁 - 在组件销毁之后访问服务                |
+| [NG0207](/errors/NG0207) | EnvironmentProviders 用在了错误的上下文中 - 在组件的 providers 中使用 `provideHttpClient()` |
 
-## Next steps
+## 下一步 {#next-steps}
 
-When you encounter DI errors, remember to:
+遇到 DI 错误时，请记得：
 
-1. Read the error message and dependency path carefully
-2. Verify basic configuration (decorators, `providedIn`, imports)
-3. Check injection context and timing
-4. Use DevTools and logging to investigate
-5. Simplify and isolate the problem
+1. 仔细阅读错误消息和依赖路径
+2. 确认基础配置（装饰器、`providedIn`、导入）
+3. 检查注入上下文和调用时机
+4. 使用 DevTools 和日志进行排查
+5. 简化并隔离问题
 
-For a deeper understanding of specific topics on dependency injection, check out:
+要更深入地了解依赖注入的特定主题，请查看：
 
-- [Understanding dependency injection](/guide/di) - Core DI concepts and patterns
-- [Hierarchical dependency injection](/guide/di/hierarchical-dependency-injection) - How the injector hierarchy works
-- [Testing with dependency injection](/guide/testing) - Using TestBed and mocking dependencies
+- [理解依赖注入](/guide/di) - DI 的核心概念与模式
+- [分层依赖注入](/guide/di/hierarchical-dependency-injection) - 注入器层级是如何工作的
+- [使用依赖注入进行测试](/guide/testing) - 使用 TestBed 并模拟依赖

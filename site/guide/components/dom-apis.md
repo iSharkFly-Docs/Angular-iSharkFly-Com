@@ -1,17 +1,13 @@
----
-untranslated: true
----
+# 使用 DOM API {#using-dom-apis}
 
-# Using DOM APIs
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假设你已经阅读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-Angular handles most DOM creation, updates, and removals for you. However, you might rarely need to
-directly interact with a component's DOM. Components can inject ElementRef to get a reference to the
-component's host element:
+Angular 会替你处理绝大多数 DOM 的创建、更新和移除工作。不过在极少数情况下，你可能需要
+直接与组件（Component）的 DOM 交互。组件可以注入 ElementRef 来获取该组件
+宿主元素（Host Element）的引用：
 
 ```ts
 @Component(/* ... */)
@@ -23,11 +19,11 @@ export class ProfilePhoto {
 }
 ```
 
-The `nativeElement` property references the
-host [Element](https://developer.mozilla.org/docs/Web/API/Element) instance.
+`nativeElement` 属性引用的是宿主
+[Element](https://developer.mozilla.org/docs/Web/API/Element) 实例。
 
-You can use Angular's `afterEveryRender` and `afterNextRender` functions to register a **render
-callback** that runs when Angular has finished rendering the page.
+你可以使用 Angular 的 `afterEveryRender` 和 `afterNextRender` 函数注册一个**渲染
+回调**，它会在 Angular 完成页面渲染后运行。
 
 ```ts
 @Component(/* ... */)
@@ -35,58 +31,58 @@ export class ProfilePhoto {
   constructor() {
     const elementRef = inject(ElementRef);
     afterEveryRender(() => {
-      // Focus the first input element in this component.
+      // 让该组件中的第一个 input 元素获得焦点。
       elementRef.nativeElement.querySelector('input')?.focus();
     });
   }
 }
 ```
 
-`afterEveryRender` and `afterNextRender` must be called in an _injection context_, typically a
-component's constructor.
+`afterEveryRender` 和 `afterNextRender` 必须在*注入上下文*（Injection Context）中调用，通常是
+组件的构造函数。
 
-**Avoid direct DOM manipulation whenever possible.** Always prefer expressing your DOM's structure
-in component templates and updating that DOM with bindings.
+**尽可能避免直接操作 DOM。** 始终优先在组件模板（Template）中表达 DOM 的结构，
+并通过绑定（Binding）来更新 DOM。
 
-**Render callbacks never run during server-side rendering or build-time pre-rendering.**
+**渲染回调永远不会在服务端渲染或构建时预渲染期间运行。**
 
-**Never directly manipulate the DOM inside of other Angular lifecycle hooks**. Angular does not
-guarantee that a component's DOM is fully rendered at any point other than in render callbacks.
-Further, reading or modifying the DOM during other lifecycle hooks can negatively impact page
-performance by
-causing [layout thrashing](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing).
+**永远不要在其他 Angular 生命周期钩子（Lifecycle Hook）中直接操作 DOM**。除了渲染回调之外，Angular 不
+保证组件的 DOM 在任何其他时刻都已完全渲染。
+此外，在其他生命周期钩子中读取或修改 DOM 可能会
+导致[布局抖动（layout thrashing）](https://web.dev/avoid-large-complex-layouts-and-layout-thrashing)，
+从而对页面性能产生负面影响。
 
-## Using a component's renderer
+## 使用组件的渲染器 {#using-a-component-s-renderer}
 
-Components can inject an instance of `Renderer2` to perform certain DOM manipulations that are tied
-to other Angular features.
+组件可以注入 `Renderer2` 的实例，来执行某些与其他 Angular 特性相关联的
+DOM 操作。
 
-Any DOM elements created by a component's `Renderer2` participate in that
-component's [style encapsulation](/guide/components/styling#style-scoping).
+由组件的 `Renderer2` 创建的任何 DOM 元素都会参与该
+组件的[样式封装](/guide/components/styling#style-scoping)。
 
-Certain `Renderer2` APIs also tie into Angular's animation system. You can use the `setProperty`
-method to update synthetic animation properties and the `listen` method to add event listeners for
-synthetic animation events. See the [Animations](/guide/animations) guide for details.
+某些 `Renderer2` API 还与 Angular 的动画系统相关联。你可以使用 `setProperty`
+方法更新合成动画属性，并使用 `listen` 方法为合成动画事件添加
+事件监听器（Event Listener）。详情请参阅[动画](/guide/animations)指南。
 
-Aside from these two narrow use-cases, there is no difference between using `Renderer2` and native
-DOM APIs. Both work in server-side rendering and build-time pre-rendering, but the server's DOM lacks
-browser-only APIs such as layout measurement and observers.
+除了这两种特定的用例之外，使用 `Renderer2` 和使用原生
+DOM API 没有任何区别。两者都可以在服务端渲染和构建时预渲染中工作，但服务端的 DOM 缺少
+仅浏览器提供的 API，例如布局测量和各种观察器（observer）。
 
-## When to use DOM APIs
+## 何时使用 DOM API {#when-to-use-dom-apis}
 
-While Angular handles most rendering concerns, some behaviors may still require using DOM APIs. Some
-common use cases include:
+虽然 Angular 处理了大多数渲染相关的事务，但某些行为可能仍然需要使用 DOM API。一些
+常见的用例包括：
 
-- Managing element focus
-- Measuring element geometry, such as with `getBoundingClientRect`
-- Reading an element's text content
-- Setting up native observers such
-  as [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver),
-  [`ResizeObserver`](https://developer.mozilla.org/docs/Web/API/ResizeObserver), or
-  [`IntersectionObserver`](https://developer.mozilla.org/docs/Web/API/Intersection_Observer_API).
+- 管理元素焦点
+- 测量元素的几何尺寸，例如使用 `getBoundingClientRect`
+- 读取元素的文本内容
+- 设置原生观察器，例如
+  [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver)、
+  [`ResizeObserver`](https://developer.mozilla.org/docs/Web/API/ResizeObserver) 或
+  [`IntersectionObserver`](https://developer.mozilla.org/docs/Web/API/Intersection_Observer_API)。
 
-Avoid inserting, removing, and modifying DOM elements. In particular, **never directly set an
-element's `innerHTML` property**, which can make your application vulnerable
-to [cross-site scripting (XSS) exploits](https://developer.mozilla.org/docs/Glossary/Cross-site_scripting).
-Angular's template bindings, including bindings for `innerHTML`, include safeguards that help
-protect against XSS attacks. See the [Security guide](/best-practices/security) for details.
+避免插入、移除和修改 DOM 元素。尤其是，**永远不要直接设置
+元素的 `innerHTML` 属性**，这会让你的应用容易受到
+[跨站脚本（XSS）攻击](https://developer.mozilla.org/docs/Glossary/Cross-site_scripting)。
+Angular 的模板绑定（包括对 `innerHTML` 的绑定）内置了有助于
+防范 XSS 攻击的保护措施。详情请参阅[安全指南](/best-practices/security)。

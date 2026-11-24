@@ -1,47 +1,43 @@
----
-untranslated: true
----
+# 组件的高级配置 {#advanced-component-configuration}
 
-# Advanced component configuration
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假定你已经读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-## ChangeDetectionStrategy
+## ChangeDetectionStrategy {#changedetectionstrategy}
 
-The `@Component` decorator accepts a `changeDetection` option that controls the component's **change
-detection mode**. There are two change detection mode options.
+`@Component` 装饰器接受一个 `changeDetection` 选项，用于控制组件的**变更
+检测模式**（Change Detection mode）。变更检测模式有两种选项。
 
-**`ChangeDetectionStrategy.Eager`** is an optional mode. In this mode,
-Angular checks whether the component's DOM needs an update whenever any activity may have occurred
-application-wide. Activities that trigger this checking include user interaction, network response,
-timers, and more.
+**`ChangeDetectionStrategy.Eager`** 是一种可选模式。在这种模式下，
+只要整个应用范围内可能发生了任何活动，Angular 都会检查该组件的 DOM 是否需要更新。
+触发这种检查的活动包括用户交互、网络响应、
+定时器等。
 
-**`ChangeDetectionStrategy.OnPush`** is the default strategy (since v22). This mode reduces the amount of checking Angular
-needs to perform. In this mode, the framework only checks if a component's DOM needs an update when:
+**`ChangeDetectionStrategy.OnPush`** 是默认策略（从 v22 开始）。这种模式减少了 Angular
+需要执行的检查次数。在这种模式下，框架只会在以下情况检查组件的 DOM 是否需要更新：
 
-- A component input has changes as a result of a binding in a template, or
-- An event listener in this component runs
-- The component is explicitly marked for check, via `ChangeDetectorRef.markForCheck` or something which wraps it, like `AsyncPipe`.
-- A signal read in the component's template changes.
+- 组件的某个输入（input）因模板中的绑定（binding）而发生了变化，或者
+- 该组件中的某个事件监听器（event listener）运行了
+- 组件被显式标记为需要检查，比如通过 `ChangeDetectorRef.markForCheck` 或包装了它的东西（例如 `AsyncPipe`）。
+- 组件模板中读取的某个信号（Signal）发生了变化。
 
-In the first three cases, Angular _also_ checks all of the component's ancestor
-components, traversing upwards through the application tree. When a signal changes, Angular only
-refreshes the components whose templates read it.
+在前三种情况下，Angular **还会**检查该组件的所有祖先
+组件，沿应用树向上遍历。当信号发生变化时，Angular 只会
+刷新那些在模板中读取了该信号的组件。
 
-## PreserveWhitespaces
+## PreserveWhitespaces {#preservewhitespaces}
 
-By default, Angular removes and collapses superfluous whitespace in templates, most commonly from
-newlines and indentation. You can change this setting by explicitly setting `preserveWhitespaces` to
-`true` in a component's metadata.
+默认情况下，Angular 会移除并折叠模板（Template）中多余的空白字符，最常见的是
+换行和缩进产生的空白。你可以在组件的元数据中显式地把 `preserveWhitespaces` 设置为
+`true` 来更改这一设置。
 
-## Custom element schemas
+## 自定义元素 schema {#custom-element-schemas}
 
-By default, Angular throws an error when it encounters an unknown HTML element. You can
-disable this behavior for a component by including `CUSTOM_ELEMENTS_SCHEMA` in the `schemas`
-property in your component metadata.
+默认情况下，Angular 遇到未知的 HTML 元素时会抛出错误。你可以
+在组件元数据的 `schemas` 属性中加入 `CUSTOM_ELEMENTS_SCHEMA`，
+为组件禁用这一行为。
 
 ```ts
 import {Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
@@ -54,4 +50,4 @@ import {Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 export class ComponentWithCustomElements { }
 ```
 
-Angular also provides `NO_ERRORS_SCHEMA`, which allows any element and any property.
+Angular 还提供了 `NO_ERRORS_SCHEMA`，它允许任何元素和任何属性。

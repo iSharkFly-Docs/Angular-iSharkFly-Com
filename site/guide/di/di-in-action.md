@@ -1,22 +1,18 @@
----
-untranslated: true
----
+# 依赖注入实战 {#di-in-action}
 
-# DI in action
+本指南介绍 Angular 中依赖注入（Dependency Injection，DI）的更多功能。
 
-This guide explores additional features of dependency injection (DI) in Angular.
-
-::: info NOTE
-For comprehensive coverage of InjectionToken and custom providers, see the [defining dependency providers guide](/guide/di/defining-dependency-providers#injection-tokens).
+::: info 注意
+关于 InjectionToken 和自定义提供者（Provider）的完整介绍，请参阅[定义依赖提供者指南](/guide/di/defining-dependency-providers#injection-tokens)。
 
 :::
 
-## Inject the component's DOM element
+## 注入组件的 DOM 元素 {#inject-the-component-s-dom-element}
 
-Although developers generally avoid it, some visual effects and third-party tools require you to access the DOM directly.
-In such cases, you may need to access a component's DOM element.
+虽然开发者通常会避免这样做，但有些视觉效果和第三方工具需要你直接访问 DOM。
+这种情况下，你可能需要访问组件（Component）的 DOM 元素。
 
-Angular exposes the underlying DOM element of a `@Component` or `@Directive` through injection using the `ElementRef` token:
+Angular 通过 `ElementRef` 令牌，以注入的方式暴露 `@Component` 或 `@Directive` 底层的 DOM 元素：
 
 ```ts
 import {Directive, ElementRef, inject} from '@angular/core';
@@ -33,9 +29,9 @@ export class HighlightDirective {
 }
 ```
 
-## Inject the host element's tag name
+## 注入宿主元素的标签名 {#inject-the-host-element-s-tag-name}
 
-To get the tag name of a host element, inject it using the `HOST_TAG_NAME` token.
+要获取宿主元素（Host Element）的标签名，请使用 `HOST_TAG_NAME` 令牌注入它。
 
 ```ts
 import {Directive, HOST_TAG_NAME, inject} from '@angular/core';
@@ -49,39 +45,39 @@ export class RoleButtonDirective {
   onAction() {
     switch (this.tagName) {
       case 'button':
-        // Handle button action
+        // 处理按钮的操作
         break;
       case 'a':
-        // Handle anchor action
+        // 处理链接的操作
         break;
       default:
-        // Handle other elements
+        // 处理其他元素
         break;
     }
   }
 }
 ```
 
-::: info NOTE
-If the host element might not have a tag name (e.g., `ng-container` or `ng-template`), make the injection optional.
+::: info 注意
+如果宿主元素可能没有标签名（例如 `ng-container` 或 `ng-template`），请将这次注入设为可选的。
 
 :::
 
-## Resolve circular dependencies with a forward reference
+## 用前向引用解决循环依赖 {#resolve-circular-dependencies-with-a-forward-reference}
 
-In TypeScript, the order of class declarations matters.
-You cannot reference a class directly until you define it.
+在 TypeScript 中，类声明的顺序很重要。
+在定义一个类之前，你无法直接引用它。
 
-This isn't usually a problem, especially if you adhere to the recommended _one class per file_ rule.
-However, in some cases, circular references are unavoidable.
-For example, if class 'A' refers to class 'B' and class 'B' refers to class 'A', one of them must be defined first.
+这通常不是问题，尤其是当你遵循推荐的「_每个文件一个类_」规则时。
+但在某些情况下，循环引用无法避免。
+例如，如果类 'A' 引用了类 'B'，而类 'B' 又引用了类 'A'，那么它们之中必须有一个先被定义。
 
-The Angular `forwardRef()` function creates an _indirect_ reference that Angular can resolve later.
+Angular 的 `forwardRef()` 函数会创建一个 _间接_ 引用，Angular 可以在稍后解析它。
 
-You face a similar problem when a class makes _a reference to itself_.
-For example, in its `providers` array.
-The `providers` array is a property of the `@Component()` decorator function, which must appear before the class definition.
-Such circular references can be resolved using `forwardRef`.
+当一个类 _引用自身_ 时，你也会遇到类似的问题。
+例如在它的 `providers` 数组中。
+`providers` 数组是 `@Component()` 装饰器函数的一个属性，而装饰器必须出现在类定义之前。
+这类循环引用可以用 `forwardRef` 来解决。
 
 ```ts [app.component.ts]
 providers: [

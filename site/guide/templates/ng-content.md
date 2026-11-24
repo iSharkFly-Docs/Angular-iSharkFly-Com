@@ -1,12 +1,8 @@
----
-untranslated: true
----
+# 使用 `ng-content` 渲染来自父组件的模板 {#render-templates-from-a-parent-component-with-ng-content}
 
-# Render templates from a parent component with `ng-content`
+`<ng-content>` 是一个特殊元素，它接受标记或模板（Template）片段，并控制组件（Component）如何渲染内容。它不会渲染出真实的 DOM 元素。
 
-`<ng-content>` is a special element that accepts markup or a template fragment and controls how components render content. It does not render a real DOM element.
-
-Here is an example of a `BaseButton` component that accepts any markup from its parent.
+下面是一个 `BaseButton` 组件的示例，它接受来自父组件的任意标记。
 
 ```ts [base-button/base-button.ts]
 import {Component} from '@angular/core';
@@ -30,4 +26,4 @@ import {BaseButton} from './base-button';
 export class App {}
 ```
 
-For more detail, check out the [`<ng-content>` in-depth guide](/guide/components/content-projection) for other ways you can leverage this pattern.
+更多细节请参阅 [`<ng-content>` 深入指南](/guide/components/content-projection)，了解利用这种模式的其他方式。

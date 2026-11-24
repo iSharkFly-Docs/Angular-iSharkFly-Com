@@ -1,24 +1,20 @@
----
-untranslated: true
----
-
-# Anatomy of a component
+# 组件的结构 {#anatomy-of-a-component}
 
 
 
 
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假定你已经读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-Every component must have:
+每个组件（Component）都必须具备：
 
-- A TypeScript class with _behaviors_ such as handling user input and fetching data from a server
-- An HTML template that controls what renders into the DOM
-- A [CSS selector](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors) that defines how the component is used in HTML
+- 一个 TypeScript 类，包含诸如处理用户输入、从服务器获取数据之类的**行为**
+- 一个 HTML 模板（Template），用于控制渲染到 DOM 中的内容
+- 一个 [CSS 选择器（selector）](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors)，用于定义该组件在 HTML 中如何使用
 
-You provide Angular-specific information for a component by adding a `@Component` [decorator](https://www.typescriptlang.org/docs/handbook/decorators.html) on top of the TypeScript class:
+你可以在 TypeScript 类上方添加 `@Component` [装饰器](https://www.typescriptlang.org/docs/handbook/decorators.html)，为组件提供 Angular 专属的信息：
 
 ```ts
 @Component({
@@ -28,11 +24,11 @@ You provide Angular-specific information for a component by adding a `@Component
 export class ProfilePhoto {}
 ```
 
-For full details on writing Angular templates, including data binding, event handling, and control flow, see the [Templates guide](/guide/templates).
+关于编写 Angular 模板的完整细节（包括数据绑定、事件处理和控制流（control flow）），请参阅[模板指南](/guide/templates)。
 
-The object passed to the `@Component` decorator is called the component's **metadata**. This includes the `selector`, `template`, and other properties described throughout this guide.
+传给 `@Component` 装饰器的对象称为组件的**元数据**。它包括 `selector`、`template` 以及本指南中介绍的其他属性。
 
-Components can optionally include a list of CSS styles that apply to that component's DOM:
+组件还可以选择性地包含一组 CSS 样式，这些样式会应用到该组件的 DOM 上：
 
 ```ts
 @Component({
@@ -47,9 +43,9 @@ Components can optionally include a list of CSS styles that apply to that compon
 export class ProfilePhoto {}
 ```
 
-By default, a component's styles only affect elements defined in that component's template. See [Styling Components](/guide/components/styling) for details on Angular's approach to styling.
+默认情况下，组件的样式只会影响该组件模板中定义的元素。关于 Angular 的样式处理方式，请参阅[组件样式](/guide/components/styling)。
 
-You can alternatively choose to write your template and styles in separate files:
+你也可以选择把模板和样式写在单独的文件中：
 
 ```ts
 @Component({
@@ -60,40 +56,40 @@ You can alternatively choose to write your template and styles in separate files
 export class ProfilePhoto {}
 ```
 
-This can help separate the concerns of _presentation_ from _behavior_ in your project. You can choose one approach for your entire project, or you can decide which to use for each component.
+这有助于在项目中把**展示**和**行为**这两个关注点分离开。你可以为整个项目选定一种方式，也可以为每个组件分别决定使用哪种方式。
 
-Both `templateUrl` and `styleUrl` are relative to the directory in which the component resides.
+`templateUrl` 和 `styleUrl` 都是相对于组件所在目录的路径。
 
-## Using components
+## 使用组件 {#using-components}
 
-### Imports in the `@Component` decorator
+### `@Component` 装饰器中的导入 {#imports-in-the-component-decorator}
 
-To use a component, [directive](/guide/directives), or [pipe](/guide/templates/pipes), you must add
-it to the `imports` array in the `@Component` decorator:
+要使用组件、[指令（Directive）](/guide/directives)或[管道（Pipe）](/guide/templates/pipes)，你必须把它
+添加到 `@Component` 装饰器的 `imports` 数组中：
 
 ```ts
 import {Component} from '@angular/core';
 import {ProfilePhoto} from './profile-photo';
 
 @Component({
-  // Import the `ProfilePhoto` component in
-  // order to use it in this component's template.
+  // 导入 `ProfilePhoto` 组件，
+  // 以便在本组件的模板中使用它。
   imports: [ProfilePhoto],
   /* ... */
 })
 export class UserProfile {}
 ```
 
-By default, Angular components are _standalone_, meaning that you can directly add them to the `imports` array of other components. Components created with an earlier version of Angular may instead specify `standalone: false` in their `@Component` decorator. For these components, you instead import the `NgModule` in which the component is defined. See the full [`NgModule` guide](/guide/ngmodules/overview) for details.
+默认情况下，Angular 组件是**独立**（standalone）的，这意味着你可以直接把它们添加到其他组件的 `imports` 数组中。用早期版本的 Angular 创建的组件可能会在 `@Component` 装饰器中指定 `standalone: false`。对于这些组件，你需要改为导入定义该组件的 `NgModule`。详情请参阅完整的 [`NgModule` 指南](/guide/ngmodules/overview)。
 
-::: warning IMPORTANT
-In Angular versions before 19.0.0, the `standalone` option defaults to `false`.
+::: warning 重要
+在 19.0.0 之前的 Angular 版本中，`standalone` 选项默认为 `false`。
 
 :::
 
-### Showing components in a template
+### 在模板中显示组件 {#showing-components-in-a-template}
 
-Every component defines a [CSS selector](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors):
+每个组件都定义了一个 [CSS 选择器](https://developer.mozilla.org/docs/Learn/CSS/Building_blocks/Selectors)：
 
 ```ts
 @Component({
@@ -103,9 +99,9 @@ Every component defines a [CSS selector](https://developer.mozilla.org/docs/Lear
 export class ProfilePhoto { }
 ```
 
-See [Component Selectors](/guide/components/selectors) for details about which types of selectors Angular supports and guidance on choosing a selector.
+关于 Angular 支持哪些类型的选择器以及如何选择选择器的建议，请参阅[组件选择器](/guide/components/selectors)。
 
-You show a component by creating a matching HTML element in the template of _other_ components:
+要显示一个组件，只需在**其他**组件的模板中创建一个与之匹配的 HTML 元素：
 
 ```ts
 @Component({
@@ -120,12 +116,12 @@ export class ProfilePhoto {}
 export class UserProfile {}
 ```
 
-Angular creates an instance of the component for every matching HTML element it encounters. The DOM element that matches a component's selector is referred to as that component's **host element**. The contents of a component's template are rendered inside its host element.
+Angular 每遇到一个匹配的 HTML 元素，就会为它创建一个组件实例。与组件选择器相匹配的 DOM 元素称为该组件的**宿主元素（host element）**。组件模板的内容会渲染在其宿主元素内部。
 
-The DOM rendered by a component, corresponding to that component's template, is called that
-component's **view**.
+组件所渲染的 DOM（与该组件的模板相对应）称为该
+组件的**视图**。
 
-In composing components in this way, **you can think of your Angular application as a tree of components**.
+通过这种方式组合组件，**你可以把 Angular 应用看作一棵组件树**。
 
 ```txt
 flowchart TD
@@ -138,4 +134,4 @@ flowchart TD
     E[UserBio]
 ```
 
-This tree structure is important to understanding several other Angular concepts, including [dependency injection](/guide/di) and [child queries](/guide/components/queries).
+这种树形结构对于理解 Angular 的其他几个概念非常重要，包括[依赖注入（Dependency Injection）](/guide/di)和[子级查询（Query）](/guide/components/queries)。

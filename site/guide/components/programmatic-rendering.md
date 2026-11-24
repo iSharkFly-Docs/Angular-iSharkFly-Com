@@ -1,33 +1,29 @@
----
-untranslated: true
----
+# 以编程方式渲染组件 {#programmatically-rendering-components}
 
-# Programmatically rendering components
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假设你已经阅读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-In addition to using a component directly in a template, you can also dynamically render components
-programmatically. This is helpful for situations when a component is unknown initially (thus can not
-be referenced in a template directly) and it depends on some conditions.
+除了在模板（Template）中直接使用组件（Component）之外，你还可以通过编程方式动态渲染组件。
+当一开始并不知道要用哪个组件（因此无法
+在模板中直接引用它），而是取决于某些条件时，这种方式很有用。
 
-There are two main ways to render a component programmatically: in a template using `NgComponentOutlet`,
-or in your TypeScript code using `ViewContainerRef`.
+以编程方式渲染组件主要有两种方法：在模板中使用 `NgComponentOutlet`，
+或者在 TypeScript 代码中使用 `ViewContainerRef`。
 
-::: tip HELPFUL
-for lazy-loading use-cases (for example if you want to delay loading of a heavy component), consider
-using the built-in [`@defer` feature](/guide/templates/defer) instead. The `@defer` feature allows the code
-of any components, directives, and pipes inside the `@defer` block to be extracted into separate JavaScript
-chunks automatically and loaded only when necessary, based on the configured triggers.
+::: tip 提示
+对于延迟加载（Lazy Loading）的用例（例如你想推迟加载一个体积较大的组件），请考虑
+改用内置的 [`@defer` 特性](/guide/templates/defer)。`@defer` 特性可以把
+`@defer` 块中所有组件、指令（Directive）和管道（Pipe）的代码自动提取到单独的 JavaScript
+代码块中，并根据配置的触发器（trigger）仅在需要时加载。
 
 :::
 
-## Using NgComponentOutlet
+## 使用 NgComponentOutlet {#using-ngcomponentoutlet}
 
-`NgComponentOutlet` is a structural directive that dynamically renders a given component in a
-template.
+`NgComponentOutlet` 是一个结构型指令（Structural Directive），它可以在模板中动态渲染
+指定的组件。
 
 ```ts
 import {NgComponentOutlet} from '@angular/common';
@@ -59,9 +55,9 @@ export class CustomDialog {
 }
 ```
 
-### Passing inputs to dynamically rendered components
+### 向动态渲染的组件传递输入 {#passing-inputs-to-dynamically-rendered-components}
 
-You can pass inputs to the dynamically rendered component using the `ngComponentOutletInputs` property. This property accepts an object where keys are input names and values are the input values.
+你可以使用 `ngComponentOutletInputs` 属性向动态渲染的组件传递输入（Input）。该属性接受一个对象，其键为输入名，值为输入的值。
 
 ```ts
 @Component({
@@ -89,11 +85,11 @@ export class ProfileView {
 }
 ```
 
-The inputs are updated whenever the `greetingInputs` signal changes, keeping the dynamic component in sync with the parent's state.
+每当 `greetingInputs` 信号（Signal）发生变化时，这些输入都会随之更新，从而让动态组件与父组件的状态保持同步。
 
-### Providing content projection
+### 提供内容投影 {#providing-content-projection}
 
-Use `ngComponentOutletContent` to pass projected content to the dynamically rendered component. This is useful when the dynamic component uses `<ng-content>` to display content.
+使用 `ngComponentOutletContent` 向动态渲染的组件传递要投影的内容。当动态组件使用 `<ng-content>` 来显示内容时，这会很有用。
 
 ```ts
 @Component({
@@ -126,21 +122,21 @@ export class DynamicCard {
   cardContent = computed(() => {
     const template = this.contentTemplate();
     if (!template) return [];
-    // Returns an array of projection slots. Each element represents one <ng-content> slot.
-    // CardWrapper has one <ng-content>, so we return an array with one element.
+    // 返回一个投影槽数组，每个元素代表一个 <ng-content> 槽。
+    // CardWrapper 只有一个 <ng-content>，所以我们返回只含一个元素的数组。
     return [this.vcr.createEmbeddedView(template).rootNodes];
   });
 }
 ```
 
-::: info NOTE
-Hydration does not support projecting DOM nodes created with native DOM APIs. This causes an [NG0503 error](/errors/NG0503). Use Angular APIs to create projected content or add `ngSkipHydration` to the component.
+::: info 注意
+水合（Hydration）不支持投影通过原生 DOM API 创建的 DOM 节点，这会导致 [NG0503 错误](/errors/NG0503)。请使用 Angular API 创建要投影的内容，或者为该组件添加 `ngSkipHydration`。
 
 :::
 
-### Providing injectors
+### 提供注入器 {#providing-injectors}
 
-You can provide a custom injector to the dynamically created component using `ngComponentOutletInjector`. This is useful for providing component-specific services or configuration.
+你可以使用 `ngComponentOutletInjector` 为动态创建的组件提供自定义注入器（Injector）。这可用于提供组件专属的服务（Service）或配置。
 
 ```ts
 export const THEME_DATA = new InjectionToken<string>('THEME_DATA', {
@@ -169,9 +165,9 @@ export class DynamicPanel {
 }
 ```
 
-### Accessing the component instance
+### 访问组件实例 {#accessing-the-component-instance}
 
-You can access the dynamically created component's instance using the directive's `exportAs` feature:
+你可以借助该指令的 `exportAs` 特性访问动态创建的组件实例：
 
 ```ts
 @Component({
@@ -198,23 +194,23 @@ export class CounterHost {
 }
 ```
 
-::: info NOTE
-The `componentInstance` property is `null` before the component is rendered.
+::: info 注意
+在组件渲染之前，`componentInstance` 属性的值为 `null`。
 
 :::
 
-See the [NgComponentOutlet API reference](https://angular.dev/api/common/NgComponentOutlet) for more information on the
-directive's capabilities.
+请参阅 [NgComponentOutlet API 参考](https://angular.dev/api/common/NgComponentOutlet)，了解
+该指令功能的更多信息。
 
-## Using ViewContainerRef
+## 使用 ViewContainerRef {#using-viewcontainerref}
 
-A **view container** is a node in Angular's component tree that can contain content. Any component
-or directive can inject `ViewContainerRef` to get a reference to a view container corresponding to
-that component or directive's location in the DOM.
+**视图容器**是 Angular 组件树中可以包含内容的节点。任何组件
+或指令都可以注入 `ViewContainerRef`，以获取与该组件或指令在 DOM 中的位置
+相对应的视图容器的引用。
 
-You can use the `createComponent`method on `ViewContainerRef` to dynamically create and render a
-component. When you create a new component with a `ViewContainerRef`, Angular appends it into the
-DOM as the next sibling of the component or directive that injected the `ViewContainerRef`.
+你可以使用 `ViewContainerRef` 上的 `createComponent` 方法来动态创建并渲染
+组件。当你用 `ViewContainerRef` 创建新组件时，Angular 会把它追加到
+DOM 中，作为注入了该 `ViewContainerRef` 的组件或指令的下一个兄弟节点。
 
 ```ts
 @Component({
@@ -246,7 +242,7 @@ export class InnerItem {
 }
 ```
 
-In the example above, clicking the "Load content" button results in the following DOM structure
+在上面的例子中，点击“Load content”按钮会得到如下 DOM 结构：
 
 ```html
 <outer-container>
@@ -259,16 +255,16 @@ In the example above, clicking the "Load content" button results in the followin
 </outer-container>
 ```
 
-## Lazy-loading components
+## 延迟加载组件 {#lazy-loading-components}
 
-::: tip HELPFUL
-if you want to lazy-load some components, you may consider using the built-in [`@defer` feature](/guide/templates/defer)
-instead.
+::: tip 提示
+如果你想延迟加载某些组件，可以考虑改用内置的
+[`@defer` 特性](/guide/templates/defer)。
 
 :::
 
-If your use-case is not covered by the `@defer` feature, you can use either `NgComponentOutlet` or
-`ViewContainerRef` with a standard JavaScript [dynamic import](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import).
+如果你的用例无法用 `@defer` 特性实现，你可以将 `NgComponentOutlet` 或
+`ViewContainerRef` 与标准的 JavaScript [动态导入](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import)结合使用。
 
 ```ts
 @Component({
@@ -299,19 +295,19 @@ export class AdminSettings {
 }
 ```
 
-The example above loads and displays the `AdvancedSettings` upon receiving a button click.
+上面的例子会在收到按钮点击后加载并显示 `AdvancedSettings`。
 
-## Binding inputs, outputs and setting host directives at creation
+## 在创建时绑定输入、输出并设置宿主指令 {#binding-inputs-outputs-and-setting-host-directives-at-creation}
 
-When dynamically creating components, manually setting inputs and subscribing to outputs can be error-prone. You often need to write extra code just to wire up bindings after the component is instantiated.
+在动态创建组件时，手动设置输入和订阅输出很容易出错。你常常需要编写额外的代码，仅仅是为了在组件实例化之后把绑定（Binding）连接起来。
 
-To simplify this, both `createComponent` and `ViewContainerRef.createComponent` support passing a `bindings` array with helpers like `inputBinding()`, `outputBinding()`, and `twoWayBinding()` to configure inputs and outputs up front. You can also specify a `directives` array to apply any host directives. This enables creating components programmatically with template-like bindings in a single, declarative call.
+为了简化这一过程，`createComponent` 和 `ViewContainerRef.createComponent` 都支持传入一个 `bindings` 数组，并借助 `inputBinding()`、`outputBinding()` 和 `twoWayBinding()` 等辅助函数预先配置输入和输出（Output）。你还可以指定一个 `directives` 数组来应用任意宿主指令（Host Directive）。这样，你就可以在一次声明式调用中，以类似模板绑定的方式以编程方式创建组件。
 
-### Host view using `ViewContainerRef.createComponent`
+### 使用 `ViewContainerRef.createComponent` 创建宿主视图 {#host-view-using-viewcontainerref-createcomponent}
 
-`ViewContainerRef.createComponent` creates a component and automatically inserts its host view and host element into the container’s view hierarchy at the container’s location. Use this when the dynamic component should become part of the container’s logical and visual structure (for example, adding list items or inline UI).
+`ViewContainerRef.createComponent` 会创建一个组件，并自动把它的宿主视图和宿主元素（Host Element）插入到容器的视图层次结构中容器所在的位置。当动态组件应当成为容器逻辑结构和视觉结构的一部分时（例如添加列表项或内联 UI），请使用这种方式。
 
-By contrast, the standalone `createComponent` API does not attach the new component to any existing view or DOM location — it returns a `ComponentRef` and gives you explicit control over where to place the component’s host element.
+相比之下，独立（Standalone）的 `createComponent` API 不会把新组件附加到任何现有的视图或 DOM 位置上——它会返回一个 `ComponentRef`，让你可以明确控制把组件的宿主元素放在哪里。
 
 ```ts
 import {Component, input, model, output} from '@angular/core';
@@ -373,11 +369,11 @@ export class Host {
 }
 ```
 
-In the example above, the dynamic **AppWarning** is created with its `canClose` input bound to a reactive signal, a two-way binding on its `isExpanded` state, and an output listener for `close`. The `FocusTrap` and `ThemeDirective` are attached to the host element via `directives`.
+在上面的例子中，动态创建的 **AppWarning** 组件的 `canClose` 输入绑定到了一个响应式信号，其 `isExpanded` 状态使用了双向绑定（Two-way Binding），并为 `close` 添加了输出监听器。`FocusTrap` 和 `ThemeDirective` 则通过 `directives` 附加到了宿主元素上。
 
-### Popup attached to `document.body` with `createComponent` + `hostElement`
+### 使用 `createComponent` + `hostElement` 将弹出框附加到 `document.body` {#popup-attached-to-document-body-with-createcomponent-hostelement}
 
-Use this when rendering outside the current view hierarchy (e.g., overlays). The provided `hostElement` becomes the component’s host in the DOM, so Angular doesn’t create a new element matching the selector. Lets you configure **bindings** directly.
+当需要在当前视图层次结构之外渲染时（例如浮层），请使用这种方式。所提供的 `hostElement` 会成为该组件在 DOM 中的宿主，因此 Angular 不会再创建一个与选择器（Selector）匹配的新元素。你可以直接配置**绑定**。
 
 ```ts
 import {
@@ -398,10 +394,10 @@ export class PopupService {
   private readonly appRef = inject(ApplicationRef);
 
   show(message: string) {
-    // Create a host element for the popup
+    // 为弹出框创建一个宿主元素
     const host = document.createElement('popup-host');
 
-    // Create the component and bind in one call
+    // 在一次调用中创建组件并完成绑定
     const ref = createComponent(Popup, {
       environmentInjector: this.injector,
       hostElement: host,
@@ -415,34 +411,34 @@ export class PopupService {
       ],
     });
 
-    // Registers the component’s view so it participates in change detection cycle.
+    // 注册组件的视图，使其参与变更检测周期。
     this.appRef.attachView(ref.hostView);
-    // Inserts the provided host element into the DOM (outside the normal Angular view hierarchy).
-    // This is what makes the popup visible on screen, typically used for overlays or modals.
+    // 把提供的宿主元素插入到 DOM 中（位于常规的 Angular 视图层次结构之外）。
+    // 正是这一步让弹出框显示在屏幕上，通常用于浮层或模态框。
     document.body.appendChild(host);
   }
 }
 ```
 
-## Handling rendering errors
+## 处理渲染错误 {#handling-rendering-errors}
 
-::: warning IMPORTANT
-The `onError` option and its `ErrorDetails` parameter are in [developer preview](/reference/releases#developer-preview).
+::: warning 重要
+`onError` 选项及其 `ErrorDetails` 参数目前处于[开发者预览](/reference/releases#developer-preview)阶段。
 
 :::
 
-When dynamically creating components using `ViewContainerRef.createComponent` or the standalone `createComponent` function, you can provide an `onError` callback in the options object to handle errors that occur during the rendering or change detection phases. This is the programmatic equivalent of using an `@error` block in templates.
+使用 `ViewContainerRef.createComponent` 或独立的 `createComponent` 函数动态创建组件时，你可以在选项对象中提供一个 `onError` 回调，用于处理在渲染或变更检测（Change Detection）阶段发生的错误。这相当于在模板中使用 `@error` 块的编程式写法。
 
 ```ts
 viewContainerRef.createComponent(DynamicComponent, {
   onError: (err: Error, details: ErrorDetails) => {
     console.error('Component rendering failed:', err);
-    // Render an alternative UI or log metrics
+    // 渲染替代 UI 或记录指标
   },
 });
 ```
 
-::: info NOTE
-The `onError` callback only catches errors that occur during the rendering or change detection phases. It does not catch errors that occur during component instantiation (for example, in the constructor). Angular throws construction errors synchronously when you call the API.
+::: info 注意
+`onError` 回调只会捕获在渲染或变更检测阶段发生的错误，不会捕获组件实例化期间（例如在构造函数中）发生的错误。调用该 API 时，Angular 会同步抛出构造阶段的错误。
 
 :::

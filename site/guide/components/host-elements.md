@@ -1,20 +1,16 @@
----
-untranslated: true
----
+# 组件宿主元素 {#component-host-elements}
 
-# Component host elements
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假设你已经阅读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-Angular creates an instance of a component for every HTML element that matches the component's
-selector. The DOM element that matches a component's selector is that component's **host element**.
-The contents of a component's template are rendered inside its host element.
+对于每个与组件（Component）选择器（Selector）相匹配的 HTML 元素，Angular 都会创建该组件的一个实例。
+与组件选择器相匹配的那个 DOM 元素，就是该组件的**宿主元素（Host Element）**。
+组件模板（Template）的内容会渲染在其宿主元素内部。
 
 ```ts
-// Component source
+// 组件源码
 @Component({
   selector: 'profile-photo',
   template: `<img src="profile-photo.jpg" alt="Your profile photo" />`,
@@ -23,14 +19,14 @@ export class ProfilePhoto {}
 ```
 
 ```html
-<!-- Using the component -->
+<!-- 使用该组件 -->
 <h3>Your profile photo</h3>
 <profile-photo />
 <button>Upload a new profile photo</button>
 ```
 
 ```html
-<!-- Rendered DOM -->
+<!-- 渲染出的 DOM -->
 <h3>Your profile photo</h3>
 <profile-photo>
   <img src="profile-photo.jpg" alt="Your profile photo" />
@@ -38,13 +34,13 @@ export class ProfilePhoto {}
 <button>Upload a new profile photo</button>
 ```
 
-In the above example, `<profile-photo>` is the host element of the `ProfilePhoto` component.
+在上面的例子中，`<profile-photo>` 就是 `ProfilePhoto` 组件的宿主元素。
 
-## Binding to the host element
+## 绑定到宿主元素 {#binding-to-the-host-element}
 
-A component can bind properties, attributes, styles and events to its host element. This behaves
-identically to bindings on elements inside the component's template, but instead defined with
-the `host` property in the `@Component` decorator:
+组件可以把 DOM 属性、HTML 属性、样式和事件绑定到自己的宿主元素上。其行为与
+组件模板内元素上的绑定（Binding）完全相同，只不过是通过
+`@Component` 装饰器中的 `host` 属性来定义的：
 
 ```ts
 @Component({
@@ -69,25 +65,25 @@ export class CustomSlider {
 }
 ```
 
-::: info NOTE
-The global target names that can be used to prefix an event name are `document:`, `window:` and `body:`.
+::: info 注意
+可用作事件名前缀的全局目标名有 `document:`、`window:` 和 `body:`。
 
 :::
 
-::: info NOTE
-Key names like `'(keydown.enter)'` are matched against `KeyboardEvent.key`, which depends on
-the user's keyboard layout and input language. To match a physical key regardless of layout, use
-the `code` modifier instead, e.g. `'(keydown.code.Enter)'`. See
-[Using key modifiers](/guide/templates/event-listeners#using-key-modifiers) for details.
+::: info 注意
+像 `'(keydown.enter)'` 这样的按键名是与 `KeyboardEvent.key` 进行匹配的，而后者取决于
+用户的键盘布局和输入语言。要在任何布局下都匹配同一个物理按键，请改用
+`code` 修饰符，例如 `'(keydown.code.Enter)'`。详情请参阅
+[使用按键修饰符](/guide/templates/event-listeners#using-key-modifiers)。
 
 :::
 
-## The `@HostBinding` and `@HostListener` decorators
+## `@HostBinding` 和 `@HostListener` 装饰器 {#the-hostbinding-and-hostlistener-decorators}
 
-You can alternatively bind to the host element by applying the `@HostBinding` and `@HostListener`
-decorator to class members.
+你也可以把 `@HostBinding` 和 `@HostListener` 装饰器应用到类成员上，
+以此绑定到宿主元素。
 
-`@HostBinding` lets you bind host properties and attributes to properties and getters:
+`@HostBinding` 让你可以把宿主的 DOM 属性和 HTML 属性绑定到类的属性和 getter 上：
 
 ```ts
 @Component({/* ... */})
@@ -104,8 +100,8 @@ export class CustomSlider {
 }
 ```
 
-`@HostListener` lets you bind event listeners to the host element. The decorator accepts an event
-name and an optional array of arguments:
+`@HostListener` 让你可以把事件监听器（Event Listener）绑定到宿主元素上。该装饰器接受一个事件
+名称和一个可选的参数数组：
 
 ```ts
 export class CustomSlider {
@@ -116,41 +112,41 @@ export class CustomSlider {
 }
 ```
 
-::: danger Prefer using the `host` property over the decorators
-  **Always prefer using the `host` property over `@HostBinding` and `@HostListener`.** These
-decorators exist exclusively for backwards compatibility.
+::: danger 优先使用 `host` 属性，而不是这些装饰器
+  **始终优先使用 `host` 属性，而不是 `@HostBinding` 和 `@HostListener`。** 这些
+装饰器的存在仅仅是为了向后兼容。
 :::
 
-## Binding collisions
+## 绑定冲突 {#binding-collisions}
 
-When using a component in a template, you can apply bindings to that component's element. The component (or directives applied to it) may also define host bindings for the same properties, attributes, classes, or styles.
+在模板中使用组件时，你可以为该组件的元素应用绑定。而组件（或应用在它上面的指令（Directive））也可能为相同的 DOM 属性、HTML 属性、CSS 类或样式定义宿主绑定（Host Binding）。
 
-How Angular handles these collisions depends on the type of binding:
+Angular 如何处理这些冲突取决于绑定的类型：
 
-### Class and style bindings
+### 类绑定和样式绑定 {#class-and-style-bindings}
 
-Class and style bindings have a defined precedence order. Bindings defined in the template take priority over host bindings defined on directives or components:
+类绑定和样式绑定有明确的优先级顺序。模板中定义的绑定优先于指令或组件上定义的宿主绑定：
 
-1. **Template bindings** (e.g., `[class.active]` or `[style.color]`)
-2. **Static template values** (e.g., `class="..."` or `style="..."` in the template)
-3. **Directive host bindings**
-4. **Component host bindings**
-5. **Static host values** (e.g., `host: {class: '...'}`)
+1. **模板绑定**（例如 `[class.active]` 或 `[style.color]`）
+2. **模板中的静态值**（例如模板中的 `class="..."` 或 `style="..."`）
+3. **指令的宿主绑定**
+4. **组件的宿主绑定**
+5. **宿主上的静态值**（例如 `host: {class: '...'}`）
 
-If a binding's value is `undefined`, Angular falls back to the next level. A `null` value removes the class or style without falling back.
+如果某个绑定的值为 `undefined`，Angular 会回退到下一个级别。值为 `null` 则会移除该类或样式，而不会回退。
 
-### Property and attribute collisions
+### DOM 属性和 HTML 属性冲突 {#property-and-attribute-collisions}
 
-For non-styling properties and attributes (such as `id`, `role`, or `[attr.aria-*]`):
+对于非样式类的 DOM 属性和 HTML 属性（例如 `id`、`role` 或 `[attr.aria-*]`）：
 
-- **Static attributes:** If both the template and the component declare a static attribute (e.g., `<my-cmp id="parent">` and `host: {id: 'child'}`), the attribute set in the template wins.
-- **Static and dynamic:** If one value is static and the other is dynamic, the dynamic value wins.
-- **Dynamic bindings:** Avoid binding to the same DOM property or attribute both in the template and via host bindings. Angular does not reconcile duplicate property bindings; overlapping dynamic bindings can lead to unexpected overwrites based on change detection execution order.
+- **静态属性：** 如果模板和组件都声明了同一个静态属性（例如 `<my-cmp id="parent">` 和 `host: {id: 'child'}`），则模板中设置的属性胜出。
+- **静态与动态：** 如果一个值是静态的、另一个是动态的，则动态值胜出。
+- **动态绑定：** 避免同时在模板中和通过宿主绑定绑定到同一个 DOM 属性或 HTML 属性。Angular 不会协调重复的属性绑定（Property Binding）；重叠的动态绑定可能会根据变更检测（Change Detection）的执行顺序导致意外的覆盖。
 
-## Styling with CSS custom properties
+## 使用 CSS 自定义属性设置样式 {#styling-with-css-custom-properties}
 
-Developers often rely on [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_CSS_custom_properties) to enable a flexible configuration of their component's styles.
-You can set such custom properties on a host element with a [style binding](/guide/templates/binding#css-style-properties).
+开发者经常借助 [CSS 自定义属性](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_CSS_custom_properties)来灵活配置组件的样式。
+你可以通过[样式绑定](/guide/templates/binding#css-style-properties)在宿主元素上设置这类自定义属性。
 
 ```ts
 @Component({
@@ -164,11 +160,11 @@ export class MyComponent {
 }
 ```
 
-In this example, the `--my-background` CSS custom property is bound to the `color` signal. The value of the custom property will automatically update whenever the `color` signal changes. This will affect the current component and all its children that rely on this custom property.
+在这个例子中，CSS 自定义属性 `--my-background` 绑定到了 `color` 信号（Signal）。每当 `color` 信号变化时，该自定义属性的值都会自动更新。这会影响当前组件及其所有依赖该自定义属性的子组件。
 
-### Setting custom properties on children components
+### 在子组件上设置自定义属性 {#setting-custom-properties-on-children-components}
 
-Alternatively, it is also possible to set css custom properties on the host element of children components with a [style binding](/guide/templates/binding#css-style-properties).
+另外，你也可以通过[样式绑定](/guide/templates/binding#css-style-properties)在子组件的宿主元素上设置 CSS 自定义属性。
 
 ```ts
 @Component({
@@ -180,9 +176,9 @@ export class MyComponent {
 }
 ```
 
-## Injecting host element attributes
+## 注入宿主元素的属性 {#injecting-host-element-attributes}
 
-Components and directives can read static attributes from their host element by using `HostAttributeToken` together with the [`inject`](https://angular.dev/api/core/inject) function.
+组件和指令可以将 `HostAttributeToken` 与 [`inject`](https://angular.dev/api/core/inject) 函数配合使用，从宿主元素上读取静态属性。
 
 ```ts
 import { Component, HostAttributeToken, inject } from '@angular/core';
@@ -200,7 +196,7 @@ export class Button {
 <app-button variation="primary">Click me</app-button>
 ```
 
-::: tip HELPFUL
-`HostAttributeToken` throws an error if the attribute is missing, unless the injection is marked as optional.
+::: tip 提示
+如果该属性不存在，`HostAttributeToken` 会抛出错误，除非将这次注入标记为可选。
 
 :::

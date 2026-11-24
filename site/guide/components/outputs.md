@@ -1,15 +1,11 @@
----
-untranslated: true
----
+# 使用输出自定义事件 {#custom-events-with-outputs}
 
-# Custom events with outputs
-
-::: tip TIP
-This guide assumes you've already read the [Essentials Guide](/essentials). Read that first if you're new to Angular.
+::: tip 提示
+本指南假定你已经读过[基础指南](/essentials)。如果你刚接触 Angular，请先阅读它。
 
 :::
 
-Angular components can define custom events by assigning a property to the `output` function:
+Angular 组件（Component）可以把某个属性赋值为 `output` 函数的返回值，以此定义自定义事件：
 
 ```ts
 @Component({
@@ -24,44 +20,44 @@ export class ExpandablePanel {
 <expandable-panel (panelClosed)="savePanelState()" />
 ```
 
-The `output` function returns an `OutputEmitterRef`. You can emit an event by calling the `emit` method on the `OutputEmitterRef`:
+`output` 函数返回一个 `OutputEmitterRef`。你可以调用 `OutputEmitterRef` 上的 `emit` 方法来发出事件：
 
 ```ts
 this.panelClosed.emit();
 ```
 
-Angular refers to properties initialized with the `output` function as **outputs**. You can use outputs to raise custom events, similar to native browser events like `click`.
+Angular 把用 `output` 函数初始化的属性称为**输出**（output）。你可以使用输出来触发自定义事件，就像 `click` 这样的原生浏览器事件一样。
 
-**Angular custom events do not bubble up the DOM**.
+**Angular 自定义事件不会在 DOM 中冒泡**。
 
-**Output names are case-sensitive.**
+**输出名称区分大小写。**
 
-When extending a component class, **outputs are inherited by the child class.**
+扩展组件类时，**输出会被子类继承。**
 
-The `output` function has special meaning to the Angular compiler. **You can exclusively call `output` in component and directive property initializers.**
+`output` 函数对 Angular 编译器有特殊意义。**你只能在组件和指令（Directive）的属性初始化器中调用 `output`。**
 
-## Emitting event data
+## 发出事件数据 {#emitting-event-data}
 
-You can pass event data when calling `emit`:
+调用 `emit` 时，你可以传递事件数据：
 
 ```ts
-// You can emit primitive values.
+// 你可以发出原始类型的值。
 this.valueChanged.emit(7);
 
-// You can emit custom event objects
+// 你可以发出自定义的事件对象
 this.thumbDropped.emit({
   pointerX: 123,
   pointerY: 456,
 });
 ```
 
-When defining an event listener in a template, you can access the event data from the `$event` variable:
+在模板（Template）中定义事件监听器（event listener）时，你可以通过 `$event` 变量访问事件数据：
 
 ```html
 <custom-slider (valueChanged)="logValue($event)" />
 ```
 
-Receive the event data in the parent component:
+在父组件中接收事件数据：
 
 ```ts
 @Component({
@@ -75,9 +71,9 @@ export class App {
 
 ```
 
-## Customizing output names
+## 自定义输出名称 {#customizing-output-names}
 
-The `output` function accepts a parameter that lets you specify a different name for the event in a template:
+`output` 函数接受一个参数，让你可以为事件在模板中指定一个不同的名称：
 
 ```ts
 @Component(/* ... */)
@@ -90,14 +86,14 @@ export class CustomSlider {
 <custom-slider (valueChanged)="saveVolume()" />
 ```
 
-This alias does not affect usage of the property in TypeScript code.
+这个别名不会影响在 TypeScript 代码中对该属性的使用。
 
-While you should generally avoid aliasing outputs for components, this feature can be useful for renaming properties while preserving an alias for the original name or for avoiding collisions with the name of native DOM events.
+虽然一般应避免为组件的输出设置别名，但在重命名属性时，这个特性可以为原名称保留一个别名；它也可以用来避免与原生 DOM 事件的名称发生冲突。
 
-## Subscribing to outputs programmatically
+## 以编程方式订阅输出 {#subscribing-to-outputs-programmatically}
 
-When creating a component dynamically, you can programmatically subscribe to output events
-from the component instance. The `OutputRef` type includes a `subscribe` method:
+动态创建组件时，你可以以编程方式订阅组件实例上的
+输出事件。`OutputRef` 类型包含一个 `subscribe` 方法：
 
 ```ts
 const someComponentRef: ComponentRef<SomeComponent> = viewContainerRef.createComponent(/*...*/);
@@ -107,7 +103,7 @@ someComponentRef.instance.someEventProperty.subscribe((eventData) => {
 });
 ```
 
-Angular automatically cleans up event subscriptions when it destroys components with subscribers. Alternatively, you can manually unsubscribe from an event. The `subscribe` function returns an `OutputRefSubscription` with an `unsubscribe` method:
+当 Angular 销毁带有订阅者的组件时，会自动清理事件订阅。你也可以手动取消对事件的订阅。`subscribe` 函数返回一个带有 `unsubscribe` 方法的 `OutputRefSubscription`：
 
 ```ts
 const eventSubscription = someComponent.someEventProperty.subscribe((eventData) => {
@@ -119,27 +115,27 @@ const eventSubscription = someComponent.someEventProperty.subscribe((eventData) 
 eventSubscription.unsubscribe();
 ```
 
-## Choosing event names
+## 选择事件名称 {#choosing-event-names}
 
-Avoid choosing output names that collide with events on DOM elements like HTMLElement. Name collisions introduce confusion about whether the bound property belongs to the component or the DOM element.
+避免选择与 DOM 元素（如 HTMLElement）上的事件相冲突的输出名称。名称冲突会让人搞不清所绑定的属性到底属于组件还是 DOM 元素。
 
-Avoid adding prefixes for component outputs like you would with component selectors. Since a given element can only host one component, any custom properties can be assumed to belong to the component.
+避免像给组件选择器（selector）加前缀那样给组件输出加前缀。由于一个元素只能承载一个组件，任何自定义属性都可以认为属于该组件。
 
-Always use [camelCase](https://en.wikipedia.org/wiki/Camel_case) output names. Avoid prefixing output names with "on".
+输出名称始终使用 [camelCase](https://en.wikipedia.org/wiki/Camel_case)（小驼峰）形式。避免给输出名称加“on”前缀。
 
-## Using outputs with RxJS
+## 与 RxJS 一起使用输出 {#using-outputs-with-rxjs}
 
-See [RxJS interop with component and directive outputs](/ecosystem/rxjs-interop/output-interop) for details on interoperability between outputs and RxJS.
+关于输出与 RxJS 之间的互操作，请参阅[RxJS 与组件和指令输出的互操作](/ecosystem/rxjs-interop/output-interop)。
 
-## Declaring outputs with the `@Output` decorator
+## 使用 `@Output` 装饰器声明输出 {#declaring-outputs-with-the-output-decorator}
 
-::: tip TIP
-While the Angular team recommends using the `output` function for new projects, the
-original decorator-based `@Output` API remains fully supported.
+::: tip 提示
+虽然 Angular 团队建议新项目使用 `output` 函数，但原有的
+基于装饰器的 `@Output` API 仍然受到完全支持。
 
 :::
 
-You can alternatively define custom events by assigning a property to a new `EventEmitter` and adding the `@Output` decorator:
+你也可以把某个属性赋值为一个新的 `EventEmitter`，并添加 `@Output` 装饰器，以此定义自定义事件：
 
 ```ts
 @Component(/* ... */)
@@ -148,11 +144,11 @@ export class ExpandablePanel {
 }
 ```
 
-You can emit an event by calling the `emit` method on the `EventEmitter`.
+你可以调用 `EventEmitter` 上的 `emit` 方法来发出事件。
 
-### Aliases with the `@Output` decorator
+### 使用 `@Output` 装饰器设置别名 {#aliases-with-the-output-decorator}
 
-The `@Output` decorator accepts a parameter that lets you specify a different name for the event in a template:
+`@Output` 装饰器接受一个参数，让你可以为事件在模板中指定一个不同的名称：
 
 ```ts
 @Component(/* ... */)
@@ -165,14 +161,14 @@ export class CustomSlider {
 <custom-slider (valueChanged)="saveVolume()" />
 ```
 
-This alias does not affect usage of the property in TypeScript code.
+这个别名不会影响在 TypeScript 代码中对该属性的使用。
 
-## Specify outputs in the `@Component` decorator
+## 在 `@Component` 装饰器中指定输出 {#specify-outputs-in-the-component-decorator}
 
-In addition to the `@Output` decorator, you can also specify a component's outputs with the `outputs` property in the `@Component` decorator. This can be useful when a component inherits a property from a base class:
+除了 `@Output` 装饰器之外，你还可以使用 `@Component` 装饰器中的 `outputs` 属性来指定组件的输出。当组件从基类继承某个属性时，这会很有用：
 
 ```ts
-// `CustomSlider` inherits the `valueChanged` property from `BaseSlider`.
+// `CustomSlider` 从 `BaseSlider` 继承了 `valueChanged` 属性。
 @Component({
   /*...*/
   outputs: ['valueChanged'],
@@ -180,10 +176,10 @@ In addition to the `@Output` decorator, you can also specify a component's outpu
 export class CustomSlider extends BaseSlider {}
 ```
 
-You can additionally specify an output alias in the `outputs` list by putting the alias after a colon in the string:
+你还可以在 `outputs` 列表中指定输出别名，方法是在字符串中把别名放在冒号之后：
 
 ```ts
-// `CustomSlider` inherits the `valueChanged` property from `BaseSlider`.
+// `CustomSlider` 从 `BaseSlider` 继承了 `valueChanged` 属性。
 @Component({
   /*...*/
   outputs: ['valueChanged: volumeChanged'],

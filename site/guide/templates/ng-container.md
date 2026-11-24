@@ -1,13 +1,9 @@
----
-untranslated: true
----
+# 使用 ng-container 对元素分组 {#grouping-elements-with-ng-container}
 
-# Grouping elements with ng-container
-
-`<ng-container>` is a special element in Angular that groups multiple elements together or marks a location in a template without rendering a real element in the DOM.
+`<ng-container>` 是 Angular 中的一个特殊元素，它可以把多个元素组合在一起，或者在模板（Template）中标记一个位置，而不会在 DOM 中渲染出真实的元素。
 
 ```html
-<!-- Component template -->
+<!-- 组件模板 -->
 <section>
   <ng-container>
     <h3>User bio</h3>
@@ -17,24 +13,24 @@ untranslated: true
 ```
 
 ```html
-<!-- Rendered DOM -->
+<!-- 渲染后的 DOM -->
 <section>
   <h3>User bio</h3>
   <p>Here's some info about the user</p>
 </section>
 ```
 
-You can apply directives to `<ng-container>` to add behaviors or configuration to a part of your template.
+你可以给 `<ng-container>` 应用指令（Directive），为模板的某一部分添加行为或配置。
 
-Angular ignores class bindings, style bindings, DOM event listeners, and static attributes applied to `<ng-container>`, including those applied via directive. Attribute bindings cause errors, and property bindings only work for directive inputs.
+Angular 会忽略应用在 `<ng-container>` 上的类绑定、样式绑定、DOM 事件监听器和静态属性，包括通过指令应用的那些。Attribute 绑定会导致错误，而属性绑定（Property Binding）只对指令的输入（Input）有效。
 
-## Using `<ng-container>` to display dynamic contents
+## 使用 `<ng-container>` 显示动态内容 {#using-to-display-dynamic-contents}
 
-`<ng-container>` can act as a placeholder for rendering dynamic content.
+`<ng-container>` 可以充当渲染动态内容的占位符。
 
-### Rendering components
+### 渲染组件 {#rendering-components}
 
-You can use Angular's built-in `NgComponentOutlet` directive to dynamically render a component to the location of the `<ng-container>`.
+你可以使用 Angular 内置的 `NgComponentOutlet` 指令，在 `<ng-container>` 所在的位置动态渲染一个组件（Component）。
 
 ```ts
 @Component({
@@ -49,11 +45,11 @@ export class UserProfile {
 }
 ```
 
-In the example above, the `NgComponentOutlet` directive dynamically renders either `AdminProfile` or `BasicUserProfile` in the location of the `<ng-container>` element.
+在上面的例子中，`NgComponentOutlet` 指令会在 `<ng-container>` 元素的位置动态渲染 `AdminProfile` 或 `BasicUserProfile`。
 
-### Rendering template fragments
+### 渲染模板片段 {#rendering-template-fragments}
 
-You can use Angular's built-in `NgTemplateOutlet` directive to dynamically render a template fragment to the location of the `<ng-container>`.
+你可以使用 Angular 内置的 `NgTemplateOutlet` 指令，在 `<ng-container>` 所在的位置动态渲染一个模板片段。
 
 ```ts
 @Component({
@@ -73,13 +69,13 @@ export class UserProfile {
 }
 ```
 
-In the example above, the `ngTemplateOutlet` directive dynamically renders one of two template fragments in the location of the `<ng-container>` element.
+在上面的例子中，`ngTemplateOutlet` 指令会在 `<ng-container>` 元素的位置动态渲染两个模板片段之一。
 
-For more information regarding `NgTemplateOutlet`, see the [NgTemplateOutlet API documentation page](https://angular.dev/api/common/NgTemplateOutlet).
+关于 `NgTemplateOutlet` 的更多信息，请参阅 [NgTemplateOutlet API 文档页面](https://angular.dev/api/common/NgTemplateOutlet)。
 
-## Using `<ng-container>` with structural directives
+## 将 `<ng-container>` 与结构型指令一起使用 {#using-with-structural-directives}
 
-You can also apply structural directives to `<ng-container>` elements. Common examples of this include `ngIf` and `ngFor`.
+你也可以给 `<ng-container>` 元素应用结构型指令（Structural Directive）。常见的例子包括 `ngIf` 和 `ngFor`。
 
 ```html
 <ng-container *ngIf="permissions == 'admin'">
@@ -93,18 +89,18 @@ You can also apply structural directives to `<ng-container>` elements. Common ex
 </ng-container>
 ```
 
-## Using `<ng-container>` for injection
+## 使用 `<ng-container>` 进行注入 {#using-for-injection}
 
-See the [Dependency Injection guide](/guide/di) for more information on Angular's dependency injection system.
+关于 Angular 依赖注入（Dependency Injection）系统的更多信息，请参阅[依赖注入指南](/guide/di)。
 
-When you apply a directive to `<ng-container>`, descendant elements can inject the directive or anything that the directive provides. Use this when you want to declaratively provide a value to a specific part of your template.
+当你给 `<ng-container>` 应用一个指令时，其后代元素可以注入该指令或该指令提供的任何东西。如果你想以声明式的方式为模板的特定部分提供某个值，就可以使用这种方式。
 
 ```ts
 @Directive({
   selector: '[theme]',
 })
 export class Theme {
-  // Create an input that accepts 'light' or 'dark`, defaulting to 'light'.
+  // 创建一个接受 'light' 或 'dark' 的输入，默认为 'light'。
   mode = input<'light' | 'dark'>('light');
 }
 ```
@@ -116,4 +112,4 @@ export class Theme {
 </ng-container>
 ```
 
-In the example above, the `ProfilePic` and `UserBio` components can inject the `Theme` directive and apply styles based on its `mode`.
+在上面的例子中，`ProfilePic` 和 `UserBio` 组件可以注入 `Theme` 指令，并根据它的 `mode` 应用样式。

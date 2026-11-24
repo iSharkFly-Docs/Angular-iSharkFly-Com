@@ -1,14 +1,10 @@
----
-untranslated: true
----
+# 添加事件监听器 {#adding-event-listeners}
 
-# Adding event listeners
+Angular 支持在模板（Template）中为元素定义事件监听器（Event Listener）：把事件名写在圆括号内，再加上一条每次事件发生时都会执行的语句。
 
-Angular supports defining event listeners on an element in your template by specifying the event name inside parentheses along with a statement that runs every time the event occurs.
+## 监听原生事件 {#listening-to-native-events}
 
-## Listening to native events
-
-When you want to add event listeners to an HTML element, you wrap the event with parentheses, `()`, which allows you to specify a listener statement.
+要为 HTML 元素添加事件监听器，可以用圆括号 `()` 包裹事件名，然后指定一条监听器语句。
 
 ```ts
 @Component({
@@ -24,13 +20,13 @@ export class App{
 }
 ```
 
-In this example, Angular calls `updateField` every time the `<input>` element emits a `keyup` event.
+在这个例子中，每当 `<input>` 元素触发 `keyup` 事件时，Angular 都会调用 `updateField`。
 
-You can add listeners for any native events, such as: `click`, `keydown`, `mouseover`, etc. To learn more, check out the [all available events on elements on MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element#events).
+你可以为任何原生事件添加监听器，例如 `click`、`keydown`、`mouseover` 等。要了解更多，请查看 [MDN 上元素的所有可用事件](https://developer.mozilla.org/en-US/docs/Web/API/Element#events)。
 
-## Accessing the event argument
+## 访问事件参数 {#accessing-the-event-argument}
 
-In every template event listener, Angular provides a variable named `$event` that contains a reference to the event object.
+在每个模板事件监听器中，Angular 都会提供一个名为 `$event` 的变量，它包含对事件对象的引用。
 
 ```ts
 @Component({
@@ -46,9 +42,9 @@ export class App {
 }
 ```
 
-## Using key modifiers
+## 使用按键修饰符 {#using-key-modifiers}
 
-When you want to capture specific keyboard events for a specific key, you might write some code like the following:
+如果想捕获某个特定按键的键盘事件，你可能会写出下面这样的代码：
 
 ```ts
 @Component({
@@ -66,7 +62,7 @@ export class App {
 }
 ```
 
-However, since this is a common scenario, Angular lets you filter the events by specifying a specific key using the period (`.`) character. By doing so, code can be simplified to:
+不过，由于这是一个常见场景，Angular 允许你使用句点（`.`）字符指定特定按键来过滤事件。这样，代码可以简化为：
 
 ```ts
 @Component({
@@ -82,29 +78,29 @@ export class App{
 }
 ```
 
-You can also add additional key modifiers:
+你还可以添加更多的按键修饰符：
 
 ```html
-<!-- Matches shift and enter -->
+<!-- 匹配 shift 和 enter -->
 <input type="text" (keyup.shift.enter)="updateField($event)" />
 ```
 
-Angular supports the modifiers `alt`, `control`, `meta`, and `shift`.
+Angular 支持 `alt`、`control`、`meta` 和 `shift` 这几个修饰符。
 
-You can specify the key or code that you would like to bind to keyboard events. The key and code fields are a native part of the browser keyboard event object. By default, event binding assumes you want to use the [Key values for keyboard events](https://developer.mozilla.org/docs/Web/API/UI_Events/Keyboard_event_key_values).
+你可以指定要绑定到键盘事件的 key 或 code。key 和 code 字段是浏览器键盘事件对象的原生组成部分。默认情况下，事件绑定（Event Binding）假定你使用的是[键盘事件的 Key 值](https://developer.mozilla.org/docs/Web/API/UI_Events/Keyboard_event_key_values)。
 
-Angular also allows you to specify [Code values for keyboard events](https://developer.mozilla.org/docs/Web/API/UI_Events/Keyboard_event_code_values) by providing a built-in `code` suffix.
+Angular 还允许你通过内置的 `code` 后缀来指定[键盘事件的 Code 值](https://developer.mozilla.org/docs/Web/API/UI_Events/Keyboard_event_code_values)。
 
 ```html
-<!-- Matches alt and left shift -->
+<!-- 匹配 alt 和左 shift -->
 <input type="text" (keydown.code.alt.shift.shiftleft)="updateField($event)" />
 ```
 
-This can be useful for handling keyboard events consistently across different operating systems. For example, when using the Alt key on macOS devices, the `key` property reports the key based on the character already modified by the Alt key. This means that a combination like Alt + S reports a `key` value of `'ß'`. The `code` property, however, corresponds to the physical or virtual button pressed rather than the character produced.
+这有助于在不同操作系统上一致地处理键盘事件。例如，在 macOS 设备上使用 Alt 键时，`key` 属性报告的是已被 Alt 键修改后的字符。这意味着像 Alt + S 这样的组合，其 `key` 值会是 `'ß'`。而 `code` 属性对应的是被按下的物理或虚拟按键，而不是产生的字符。
 
-## Listening on global targets
+## 监听全局目标 {#listening-on-global-targets}
 
-Global target names can be used to prefix an event. The 3 supported global targets are `window`, `document` and `body`.
+可以使用全局目标名作为事件的前缀。支持的 3 个全局目标是 `window`、`document` 和 `body`。
 
 ```ts
 @Component({
@@ -118,9 +114,9 @@ Global target names can be used to prefix an event. The 3 supported global targe
 export class MyView {}
 ```
 
-## Preventing event default behavior
+## 阻止事件的默认行为 {#preventing-event-default-behavior}
 
-If your event handler should replace the native browser behavior, you can use the event object's [`preventDefault` method](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault):
+如果你的事件处理器需要取代浏览器的原生行为，可以调用事件对象的 [`preventDefault` 方法](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)：
 
 ```ts
 @Component({
@@ -137,15 +133,15 @@ export class App{
 }
 ```
 
-If the event handler statement evaluates to `false`, Angular automatically calls `preventDefault()`, similar to [native event handler attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes#event_handler_attributes). _Always prefer explicitly calling `preventDefault`_, as this approach makes the code's intent obvious.
+如果事件处理语句的求值结果为 `false`，Angular 会自动调用 `preventDefault()`，这与[原生事件处理器属性](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes#event_handler_attributes)类似。_始终优先显式调用 `preventDefault`_，因为这种方式能让代码意图一目了然。
 
-## Extend event handling
+## 扩展事件处理 {#extend-event-handling}
 
-Angular’s event system is extensible via custom event plugins registered with the `EVENT_MANAGER_PLUGINS` injection token.
+Angular 的事件系统是可扩展的，可以通过使用 `EVENT_MANAGER_PLUGINS` 注入令牌（Injection Token）注册的自定义事件插件来扩展。
 
-### Implementing Event Plugin
+### 实现事件插件 {#implementing-event-plugin}
 
-To create a custom event plugin, extend the `EventManagerPlugin` class and implement the required methods.
+要创建自定义事件插件，请继承 `EventManagerPlugin` 类并实现所需的方法。
 
 ```ts
 import {Injectable} from '@angular/core';
@@ -157,15 +153,15 @@ export class DebounceEventPlugin extends EventManagerPlugin {
     super(document);
   }
 
-  // Define which events this plugin supports
+  // 定义此插件支持哪些事件
   override supports(eventName: string) {
     return /debounce/.test(eventName);
   }
 
-  // Handle the event registration
+  // 处理事件注册
   override addEventListener(element: HTMLElement, eventName: string, handler: Function) {
-    // Parse the event: e.g., "click.debounce.500"
-    // event: "click", delay: 500
+    // 解析事件：例如 "click.debounce.500"
+    // 事件："click"，延迟：500
     const [event, , delay = '300'] = eventName.split('.');
 
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -179,7 +175,7 @@ export class DebounceEventPlugin extends EventManagerPlugin {
 
     element.addEventListener(event, listener);
 
-    // Return cleanup function
+    // 返回清理函数
     return () => {
       clearTimeout(timeoutId);
       element.removeEventListener(event, listener);
@@ -188,7 +184,7 @@ export class DebounceEventPlugin extends EventManagerPlugin {
 }
 ```
 
-Register your custom plugin using the `EVENT_MANAGER_PLUGINS` token in your application's providers:
+在应用的提供者（Provider）中使用 `EVENT_MANAGER_PLUGINS` 令牌注册自定义插件：
 
 ```ts
 import {bootstrapApplication, EVENT_MANAGER_PLUGINS} from '@angular/platform-browser';
@@ -206,7 +202,7 @@ bootstrapApplication(App, {
 });
 ```
 
-Once registered, you can use your custom event syntax in templates, as well as with the `host` property:
+注册完成后，就可以在模板中以及 `host` 属性里使用自定义的事件语法：
 
 ```ts
 @Component({
